@@ -18,7 +18,7 @@ import os
 from getpass import getpass
 
 from langchain_community.chat_models import ChatDeepInfra
-from langchain_core.messages import HumanMessage
+from langchain.messages import HumanMessage
 
 DEEPINFRA_API_TOKEN = getpass()
 
@@ -65,8 +65,8 @@ import asyncio
 
 from dotenv import find_dotenv, load_dotenv
 from langchain_community.chat_models import ChatDeepInfra
-from langchain_core.messages import HumanMessage
-from langchain_core.tools import tool
+from langchain.messages import HumanMessage
+from langchain.tools import tool
 from pydantic import BaseModel
 
 model_name = "meta-llama/Meta-Llama-3-70B-Instruct"
@@ -113,3 +113,9 @@ async def call_ainvoke():
 asyncio.run(call_ainvoke())
 # [{'name': 'foo', 'args': {'something': None}, 'id': 'call_ZH7FetmgSot4LHcMU6CEb8tI'}, {'name': 'Bar', 'args': {}, 'id': 'call_2MQhDifAJVoijZEvH8PeFSVB'}]
 ```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/chat/deepinfra.mdx)
+</Callout>

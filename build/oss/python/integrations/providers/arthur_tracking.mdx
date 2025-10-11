@@ -23,7 +23,7 @@ arthur_model_id = "your-arthur-model-id-here"
 ```python
 from langchain_community.callbacks import ArthurCallbackHandler
 from langchain_core.callbacks import StreamingStdOutCallbackHandler
-from langchain_core.messages import HumanMessage
+from langchain.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 ```
 
@@ -98,3 +98,9 @@ By following these steps, you can leverage the benefits of callback handlers, su
 >>> input >>>
 >>>: q
 ```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/arthur_tracking.mdx)
+</Callout>

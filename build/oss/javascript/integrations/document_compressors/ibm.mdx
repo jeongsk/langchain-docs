@@ -135,7 +135,7 @@ First, set up a basic RAG ingest pipeline with embeddings, a text splitter and a
 
 ```javascript
 import { readFileSync } from "node:fs";
-import { MemoryVectorStore } from "langchain/vectorstores/memory";
+import { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
 import { WatsonxEmbeddings } from "@langchain/community/embeddings/ibm";
 import { CharacterTextSplitter } from "@langchain/textsplitters";
 
@@ -271,3 +271,9 @@ console.log(compressedWithResults);
 ## API reference
 
 For detailed documentation of all Watsonx document compressor features and configurations head to the [API reference](https://api.js.langchain.com/modules/_langchain_community.document_compressors_ibm.html).
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_compressors/ibm.mdx)
+</Callout>

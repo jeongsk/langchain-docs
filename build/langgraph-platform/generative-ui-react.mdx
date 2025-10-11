@@ -80,7 +80,7 @@ CSS and Tailwind 4.x is also supported out of the box, so you can freely use Tai
     import uuid
     from typing import Annotated, Sequence, TypedDict
 
-    from langchain_core.messages import AIMessage, BaseMessage
+    from langchain.messages import AIMessage, BaseMessage
     from langchain_openai import ChatOpenAI
     from langgraph.graph import StateGraph
     from langgraph.graph.message import add_messages
@@ -349,7 +349,7 @@ Then you can push updates to the UI component by calling `ui.push()` / `push_ui_
     from typing import Annotated, Sequence, TypedDict
 
     from langchain_anthropic import ChatAnthropic
-    from langchain_core.messages import AIMessage, AIMessageChunk, BaseMessage
+    from langchain.messages import AIMessage, AIMessageChunk, BaseMessage
     from langgraph.graph import StateGraph
     from langgraph.graph.message import add_messages
     from langgraph.graph.ui import AnyUIMessage, push_ui_message, ui_message_reducer
@@ -527,3 +527,9 @@ Similar to how messages can be removed from the state by appending a RemoveMessa
 ## Learn more
 
 * [JS/TS SDK Reference](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/langgraph-platform/generative-ui-react.mdx)
+</Callout>

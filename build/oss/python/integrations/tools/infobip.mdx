@@ -54,7 +54,7 @@ infobip.run(
 from langchain import hub
 from langchain.agents import AgentExecutor, create_openai_functions_agent
 from langchain_community.utilities.infobip import InfobipAPIWrapper
-from langchain_core.tools import StructuredTool
+from langchain.tools import StructuredTool
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
@@ -107,3 +107,9 @@ I have sent an example of Python recursion to your email. Please check your inbo
 
 > Finished chain.
 ```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/infobip.mdx)
+</Callout>

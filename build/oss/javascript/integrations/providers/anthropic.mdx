@@ -20,9 +20,9 @@ Anthropic models require any system messages to be the first one in your prompts
 `ChatAnthropic` is a subclass of LangChain's `ChatModel`, meaning it works best with `ChatPromptTemplate`.
 You can import this wrapper with the following code:
 
-import IntegrationInstallTooltip from '/snippets/javascript-integrations/integration-install-tooltip.mdx';
-
-<IntegrationInstallTooltip/>
+<Tip>
+See [this section for general instructions on installing LangChain packages](/oss/javascript/langchain/install).
+</Tip>
 
 ```bash npm
 npm install @langchain/anthropic @langchain/core
@@ -36,7 +36,7 @@ When working with ChatModels, it is preferred that you design your prompts as `C
 Here is an example below of doing that:
 
 ```typescript
-import { ChatPromptTemplate } from "langchain/prompts";
+import { ChatPromptTemplate } from "@langchain/classic/prompts";
 
 const prompt = ChatPromptTemplate.fromMessages([
   ["system", "You are a helpful chatbot"],
@@ -52,3 +52,9 @@ await chain.invoke({ topic: "bears" });
 ```
 
 See the [chat model integration page](/oss/javascript/integrations/chat/anthropic/) for more examples, including multimodal inputs.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/providers/anthropic.mdx)
+</Callout>

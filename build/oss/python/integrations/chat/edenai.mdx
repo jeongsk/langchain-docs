@@ -36,7 +36,7 @@ If you'd prefer not to set an environment variable you can pass the key in direc
 
 ```python
 from langchain_community.chat_models.edenai import ChatEdenAI
-from langchain_core.messages import HumanMessage
+from langchain.messages import HumanMessage
 ```
 
 ```python
@@ -182,8 +182,8 @@ GetWeather(location='San Francisco')
 Here is a full example of how to use a tool. Pass the tool output to the model, and get the result back from the model
 
 ```python
-from langchain_core.messages import HumanMessage, ToolMessage
-from langchain_core.tools import tool
+from langchain.messages import HumanMessage, ToolMessage
+from langchain.tools import tool
 
 
 @tool
@@ -240,3 +240,9 @@ list(llm_with_tools.stream("What's 9 + 9"))
 ```output
 [AIMessageChunk(content='', id='run-fae32908-ec48-4ab2-ad96-bb0d0511754f', tool_calls=[{'name': 'add', 'args': {'a': 9, 'b': 9}, 'id': 'call_n0Tm7I9zERWa6UpxCAVCweLN'}], tool_call_chunks=[{'name': 'add', 'args': '{"a": 9, "b": 9}', 'id': 'call_n0Tm7I9zERWa6UpxCAVCweLN', 'index': 0}])]
 ```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/chat/edenai.mdx)
+</Callout>

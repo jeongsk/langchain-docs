@@ -37,7 +37,7 @@ import time
 from uuid import uuid4
 
 from langchain_community.memory.zep_memory import ZepMemory
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain.messages import AIMessage, HumanMessage
 
 # Set this to your Zep server URL
 ZEP_API_URL = "http://localhost:8000"
@@ -306,3 +306,9 @@ await zep_retriever.ainvoke("Who wrote Parable of the Sower?")
 ```python
 
 ```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/retrievers/zep_memorystore.mdx)
+</Callout>

@@ -55,7 +55,7 @@ Example:
 ```python
 from langchain_openai import ChatOpenAI
 from langchain_community.callbacks.llmonitor_callback import LLMonitorCallbackHandler
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain.messages import SystemMessage, HumanMessage
 from langchain.agents import OpenAIFunctionsAgent, AgentExecutor, tool
 
 llm = ChatOpenAI(temperature=0)
@@ -126,3 +126,9 @@ with identify("user-456", user_props={"email": "user456@test.com"}):
 ## Support
 
 For any question or issue with integration you can reach out to the LLMonitor team on [Discord](http://discord.com/invite/8PafSG58kK) or via [email](mailto:vince@llmonitor.com).
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/callbacks/llmonitor.mdx)
+</Callout>

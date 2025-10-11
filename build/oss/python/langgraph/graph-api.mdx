@@ -207,7 +207,7 @@ In addition to keeping track of message IDs, the `add_messages` function will al
 Since the state updates are always deserialized into LangChain `Messages` when using `add_messages`, you should use dot notation to access message attributes, like `state["messages"][-1].content`. Below is an example of a graph that uses `add_messages` as its reducer function.
 
 ```python
-from langchain_core.messages import AnyMessage
+from langchain.messages import AnyMessage
 from langgraph.graph.message import add_messages
 from typing import Annotated
 from typing_extensions import TypedDict
@@ -518,7 +518,7 @@ Check out this [how-to guide](/oss/python/langgraph/graph-api.md#combine-control
 
 ### Navigating to a node in a parent graph
 
-If you are using [subgraphs](/oss/python/concepts/subgraphs), you might want to navigate from a node within a subgraph to a different subgraph (i.e. a different node in the parent graph). To do so, you can specify `graph=Command.PARENT` in `Command`:
+If you are using [subgraphs](/oss/python/langgraph/use-subgraphs), you might want to navigate from a node within a subgraph to a different subgraph (i.e. a different node in the parent graph). To do so, you can specify `graph=Command.PARENT` in `Command`:
 
 ```python
 def my_node(state: State) -> Command[Literal["other_subgraph"]]:
@@ -556,7 +556,7 @@ Refer to [this guide](/oss/python/langgraph/graph-api.md#use-inside-tools) for d
 
 ### Human-in-the-loop
 
-`Command` is an important part of human-in-the-loop workflows: when using `interrupt()` to collect user input, `Command` is then used to supply the input and resume execution via `Command(resume="User input")`. Check out [this conceptual guide](/oss/python/langgraph/add-human-in-the-loop) for more information.
+`Command` is an important part of human-in-the-loop workflows: when using `interrupt()` to collect user input, `Command` is then used to supply the input and resume execution via `Command(resume="User input")`. Check out [this conceptual guide](/oss/python/langgraph/interrupts) for more information.
 
 
 
@@ -630,3 +630,9 @@ Read [this how-to](/oss/python/langgraph/graph-api#impose-a-recursion-limit) to 
 ## Visualization
 
 It's often nice to be able to visualize graphs, especially as they get more complex. LangGraph comes with several built-in ways to visualize graphs. See [this how-to guide](/oss/python/langgraph/graph-api.md#visualize-your-graph) for more info.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/graph-api.mdx)
+</Callout>

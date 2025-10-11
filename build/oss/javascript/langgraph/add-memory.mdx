@@ -116,7 +116,7 @@ const graph = builder.compile({ checkpointer });
 
 ### Use in subgraphs
 
-If your graph contains [subgraphs](/oss/javascript/concepts/subgraphs), you only need to provide the checkpointer when compiling the parent graph. LangGraph will automatically propagate the checkpointer to the child subgraphs.
+If your graph contains [subgraphs](/oss/javascript/langgraph/use-subgraphs), you only need to provide the checkpointer when compiling the parent graph. LangGraph will automatically propagate the checkpointer to the child subgraphs.
 
 
 
@@ -830,5 +830,8 @@ const threadId = "1";
 await checkpointer.deleteThread(threadId);
 ```
 
+---
 
-
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/add-memory.mdx)
+</Callout>

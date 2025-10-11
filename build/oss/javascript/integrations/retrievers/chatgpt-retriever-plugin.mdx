@@ -13,7 +13,7 @@ To set up the ChatGPT Retriever Plugin, please follow instructions [here](https:
 ## Usage
 
 ```typescript
-import { ChatGPTPluginRetriever } from "langchain/retrievers/remote";
+import { ChatGPTPluginRetriever } from "@langchain/classic/retrievers/remote";
 
 const retriever = new ChatGPTPluginRetriever({
   url: "http://0.0.0.0:8000",
@@ -30,3 +30,9 @@ console.log(docs);
 ## Related
 
 - [Retrieval guide](/oss/javascript/langchain/retrieval)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/retrievers/chatgpt-retriever-plugin.mdx)
+</Callout>

@@ -436,7 +436,7 @@ Use this to stream the **full state** of the graph after each step.
 
 ## Subgraphs
 
-To include outputs from [subgraphs](/oss/python/concepts/subgraphs) in the streamed outputs, you can set `subgraphs=True` in the `.stream()` method of the parent graph. This will stream outputs from both the parent graph and any subgraphs.
+To include outputs from [subgraphs](/oss/python/langgraph/use-subgraphs) in the streamed outputs, you can set `subgraphs=True` in the `.stream()` method of the parent graph. This will stream outputs from both the parent graph and any subgraphs.
 
 ```python {highlight={5}}
 for chunk in client.runs.stream(
@@ -929,3 +929,9 @@ When you use `.join_stream`, output is not buffered, so any output produced befo
 ## API Reference
 
 For API usage and implementation, refer to the [API reference](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html#tag/thread-runs/POST/threads/{thread_id}/runs/stream).
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/langgraph-platform/streaming.mdx)
+</Callout>

@@ -114,7 +114,7 @@ You can also track and display full chat dialogues in LabelStudio, with the abil
 ```
 
 ```python
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 chat_llm = ChatOpenAI(
@@ -174,3 +174,9 @@ The `LabelStudioCallbackHandler` accepts several optional parameters:
 - **mode**: use this shortcut to create target configuration from scratch:
   - `"prompt"` - Single prompt, single response. Default.
   - `"chat"` - Multi-turn chat mode.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/callbacks/labelstudio.mdx)
+</Callout>

@@ -153,7 +153,7 @@ print(result)
 
 ```python
 from langchain_community.chat_models import ChatOutlines
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain.messages import HumanMessage, SystemMessage
 
 chat = ChatOutlines(model="meta-llama/Llama-2-7b-chat-hf", max_tokens=100)
 messages = [
@@ -167,7 +167,7 @@ print(result.content)
 
 ```python
 from langchain_community.chat_models import ChatOutlines
-from langchain_core.messages import HumanMessage
+from langchain.messages import HumanMessage
 
 chat = ChatOutlines(model="meta-llama/Llama-2-7b-chat-hf", streaming=True)
 for chunk in chat.stream("Tell me a joke about programming."):
@@ -203,3 +203,9 @@ tokenizer = llm.tokenizer
 encoded = tokenizer.encode("Hello, world!")
 decoded = tokenizer.decode(encoded)
 ```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/providers/outlines.mdx)
+</Callout>

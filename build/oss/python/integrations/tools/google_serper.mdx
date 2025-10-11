@@ -42,7 +42,7 @@ and use the `create_agent` functionality to initialize a ReAct agent. You will a
 ```python
 from langchain.chat_models import init_chat_model
 from langchain_community.utilities import GoogleSerperAPIWrapper
-from langchain_core.tools import Tool
+from langchain.tools import Tool
 from langchain.agents import create_agent
 
 os.environ["OPENAI_API_KEY"] = "[your openai key]"
@@ -661,3 +661,9 @@ pprint.pp(results)
              'cid': '14865033522272348854'}],
  'credits': 1}
 ```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/google_serper.mdx)
+</Callout>

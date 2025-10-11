@@ -209,7 +209,7 @@ llm = ChatNVIDIA(model="nvidia/neva-22b")
 #### Passing an image as a URL
 
 ```python
-from langchain_core.messages import HumanMessage
+from langchain.messages import HumanMessage
 
 llm.invoke(
     [
@@ -240,7 +240,7 @@ IPython.display.Image(image_content)
 ```python
 import base64
 
-from langchain_core.messages import HumanMessage
+from langchain.messages import HumanMessage
 
 ## Works for simpler images. For larger images, see actual implementation
 b64_string = base64.b64encode(image_content).decode("utf-8")
@@ -345,7 +345,7 @@ tool_models
 With a tool capable model,
 
 ```python
-from langchain_core.tools import tool
+from langchain.tools import tool
 from pydantic import Field
 
 
@@ -367,3 +367,9 @@ See [How to use chat models to call tools](https://python.langchain.com/docs/how
 ## API reference
 
 For detailed documentation of all `ChatNVIDIA` features and configurations head to the API reference: [python.langchain.com/api_reference/nvidia_ai_endpoints/chat_models/langchain_nvidia_ai_endpoints.chat_models.ChatNVIDIA.html](https://python.langchain.com/api_reference/nvidia_ai_endpoints/chat_models/langchain_nvidia_ai_endpoints.chat_models.ChatNVIDIA.html)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/chat/nvidia_ai_endpoints.mdx)
+</Callout>

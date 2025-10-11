@@ -12,11 +12,12 @@ and [AI Studio](https://aistudio.google.com/)
 Access Gemini models such as `gemini-1.5-pro` and `gemini-2.0-flex` through the [`ChatGoogleGenerativeAI`](/oss/javascript/integrations/chat/google_generative_ai),
 or if using VertexAI, via the [`ChatVertexAI`](/oss/javascript/integrations/chat/google_vertex_ai) class.
 
-import IntegrationInstallTooltip from '/snippets/javascript-integrations/integration-install-tooltip.mdx';
+<Tip>
+See [this section for general instructions on installing LangChain packages](/oss/javascript/langchain/install).
+</Tip>
 
 <Tabs>
 <Tab title="GenAI">
-<IntegrationInstallTooltip/>
 
 ```bash npm
 npm install @langchain/google-genai @langchain/core
@@ -276,3 +277,9 @@ We can easily load this wrapper as a Tool (to use with an Agent). We can do this
 const tools = [new GoogleCustomSearch({})];
 // Pass this variable into your agent.
 ```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/providers/google.mdx)
+</Callout>

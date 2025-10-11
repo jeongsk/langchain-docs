@@ -61,8 +61,8 @@ initial testing, you will want to use something like a
 
 ```typescript
 import { MatchingEngine } from "@langchain/community/vectorstores/googlevertexai";
-import { Document } from "langchain/document";
-import { SyntheticEmbeddings } from "langchain/embeddings/fake";
+import { Document } from "@langchain/classic/document";
+import { SyntheticEmbeddings } from "@langchain/classic/embeddings/fake";
 import { GoogleCloudStorageDocstore } from "@langchain/community/stores/doc/gcs";
 
 const embeddings = new SyntheticEmbeddings({
@@ -182,3 +182,9 @@ await engine.delete({ids: oldIds});
 
 - Vector store [conceptual guide](/oss/javascript/integrations/vectorstores)
 - Vector store [how-to guides](/oss/javascript/integrations/vectorstores)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/vectorstores/googlevertexai.mdx)
+</Callout>

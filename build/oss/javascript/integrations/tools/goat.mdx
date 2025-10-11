@@ -82,7 +82,7 @@ import { sendETH } from "@goat-sdk/wallet-evm";
 import { viem } from "@goat-sdk/wallet-viem";
 
 import { ChatOpenAI } from "@langchain/openai";
-import { createAgent } from "langchain";
+import { createAgent } from "@langchain/classic";
 
 // 1. Create a wallet client
 const account = privateKeyToAccount(
@@ -113,3 +113,9 @@ const agent = createAgent({ llm: model, tools: tools });
 
 - Tool [conceptual guide](/oss/javascript/concepts/#tools)
 - Tool [how-to guides](/oss/javascript/langchain/tools)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/tools/goat.mdx)
+</Callout>

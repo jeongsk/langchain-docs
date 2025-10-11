@@ -372,7 +372,7 @@ Routing workflows process inputs and then directs them to context-specific tasks
 <CodeGroup>
 ```python Graph API
 from typing_extensions import Literal
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain.messages import HumanMessage, SystemMessage
 
 # Schema for structured output to use as routing logic
 class Route(BaseModel):
@@ -478,7 +478,7 @@ print(state["output"])
 ```python Functional API
 from typing_extensions import Literal
 from pydantic import BaseModel
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain.messages import HumanMessage, SystemMessage
 
 
 # Schema for structured output to use as routing logic
@@ -781,7 +781,7 @@ Markdown(state["final_report"])
 
 ## Evaluator-optimizer
 
-In evaluator-optimizer workflows, one LLM call creates a response and the other evaluates that response. If the evaluator or a [human-in-the-loop](/oss/python/langgraph/add-human-in-the-loop) determines the response needs refinement, feedback is provided and the response is recreated. This loop continues until an acceptable response is generated.
+In evaluator-optimizer workflows, one LLM call creates a response and the other evaluates that response. If the evaluator or a [human-in-the-loop](/oss/python/langgraph/interrupts) determines the response needs refinement, feedback is provided and the response is recreated. This loop continues until an acceptable response is generated.
 
 Evaluator-optimizer workflows are commonly used when there's particular success criteria for a task, but iteration is required to meet that criteria. For example, there's not always a perfect match when translating text between two languages. It might take a few iterations to generate a translation with the same meaning across the two languages.
 
@@ -937,7 +937,7 @@ To get started with agents, see the [quickstart](/oss/python/langchain/quickstar
 </Note>
 
 ```python Using tools
-from langchain_core.tools import tool
+from langchain.tools import tool
 
 
 # Define tools
@@ -983,7 +983,7 @@ llm_with_tools = llm.bind_tools(tools)
 <CodeGroup>
 ```python Graph API
 from langgraph.graph import MessagesState
-from langchain_core.messages import SystemMessage, HumanMessage, ToolMessage
+from langchain.messages import SystemMessage, HumanMessage, ToolMessage
 
 
 # Nodes
@@ -1058,7 +1058,7 @@ for m in messages["messages"]:
 ```
 ```python Functional API
 from langgraph.graph import add_messages
-from langchain_core.messages import (
+from langchain.messages import (
     SystemMessage,
     HumanMessage,
     BaseMessage,
@@ -1113,5 +1113,8 @@ for chunk in agent.stream(messages, stream_mode="updates"):
 ```
 </CodeGroup>
 
+---
 
-
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/workflows-agents.mdx)
+</Callout>

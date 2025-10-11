@@ -8,32 +8,9 @@ import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
 This quickstart takes you from a simple setup to a fully functional AI agent in just a few minutes.
 
-## Install
-
-<CodeGroup>
-    ```bash pip
-    pip install --pre -U "langchain[anthropic]"
-    ```
-
-    ```bash uv
-    uv add --prerelease=allow "langchain[anthropic]"
-    ```
-</CodeGroup>
-
-
-
-
-
 ## Build a basic agent
 
-Start by creating a simple agent that can answer questions and call tools.
-
-The agent will have the following components:
-
-- A language model (Claude Sonnet 4.5)
-- A simple tool (weather function)
-- A basic prompt
-- The ability to invoke it with messages
+Start by creating a simple agent that can answer questions and call tools. The agent will use Claude Sonnet 4.5 as its language model, a basic weather function as a tool, and a simple prompt to guide its behavior.
 
 ```python
 from langchain.agents import create_agent
@@ -45,7 +22,7 @@ def get_weather(city: str) -> str:
 agent = create_agent(
     model="anthropic:claude-sonnet-4-5-20250929",
     tools=[get_weather],
-    prompt="You are a helpful assistant",
+    system_prompt="You are a helpful assistant",
 )
 
 # Run the agent
@@ -187,7 +164,7 @@ Let's walk through each step:
         ```python
         agent = create_agent(
             model=model,
-            prompt=system_prompt,
+            system_prompt=system_prompt,
             tools=[get_user_location, get_weather_for_location],
             context_schema=Context,
             response_format=ResponseFormat,
@@ -285,7 +262,7 @@ checkpointer = InMemorySaver()
 # Create agent
 agent = create_agent(
     model=model,
-    prompt=system_prompt,
+    system_prompt=system_prompt,
     tools=[get_user_location, get_weather_for_location],
     context_schema=Context,
     response_format=ResponseFormat,
@@ -335,3 +312,9 @@ Congratulations! You now have an AI agent that can:
 - **Provide structured responses** in a consistent format
 - **Handle user-specific information** through context
 - **Maintain conversation state** across interactions
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/quickstart.mdx)
+</Callout>

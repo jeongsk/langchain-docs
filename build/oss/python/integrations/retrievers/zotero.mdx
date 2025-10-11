@@ -84,7 +84,7 @@ Due to the way the Zotero API search operates, directly passing a user question 
 from typing import List, Optional, Union
 
 from langchain_core.output_parsers import PydanticToolsParser
-from langchain_core.tools import StructuredTool, tool
+from langchain.tools import StructuredTool, tool
 from langchain_openai import ChatOpenAI
 
 
@@ -143,3 +143,9 @@ chain.invoke(q)
 For detailed documentation of all ZoteroRetriever features and configurations head to the [Github page](https://github.com/TimBMK/langchain-zotero-retriever).
 
 For detailed documentation on the Zotero API, head to the [Zotero API reference](https://www.zotero.org/support/dev/web_api/v3/start).
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/retrievers/zotero.mdx)
+</Callout>

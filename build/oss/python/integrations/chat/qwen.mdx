@@ -84,7 +84,7 @@ ChatQwen supports tool calling API that lets you describe tools and their argume
 ### Use with `bind_tools`
 
 ```python
-from langchain_core.tools import tool
+from langchain.tools import tool
 from langchain_qwq import ChatQwen
 
 
@@ -109,7 +109,7 @@ content='' additional_kwargs={'tool_calls': [{'index': 0, 'id': 'call_f0c2cc4930
 ### Vision Support
 #### Image
 ```python
-from langchain_core.messages import HumanMessage
+from langchain.messages import HumanMessage
 
 model = ChatQwen(model="qwen-vl-max-latest")
 
@@ -134,7 +134,7 @@ content='In this image, I see a heartwarming scene on a sandy beach during what 
 ```
 #### Video
 ```python
-from langchain_core.messages import HumanMessage
+from langchain.messages import HumanMessage
 
 model = ChatQwen(model="qwen-vl-max-latest")
 
@@ -160,3 +160,9 @@ content='This video features a young woman with short, neatly styled brown hair 
 ## API reference
 
 For detailed documentation of all ChatQwen features and configurations head to the [API reference](https://pypi.org/project/langchain-qwq/)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/chat/qwen.mdx)
+</Callout>

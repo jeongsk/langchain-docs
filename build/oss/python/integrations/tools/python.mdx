@@ -12,7 +12,7 @@ This interface will only return things that are printed - therefore, if you want
 </Warning>
 
 ```python
-from langchain_core.tools import Tool
+from langchain.tools import Tool
 from langchain_experimental.utilities import PythonREPL
 ```
 
@@ -40,3 +40,9 @@ repl_tool = Tool(
     func=python_repl.run,
 )
 ```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/python.mdx)
+</Callout>

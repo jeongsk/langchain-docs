@@ -14,9 +14,9 @@ LangChain.js accepts [@opensearch-project/opensearch](https://opensearch.org/doc
 
 ## Setup
 
-import IntegrationInstallTooltip from '/snippets/javascript-integrations/integration-install-tooltip.mdx';
-
-<IntegrationInstallTooltip/>
+<Tip>
+See [this section for general instructions on installing LangChain packages](/oss/javascript/langchain/install).
+</Tip>
 
 ```bash npm
 npm install -S @langchain/openai @langchain/core @opensearch-project/opensearch
@@ -27,7 +27,7 @@ You'll also need to have an OpenSearch instance running. You can use the [offici
 
 ```typescript
 import { Client } from "@opensearch-project/opensearch";
-import { Document } from "langchain/document";
+import { Document } from "@langchain/classic/document";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { OpenSearchVectorStore } from "@langchain/community/vectorstores/opensearch";
 
@@ -64,7 +64,7 @@ await OpenSearchVectorStore.fromDocuments(docs, new OpenAIEmbeddings(), {
 
 ```typescript
 import { Client } from "@opensearch-project/opensearch";
-import { VectorDBQAChain } from "langchain/chains";
+import { VectorDBQAChain } from "@langchain/classic/chains";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { OpenAI } from "@langchain/openai";
 import { OpenSearchVectorStore } from "@langchain/community/vectorstores/opensearch";
@@ -117,3 +117,9 @@ console.log(JSON.stringify(response, null, 2));
 
 - Vector store [conceptual guide](/oss/javascript/integrations/vectorstores)
 - Vector store [how-to guides](/oss/javascript/integrations/vectorstores)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/vectorstores/opensearch.mdx)
+</Callout>

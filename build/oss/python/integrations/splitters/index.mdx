@@ -11,6 +11,7 @@ For most use cases, start with the [RecursiveCharacterTextSplitter](/oss/python/
 </Tip>
 
 ## Text structure-based
+
 Text is naturally organized into hierarchical units such as paragraphs, sentences, and words. We can leverage this inherent structure to inform our splitting strategy, creating split that maintain natural language flow, maintain semantic coherence within split, and adapts to varying levels of text granularity. LangChain's `RecursiveCharacterTextSplitter` implements this concept:
 
 - The [RecursiveCharacterTextSplitter](/oss/python/integrations/splitters/recursive_text_splitter) attempts to keep larger units (e.g., paragraphs) intact.
@@ -25,6 +26,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=0)
 texts = text_splitter.split_text(document)
 ```
+
+
 
 **Available text splitters**:
 - [Recursively split text](/oss/python/integrations/splitters/recursive_text_splitter)
@@ -53,6 +56,8 @@ text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
 texts = text_splitter.split_text(document)
 ```
 
+
+
 **Available text splitters**:
 - [Split by tokens](/oss/python/integrations/splitters/split_by_token)
 - [Split by characters](/oss/python/integrations/splitters/character_text_splitter)
@@ -78,8 +83,16 @@ Examples of structure-based splitting:
 - [Split code](/oss/python/integrations/splitters/code_splitter)
 - [Split HTML](/oss/python/integrations/splitters/split_html)
 
+
+
 ## Provider-specific
 
 <Columns cols={3}>
 <Card title="WRITER" icon="link" href="/oss/python/integrations/splitters/writer" arrow="true" cta="View guide" />
 </Columns>
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/integrations/splitters/index.mdx)
+</Callout>

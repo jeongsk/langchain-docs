@@ -173,7 +173,7 @@ graph = (
 
 ## Stream subgraph outputs
 
-To include outputs from [subgraphs](/oss/python/concepts/subgraphs) in the streamed outputs, you can set `subgraphs=True` in the `.stream()` method of the parent graph. This will stream outputs from both the parent graph and any subgraphs.
+To include outputs from [subgraphs](/oss/python/langgraph/use-subgraphs) in the streamed outputs, you can set `subgraphs=True` in the `.stream()` method of the parent graph. This will stream outputs from both the parent graph and any subgraphs.
 
 The outputs will be streamed as tuples `(namespace, data)`, where `namespace` is a tuple with the path to the node where a subgraph is invoked, e.g. `("parent_node:<task_id>", "child_node:<task_id>")`.
 
@@ -546,7 +546,7 @@ See [Async with Python < 3.11](#async) for usage examples.
     </Tab>
     <Tab title="tool">
     ```python {highlight={8,10}}
-    from langchain_core.tools import tool
+    from langchain.tools import tool
     from langgraph.config import get_stream_writer
 
     @tool
@@ -847,3 +847,8 @@ This limits LangGraph ability to automatically propagate context, and affects La
   ```
 </Accordion>
 
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/streaming.mdx)
+</Callout>

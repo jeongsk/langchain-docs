@@ -109,7 +109,7 @@ maps_search.results("coffee near me")
 You can use the `Tool` class from the `langchain.agents` module to integrate the `DataForSeoAPIWrapper` with a langchain agent. The `Tool` class encapsulates a function that the agent can call.
 
 ```python
-from langchain_core.tools import Tool
+from langchain.tools import Tool
 
 search = DataForSeoAPIWrapper(
     top_count=3,
@@ -127,3 +127,9 @@ json_tool = Tool(
     func=search.results,
 )
 ```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/python/integrations/tools/dataforseo.mdx)
+</Callout>

@@ -10,8 +10,7 @@
   },
   "logo": {
     "light": "/images/brand/langchain-docs-teal.svg",
-    "dark": "/images/brand/langchain-docs-lilac.svg",
-    "href": "https://docs.langchain.com/oss/python"
+    "dark": "/images/brand/langchain-docs-lilac.svg"
   },
   "favicon": {
     "light": "/images/brand/docs-favicon.svg",
@@ -130,7 +129,40 @@
     "versions": [
       {
         "version": "Python",
+        "languages": [
+          {
+            "language": "ko",
+            "dropdowns": [
+              {
+                "dropdown": "OSS (v1-alpha)",
+                "icon": "link",
+                "description": "LangChain과 LangGraph",
+                "tabs": [
+                  {
+                    "tab": "LangGraph",
+                    "pages": [
+                      {
+                        "group": "기능",
+                        "pages": [
+                          "ko/oss/langgraph/add-memory"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
         "dropdowns": [
+          {
+            "dropdown": "Home",
+            "icon": "house",
+            "description": "LangChain docs home",
+            "pages": [
+              "index"
+            ]
+          },
           {
             "dropdown": "OSS (v1-alpha)",
             "icon": "link",
@@ -140,6 +172,13 @@
                 "tab": "LangChain",
                 "pages": [
                   "oss/python/langchain/overview",
+                  {
+                    "group": "LangChain v1.0",
+                    "pages": [
+                      "oss/python/releases/langchain-v1",
+                      "oss/python/migrate/langchain-v1"
+                    ]
+                  },
                   {
                     "group": "Get started",
                     "pages": [
@@ -204,7 +243,7 @@
                       "oss/python/langgraph/persistence",
                       "oss/python/langgraph/durable-execution",
                       "oss/python/langgraph/streaming",
-                      "oss/python/langgraph/add-human-in-the-loop",
+                      "oss/python/langgraph/interrupts",
                       "oss/python/langgraph/use-time-travel",
                       "oss/python/langgraph/add-memory",
                       "oss/python/langgraph/use-subgraphs"
@@ -224,8 +263,20 @@
                   {
                     "group": "LangGraph APIs",
                     "pages": [
-                        "oss/python/langgraph/use-graph-api",
-                        "oss/python/langgraph/use-functional-api",
+                        {
+                          "group": "Graph API",
+                          "pages": [
+                            "oss/python/langgraph/graph-api",
+                            "oss/python/langgraph/use-graph-api"
+                          ]
+                        },
+                        {
+                        "group": "Functional API",
+                        "pages": [
+                          "oss/python/langgraph/functional-api",
+                          "oss/python/langgraph/use-functional-api"
+                        ]
+                      },
                         "oss/python/langgraph/pregel"
                         ]
                   }
@@ -236,60 +287,16 @@
                 "pages": [
                   "oss/python/integrations/providers/overview",
                   {
-                    "group": "Providers",
+                    "group": "Popular Providers",
                     "icon": "user-group",
                     "pages": [
-                      {
-                        "group": "OpenAI",
-                        "pages": [
-                          "oss/python/integrations/providers/openai",
-                          "oss/python/integrations/chat/openai",
-                          "oss/python/integrations/text_embedding/openai"
-                        ]
-                      },
-                      {
-                        "group": "Anthropic",
-                        "pages": [
-                          "oss/python/integrations/providers/anthropic",
-                          "oss/python/integrations/chat/anthropic"
-                        ]
-                      },
-                      {
-                        "group": "Google",
-                        "pages": [
-                          "oss/python/integrations/providers/google",
-                          "oss/python/integrations/chat/google_generative_ai",
-                          "oss/python/integrations/chat/google_vertex_ai_palm",
-                          "oss/python/integrations/text_embedding/google_generative_ai",
-                          "oss/python/integrations/text_embedding/google_vertex_ai_palm"
-                        ]
-                      },
-                      {
-                        "group": "AWS",
-                        "pages": [
-                          "oss/python/integrations/providers/aws",
-                          "oss/python/integrations/chat/bedrock",
-                          "oss/python/integrations/text_embedding/bedrock"
-                        ]
-                      },
-                      {
-                        "group": "Hugging Face",
-                        "pages": [
-                          "oss/python/integrations/providers/huggingface",
-                          "oss/python/integrations/chat/huggingface",
-                          "oss/python/integrations/text_embedding/huggingfacehub"
-                        ]
-                      },
-                      {
-                        "group": "Microsoft",
-                        "pages": [
-                          "oss/python/integrations/providers/microsoft",
-                          "oss/python/integrations/chat/azure_chat_openai/",
-                          "oss/python/integrations/text_embedding/azureopenai",
-                          "oss/python/integrations/chat/azure_ai"
-                        ]
-                      },
-                      "oss/python/integrations/providers/all_providers"
+                      "oss/python/integrations/providers/openai",
+                      "oss/python/integrations/providers/anthropic",
+                      "oss/python/integrations/providers/google",
+                      "oss/python/integrations/providers/aws",
+                      "oss/python/integrations/providers/huggingface",
+                      "oss/python/integrations/providers/microsoft",
+                      "oss/python/integrations/providers/ollama"
                     ]
                   },
                   {
@@ -305,7 +312,8 @@
                       "oss/python/integrations/document_loaders/index",
                       "oss/python/integrations/stores/index"
                     ]
-                  }
+                  },
+                  "oss/python/integrations/providers/all_providers"
                 ]
               },
               {
@@ -316,10 +324,24 @@
                     "group": "Tutorials",
                     "icon": "code",
                     "pages": [
-                      "oss/python/langchain/knowledge-base",
-		                  "oss/python/langchain/rag",
-                      "oss/python/langgraph/agentic-rag",
-                      "oss/python/langchain/sql-agent"
+                      {
+                        "group": "LangChain",
+                        "expanded": true,
+                        "pages": [
+                          "oss/python/langchain/knowledge-base",
+                          "oss/python/langchain/rag",
+                          "oss/python/langchain/sql-agent",
+                          "oss/python/langchain/supervisor"
+                        ]
+                      },
+                      {
+                        "group": "LangGraph",
+                        "expanded": true,
+                        "pages": [
+                          "oss/python/langgraph/agentic-rag",
+                          "oss/python/langgraph/sql-agent"
+                        ]
+                      }
                     ]
                   },
                   {
@@ -329,8 +351,7 @@
                       "oss/python/concepts/memory",
                       "oss/python/concepts/context",
                       "oss/python/langgraph/graph-api",
-                      "oss/python/langgraph/functional-api",
-                      "oss/python/concepts/subgraphs"
+                      "oss/python/langgraph/functional-api"
                     ]
                   },
                   {
@@ -385,6 +406,12 @@
                         "group": "Releases",
                         "pages": [
                           "oss/python/releases/langchain-v1"
+                        ]
+                      },
+                      {
+                        "group": "Migration guides",
+                        "pages": [
+                          "oss/python/migrate/langchain-v1"
                         ]
                       }
                     ]
@@ -1150,6 +1177,14 @@
         "version": "JavaScript",
         "dropdowns": [
           {
+            "dropdown": "Home",
+            "icon": "house",
+            "description": "LangChain docs home",
+            "pages": [
+              "index"
+            ]
+          },
+          {
             "dropdown": "OSS (v1-alpha)",
             "icon": "link",
             "description": "LangChain and LangGraph",
@@ -1158,6 +1193,13 @@
                 "tab": "LangChain",
                 "pages": [
                   "oss/javascript/langchain/overview",
+                  {
+                    "group": "LangChain v1.0",
+                    "pages": [
+                      "oss/javascript/releases/langchain-v1",
+                      "oss/javascript/migrate/langchain-v1"
+                    ]
+                  },
                   {
                     "group": "Get started",
                     "pages": [
@@ -1222,7 +1264,7 @@
                       "oss/javascript/langgraph/persistence",
                       "oss/javascript/langgraph/durable-execution",
                       "oss/javascript/langgraph/streaming",
-                      "oss/javascript/langgraph/add-human-in-the-loop",
+                      "oss/javascript/langgraph/interrupts",
                       "oss/javascript/langgraph/use-time-travel",
                       "oss/javascript/langgraph/add-memory",
                       "oss/javascript/langgraph/use-subgraphs"
@@ -1245,7 +1287,7 @@
                       {
                         "group": "Graph API",
                         "pages": [
-
+                          "oss/javascript/langgraph/graph-api",
                           "oss/javascript/langgraph/use-graph-api"
                         ]
                       },
@@ -1265,16 +1307,17 @@
                 "tab": "Integrations",
                 "pages": [
                   "oss/javascript/integrations/providers/overview",
+                  "oss/javascript/integrations/providers/all_providers",
                   {
-                    "group": "Providers",
+                    "group": "Popular Providers",
                     "icon": "user-group",
                     "pages": [
                       {
                         "group": "OpenAI",
                         "pages": [
                           "oss/javascript/integrations/providers/openai",
-                          "/oss/javascript/integrations/chat/openai",
-                          "/oss/javascript/integrations/text_embedding/openai"
+                          "oss/javascript/integrations/chat/openai",
+                          "oss/javascript/integrations/text_embedding/openai"
                         ]
                       },
                       {
@@ -1288,27 +1331,26 @@
                         "group": "Google",
                         "pages": [
                           "oss/javascript/integrations/providers/google",
-                          "/oss/javascript/integrations/chat/google_generative_ai",
-                          "/oss/javascript/integrations/text_embedding/google_generativeai"
+                          "oss/javascript/integrations/chat/google_generative_ai",
+                          "oss/javascript/integrations/text_embedding/google_generativeai"
                         ]
                       },
                       {
                         "group": "AWS",
                         "pages": [
                           "oss/javascript/integrations/providers/aws",
-                          "/oss/javascript/integrations/chat/bedrock",
-                          "/oss/javascript/integrations/text_embedding/bedrock"
+                          "oss/javascript/integrations/chat/bedrock",
+                          "oss/javascript/integrations/text_embedding/bedrock"
                         ]
                       },
                       {
                         "group": "Microsoft",
                         "pages": [
                           "oss/javascript/integrations/providers/microsoft",
-                          "/oss/javascript/integrations/chat/azure",
-                          "/oss/javascript/integrations/text_embedding/azure_openai"
+                          "oss/javascript/integrations/chat/azure",
+                          "oss/javascript/integrations/text_embedding/azure_openai"
                         ]
-                      },
-                      "oss/javascript/integrations/providers/all_providers"
+                      }
                     ]
                   },
                   {
@@ -1329,16 +1371,11 @@
                     "icon": "database",
                     "pages": [
                       "oss/javascript/integrations/retrievers/index",
+                      "oss/javascript/integrations/splitters/index",
                       "oss/javascript/integrations/text_embedding/index",
                       "oss/javascript/integrations/vectorstores/index",
-                      {
-                        "group": "Document loaders",
-                        "pages": [
-                          "oss/javascript/integrations/document_loaders/index",
-                          "oss/javascript/integrations/document_loaders/file_loaders/index",
-                          "oss/javascript/integrations/document_loaders/web_loaders/index"
-                        ]
-                      }
+                      "oss/javascript/integrations/document_loaders/index",
+                      "oss/javascript/integrations/stores/index"
                     ]
                   }
                 ]
@@ -1364,8 +1401,7 @@
                       "oss/javascript/concepts/memory",
                       "oss/javascript/concepts/context",
                       "oss/javascript/langgraph/graph-api",
-                      "oss/javascript/langgraph/functional-api",
-                      "oss/javascript/concepts/subgraphs"
+                      "oss/javascript/langgraph/functional-api"
                     ]
                   },
                   {
@@ -1426,6 +1462,12 @@
                         "group": "Releases",
                         "pages": [
                           "oss/javascript/releases/langchain-v1"
+                        ]
+                      },
+                      {
+                        "group": "Migration guides",
+                        "pages": [
+                          "oss/javascript/migrate/langchain-v1"
                         ]
                       }
                     ]
@@ -2272,11 +2314,11 @@
   },
   {
     "source": "/oss/python/langgraph/human-in-the-loop",
-    "destination": "/oss/python/langgraph/add-human-in-the-loop"
+    "destination": "/oss/python/langgraph/interrupts"
   },
   {
     "source": "/oss/javascript/langgraph/human-in-the-loop",
-    "destination": "/oss/javascript/langgraph/add-human-in-the-loop"
+    "destination": "/oss/javascript/langgraph/interrupts"
   }
 ]
 }

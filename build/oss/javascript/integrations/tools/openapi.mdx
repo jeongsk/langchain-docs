@@ -73,10 +73,10 @@ const llm = new ChatOpenAI({
 ```
 
 ```typescript
-import { OpenApiToolkit } from "langchain/agents/toolkits"
+import { OpenApiToolkit } from "@langchain/classic/agents/toolkits"
 import * as fs from "fs";
 import * as yaml from "js-yaml";
-import { JsonSpec, JsonObject } from "langchain/tools";
+import { JsonSpec, JsonObject } from "@langchain/classic/tools";
 
 // Load & convert the OpenAPI spec from YAML to JSON.
 const yamlFile = fs.readFileSync("../../../../../examples/openai_openapi.yaml", "utf8");
@@ -146,7 +146,7 @@ First, ensure you have LangGraph installed:
 ```
 
 ```typescript
-import { createAgent } from "langchain"
+import { createAgent } from "@langchain/classic"
 
 const agentExecutor = createAgent({ llm, tools });
 ```
@@ -213,3 +213,9 @@ They don't have the guts!
 ## API reference
 
 For detailed documentation of all OpenApiToolkit features and configurations head to the [API reference](https://api.js.langchain.com/classes/langchain.agents.OpenApiToolkit.html).
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/tools/openapi.mdx)
+</Callout>

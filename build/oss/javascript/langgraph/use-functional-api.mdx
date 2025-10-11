@@ -1,13 +1,13 @@
 ---
 title: Use the functional API
-sidebarTitle: Functional API
+sidebarTitle: Use the Functional API
 ---
 
 import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
 <AlphaCallout />
 
-The [**Functional API**](/oss/javascript/langgraph/functional-api) allows you to add LangGraph's key features — [persistence](/oss/javascript/langgraph/persistence), [memory](/oss/javascript/langgraph/add-memory), [human-in-the-loop](/oss/javascript/langgraph/add-human-in-the-loop), and [streaming](/oss/javascript/langgraph/streaming) — to your applications with minimal changes to your existing code.
+The [**Functional API**](/oss/javascript/langgraph/functional-api) allows you to add LangGraph's key features — [persistence](/oss/javascript/langgraph/persistence), [memory](/oss/javascript/langgraph/add-memory), [human-in-the-loop](/oss/javascript/langgraph/interrupts), and [streaming](/oss/javascript/langgraph/streaming) — to your applications with minimal changes to your existing code.
 
 <Tip>
 For conceptual information on the functional API, see [Functional API](/oss/javascript/langgraph/functional-api).
@@ -551,7 +551,7 @@ await main.invoke(null, config);
 
 ## Human-in-the-loop
 
-The functional API supports [human-in-the-loop](/oss/javascript/langgraph/add-human-in-the-loop) workflows using the `interrupt` function and the `Command` primitive.
+The functional API supports [human-in-the-loop](/oss/javascript/langgraph/interrupts) workflows using the `interrupt` function and the `Command` primitive.
 
 ### Basic human-in-the-loop workflow
 
@@ -606,7 +606,7 @@ const graph = entrypoint(
 ```
 
 
-[interrupt()](/oss/javascript/langgraph/add-human-in-the-loop#pause-using-interrupt) is called inside a task, enabling a human to review and edit the output of the previous task. The results of prior tasks-- in this case `step_1`-- are persisted, so that they are not run again following the `interrupt`.
+[interrupt()](/oss/javascript/langgraph/interrupts#pause-using-interrupt) is called inside a task, enabling a human to review and edit the output of the previous task. The results of prior tasks-- in this case `step_1`-- are persisted, so that they are not run again following the `interrupt`.
 
 Let's send in a query string:
 
@@ -622,7 +622,7 @@ for await (const event of await graph.stream("foo", config)) {
 ```
 
 
-Note that we've paused with an `interrupt` after `step_1`. The interrupt provides instructions to resume the run. To resume, we issue a [Command](/oss/javascript/langgraph/add-human-in-the-loop#resume-using-the-command-primitive) containing the data expected by the `human_feedback` task.
+Note that we've paused with an `interrupt` after `step_1`. The interrupt provides instructions to resume the run. To resume, we issue a [Command](/oss/javascript/langgraph/interrupts#resuming-interrupts) containing the data expected by the `human_feedback` task.
 
 
 
@@ -642,7 +642,7 @@ After resuming, the run proceeds through the remaining step and terminates as ex
 
 ### Review tool calls
 
-To review tool calls before execution, we add a `review_tool_call` function that calls [`interrupt`](/oss/javascript/langgraph/add-human-in-the-loop#pause-using-interrupt). When this function is called, execution will be paused until we issue a command to resume it.
+To review tool calls before execution, we add a `review_tool_call` function that calls [`interrupt`](/oss/javascript/langgraph/interrupts#pause-using-interrupt). When this function is called, execution will be paused until we issue a command to resume it.
 
 Given a tool call, our function will `interrupt` for human review. At that point we can either:
 
@@ -961,3 +961,9 @@ for await (const chunk of await workflow.stream([inputMessage2], {
 ## Integrate with other libraries
 
 * [Add LangGraph's features to other frameworks using the functional API](/langgraph-platform/autogen-integration): Add LangGraph features like persistence, memory and streaming to other agent frameworks that do not provide them out of the box.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/use-functional-api.mdx)
+</Callout>

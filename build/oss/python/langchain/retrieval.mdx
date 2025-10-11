@@ -123,13 +123,43 @@ RAG can be implemented in multiple ways, depending on your system's needs. We ou
 
 | Architecture            | Description                                                                | Control   | Flexibility | Latency        | Example Use Case                                   |
 |-------------------------|----------------------------------------------------------------------------|-----------|-------------|----------------|----------------------------------------------------|
-| **Agentic RAG**         | An LLM-powered agent decides *when* and *how* to retrieve during reasoning | ❌ Low     | ✅ High      | ⏳ Variable     | Research assistants with access to multiple tools  |
 | **2-Step RAG**          | Retrieval always happens before generation. Simple and predictable         | ✅ High    | ❌ Low       | ⚡ Fast         | FAQs, documentation bots                           |
+| **Agentic RAG**         | An LLM-powered agent decides *when* and *how* to retrieve during reasoning | ❌ Low     | ✅ High      | ⏳ Variable     | Research assistants with access to multiple tools  |
 | **Hybrid**              | Combines characteristics of both approaches with validation steps          | ⚖️ Medium | ⚖️ Medium   | ⏳ Variable     | Domain-specific Q&A with quality validation        |
 
 <Info>
 **Latency**: Latency is generally more **predictable** in **2-Step RAG**, as the maximum number of LLM calls is known and capped. This predictability assumes that LLM inference time is the dominant factor. However, real-world latency may also be affected by the performance of retrieval steps—such as API response times, network delays, or database queries—which can vary based on the tools and infrastructure in use.
 </Info>
+
+### 2-step RAG
+
+In **2-Step RAG**, the retrieval step is always executed before the generation step. This architecture is straightforward and predictable, making it suitable for many applications where the retrieval of relevant documents is a clear prerequisite for generating an answer.
+
+```mermaid
+graph LR
+    A[User Question] --> B["Retrieve Relevant Documents"]
+    B --> C["Generate Answer"]
+    C --> D[Return Answer to User]
+
+    %% Styling
+    classDef startend fill:#2e7d32,stroke:#1b5e20,stroke-width:2px,color:#fff
+    classDef process fill:#1976d2,stroke:#0d47a1,stroke-width:1.5px,color:#fff
+
+    class A,D startend
+    class B,C process
+```
+
+<Card
+    title="Tutorial: Retrieval-Augmented Generation (RAG)"
+    icon="robot"
+    href="/oss/python/langchain/rag#rag-chains"
+    arrow cta="Learn more"
+>
+    See how to build a Q&A chatbot that can answer questions grounded in your data using Retrieval-Augmented Generation.
+    This tutorial walks through two approaches:
+    * A **RAG agent** that runs searches with a flexible tool—great for general-purpose use.
+    * A **2-step RAG** chain that requires just one LLM call per query—fast and efficient for simpler tasks.
+</Card>
 
 ### Agentic RAG
 
@@ -162,7 +192,7 @@ graph LR
 
 ```python
 import requests
-from langchain_core.tools import tool
+from langchain.tools import tool
 from langchain.chat_models import init_chat_model
 from langchain.agents import create_agent
 
@@ -177,12 +207,15 @@ system_prompt = """\
 Use fetch_url when you need to fetch information from a web-page; quote relevant snippets.
 """
 
-agent = create_react_agent(
-    model=init_chat_model("claude-sonnet-4-0"),
+agent = create_agent(
+    model="claude-sonnet-4-0",
     tools=[fetch_url], # A tool for retrieval [!code highlight]
-    prompt=system_prompt,
+    system_prompt=system_prompt,
 )
 ```
+
+
+
 
 <Expandable title="Extended example: Agentic RAG for LangGraph's llms.txt">
 
@@ -190,9 +223,9 @@ This example implements an **Agentic RAG system** to assist users in querying La
 
 ```python
 import requests
-from langchain.chat_models import init_chat_model
-from langchain_core.tools import tool
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
+from langchain.messages import HumanMessage
+from langchain.tools import tool
 from markdownify import markdownify
 
 ALLOWED_DOMAINS = ["https://langchain-ai.github.io/"]
@@ -243,62 +276,33 @@ tools = [fetch_documentation]
 
 model = init_chat_model("claude-sonnet-4-0", max_tokens=32_000)
 
-agent = create_react_agent(
+agent = create_agent(
     model=model,
     tools=tools,  # [!code highlight]
-    prompt=system_prompt,  # [!code highlight]
+    system_prompt=system_prompt,  # [!code highlight]
     name="Agentic RAG",
 )
 
 response = agent.invoke({
-    'messages': [{
-        'role': 'user',
-        'content': (
+    'messages': [
+        HumanMessage(content=(
             "Write a short example of a langgraph agent using the "
             "prebuilt create react agent. the agent should be able "
             "to look up stock pricing information."
-        )
-    }]
+        ))
+    ]
 })
 
 print(response['messages'][-1].content)
 ```
+
+
 </Expandable>
 
 <Card
     title="Tutorial: Retrieval-Augmented Generation (RAG)"
     icon="robot"
     href="/oss/python/langchain/rag"
-    arrow cta="Learn more"
->
-    See how to build a Q&A chatbot that can answer questions grounded in your data using Retrieval-Augmented Generation.
-    This tutorial walks through two approaches:
-    * A **RAG agent** that runs searches with a flexible tool—great for general-purpose use.
-    * A **2-step RAG** chain that requires just one LLM call per query—fast and efficient for simpler tasks.
-</Card>
-
-### 2-step RAG
-
-In **2-Step RAG**, the retrieval step is always executed before the generation step. This architecture is straightforward and predictable, making it suitable for many applications where the retrieval of relevant documents is a clear prerequisite for generating an answer.
-
-```mermaid
-graph LR
-    A[User Question] --> B["Retrieve Relevant Documents"]
-    B --> C["Generate Answer"]
-    C --> D[Return Answer to User]
-
-    %% Styling
-    classDef startend fill:#2e7d32,stroke:#1b5e20,stroke-width:2px,color:#fff
-    classDef process fill:#1976d2,stroke:#0d47a1,stroke-width:1.5px,color:#fff
-
-    class A,D startend
-    class B,C process
-```
-
-<Card
-    title="Tutorial: Retrieval-Augmented Generation (RAG)"
-    icon="robot"
-    href="/oss/python/langchain/rag#rag-chains"
     arrow cta="Learn more"
 >
     See how to build a Q&A chatbot that can answer questions grounded in your data using Retrieval-Augmented Generation.
@@ -357,3 +361,9 @@ This architecture is suitable for:
 >
     An example of **Hybrid RAG** that combines agentic reasoning with retrieval and self-correction.
 </Card>
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/retrieval.mdx)
+</Callout>
