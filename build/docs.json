@@ -141,10 +141,32 @@
                   {
                     "tab": "LangGraph",
                     "pages": [
+                      "ko/oss/langgraph/overview",
                       {
                         "group": "기능",
                         "pages": [
+                          "ko/oss/langgraph/durable-execution",
                           "ko/oss/langgraph/add-memory"
+                        ]
+                      },
+                      {
+                        "group": "프로덕션",
+                        "pages": [
+                          "ko/oss/langgraph/application-structure",
+                          "ko/oss/langgraph/deploy"
+                        ]
+                      },
+                      {
+                        "group": "튜토리얼",
+                        "pages": [
+                          "ko/oss/langgraph/agentic-rag"
+                        ]
+                      },
+                      {
+                        "group": "참고 자료",
+                        "pages": [
+                          "ko/oss/langgraph/common-errors",
+                          "ko/oss/langgraph/case-studies"
                         ]
                       }
                     ]
