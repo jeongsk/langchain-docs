@@ -308,7 +308,12 @@ class DocumentationBuilder:
         if relative_path.parts[0] == "oss":
             self._build_oss_file(file_path, relative_path)
         # Check if this is unversioned content
-        elif relative_path.parts[0] in {"langgraph-platform", "labs", "langsmith", "ko"}:
+        elif relative_path.parts[0] in {
+            "langgraph-platform",
+            "labs",
+            "langsmith",
+            "ko",
+        }:
             self._build_unversioned_file(file_path, relative_path)
         # Handle shared files (images, docs.json, etc.)
         elif self.is_shared_file(file_path):
