@@ -1,0 +1,133 @@
+---
+title: 애플리케이션 구조
+---
+
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
+
+<AlphaCallout />
+
+## 개요
+
+LangGraph 애플리케이션은 하나 이상의 그래프, 구성 파일(`langgraph.json`), 의존성을 명시하는 파일, 그리고 환경 변수를 명시하는 선택적 `.env` 파일로 구성됩니다.
+
+이 가이드는 애플리케이션의 일반적인 구조를 보여주며, LangGraph Platform을 사용하여 애플리케이션을 배포하는 데 필요한 정보를 어떻게 명시하는지 설명합니다.
+
+## 주요 개념
+
+LangGraph Platform을 사용하여 배포하려면 다음 정보를 제공해야 합니다:
+
+1. 애플리케이션에 사용할 의존성, 그래프, 환경 변수를 명시하는 [LangGraph 구성 파일](#configuration-file-concepts)(`langgraph.json`)
+2. 애플리케이션의 로직을 구현하는 [그래프](#graphs)
+3. 애플리케이션 실행에 필요한 [의존성](#dependencies)을 명시하는 파일
+4. 애플리케이션 실행에 필요한 [환경 변수](#environment-variables)
+
+## 파일 구조
+
+다음은 애플리케이션의 디렉터리 구조 예시입니다:
+
+<Tabs>
+    <Tab title="Python (requirements.txt)">
+    ```plaintext
+    my-app/
+    ├── my_agent # 모든 프로젝트 코드가 여기에 위치합니다
+    │   ├── utils # 그래프를 위한 유틸리티
+    │   │   ├── __init__.py
+    │   │   ├── tools.py # 그래프를 위한 도구
+    │   │   ├── nodes.py # 그래프를 위한 노드 함수
+    │   │   └── state.py # 그래프의 상태 정의
+    │   ├── __init__.py
+    │   └── agent.py # 그래프를 구성하는 코드
+    ├── .env # 환경 변수
+    ├── requirements.txt # 패키지 의존성
+    └── langgraph.json # LangGraph를 위한 구성 파일
+    ```
+    </Tab>
+    <Tab title="Python (pyproject.toml)">
+    ```plaintext
+    my-app/
+    ├── my_agent # 모든 프로젝트 코드가 여기에 위치합니다
+    │   ├── utils # 그래프를 위한 유틸리티
+    │   │   ├── __init__.py
+    │   │   ├── tools.py # 그래프를 위한 도구
+    │   │   ├── nodes.py # 그래프를 위한 노드 함수
+    │   │   └── state.py # 그래프의 상태 정의
+    │   ├── __init__.py
+    │   └── agent.py # 그래프를 구성하는 코드
+    ├── .env # 환경 변수
+    ├── langgraph.json  # LangGraph를 위한 구성 파일
+    └── pyproject.toml # 프로젝트의 의존성
+    ```
+    </Tab>
+</Tabs>
+
+
+
+
+<Note>
+LangGraph 애플리케이션의 디렉터리 구조는 사용하는 프로그래밍 언어와 패키지 매니저에 따라 달라질 수 있습니다.
+</Note>
+
+<a id="configuration-file-concepts"></a>
+## 구성 파일
+
+`langgraph.json` 파일은 LangGraph 애플리케이션을 배포하는 데 필요한 의존성, 그래프, 환경 변수 및 기타 설정을 명시하는 JSON 파일입니다.
+
+JSON 파일에서 지원되는 모든 키에 대한 자세한 내용은 [LangGraph 구성 파일 참조](/langgraph-platform/cli#configuration-file)를 확인하세요.
+
+<Tip>
+[LangGraph CLI](/langgraph-platform/cli)는 기본적으로 현재 디렉터리의 구성 파일 `langgraph.json`을 사용합니다.
+</Tip>
+
+### 예시
+
+* 의존성에는 커스텀 로컬 패키지와 `langchain_openai` 패키지가 포함됩니다.
+* 단일 그래프는 `./your_package/your_file.py` 파일의 `variable` 변수에서 로드됩니다.
+* 환경 변수는 `.env` 파일에서 로드됩니다.
+
+```json
+{
+  "dependencies": ["langchain_openai", "./your_package"],
+  "graphs": {
+    "my_agent": "./your_package/your_file.py:agent"
+  },
+  "env": "./.env"
+}
+```
+
+
+
+
+## Dependencies
+
+LangGraph 애플리케이션은 다른 Python 패키지에 의존할 수 있습니다.
+
+
+
+
+의존성을 올바르게 설정하려면 일반적으로 다음 정보를 명시해야 합니다:
+
+1. 의존성을 명시하는 디렉터리의 파일(예: `requirements.txt`, `pyproject.toml` 또는 `package.json`)
+
+
+
+
+1. LangGraph 애플리케이션을 실행하는 데 필요한 의존성을 명시하는 [LangGraph 구성 파일](#configuration-file-concepts)의 `dependencies` 키
+2. 추가 바이너리나 시스템 라이브러리는 [LangGraph 구성 파일](#configuration-file-concepts)의 `dockerfile_lines` 키를 사용하여 명시할 수 있습니다
+
+## Graphs
+
+배포된 LangGraph 애플리케이션에서 사용할 수 있는 그래프를 명시하려면 [LangGraph 구성 파일](#configuration-file-concepts)의 `graphs` 키를 사용하세요.
+
+구성 파일에서 하나 이상의 그래프를 명시할 수 있습니다. 각 그래프는 고유한 이름과 다음 중 하나의 경로로 식별됩니다: (1) 컴파일된 그래프 또는 (2) 그래프를 생성하는 함수가 정의된 경로
+
+## Environment Variables
+
+배포된 LangGraph 애플리케이션을 로컬에서 작업하는 경우, [LangGraph 구성 파일](#configuration-file-concepts)의 `env` 키에서 환경 변수를 구성할 수 있습니다.
+
+프로덕션 배포의 경우, 일반적으로 배포 환경에서 환경 변수를 구성하는 것이 좋습니다.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/ko/oss/langgraph/application-structure.mdx)
+</Callout>
