@@ -129,6 +129,31 @@
     "versions": [
       {
         "version": "Python",
+        "languages": [
+          {
+            "language": "ko",
+            "dropdowns": [
+              {
+                "dropdown": "OSS (v1-alpha)",
+                "icon": "link",
+                "description": "LangChain과 LangGraph",
+                "tabs": [
+                  {
+                    "tab": "LangGraph",
+                    "pages": [
+                      {
+                        "group": "기능",
+                        "pages": [
+                          "ko/oss/langgraph/add-memory"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
         "dropdowns": [
           {
             "dropdown": "Home",
