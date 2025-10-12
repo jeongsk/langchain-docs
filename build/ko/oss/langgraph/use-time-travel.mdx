@@ -1,0 +1,238 @@
+---
+title: 타임 트래블 사용하기
+sidebarTitle: 타임 트래블
+---
+
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
+
+<AlphaCallout />
+
+모델 기반 의사결정을 수행하는 비결정적 시스템(예: LLM으로 구동되는 에이전트)으로 작업할 때, 의사결정 프로세스를 상세히 검토하는 것이 유용할 수 있습니다:
+
+1. <Icon icon="lightbulb" size={16} /> **추론 이해**: 성공적인 결과로 이어진 단계를 분석합니다.
+2. <Icon icon="bug" size={16} /> **실수 디버깅**: 오류가 어디서, 왜 발생했는지 식별합니다.
+3. <Icon icon="magnifying-glass" size={16} /> **대안 탐색**: 다양한 경로를 테스트하여 더 나은 솔루션을 발견합니다.
+
+LangGraph는 이러한 사용 사례를 지원하기 위해 [타임 트래블](/oss/python/langgraph/use-time-travel) 기능을 제공합니다. 구체적으로, 이전 체크포인트에서 실행을 재개할 수 있습니다. 동일한 상태를 재실행하거나 수정하여 대안을 탐색할 수 있습니다. 모든 경우에 과거 실행을 재개하면 히스토리에 새로운 분기가 생성됩니다.
+
+LangGraph에서 [타임 트래블](/oss/python/langgraph/use-time-travel)을 사용하려면:
+
+1. [`invoke`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.invoke) 또는 [`stream`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.stream) 메서드를 사용하여 초기 입력으로 [그래프를 실행](#1-run-the-graph)합니다.
+2. [기존 스레드에서 체크포인트를 식별](#2-identify-a-checkpoint): [`get_state_history()`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.get_state_history) 메서드를 사용하여 특정 `thread_id`에 대한 실행 히스토리를 검색하고 원하는 `checkpoint_id`를 찾습니다.
+  또는 실행을 일시 중지하려는 노드 앞에 [인터럽트](/oss/python/langgraph/interrupts)를 설정합니다. 그런 다음 해당 인터럽트까지 기록된 가장 최근 체크포인트를 찾을 수 있습니다.
+3. [그래프 상태 업데이트(선택 사항)](#3-update-the-state-optional): [`update_state`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.update_state) 메서드를 사용하여 체크포인트에서 그래프의 상태를 수정하고 대체 상태에서 실행을 재개합니다.
+4. [체크포인트에서 실행 재개](#4-resume-execution-from-the-checkpoint): 입력을 `None`으로, 적절한 `thread_id`와 `checkpoint_id`를 포함하는 구성으로 `invoke` 또는 `stream` 메서드를 사용합니다.
+
+
+
+
+<Tip>
+타임 트래블의 개념적 개요는 [타임 트래블](/oss/python/langgraph/use-time-travel)을 참조하세요.
+</Tip>
+
+## 워크플로우에서 사용하기
+
+이 예제는 LLM을 사용하여 농담 주제를 생성하고 농담을 작성하는 간단한 LangGraph 워크플로우를 구축합니다. 그래프를 실행하고, 과거 실행 체크포인트를 검색하고, 선택적으로 상태를 수정하고, 선택한 체크포인트에서 실행을 재개하여 대안적인 결과를 탐색하는 방법을 보여줍니다.
+
+### 설정
+
+먼저 필요한 패키지를 설치해야 합니다
+
+```python
+%%capture --no-stderr
+%pip install --quiet -U langgraph langchain_anthropic
+```
+
+
+
+
+다음으로, Anthropic(사용할 LLM)에 대한 API 키를 설정해야 합니다
+
+```python
+import getpass
+import os
+
+
+def _set_env(var: str):
+    if not os.environ.get(var):
+        os.environ[var] = getpass.getpass(f"{var}: ")
+
+
+_set_env("ANTHROPIC_API_KEY")
+```
+
+
+
+
+<Tip>
+LangGraph로 구축된 LLM 앱을 디버깅, 테스트 및 모니터링하기 위해 트레이스 데이터를 사용할 수 있는 [LangSmith](https://smith.langchain.com)에 가입하여 LangGraph 프로젝트의 문제를 신속하게 파악하고 성능을 개선하세요.
+</Tip>
+
+```python
+import uuid
+
+from typing_extensions import TypedDict, NotRequired
+from langgraph.graph import StateGraph, START, END
+from langchain.chat_models import init_chat_model
+from langgraph.checkpoint.memory import InMemorySaver
+
+
+class State(TypedDict):
+    topic: NotRequired[str]
+    joke: NotRequired[str]
+
+
+llm = init_chat_model(
+    "anthropic:claude-3-7-sonnet-latest",
+    temperature=0,
+)
+
+
+def generate_topic(state: State):
+    """LLM call to generate a topic for the joke"""
+    msg = llm.invoke("Give me a funny topic for a joke")
+    return {"topic": msg.content}
+
+
+def write_joke(state: State):
+    """LLM call to write a joke based on the topic"""
+    msg = llm.invoke(f"Write a short joke about {state['topic']}")
+    return {"joke": msg.content}
+
+
+# Build workflow
+workflow = StateGraph(State)
+
+# Add nodes
+workflow.add_node("generate_topic", generate_topic)
+workflow.add_node("write_joke", write_joke)
+
+# Add edges to connect nodes
+workflow.add_edge(START, "generate_topic")
+workflow.add_edge("generate_topic", "write_joke")
+workflow.add_edge("write_joke", END)
+
+# Compile
+checkpointer = InMemorySaver()
+graph = workflow.compile(checkpointer=checkpointer)
+graph
+```
+
+
+
+
+### 1. 그래프 실행
+
+```python
+config = {
+    "configurable": {
+        "thread_id": uuid.uuid4(),
+    }
+}
+state = graph.invoke({}, config)
+
+print(state["topic"])
+print()
+print(state["joke"])
+```
+
+
+
+
+**출력:**
+
+```
+How about "The Secret Life of Socks in the Dryer"? You know, exploring the mysterious phenomenon of how socks go into the laundry as pairs but come out as singles. Where do they go? Are they starting new lives elsewhere? Is there a sock paradise we don't know about? There's a lot of comedic potential in the everyday mystery that unites us all!
+
+# The Secret Life of Socks in the Dryer
+
+I finally discovered where all my missing socks go after the dryer. Turns out they're not missing at all—they've just eloped with someone else's socks from the laundromat to start new lives together.
+
+My blue argyle is now living in Bermuda with a red polka dot, posting vacation photos on Sockstagram and sending me lint as alimony.
+```
+
+### 2. 체크포인트 식별
+
+```python
+# The states are returned in reverse chronological order.
+states = list(graph.get_state_history(config))
+
+for state in states:
+    print(state.next)
+    print(state.config["configurable"]["checkpoint_id"])
+    print()
+```
+
+**출력:**
+
+```
+()
+1f02ac4a-ec9f-6524-8002-8f7b0bbeed0e
+
+('write_joke',)
+1f02ac4a-ce2a-6494-8001-cb2e2d651227
+
+('generate_topic',)
+1f02ac4a-a4e0-630d-8000-b73c254ba748
+
+('__start__',)
+1f02ac4a-a4dd-665e-bfff-e6c8c44315d9
+```
+
+
+
+
+```python
+# This is the state before last (states are listed in chronological order)
+selected_state = states[1]
+print(selected_state.next)
+print(selected_state.values)
+```
+
+**출력:**
+
+```
+('write_joke',)
+{'topic': 'How about "The Secret Life of Socks in the Dryer"? You know, exploring the mysterious phenomenon of how socks go into the laundry as pairs but come out as singles. Where do they go? Are they starting new lives elsewhere? Is there a sock paradise we don\\'t know about? There\\'s a lot of comedic potential in the everyday mystery that unites us all!'}
+```
+
+
+
+
+<a id="optional"></a>
+### 3. 상태 업데이트
+
+`update_state`는 새 체크포인트를 생성합니다. 새 체크포인트는 동일한 스레드와 연결되지만, 새로운 체크포인트 ID를 갖습니다.
+
+```python
+new_config = graph.update_state(selected_state.config, values={"topic": "chickens"})
+print(new_config)
+```
+
+**출력:**
+
+```
+{'configurable': {'thread_id': 'c62e2e03-c27b-4cb6-8cea-ea9bfedae006', 'checkpoint_ns': '', 'checkpoint_id': '1f02ac4a-ecee-600b-8002-a1d21df32e4c'}}
+```
+
+
+
+
+### 4. 체크포인트에서 실행 재개
+
+```python
+graph.invoke(None, new_config)
+```
+
+**출력:**
+
+```python
+{'topic': 'chickens',
+ 'joke': 'Why did the chicken join a band?\n\nBecause it had excellent drumsticks!'}
+```
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/ko/oss/langgraph/use-time-travel.mdx)
+</Callout>

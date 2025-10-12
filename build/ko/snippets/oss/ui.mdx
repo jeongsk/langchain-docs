@@ -1,0 +1,86 @@
+LangChain은 [`create_agent()`](../langchain/agents)를 사용하여 생성된 에이전트와 원활하게 작동하는 강력한 사전 구축 사용자 인터페이스를 제공합니다. 이 UI는 로컬 환경이나 배포된 컨텍스트([LangGraph Platform](/langgraph-platform/) 등)에서 최소한의 설정만으로 에이전트를 위한 풍부하고 인터랙티브한 경험을 제공하도록 설계되었습니다.
+
+## Agent Chat UI
+
+[Agent Chat UI](https://github.com/langchain-ai/agent-chat-ui)는 모든 LangChain 에이전트와 상호작용할 수 있는 대화형 인터페이스를 제공하는 Next.js 애플리케이션입니다. 실시간 채팅, 도구 시각화, 그리고 타임 트래블 디버깅 및 상태 포킹과 같은 고급 기능을 지원합니다.
+
+Agent Chat UI는 오픈 소스이며 애플리케이션의 필요에 맞게 조정할 수 있습니다.
+
+<Frame>
+<iframe
+  className="w-full aspect-video rounded-xl"
+  src="https://www.youtube.com/embed/lInrwVnZ83o?si=Uw66mPtCERJm0EjU"
+  title="Agent Chat UI"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+/>
+</Frame>
+
+### 주요 기능
+
+<Accordion title="도구 시각화">
+Studio는 도구 호출과 결과를 직관적인 인터페이스로 자동으로 렌더링합니다.
+<Frame>
+![Studio의 도구 시각화](/oss/images/studio_tools.gif)
+</Frame>
+</Accordion>
+
+<Accordion title="타임 트래블 디버깅">
+대화 기록을 탐색하고 어떤 시점에서든 포크할 수 있습니다
+<Frame>
+![Studio의 타임 트래블 디버깅](/oss/images/studio_fork.gif)
+</Frame>
+</Accordion>
+
+<Accordion title="상태 검사">
+실행 중 어떤 시점에서든 에이전트 상태를 확인하고 수정할 수 있습니다
+<Frame>
+![Studio의 상태 검사](/oss/images/studio_state.gif)
+</Frame>
+</Accordion>
+
+<Accordion title="Human-in-the-loop">
+에이전트 요청을 검토하고 응답할 수 있는 기본 지원 기능
+<Frame>
+![Studio의 Human-in-the-Loop](/oss/images/studio_hitl.gif)
+</Frame>
+</Accordion>
+
+<Tip>
+Agent Chat UI에서 생성형 UI를 사용할 수 있습니다. 자세한 내용은 [LangGraph로 생성형 사용자 인터페이스 구현하기](/langgraph-platform/generative-ui-react)를 참조하세요.
+</Tip>
+
+
+### 빠른 시작
+
+가장 빠른 시작 방법은 호스팅된 버전을 사용하는 것입니다:
+
+1. **[Agent Chat UI](https://agentchat.vercel.app) 방문**
+2. **배포 URL 또는 로컬 서버 주소를 입력하여 에이전트 연결**
+3. **채팅 시작** - UI가 도구 호출 및 중단을 자동으로 감지하고 렌더링합니다
+
+### 로컬 개발
+
+사용자 정의나 로컬 개발을 위해 Agent Chat UI를 로컬에서 실행할 수 있습니다:
+
+<CodeGroup>
+```bash npx 사용
+# 새로운 Agent Chat UI 프로젝트 생성
+npx create-agent-chat-app my-chat-ui
+cd my-chat-ui
+
+# 의존성 설치 및 시작
+pnpm install
+pnpm dev
+```
+```bash 저장소 복제
+# 저장소 복제
+git clone https://github.com/langchain-ai/agent-chat-ui.git
+cd agent-chat-ui
+
+# 의존성 설치 및 시작
+pnpm install
+pnpm dev
+```
+</CodeGroup>
+
