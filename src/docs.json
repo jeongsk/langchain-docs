@@ -143,6 +143,15 @@
                     "pages": [
                       "ko/oss/langgraph/overview",
                       {
+                        "group": "시작하기",
+                        "pages": [
+                          "ko/oss/langgraph/install",
+                          "ko/oss/langgraph/quickstart",
+                          "ko/oss/langgraph/local-server",
+                          "ko/oss/langgraph/workflows-agents"
+                        ]
+                      },
+                      {
                         "group": "기능",
                         "pages": [
                           "ko/oss/langgraph/durable-execution",

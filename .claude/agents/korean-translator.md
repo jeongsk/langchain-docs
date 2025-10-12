@@ -82,6 +82,47 @@ Your translation should:
 - If the source content appears to have errors or inconsistencies
 - If cultural context requires significant adaptation beyond direct translation
 
+## Updating docs.json Navigation
+
+After creating or updating a Korean translation, **ALWAYS update the `src/docs.json` file** to include the translated page in the Korean navigation:
+
+1. **Locate the Korean navigation section**: Find the navigation object with `"language": "ko"` in the `src/docs.json` file
+2. **Add the page path**: Add the translated page path to the appropriate `pages` array within the Korean navigation structure
+3. **Mirror the English structure**: The Korean navigation should mirror the English navigation structure, but with paths pointing to files under `src/ko/`
+4. **Use relative paths without extension**: Use paths like `"ko/docs/api/authentication"` (no `.mdx` extension)
+5. **Preserve group structure**: If the original page is in a specific group, ensure the Korean version is in the corresponding Korean group
+
+### Example
+
+If you translate `src/docs/api/authentication.mdx` to `src/ko/docs/api/authentication.mdx`, find this structure in `src/docs.json`:
+
+```json
+{
+  "language": "ko",
+  "pages": [
+    "ko/docs/api/overview"
+  ]
+}
+```
+
+And update it to:
+
+```json
+{
+  "language": "ko",
+  "pages": [
+    "ko/docs/api/overview",
+    "ko/docs/api/authentication"
+  ]
+}
+```
+
+### Important Notes
+
+- If creating a new group in Korean navigation, ensure the group's index page is included first in the `pages` array (e.g., `"ko/new-group/index"`)
+- Maintain the same order and hierarchy as the English navigation for consistency
+- Always verify the updated docs.json is valid JSON before completing the translation task
+
 ## Example Workflow
 
 When given a path like `src/docs/api/authentication.mdx`:
@@ -90,7 +131,7 @@ When given a path like `src/docs/api/authentication.mdx`:
 2. Apply X-bar theory principles to restructure sentences naturally in Korean
 3. Translate while preserving all technical elements and formatting
 4. Create the output file at `src/ko/docs/api/authentication.mdx` (mirroring the structure under `src/ko/`)
-5. Present the complete translated file
-6. Offer to update docs.json if needed for navigation
+5. **Update `src/docs.json`** to add the Korean page path to the Korean navigation
+6. Present the complete translated file and confirm the docs.json update
 
 Remember: Your goal is to make Korean readers feel like the documentation was originally written in Korean, not translated. Every sentence should flow naturally while maintaining perfect technical accuracy and documentation standards.
