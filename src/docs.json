@@ -175,6 +175,26 @@
                         ]
                       },
                       {
+                        "group": "LangGraph API",
+                        "pages": [
+                          {
+                            "group": "Graph API",
+                            "pages": [
+                              "ko/oss/langgraph/graph-api",
+                              "ko/oss/langgraph/use-graph-api"
+                            ]
+                          },
+                          {
+                            "group": "Functional API",
+                            "pages": [
+                              "ko/oss/langgraph/functional-api",
+                              "ko/oss/langgraph/use-functional-api"
+                            ]
+                          },
+                          "ko/oss/langgraph/pregel"
+                        ]
+                      },
+                      {
                         "group": "튜토리얼",
                         "pages": [
                           "ko/oss/langgraph/agentic-rag"

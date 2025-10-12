@@ -1,0 +1,1674 @@
+---
+title: 함수형 API 사용하기
+sidebarTitle: 함수형 API 사용하기
+---
+
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
+
+<AlphaCallout />
+
+[**함수형 API**](/oss/langgraph/functional-api)를 사용하면 기존 코드를 최소한으로 수정하면서도 LangGraph의 핵심 기능인 [영속성](/oss/langgraph/persistence), [메모리](/oss/langgraph/add-memory), [human-in-the-loop](/oss/langgraph/interrupts), [스트리밍](/oss/langgraph/streaming)을 애플리케이션에 추가할 수 있습니다.
+
+<Tip>
+함수형 API에 대한 개념적인 정보는 [함수형 API](/oss/langgraph/functional-api)를 참조하세요.
+</Tip>
+
+## 간단한 워크플로우 만들기
+
+`entrypoint`를 정의할 때 입력은 함수의 첫 번째 인자로 제한됩니다. 여러 입력을 전달하려면 딕셔너리를 사용할 수 있습니다.
+
+:::python
+```python
+@entrypoint(checkpointer=checkpointer)
+def my_workflow(inputs: dict) -> int:
+    value = inputs["value"]
+    another_value = inputs["another_value"]
+    ...
+
+my_workflow.invoke({"value": 1, "another_value": 2})
+```
+:::
+
+:::js
+```typescript
+const checkpointer = new MemorySaver();
+
+const myWorkflow = entrypoint(
+  { checkpointer, name: "myWorkflow" },
+  async (inputs: { value: number; anotherValue: number }) => {
+    const value = inputs.value;
+    const anotherValue = inputs.anotherValue;
+    // ...
+  }
+);
+
+await myWorkflow.invoke({ value: 1, anotherValue: 2 });
+```
+:::
+
+<Accordion title="확장 예제: 간단한 워크플로우">
+  :::python
+  ```python
+  import uuid
+  from langgraph.func import entrypoint, task
+  from langgraph.checkpoint.memory import InMemorySaver
+
+  # 숫자가 짝수인지 확인하는 작업
+  @task
+  def is_even(number: int) -> bool:
+      return number % 2 == 0
+
+  # 메시지 형식을 지정하는 작업
+  @task
+  def format_message(is_even: bool) -> str:
+      return "The number is even." if is_even else "The number is odd."
+
+  # 영속성을 위한 체크포인터 생성
+  checkpointer = InMemorySaver()
+
+  @entrypoint(checkpointer=checkpointer)
+  def workflow(inputs: dict) -> str:
+      """숫자를 분류하는 간단한 워크플로우입니다."""
+      even = is_even(inputs["number"]).result()
+      return format_message(even).result()
+
+  # 고유한 스레드 ID로 워크플로우 실행
+  config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+  result = workflow.invoke({"number": 7}, config=config)
+  print(result)
+  ```
+  :::
+
+  :::js
+  ```typescript
+  import { v4 as uuidv4 } from "uuid";
+  import { entrypoint, task, MemorySaver } from "@langchain/langgraph";
+
+  // 숫자가 짝수인지 확인하는 작업
+  const isEven = task("isEven", async (number: number) => {
+    return number % 2 === 0;
+  });
+
+  // 메시지 형식을 지정하는 작업
+  const formatMessage = task("formatMessage", async (isEven: boolean) => {
+    return isEven ? "The number is even." : "The number is odd.";
+  });
+
+  // 영속성을 위한 체크포인터 생성
+  const checkpointer = new MemorySaver();
+
+  const workflow = entrypoint(
+    { checkpointer, name: "workflow" },
+    async (inputs: { number: number }) => {
+      // 숫자를 분류하는 간단한 워크플로우
+      const even = await isEven(inputs.number);
+      return await formatMessage(even);
+    }
+  );
+
+  // 고유한 스레드 ID로 워크플로우 실행
+  const config = { configurable: { thread_id: uuidv4() } };
+  const result = await workflow.invoke({ number: 7 }, config);
+  console.log(result);
+  ```
+  :::
+</Accordion>
+
+<Accordion title="확장 예제: LLM으로 에세이 작성하기">
+  이 예제는 `@task`와 `@entrypoint` 데코레이터를 구문적으로 사용하는 방법을 보여줍니다.
+  체크포인터가 제공되면 워크플로우 결과가 체크포인터에 저장됩니다.
+
+  :::python
+  ```python
+  import uuid
+  from langchain.chat_models import init_chat_model
+  from langgraph.func import entrypoint, task
+  from langgraph.checkpoint.memory import InMemorySaver
+
+  llm = init_chat_model('openai:gpt-3.5-turbo')
+
+  # 작업: LLM을 사용하여 에세이 생성
+  @task
+  def compose_essay(topic: str) -> str:
+      """주어진 주제에 대한 에세이를 생성합니다."""
+      return llm.invoke([
+          {"role": "system", "content": "You are a helpful assistant that writes essays."},
+          {"role": "user", "content": f"Write an essay about {topic}."}
+      ]).content
+
+  # 영속성을 위한 체크포인터 생성
+  checkpointer = InMemorySaver()
+
+  @entrypoint(checkpointer=checkpointer)
+  def workflow(topic: str) -> str:
+      """LLM으로 에세이를 생성하는 간단한 워크플로우입니다."""
+      return compose_essay(topic).result()
+
+  # 워크플로우 실행
+  config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+  result = workflow.invoke("the history of flight", config=config)
+  print(result)
+  ```
+  :::
+
+  :::js
+  ```typescript
+  import { v4 as uuidv4 } from "uuid";
+  import { ChatOpenAI } from "@langchain/openai";
+  import { entrypoint, task, MemorySaver } from "@langchain/langgraph";
+
+  const llm = new ChatOpenAI({ model: "gpt-3.5-turbo" });
+
+  // 작업: LLM을 사용하여 에세이 생성
+  const composeEssay = task("composeEssay", async (topic: string) => {
+    // 주어진 주제에 대한 에세이 생성
+    const response = await llm.invoke([
+      { role: "system", content: "You are a helpful assistant that writes essays." },
+      { role: "user", content: `Write an essay about ${topic}.` }
+    ]);
+    return response.content as string;
+  });
+
+  // 영속성을 위한 체크포인터 생성
+  const checkpointer = new MemorySaver();
+
+  const workflow = entrypoint(
+    { checkpointer, name: "workflow" },
+    async (topic: string) => {
+      // LLM으로 에세이를 생성하는 간단한 워크플로우
+      return await composeEssay(topic);
+    }
+  );
+
+  // 워크플로우 실행
+  const config = { configurable: { thread_id: uuidv4() } };
+  const result = await workflow.invoke("the history of flight", config);
+  console.log(result);
+  ```
+  :::
+</Accordion>
+
+## 병렬 실행
+
+작업을 동시에 호출하고 결과를 기다림으로써 병렬로 실행할 수 있습니다. 이는 IO 바운드 작업(예: LLM을 위한 API 호출)의 성능을 향상시키는 데 유용합니다.
+
+:::python
+```python
+@task
+def add_one(number: int) -> int:
+    return number + 1
+
+@entrypoint(checkpointer=checkpointer)
+def graph(numbers: list[int]) -> list[str]:
+    futures = [add_one(i) for i in numbers]
+    return [f.result() for f in futures]
+```
+:::
+
+:::js
+```typescript
+const addOne = task("addOne", async (number: number) => {
+  return number + 1;
+});
+
+const graph = entrypoint(
+  { checkpointer, name: "graph" },
+  async (numbers: number[]) => {
+    return await Promise.all(numbers.map(addOne));
+  }
+);
+```
+:::
+
+<Accordion title="확장 예제: 병렬 LLM 호출">
+  이 예제는 `@task`를 사용하여 여러 LLM 호출을 병렬로 실행하는 방법을 보여줍니다. 각 호출은 서로 다른 주제에 대한 단락을 생성하고, 결과는 하나의 텍스트 출력으로 결합됩니다.
+
+  :::python
+  ```python
+  import uuid
+  from langchain.chat_models import init_chat_model
+  from langgraph.func import entrypoint, task
+  from langgraph.checkpoint.memory import InMemorySaver
+
+  # LLM 모델 초기화
+  llm = init_chat_model("openai:gpt-3.5-turbo")
+
+  # 주어진 주제에 대한 단락을 생성하는 작업
+  @task
+  def generate_paragraph(topic: str) -> str:
+      response = llm.invoke([
+          {"role": "system", "content": "You are a helpful assistant that writes educational paragraphs."},
+          {"role": "user", "content": f"Write a paragraph about {topic}."}
+      ])
+      return response.content
+
+  # 영속성을 위한 체크포인터 생성
+  checkpointer = InMemorySaver()
+
+  @entrypoint(checkpointer=checkpointer)
+  def workflow(topics: list[str]) -> str:
+      """여러 단락을 병렬로 생성하고 결합합니다."""
+      futures = [generate_paragraph(topic) for topic in topics]
+      paragraphs = [f.result() for f in futures]
+      return "\n\n".join(paragraphs)
+
+  # 워크플로우 실행
+  config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+  result = workflow.invoke(["quantum computing", "climate change", "history of aviation"], config=config)
+  print(result)
+  ```
+  :::
+
+  :::js
+  ```typescript
+  import { v4 as uuidv4 } from "uuid";
+  import { ChatOpenAI } from "@langchain/openai";
+  import { entrypoint, task, MemorySaver } from "@langchain/langgraph";
+
+  // LLM 모델 초기화
+  const llm = new ChatOpenAI({ model: "gpt-3.5-turbo" });
+
+  // 주어진 주제에 대한 단락을 생성하는 작업
+  const generateParagraph = task("generateParagraph", async (topic: string) => {
+    const response = await llm.invoke([
+      { role: "system", content: "You are a helpful assistant that writes educational paragraphs." },
+      { role: "user", content: `Write a paragraph about ${topic}.` }
+    ]);
+    return response.content as string;
+  });
+
+  // 영속성을 위한 체크포인터 생성
+  const checkpointer = new MemorySaver();
+
+  const workflow = entrypoint(
+    { checkpointer, name: "workflow" },
+    async (topics: string[]) => {
+      // 여러 단락을 병렬로 생성하고 결합
+      const paragraphs = await Promise.all(topics.map(generateParagraph));
+      return paragraphs.join("\n\n");
+    }
+  );
+
+  // 워크플로우 실행
+  const config = { configurable: { thread_id: uuidv4() } };
+  const result = await workflow.invoke(["quantum computing", "climate change", "history of aviation"], config);
+  console.log(result);
+  ```
+  :::
+
+  이 예제는 LangGraph의 동시성 모델을 사용하여 실행 시간을 개선합니다. 특히 작업이 LLM 완성과 같은 I/O를 포함할 때 효과적입니다.
+</Accordion>
+
+## 그래프 호출하기
+
+**함수형 API**와 [**그래프 API**](/oss/langgraph/graph-api)는 동일한 기본 런타임을 공유하므로 같은 애플리케이션에서 함께 사용할 수 있습니다.
+
+:::python
+```python
+from langgraph.func import entrypoint
+from langgraph.graph import StateGraph
+
+builder = StateGraph()
+...
+some_graph = builder.compile()
+
+@entrypoint()
+def some_workflow(some_input: dict) -> int:
+    # 그래프 API로 정의된 그래프 호출
+    result_1 = some_graph.invoke(...)
+    # 그래프 API로 정의된 다른 그래프 호출
+    result_2 = another_graph.invoke(...)
+    return {
+        "result_1": result_1,
+        "result_2": result_2
+    }
+```
+:::
+
+:::js
+```typescript
+import { entrypoint } from "@langchain/langgraph";
+import { StateGraph } from "@langchain/langgraph";
+
+const builder = new StateGraph(/* ... */);
+// ...
+const someGraph = builder.compile();
+
+const someWorkflow = entrypoint(
+  { name: "someWorkflow" },
+  async (someInput: Record<string, any>) => {
+    // 그래프 API로 정의된 그래프 호출
+    const result1 = await someGraph.invoke(/* ... */);
+    // 그래프 API로 정의된 다른 그래프 호출
+    const result2 = await anotherGraph.invoke(/* ... */);
+    return {
+      result1,
+      result2,
+    };
+  }
+);
+```
+:::
+
+<Accordion title="확장 예제: 함수형 API에서 간단한 그래프 호출하기">
+  :::python
+  ```python
+  import uuid
+  from typing import TypedDict
+  from langgraph.func import entrypoint
+  from langgraph.checkpoint.memory import InMemorySaver
+  from langgraph.graph import StateGraph
+
+  # 공유 상태 타입 정의
+  class State(TypedDict):
+      foo: int
+
+  # 간단한 변환 노드 정의
+  def double(state: State) -> State:
+      return {"foo": state["foo"] * 2}
+
+  # 그래프 API를 사용하여 그래프 구축
+  builder = StateGraph(State)
+  builder.add_node("double", double)
+  builder.set_entry_point("double")
+  graph = builder.compile()
+
+  # 함수형 API 워크플로우 정의
+  checkpointer = InMemorySaver()
+
+  @entrypoint(checkpointer=checkpointer)
+  def workflow(x: int) -> dict:
+      result = graph.invoke({"foo": x})
+      return {"bar": result["foo"]}
+
+  # 워크플로우 실행
+  config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+  print(workflow.invoke(5, config=config))  # 출력: {'bar': 10}
+  ```
+  :::
+
+  :::js
+  ```typescript
+  import { v4 as uuidv4 } from "uuid";
+  import { entrypoint, MemorySaver } from "@langchain/langgraph";
+  import { StateGraph } from "@langchain/langgraph";
+  import * as z from "zod";
+
+  // 공유 상태 타입 정의
+  const State = z.object({
+    foo: z.number(),
+  });
+
+  // 그래프 API를 사용하여 그래프 구축
+  const builder = new StateGraph(State)
+    .addNode("double", (state) => {
+      return { foo: state.foo * 2 };
+    })
+    .addEdge("__start__", "double");
+  const graph = builder.compile();
+
+  // 함수형 API 워크플로우 정의
+  const checkpointer = new MemorySaver();
+
+  const workflow = entrypoint(
+    { checkpointer, name: "workflow" },
+    async (x: number) => {
+      const result = await graph.invoke({ foo: x });
+      return { bar: result.foo };
+    }
+  );
+
+  // 워크플로우 실행
+  const config = { configurable: { thread_id: uuidv4() } };
+  console.log(await workflow.invoke(5, config)); // 출력: { bar: 10 }
+  ```
+  :::
+</Accordion>
+
+## 다른 엔트리포인트 호출하기
+
+**entrypoint** 또는 **task** 내에서 다른 **entrypoint**를 호출할 수 있습니다.
+
+:::python
+```python
+@entrypoint() # 부모 엔트리포인트의 체크포인터를 자동으로 사용합니다
+def some_other_workflow(inputs: dict) -> int:
+    return inputs["value"]
+
+@entrypoint(checkpointer=checkpointer)
+def my_workflow(inputs: dict) -> int:
+    value = some_other_workflow.invoke({"value": 1})
+    return value
+```
+:::
+
+:::js
+```typescript
+// 부모 엔트리포인트의 체크포인터를 자동으로 사용
+const someOtherWorkflow = entrypoint(
+  { name: "someOtherWorkflow" },
+  async (inputs: { value: number }) => {
+    return inputs.value;
+  }
+);
+
+const myWorkflow = entrypoint(
+  { checkpointer, name: "myWorkflow" },
+  async (inputs: { value: number }) => {
+    const value = await someOtherWorkflow.invoke({ value: 1 });
+    return value;
+  }
+);
+```
+:::
+
+<Accordion title="확장 예제: 다른 엔트리포인트 호출하기">
+  :::python
+  ```python
+  import uuid
+  from langgraph.func import entrypoint
+  from langgraph.checkpoint.memory import InMemorySaver
+
+  # 체크포인터 초기화
+  checkpointer = InMemorySaver()
+
+  # 숫자를 곱하는 재사용 가능한 서브 워크플로우
+  @entrypoint()
+  def multiply(inputs: dict) -> int:
+      return inputs["a"] * inputs["b"]
+
+  # 서브 워크플로우를 호출하는 메인 워크플로우
+  @entrypoint(checkpointer=checkpointer)
+  def main(inputs: dict) -> dict:
+      result = multiply.invoke({"a": inputs["x"], "b": inputs["y"]})
+      return {"product": result}
+
+  # 메인 워크플로우 실행
+  config = {"configurable": {"thread_id": str(uuid.uuid4())}}
+  print(main.invoke({"x": 6, "y": 7}, config=config))  # 출력: {'product': 42}
+  ```
+  :::
+
+  :::js
+  ```typescript
+  import { v4 as uuidv4 } from "uuid";
+  import { entrypoint, MemorySaver } from "@langchain/langgraph";
+
+  // 체크포인터 초기화
+  const checkpointer = new MemorySaver();
+
+  // 숫자를 곱하는 재사용 가능한 서브 워크플로우
+  const multiply = entrypoint(
+    { name: "multiply" },
+    async (inputs: { a: number; b: number }) => {
+      return inputs.a * inputs.b;
+    }
+  );
+
+  // 서브 워크플로우를 호출하는 메인 워크플로우
+  const main = entrypoint(
+    { checkpointer, name: "main" },
+    async (inputs: { x: number; y: number }) => {
+      const result = await multiply.invoke({ a: inputs.x, b: inputs.y });
+      return { product: result };
+    }
+  );
+
+  // 메인 워크플로우 실행
+  const config = { configurable: { thread_id: uuidv4() } };
+  console.log(await main.invoke({ x: 6, y: 7 }, config)); // 출력: { product: 42 }
+  ```
+  :::
+</Accordion>
+
+## 스트리밍
+
+**함수형 API**는 **그래프 API**와 동일한 스트리밍 메커니즘을 사용합니다.
+자세한 내용은 [**스트리밍 가이드**](/oss/langgraph/streaming) 섹션을 참조하세요.
+
+업데이트와 사용자 정의 데이터를 모두 스트리밍하는 스트리밍 API 사용 예제입니다.
+
+:::python
+```python {highlight={17}}
+from langgraph.func import entrypoint
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.config import get_stream_writer # (1)!
+
+checkpointer = InMemorySaver()
+
+@entrypoint(checkpointer=checkpointer)
+def main(inputs: dict) -> int:
+    writer = get_stream_writer() # (2)!
+    writer("Started processing") # (3)!
+    result = inputs["x"] * 2
+    writer(f"Result is {result}") # (4)!
+    return result
+
+config = {"configurable": {"thread_id": "abc"}}
+
+for mode, chunk in main.stream( # (5)!
+    {"x": 5},
+    stream_mode=["custom", "updates"], # (6)!
+    config=config
+):
+    print(f"{mode}: {chunk}")
+```
+
+1. `langgraph.config`에서 `get_stream_writer`를 가져옵니다.
+2. 엔트리포인트 내에서 스트림 라이터 인스턴스를 가져옵니다.
+3. 계산이 시작되기 전에 사용자 정의 데이터를 출력합니다.
+4. 결과를 계산한 후 다른 사용자 정의 메시지를 출력합니다.
+5. `.stream()`을 사용하여 스트리밍된 출력을 처리합니다.
+6. 사용할 스트리밍 모드를 지정합니다.
+
+```pycon
+('updates', {'add_one': 2})
+('updates', {'add_two': 3})
+('custom', 'hello')
+('custom', 'world')
+('updates', {'main': 5})
+```
+
+<Warning>
+**Python < 3.11에서 비동기 사용**
+Python < 3.11을 사용하고 비동기 코드를 작성하는 경우 `get_stream_writer()`를 사용하면 작동하지 않습니다. 대신 `StreamWriter` 클래스를 직접 사용하세요. 자세한 내용은 [Python < 3.11에서 비동기](/oss/langgraph/streaming#async)를 참조하세요.
+
+```python {highlight={4}}
+from langgraph.types import StreamWriter
+
+@entrypoint(checkpointer=checkpointer)
+async def main(inputs: dict, writer: StreamWriter) -> int:
+...
+```
+</Warning>
+:::
+
+:::js
+```typescript
+import {
+  entrypoint,
+  MemorySaver,
+  LangGraphRunnableConfig,
+} from "@langchain/langgraph";
+
+const checkpointer = new MemorySaver();
+
+const main = entrypoint(
+  { checkpointer, name: "main" },
+  async (
+    inputs: { x: number },
+    config: LangGraphRunnableConfig
+  ): Promise<number> => {
+    config.writer?.("Started processing"); // (1)!
+    const result = inputs.x * 2;
+    config.writer?.(`Result is ${result}`); // (2)!
+    return result;
+  }
+);
+
+const config = { configurable: { thread_id: "abc" } };
+
+// (3)!
+for await (const [mode, chunk] of await main.stream(
+  { x: 5 },
+  { streamMode: ["custom", "updates"], ...config } // (4)!
+)) {
+  console.log(`${mode}: ${JSON.stringify(chunk)}`);
+}
+```
+
+1. 계산이 시작되기 전에 사용자 정의 데이터를 출력합니다.
+2. 결과를 계산한 후 다른 사용자 정의 메시지를 출력합니다.
+3. `.stream()`을 사용하여 스트리밍된 출력을 처리합니다.
+4. 사용할 스트리밍 모드를 지정합니다.
+
+```
+updates: {"addOne": 2}
+updates: {"addTwo": 3}
+custom: "hello"
+custom: "world"
+updates: {"main": 5}
+```
+:::
+
+## 재시도 정책
+
+:::python
+```python
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.func import entrypoint, task
+from langgraph.types import RetryPolicy
+
+# 이 변수는 네트워크 장애를 시뮬레이션하기 위한 데모용입니다.
+# 실제 코드에서는 사용하지 않습니다.
+attempts = 0
+
+# RetryPolicy를 ValueError에 대해 재시도하도록 구성합니다.
+# 기본 RetryPolicy는 특정 네트워크 오류를 재시도하도록 최적화되어 있습니다.
+retry_policy = RetryPolicy(retry_on=ValueError)
+
+@task(retry_policy=retry_policy)
+def get_info():
+    global attempts
+    attempts += 1
+
+    if attempts < 2:
+        raise ValueError('Failure')
+    return "OK"
+
+checkpointer = InMemorySaver()
+
+@entrypoint(checkpointer=checkpointer)
+def main(inputs, writer):
+    return get_info().result()
+
+config = {
+    "configurable": {
+        "thread_id": "1"
+    }
+}
+
+main.invoke({'any_input': 'foobar'}, config=config)
+```
+
+```pycon
+'OK'
+```
+:::
+
+:::js
+```typescript
+import {
+  MemorySaver,
+  entrypoint,
+  task,
+  RetryPolicy,
+} from "@langchain/langgraph";
+
+// 이 변수는 네트워크 장애를 시뮬레이션하기 위한 데모용입니다.
+// 실제 코드에서는 사용하지 않습니다.
+let attempts = 0;
+
+// RetryPolicy를 ValueError에 대해 재시도하도록 구성합니다.
+// 기본 RetryPolicy는 특정 네트워크 오류를 재시도하도록 최적화되어 있습니다.
+const retryPolicy: RetryPolicy = { retryOn: (error) => error instanceof Error };
+
+const getInfo = task(
+  {
+    name: "getInfo",
+    retry: retryPolicy,
+  },
+  () => {
+    attempts += 1;
+
+    if (attempts < 2) {
+      throw new Error("Failure");
+    }
+    return "OK";
+  }
+);
+
+const checkpointer = new MemorySaver();
+
+const main = entrypoint(
+  { checkpointer, name: "main" },
+  async (inputs: Record<string, any>) => {
+    return await getInfo();
+  }
+);
+
+const config = {
+  configurable: {
+    thread_id: "1",
+  },
+};
+
+await main.invoke({ any_input: "foobar" }, config);
+```
+
+```
+'OK'
+```
+:::
+
+## 작업 캐싱
+
+:::python
+```python
+import time
+from langgraph.cache.memory import InMemoryCache
+from langgraph.func import entrypoint, task
+from langgraph.types import CachePolicy
+
+
+@task(cache_policy=CachePolicy(ttl=120))  # (1)!
+def slow_add(x: int) -> int:
+    time.sleep(1)
+    return x * 2
+
+
+@entrypoint(cache=InMemoryCache())
+def main(inputs: dict) -> dict[str, int]:
+    result1 = slow_add(inputs["x"]).result()
+    result2 = slow_add(inputs["x"]).result()
+    return {"result1": result1, "result2": result2}
+
+
+for chunk in main.stream({"x": 5}, stream_mode="updates"):
+    print(chunk)
+
+#> {'slow_add': 10}
+#> {'slow_add': 10, '__metadata__': {'cached': True}}
+#> {'main': {'result1': 10, 'result2': 10}}
+```
+
+1. `ttl`은 초 단위로 지정됩니다. 이 시간이 지나면 캐시가 무효화됩니다.
+:::
+
+:::js
+```typescript
+import {
+  InMemoryCache,
+  entrypoint,
+  task,
+  CachePolicy,
+} from "@langchain/langgraph";
+
+const slowAdd = task(
+  {
+    name: "slowAdd",
+    cache: { ttl: 120 }, // (1)!
+  },
+  async (x: number) => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return x * 2;
+  }
+);
+
+const main = entrypoint(
+  { cache: new InMemoryCache(), name: "main" },
+  async (inputs: { x: number }) => {
+    const result1 = await slowAdd(inputs.x);
+    const result2 = await slowAdd(inputs.x);
+    return { result1, result2 };
+  }
+);
+
+for await (const chunk of await main.stream(
+  { x: 5 },
+  { streamMode: "updates" }
+)) {
+  console.log(chunk);
+}
+
+//> { slowAdd: 10 }
+//> { slowAdd: 10, '__metadata__': { cached: true } }
+//> { main: { result1: 10, result2: 10 } }
+```
+
+1. `ttl`은 초 단위로 지정됩니다. 이 시간이 지나면 캐시가 무효화됩니다.
+:::
+
+## 오류 후 재개하기
+
+:::python
+```python
+import time
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.func import entrypoint, task
+from langgraph.types import StreamWriter
+
+# 이 변수는 네트워크 장애를 시뮬레이션하기 위한 데모용입니다.
+# 실제 코드에서는 사용하지 않습니다.
+attempts = 0
+
+@task()
+def get_info():
+    """
+    성공하기 전에 한 번 실패하는 작업을 시뮬레이션합니다.
+    첫 번째 시도에서는 예외를 발생시키고, 이후 시도에서는 "OK"를 반환합니다.
+    """
+    global attempts
+    attempts += 1
+
+    if attempts < 2:
+        raise ValueError("Failure")  # 첫 번째 시도에서 실패 시뮬레이션
+    return "OK"
+
+# 영속성을 위한 인메모리 체크포인터 초기화
+checkpointer = InMemorySaver()
+
+@task
+def slow_task():
+    """
+    1초 지연을 도입하여 느리게 실행되는 작업을 시뮬레이션합니다.
+    """
+    time.sleep(1)
+    return "Ran slow task."
+
+@entrypoint(checkpointer=checkpointer)
+def main(inputs, writer: StreamWriter):
+    """
+    slow_task와 get_info 작업을 순차적으로 실행하는 메인 워크플로우 함수입니다.
+
+    매개변수:
+    - inputs: 워크플로우 입력 값을 포함하는 딕셔너리입니다.
+    - writer: 사용자 정의 데이터를 스트리밍하기 위한 StreamWriter입니다.
+
+    워크플로우는 먼저 `slow_task`를 실행한 다음 `get_info`를 실행하려고 시도하는데,
+    첫 번째 호출에서는 실패합니다.
+    """
+    slow_task_result = slow_task().result()  # slow_task에 대한 블로킹 호출
+    get_info().result()  # 첫 번째 시도에서 여기서 예외가 발생합니다
+    return slow_task_result
+
+# 고유한 스레드 식별자를 사용한 워크플로우 실행 구성
+config = {
+    "configurable": {
+        "thread_id": "1"  # 워크플로우 실행을 추적하기 위한 고유 식별자
+    }
+}
+
+# 이 호출은 slow_task 실행으로 인해 약 1초가 소요됩니다
+try:
+    # get_info 작업이 실패하여 첫 번째 호출에서 예외가 발생합니다
+    main.invoke({'any_input': 'foobar'}, config=config)
+except ValueError:
+    pass  # 실패를 우아하게 처리
+```
+
+실행을 재개할 때 `slow_task`의 결과가 이미 체크포인트에 저장되어 있으므로 다시 실행할 필요가 없습니다.
+
+```python
+main.invoke(None, config=config)
+```
+
+```pycon
+'Ran slow task.'
+```
+:::
+
+:::js
+```typescript
+import { entrypoint, task, MemorySaver } from "@langchain/langgraph";
+
+// 이 변수는 네트워크 장애를 시뮬레이션하기 위한 데모용입니다.
+// 실제 코드에서는 사용하지 않습니다.
+let attempts = 0;
+
+const getInfo = task("getInfo", async () => {
+  /**
+   * 성공하기 전에 한 번 실패하는 작업을 시뮬레이션합니다.
+   * 첫 번째 시도에서는 예외를 발생시키고, 이후 시도에서는 "OK"를 반환합니다.
+   */
+  attempts += 1;
+
+  if (attempts < 2) {
+    throw new Error("Failure"); // 첫 번째 시도에서 실패 시뮬레이션
+  }
+  return "OK";
+});
+
+// 영속성을 위한 인메모리 체크포인터 초기화
+const checkpointer = new MemorySaver();
+
+const slowTask = task("slowTask", async () => {
+  /**
+   * 1초 지연을 도입하여 느리게 실행되는 작업을 시뮬레이션합니다.
+   */
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  return "Ran slow task.";
+});
+
+const main = entrypoint(
+  { checkpointer, name: "main" },
+  async (inputs: Record<string, any>) => {
+    /**
+     * slowTask와 getInfo 작업을 순차적으로 실행하는 메인 워크플로우 함수입니다.
+     *
+     * 매개변수:
+     * - inputs: 워크플로우 입력 값을 포함하는 Record<string, any>입니다.
+     *
+     * 워크플로우는 먼저 `slowTask`를 실행한 다음 `getInfo`를 실행하려고 시도하는데,
+     * 첫 번째 호출에서는 실패합니다.
+     */
+    const slowTaskResult = await slowTask(); // slowTask에 대한 블로킹 호출
+    await getInfo(); // 첫 번째 시도에서 여기서 예외가 발생합니다
+    return slowTaskResult;
+  }
+);
+
+// 고유한 스레드 식별자를 사용한 워크플로우 실행 구성
+const config = {
+  configurable: {
+    thread_id: "1", // 워크플로우 실행을 추적하기 위한 고유 식별자
+  },
+};
+
+// 이 호출은 slowTask 실행으로 인해 약 1초가 소요됩니다
+try {
+  // getInfo 작업이 실패하여 첫 번째 호출에서 예외가 발생합니다
+  await main.invoke({ any_input: "foobar" }, config);
+} catch (err) {
+  // 실패를 우아하게 처리
+}
+```
+
+실행을 재개할 때 `slowTask`의 결과가 이미 체크포인트에 저장되어 있으므로 다시 실행할 필요가 없습니다.
+
+```typescript
+await main.invoke(null, config);
+```
+
+```
+'Ran slow task.'
+```
+:::
+
+## Human-in-the-loop
+
+함수형 API는 `interrupt` 함수와 `Command` 프리미티브를 사용하여 [human-in-the-loop](/oss/langgraph/interrupts) 워크플로우를 지원합니다.
+
+### 기본 human-in-the-loop 워크플로우
+
+세 개의 [작업](/oss/langgraph/functional-api#task)을 생성하겠습니다:
+
+1. `"bar"` 추가하기.
+2. 사용자 입력을 위해 일시 정지. 재개할 때 사용자 입력 추가하기.
+3. `"qux"` 추가하기.
+
+:::python
+```python
+from langgraph.func import entrypoint, task
+from langgraph.types import Command, interrupt
+
+
+@task
+def step_1(input_query):
+    """bar를 추가합니다."""
+    return f"{input_query} bar"
+
+
+@task
+def human_feedback(input_query):
+    """사용자 입력을 추가합니다."""
+    feedback = interrupt(f"Please provide feedback: {input_query}")
+    return f"{input_query} {feedback}"
+
+@task
+def step_3(input_query):
+    """qux를 추가합니다."""
+    return f"{input_query} qux"
+```
+:::
+
+:::js
+```typescript
+import { entrypoint, task, interrupt, Command } from "@langchain/langgraph";
+
+const step1 = task("step1", async (inputQuery: string) => {
+  // bar 추가
+  return `${inputQuery} bar`;
+});
+
+const humanFeedback = task("humanFeedback", async (inputQuery: string) => {
+  // 사용자 입력 추가
+  const feedback = interrupt(`Please provide feedback: ${inputQuery}`);
+  return `${inputQuery} ${feedback}`;
+});
+
+const step3 = task("step3", async (inputQuery: string) => {
+  // qux 추가
+  return `${inputQuery} qux`;
+});
+```
+:::
+
+이제 이러한 작업을 [entrypoint](/oss/langgraph/functional-api#entrypoint)에서 구성할 수 있습니다:
+
+:::python
+```python
+from langgraph.checkpoint.memory import InMemorySaver
+
+checkpointer = InMemorySaver()
+
+
+@entrypoint(checkpointer=checkpointer)
+def graph(input_query):
+    result_1 = step_1(input_query).result()
+    result_2 = human_feedback(result_1).result()
+    result_3 = step_3(result_2).result()
+
+    return result_3
+```
+:::
+
+:::js
+```typescript
+import { MemorySaver } from "@langchain/langgraph";
+
+const checkpointer = new MemorySaver();
+
+const graph = entrypoint(
+  { checkpointer, name: "graph" },
+  async (inputQuery: string) => {
+    const result1 = await step1(inputQuery);
+    const result2 = await humanFeedback(result1);
+    const result3 = await step3(result2);
+
+    return result3;
+  }
+);
+```
+:::
+
+[interrupt()](/oss/langgraph/interrupts#pause-using-interrupt)는 작업 내에서 호출되어 사람이 이전 작업의 출력을 검토하고 편집할 수 있게 합니다. 이 경우 `step_1`과 같은 이전 작업의 결과는 유지되므로 `interrupt` 이후 다시 실행되지 않습니다.
+
+쿼리 문자열을 보내 보겠습니다:
+
+:::python
+```python
+config = {"configurable": {"thread_id": "1"}}
+
+for event in graph.stream("foo", config):
+    print(event)
+    print("\n")
+```
+:::
+
+:::js
+```typescript
+const config = { configurable: { thread_id: "1" } };
+
+for await (const event of await graph.stream("foo", config)) {
+  console.log(event);
+  console.log("\n");
+}
+```
+:::
+
+`step_1` 이후 `interrupt`로 일시 정지했습니다. interrupt는 실행을 재개하기 위한 지침을 제공합니다. 재개하려면 `human_feedback` 작업에서 예상하는 데이터를 포함하는 [Command](/oss/langgraph/interrupts#resuming-interrupts)를 발행합니다.
+
+:::python
+```python
+# 실행 계속
+for event in graph.stream(Command(resume="baz"), config):
+    print(event)
+    print("\n")
+```
+:::
+
+:::js
+```typescript
+// 실행 계속
+for await (const event of await graph.stream(
+  new Command({ resume: "baz" }),
+  config
+)) {
+  console.log(event);
+  console.log("\n");
+}
+```
+:::
+
+재개한 후 실행은 나머지 단계를 거쳐 예상대로 종료됩니다.
+
+### 도구 호출 검토하기
+
+실행 전에 도구 호출을 검토하려면 [`interrupt`](/oss/langgraph/interrupts#pause-using-interrupt)를 호출하는 `review_tool_call` 함수를 추가합니다. 이 함수가 호출되면 재개 명령을 발행할 때까지 실행이 일시 정지됩니다.
+
+도구 호출이 주어지면 함수는 사람의 검토를 위해 `interrupt`합니다. 이 시점에서 다음 중 하나를 수행할 수 있습니다:
+
+* 도구 호출 수락
+* 도구 호출 수정 및 계속
+* 사용자 정의 도구 메시지 생성(예: 도구 호출을 다시 포맷하도록 모델에 지시)
+
+:::python
+```python
+from typing import Union
+
+def review_tool_call(tool_call: ToolCall) -> Union[ToolCall, ToolMessage]:
+    """도구 호출을 검토하고 검증된 버전을 반환합니다."""
+    human_review = interrupt(
+        {
+            "question": "Is this correct?",
+            "tool_call": tool_call,
+        }
+    )
+    review_action = human_review["action"]
+    review_data = human_review.get("data")
+    if review_action == "continue":
+        return tool_call
+    elif review_action == "update":
+        updated_tool_call = {**tool_call, **{"args": review_data}}
+        return updated_tool_call
+    elif review_action == "feedback":
+        return ToolMessage(
+            content=review_data, name=tool_call["name"], tool_call_id=tool_call["id"]
+        )
+```
+:::
+
+:::js
+```typescript
+import { ToolCall } from "@langchain/core/messages/tool";
+import { ToolMessage } from "@langchain/core/messages";
+
+function reviewToolCall(toolCall: ToolCall): ToolCall | ToolMessage {
+  // 도구 호출을 검토하고 검증된 버전 반환
+  const humanReview = interrupt({
+    question: "Is this correct?",
+    tool_call: toolCall,
+  });
+
+  const reviewAction = humanReview.action;
+  const reviewData = humanReview.data;
+
+  if (reviewAction === "continue") {
+    return toolCall;
+  } else if (reviewAction === "update") {
+    const updatedToolCall = { ...toolCall, args: reviewData };
+    return updatedToolCall;
+  } else if (reviewAction === "feedback") {
+    return new ToolMessage({
+      content: reviewData,
+      name: toolCall.name,
+      tool_call_id: toolCall.id,
+    });
+  }
+
+  throw new Error(`Unknown review action: ${reviewAction}`);
+}
+```
+:::
+
+이제 [entrypoint](/oss/langgraph/functional-api#entrypoint)를 업데이트하여 생성된 도구 호출을 검토할 수 있습니다. 도구 호출이 수락되거나 수정되면 이전과 같은 방식으로 실행합니다. 그렇지 않으면 사람이 제공한 `ToolMessage`를 추가하기만 하면 됩니다. 이전 작업의 결과(이 경우 초기 모델 호출)는 유지되므로 `interrupt` 이후 다시 실행되지 않습니다.
+
+:::python
+```python
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.graph.message import add_messages
+from langgraph.types import Command, interrupt
+
+
+checkpointer = InMemorySaver()
+
+
+@entrypoint(checkpointer=checkpointer)
+def agent(messages, previous):
+    if previous is not None:
+        messages = add_messages(previous, messages)
+
+    llm_response = call_model(messages).result()
+    while True:
+        if not llm_response.tool_calls:
+            break
+
+        # 도구 호출 검토
+        tool_results = []
+        tool_calls = []
+        for i, tool_call in enumerate(llm_response.tool_calls):
+            review = review_tool_call(tool_call)
+            if isinstance(review, ToolMessage):
+                tool_results.append(review)
+            else:  # 검증된 도구 호출인 경우
+                tool_calls.append(review)
+                if review != tool_call:
+                    llm_response.tool_calls[i] = review  # 메시지 업데이트
+
+        # 나머지 도구 호출 실행
+        tool_result_futures = [call_tool(tool_call) for tool_call in tool_calls]
+        remaining_tool_results = [fut.result() for fut in tool_result_futures]
+
+        # 메시지 목록에 추가
+        messages = add_messages(
+            messages,
+            [llm_response, *tool_results, *remaining_tool_results],
+        )
+
+        # 모델 다시 호출
+        llm_response = call_model(messages).result()
+
+    # 최종 응답 생성
+    messages = add_messages(messages, llm_response)
+    return entrypoint.final(value=llm_response, save=messages)
+```
+:::
+
+:::js
+```typescript
+import {
+  MemorySaver,
+  entrypoint,
+  interrupt,
+  Command,
+  addMessages,
+} from "@langchain/langgraph";
+import { ToolMessage, AIMessage, BaseMessage } from "@langchain/core/messages";
+
+const checkpointer = new MemorySaver();
+
+const agent = entrypoint(
+  { checkpointer, name: "agent" },
+  async (
+    messages: BaseMessage[],
+    previous?: BaseMessage[]
+  ): Promise<BaseMessage> => {
+    if (previous !== undefined) {
+      messages = addMessages(previous, messages);
+    }
+
+    let llmResponse = await callModel(messages);
+    while (true) {
+      if (!llmResponse.tool_calls?.length) {
+        break;
+      }
+
+      // 도구 호출 검토
+      const toolResults: ToolMessage[] = [];
+      const toolCalls: ToolCall[] = [];
+
+      for (let i = 0; i < llmResponse.tool_calls.length; i++) {
+        const review = reviewToolCall(llmResponse.tool_calls[i]);
+        if (review instanceof ToolMessage) {
+          toolResults.push(review);
+        } else {
+          // 검증된 도구 호출인 경우
+          toolCalls.push(review);
+          if (review !== llmResponse.tool_calls[i]) {
+            llmResponse.tool_calls[i] = review; // 메시지 업데이트
+          }
+        }
+      }
+
+      // 나머지 도구 호출 실행
+      const remainingToolResults = await Promise.all(
+        toolCalls.map((toolCall) => callTool(toolCall))
+      );
+
+      // 메시지 목록에 추가
+      messages = addMessages(messages, [
+        llmResponse,
+        ...toolResults,
+        ...remainingToolResults,
+      ]);
+
+      // 모델 다시 호출
+      llmResponse = await callModel(messages);
+    }
+
+    // 최종 응답 생성
+    messages = addMessages(messages, llmResponse);
+    return entrypoint.final({ value: llmResponse, save: messages });
+  }
+);
+```
+:::
+
+## 단기 메모리
+
+단기 메모리를 사용하면 동일한 **스레드 ID**의 서로 다른 **호출** 간에 정보를 저장할 수 있습니다. 자세한 내용은 [단기 메모리](/oss/langgraph/functional-api#short-term-memory)를 참조하세요.
+
+### 체크포인트 관리
+
+체크포인터에 저장된 정보를 보고 삭제할 수 있습니다.
+
+<a id="checkpoint"></a>
+#### 스레드 상태 보기
+
+:::python
+```python {highlight={3,6,10}}
+config = {
+    "configurable": {
+        "thread_id": "1",
+        # 선택적으로 특정 체크포인트의 ID를 제공할 수 있습니다.
+        # 그렇지 않으면 최신 체크포인트가 표시됩니다.
+        # "checkpoint_id": "1f029ca3-1f5b-6704-8004-820c16b69a5a"
+
+    }
+}
+graph.get_state(config)
+```
+
+```
+StateSnapshot(
+    values={'messages': [HumanMessage(content="hi! I'm bob"), AIMessage(content='Hi Bob! How are you doing today?), HumanMessage(content="what's my name?"), AIMessage(content='Your name is Bob.')]}, next=(),
+    config={'configurable': {'thread_id': '1', 'checkpoint_ns': '', 'checkpoint_id': '1f029ca3-1f5b-6704-8004-820c16b69a5a'}},
+    metadata={
+        'source': 'loop',
+        'writes': {'call_model': {'messages': AIMessage(content='Your name is Bob.')}},
+        'step': 4,
+        'parents': {},
+        'thread_id': '1'
+    },
+    created_at='2025-05-05T16:01:24.680462+00:00',
+    parent_config={'configurable': {'thread_id': '1', 'checkpoint_ns': '', 'checkpoint_id': '1f029ca3-1790-6b0a-8003-baf965b6a38f'}},
+    tasks=(),
+    interrupts=()
+)
+```
+:::
+
+:::js
+```typescript {highlight={3,6,9}}
+const config = {
+  configurable: {
+    thread_id: "1",
+    // 선택적으로 특정 체크포인트의 ID를 제공할 수 있습니다.
+    // 그렇지 않으면 최신 체크포인트가 표시됩니다.
+    // checkpoint_id: "1f029ca3-1f5b-6704-8004-820c16b69a5a"
+  },
+};
+await graph.getState(config);
+```
+
+```
+StateSnapshot {
+  values: {
+    messages: [
+      HumanMessage { content: "hi! I'm bob" },
+      AIMessage { content: "Hi Bob! How are you doing today?" },
+      HumanMessage { content: "what's my name?" },
+      AIMessage { content: "Your name is Bob." }
+    ]
+  },
+  next: [],
+  config: { configurable: { thread_id: '1', checkpoint_ns: '', checkpoint_id: '1f029ca3-1f5b-6704-8004-820c16b69a5a' } },
+  metadata: {
+    source: 'loop',
+    writes: { call_model: { messages: AIMessage { content: "Your name is Bob." } } },
+    step: 4,
+    parents: {},
+    thread_id: '1'
+  },
+  createdAt: '2025-05-05T16:01:24.680462+00:00',
+  parentConfig: { configurable: { thread_id: '1', checkpoint_ns: '', checkpoint_id: '1f029ca3-1790-6b0a-8003-baf965b6a38f' } },
+  tasks: [],
+  interrupts: []
+}
+```
+:::
+
+<a id="checkpoints"></a>
+#### 스레드 히스토리 보기
+
+:::python
+```python {highlight={3,6}}
+config = {
+    "configurable": {
+        "thread_id": "1"
+    }
+}
+list(graph.get_state_history(config))
+```
+
+```
+[
+    StateSnapshot(
+        values={'messages': [HumanMessage(content="hi! I'm bob"), AIMessage(content='Hi Bob! How are you doing today? Is there anything I can help you with?'), HumanMessage(content="what's my name?"), AIMessage(content='Your name is Bob.')]},
+        next=(),
+        config={'configurable': {'thread_id': '1', 'checkpoint_ns': '', 'checkpoint_id': '1f029ca3-1f5b-6704-8004-820c16b69a5a'}},
+        metadata={'source': 'loop', 'writes': {'call_model': {'messages': AIMessage(content='Your name is Bob.')}}, 'step': 4, 'parents': {}, 'thread_id': '1'},
+        created_at='2025-05-05T16:01:24.680462+00:00',
+        parent_config={'configurable': {'thread_id': '1', 'checkpoint_ns': '', 'checkpoint_id': '1f029ca3-1790-6b0a-8003-baf965b6a38f'}},
+        tasks=(),
+        interrupts=()
+    ),
+    StateSnapshot(
+        values={'messages': [HumanMessage(content="hi! I'm bob"), AIMessage(content='Hi Bob! How are you doing today? Is there anything I can help you with?'), HumanMessage(content="what's my name?")]},
+        next=('call_model',),
+        config={'configurable': {'thread_id': '1', 'checkpoint_ns': '', 'checkpoint_id': '1f029ca3-1790-6b0a-8003-baf965b6a38f'}},
+        metadata={'source': 'loop', 'writes': None, 'step': 3, 'parents': {}, 'thread_id': '1'},
+        created_at='2025-05-05T16:01:23.863421+00:00',
+        parent_config={...}
+        tasks=(PregelTask(id='8ab4155e-6b15-b885-9ce5-bed69a2c305c', name='call_model', path=('__pregel_pull', 'call_model'), error=None, interrupts=(), state=None, result={'messages': AIMessage(content='Your name is Bob.')}),),
+        interrupts=()
+    ),
+    StateSnapshot(
+        values={'messages': [HumanMessage(content="hi! I'm bob"), AIMessage(content='Hi Bob! How are you doing today? Is there anything I can help you with?')]},
+        next=('__start__',),
+        config={...},
+        metadata={'source': 'input', 'writes': {'__start__': {'messages': [{'role': 'user', 'content': "what's my name?"}]}}, 'step': 2, 'parents': {}, 'thread_id': '1'},
+        created_at='2025-05-05T16:01:23.863173+00:00',
+        parent_config={...}
+        tasks=(PregelTask(id='24ba39d6-6db1-4c9b-f4c5-682aeaf38dcd', name='__start__', path=('__pregel_pull', '__start__'), error=None, interrupts=(), state=None, result={'messages': [{'role': 'user', 'content': "what's my name?"}]}),),
+        interrupts=()
+    ),
+    StateSnapshot(
+        values={'messages': [HumanMessage(content="hi! I'm bob"), AIMessage(content='Hi Bob! How are you doing today? Is there anything I can help you with?')]},
+        next=(),
+        config={...},
+        metadata={'source': 'loop', 'writes': {'call_model': {'messages': AIMessage(content='Hi Bob! How are you doing today? Is there anything I can help you with?')}}, 'step': 1, 'parents': {}, 'thread_id': '1'},
+        created_at='2025-05-05T16:01:23.862295+00:00',
+        parent_config={...}
+        tasks=(),
+        interrupts=()
+    ),
+    StateSnapshot(
+        values={'messages': [HumanMessage(content="hi! I'm bob")]},
+        next=('call_model',),
+        config={...},
+        metadata={'source': 'loop', 'writes': None, 'step': 0, 'parents': {}, 'thread_id': '1'},
+        created_at='2025-05-05T16:01:22.278960+00:00',
+        parent_config={...}
+        tasks=(PregelTask(id='8cbd75e0-3720-b056-04f7-71ac805140a0', name='call_model', path=('__pregel_pull', 'call_model'), error=None, interrupts=(), state=None, result={'messages': AIMessage(content='Hi Bob! How are you doing today? Is there anything I can help you with?')}),),
+        interrupts=()
+    ),
+    StateSnapshot(
+        values={'messages': []},
+        next=('__start__',),
+        config={'configurable': {'thread_id': '1', 'checkpoint_ns': '', 'checkpoint_id': '1f029ca3-0870-6ce2-bfff-1f3f14c3e565'}},
+        metadata={'source': 'input', 'writes': {'__start__': {'messages': [{'role': 'user', 'content': "hi! I'm bob"}]}}, 'step': -1, 'parents': {}, 'thread_id': '1'},
+        created_at='2025-05-05T16:01:22.277497+00:00',
+        parent_config=None,
+        tasks=(PregelTask(id='d458367b-8265-812c-18e2-33001d199ce6', name='__start__', path=('__pregel_pull', '__start__'), error=None, interrupts=(), state=None, result={'messages': [{'role': 'user', 'content': "hi! I'm bob"}]}),),
+        interrupts=()
+    )
+]
+```
+:::
+
+:::js
+```typescript {highlight={3,6}}
+const config = {
+  configurable: {
+    thread_id: "1",
+  },
+};
+const history = [];
+for await (const state of graph.getStateHistory(config)) {
+  history.push(state);
+}
+```
+
+```
+[
+  StateSnapshot {
+    values: {
+      messages: [
+        HumanMessage { content: "hi! I'm bob" },
+        AIMessage { content: "Hi Bob! How are you doing today? Is there anything I can help you with?" },
+        HumanMessage { content: "what's my name?" },
+        AIMessage { content: "Your name is Bob." }
+      ]
+    },
+    next: [],
+    config: { configurable: { thread_id: '1', checkpoint_ns: '', checkpoint_id: '1f029ca3-1f5b-6704-8004-820c16b69a5a' } },
+    metadata: { source: 'loop', writes: { call_model: { messages: AIMessage { content: "Your name is Bob." } } }, step: 4, parents: {}, thread_id: '1' },
+    createdAt: '2025-05-05T16:01:24.680462+00:00',
+    parentConfig: { configurable: { thread_id: '1', checkpoint_ns: '', checkpoint_id: '1f029ca3-1790-6b0a-8003-baf965b6a38f' } },
+    tasks: [],
+    interrupts: []
+  },
+  // ... 더 많은 상태 스냅샷
+]
+```
+:::
+
+### 반환 값과 저장 값 분리하기
+
+`entrypoint.final`을 사용하면 호출자에게 반환되는 값과 체크포인트에 저장되는 값을 분리할 수 있습니다. 다음과 같은 경우에 유용합니다:
+
+* 계산된 결과(예: 요약 또는 상태)를 반환하지만 다음 호출에 사용할 다른 내부 값을 저장하려는 경우.
+* 다음 실행에서 previous 매개변수로 전달될 값을 제어해야 하는 경우.
+
+:::python
+```python
+from langgraph.func import entrypoint
+from langgraph.checkpoint.memory import InMemorySaver
+
+checkpointer = InMemorySaver()
+
+@entrypoint(checkpointer=checkpointer)
+def accumulate(n: int, *, previous: int | None) -> entrypoint.final[int, int]:
+    previous = previous or 0
+    total = previous + n
+    # 호출자에게는 *이전* 값을 반환하지만 체크포인트에는 *새* 합계를 저장합니다.
+    return entrypoint.final(value=previous, save=total)
+
+config = {"configurable": {"thread_id": "my-thread"}}
+
+print(accumulate.invoke(1, config=config))  # 0
+print(accumulate.invoke(2, config=config))  # 1
+print(accumulate.invoke(3, config=config))  # 3
+```
+:::
+
+:::js
+```typescript
+import { entrypoint, MemorySaver } from "@langchain/langgraph";
+
+const checkpointer = new MemorySaver();
+
+const accumulate = entrypoint(
+  { checkpointer, name: "accumulate" },
+  async (n: number, previous?: number) => {
+    const prev = previous || 0;
+    const total = prev + n;
+    // 호출자에게는 *이전* 값을 반환하지만 체크포인트에는 *새* 합계를 저장
+    return entrypoint.final({ value: prev, save: total });
+  }
+);
+
+const config = { configurable: { thread_id: "my-thread" } };
+
+console.log(await accumulate.invoke(1, config)); // 0
+console.log(await accumulate.invoke(2, config)); // 1
+console.log(await accumulate.invoke(3, config)); // 3
+```
+:::
+
+### 챗봇 예제
+
+함수형 API와 `InMemorySaver` 체크포인터를 사용하는 간단한 챗봇 예제입니다.
+봇은 이전 대화를 기억하고 중단한 부분부터 계속할 수 있습니다.
+
+:::python
+```python
+from langchain.messages import BaseMessage
+from langgraph.graph import add_messages
+from langgraph.func import entrypoint, task
+from langgraph.checkpoint.memory import InMemorySaver
+from langchain_anthropic import ChatAnthropic
+
+model = ChatAnthropic(model="claude-3-5-sonnet-latest")
+
+@task
+def call_model(messages: list[BaseMessage]):
+    response = model.invoke(messages)
+    return response
+
+checkpointer = InMemorySaver()
+
+@entrypoint(checkpointer=checkpointer)
+def workflow(inputs: list[BaseMessage], *, previous: list[BaseMessage]):
+    if previous:
+        inputs = add_messages(previous, inputs)
+
+    response = call_model(inputs).result()
+    return entrypoint.final(value=response, save=add_messages(inputs, response))
+
+config = {"configurable": {"thread_id": "1"}}
+input_message = {"role": "user", "content": "hi! I'm bob"}
+for chunk in workflow.stream([input_message], config, stream_mode="values"):
+    chunk.pretty_print()
+
+input_message = {"role": "user", "content": "what's my name?"}
+for chunk in workflow.stream([input_message], config, stream_mode="values"):
+    chunk.pretty_print()
+```
+:::
+
+:::js
+```typescript
+import { BaseMessage } from "@langchain/core/messages";
+import {
+  addMessages,
+  entrypoint,
+  task,
+  MemorySaver,
+} from "@langchain/langgraph";
+import { ChatAnthropic } from "@langchain/anthropic";
+
+const model = new ChatAnthropic({ model: "claude-3-5-sonnet-latest" });
+
+const callModel = task(
+  "callModel",
+  async (messages: BaseMessage[]): Promise<BaseMessage> => {
+    const response = await model.invoke(messages);
+    return response;
+  }
+);
+
+const checkpointer = new MemorySaver();
+
+const workflow = entrypoint(
+  { checkpointer, name: "workflow" },
+  async (
+    inputs: BaseMessage[],
+    previous?: BaseMessage[]
+  ): Promise<BaseMessage> => {
+    let messages = inputs;
+    if (previous) {
+      messages = addMessages(previous, inputs);
+    }
+
+    const response = await callModel(messages);
+    return entrypoint.final({
+      value: response,
+      save: addMessages(messages, response),
+    });
+  }
+);
+
+const config = { configurable: { thread_id: "1" } };
+const inputMessage = { role: "user", content: "hi! I'm bob" };
+
+for await (const chunk of await workflow.stream([inputMessage], {
+  ...config,
+  streamMode: "values",
+})) {
+  console.log(chunk.content);
+}
+
+const inputMessage2 = { role: "user", content: "what's my name?" };
+for await (const chunk of await workflow.stream([inputMessage2], {
+  ...config,
+  streamMode: "values",
+})) {
+  console.log(chunk.content);
+}
+```
+:::
+
+## 장기 메모리
+
+[장기 메모리](/oss/concepts/memory#long-term-memory)를 사용하면 서로 다른 **스레드 ID** 간에 정보를 저장할 수 있습니다. 이는 한 대화에서 특정 사용자에 대한 정보를 학습하고 다른 대화에서 사용하는 데 유용할 수 있습니다.
+
+## 워크플로우
+
+* 함수형 API를 사용하여 워크플로우를 구축하는 방법에 대한 더 많은 예제는 [워크플로우와 에이전트](/oss/langgraph/workflows-agents) 가이드를 참조하세요.
+
+## 다른 라이브러리와 통합하기
+
+* [함수형 API를 사용하여 다른 프레임워크에 LangGraph 기능 추가하기](/langgraph-platform/autogen-integration): 기본적으로 제공하지 않는 다른 에이전트 프레임워크에 영속성, 메모리, 스트리밍과 같은 LangGraph 기능을 추가하세요.
