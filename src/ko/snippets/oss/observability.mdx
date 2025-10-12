@@ -1,0 +1,141 @@
+## 선택적 트레이싱
+
+LangSmith의 `tracing_context` 컨텍스트 매니저를 사용하여 특정 호출이나 애플리케이션의 일부만 트레이싱하도록 선택할 수 있습니다:
+
+:::python
+```python
+import langsmith as ls
+
+# 이것은 트레이싱됩니다
+with ls.tracing_context(enabled=True):
+    agent.invoke({"messages": [{"role": "user", "content": "Send a test email to alice@example.com"}]})
+
+# 이것은 트레이싱되지 않습니다 (LANGSMITH_TRACING이 설정되지 않은 경우)
+agent.invoke({"messages": [{"role": "user", "content": "Send another email"}]})
+```
+:::
+
+:::js
+```ts
+import { LangChainTracer } from "@langchain/core/tracers/tracer_langchain";
+
+// 이것은 트레이싱됩니다
+const tracer = new LangChainTracer();
+await agent.invoke(
+  {
+    messages: [{role: "user", content: "Send a test email to alice@example.com"}]
+  },
+  { callbacks: [tracer] }
+);
+
+// 이것은 트레이싱되지 않습니다 (LANGSMITH_TRACING이 설정되지 않은 경우)
+await agent.invoke(
+  {
+    messages: [{role: "user", content: "Send another email"}]
+  }
+);
+```
+:::
+
+## 프로젝트에 로깅
+
+<Accordion title="정적으로">
+
+전체 애플리케이션에 대한 사용자 정의 프로젝트 이름을 `LANGSMITH_PROJECT` 환경 변수를 설정하여 지정할 수 있습니다:
+
+```bash
+export LANGSMITH_PROJECT=my-agent-project
+```
+</Accordion>
+
+<Accordion title="동적으로">
+
+특정 작업에 대해 프로그래밍 방식으로 프로젝트 이름을 설정할 수 있습니다:
+
+:::python
+```python
+import langsmith as ls
+
+with ls.tracing_context(project_name="email-agent-test", enabled=True):
+    response = agent.invoke({
+        "messages": [{"role": "user", "content": "Send a welcome email"}]
+    })
+```
+:::
+
+:::js
+```ts
+import { LangChainTracer } from "@langchain/core/tracers/tracer_langchain";
+
+const tracer = new LangChainTracer({ projectName: "email-agent-test" });
+await agent.invoke(
+  {
+    messages: [{role: "user", content: "Send a test email to alice@example.com"}]
+  },
+  { callbacks: [tracer] }
+);
+```
+:::
+</Accordion>
+
+## 트레이스에 메타데이터 추가
+
+사용자 정의 메타데이터와 태그로 트레이스에 주석을 달 수 있습니다:
+
+:::python
+```python
+response = agent.invoke(
+    {"messages": [{"role": "user", "content": "Send a welcome email"}]},
+    config={
+        "tags": ["production", "email-assistant", "v1.0"],
+        "metadata": {
+            "user_id": "user_123",
+            "session_id": "session_456",
+            "environment": "production"
+        }
+    }
+)
+```
+
+`tracing_context`는 세밀한 제어를 위해 태그와 메타데이터도 허용합니다:
+
+```python
+with ls.tracing_context(
+    project_name="email-agent-test",
+    enabled=True,
+    tags=["production", "email-assistant", "v1.0"],
+    metadata={"user_id": "user_123", "session_id": "session_456", "environment": "production"}):
+    response = agent.invoke(
+        {"messages": [{"role": "user", "content": "Send a welcome email"}]}
+    )
+```
+:::
+
+:::js
+```ts
+import { LangChainTracer } from "@langchain/core/tracers/tracer_langchain";
+
+const tracer = new LangChainTracer({ projectName: "email-agent-test" });
+await agent.invoke(
+  {
+    messages: [{role: "user", content: "Send a test email to alice@example.com"}]
+  },
+  config: {
+    tags: ["production", "email-assistant", "v1.0"],
+    metadata: {
+      userId: "user123",
+      sessionId: "session456",
+      environment: "production"
+    }
+  },
+);
+
+```
+:::
+
+이 사용자 정의 메타데이터와 태그는 LangSmith의 트레이스에 첨부됩니다.
+
+
+<Tip>
+트레이스를 사용하여 에이전트를 디버그하고, 평가하고, 모니터링하는 방법에 대해 자세히 알아보려면 [LangSmith 문서](/langsmith/home)를 참조하세요.
+</Tip>

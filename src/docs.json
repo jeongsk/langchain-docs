@@ -167,7 +167,11 @@
                         "group": "프로덕션",
                         "pages": [
                           "ko/oss/langgraph/application-structure",
-                          "ko/oss/langgraph/deploy"
+                          "ko/oss/langgraph/studio",
+                          "ko/oss/langgraph/test",
+                          "ko/oss/langgraph/deploy",
+                          "ko/oss/langgraph/ui",
+                          "ko/oss/langgraph/observability"
                         ]
                       },
                       {

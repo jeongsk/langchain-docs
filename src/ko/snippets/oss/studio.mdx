@@ -1,0 +1,162 @@
+이 가이드에서는 **LangGraph Studio**를 사용하여 에이전트를 로컬에서 시각화하고, 상호작용하며, 디버깅하는 방법을 안내합니다.
+
+LangGraph Studio는 무료로 사용할 수 있는 강력한 에이전트 IDE로, [LangSmith](/langsmith/home)와 통합되어 추적, 평가 및 프롬프트 엔지니어링을 지원합니다. 에이전트가 어떻게 사고하는지 정확히 확인하고, 모든 결정을 추적하며, 더 스마트하고 신뢰할 수 있는 에이전트를 출시하세요.
+
+<Frame>
+<iframe
+  className="w-full aspect-video rounded-xl"
+  src="https://www.youtube.com/embed/Mi1gSlHwZLM?si=zA47TNuTC5aH0ahd"
+  title="LangGraph Studio"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+</Frame>
+
+## 사전 준비사항
+
+시작하기 전에 다음 사항을 준비하세요:
+* [LangSmith](https://smith.langchain.com/settings) API 키 (무료 가입 가능)
+
+## 로컬 LangGraph 서버 설정
+
+### 1. LangGraph CLI 설치
+
+:::python
+```shell
+# Python >= 3.11 버전이 필요합니다.
+pip install --upgrade "langgraph-cli[inmem]"
+```
+:::
+
+:::js
+```shell
+npx @langchain/langgraph-cli
+```
+:::
+
+### 2. 에이전트 준비
+
+다음 간단한 에이전트를 예제로 사용하겠습니다:
+
+```python title="agent.py"
+from langchain.agents import create_agent
+
+model = ChatOpenAI(model="gpt-4o")
+
+def send_email(to: str, subject: str, body: str):
+    """이메일 전송"""
+    email = {
+        "to": to,
+        "subject": subject,
+        "body": body
+    }
+    # ... 이메일 전송 로직
+
+    return f"Email sent to {to}"
+
+agent = create_agent(
+    "openai:gpt-4o",
+    tools=[send_email],
+    prompt="You are an email assistant. Always use the send_email tool.",
+)
+```
+
+### 3. 환경 변수 설정
+
+프로젝트 루트에 `.env` 파일을 생성하고 필요한 API 키를 입력하세요. [LangSmith](https://smith.langchain.com/settings)에서 받은 API 키로 `LANGSMITH_API_KEY` 환경 변수를 설정해야 합니다.
+
+<Warning>
+    `.env` 파일을 Git과 같은 버전 관리 시스템에 커밋하지 않도록 주의하세요!
+</Warning>
+
+```bash .env
+LANGSMITH_API_KEY=lsv2...
+```
+
+### 4. LangGraph 설정 파일 생성
+
+앱 디렉토리 내에 `langgraph.json` 설정 파일을 생성하세요:
+
+```json title="langgraph.json"
+{
+  "dependencies": ["."],
+  "graphs": {
+    "agent": "./src/agent.py:agent"
+  },
+  "env": ".env"
+}
+```
+
+`create_agent()`는 자동으로 컴파일된 LangGraph 그래프를 반환하므로, 설정 파일의 `graphs` 키에 전달할 수 있습니다.
+
+<Info>
+설정 파일의 JSON 객체에 포함된 각 키에 대한 자세한 설명은 [LangGraph 설정 파일 참조](/langgraph-platform/cli#configuration-file)를 참조하세요.
+</Info>
+
+지금까지의 프로젝트 구조는 다음과 같습니다:
+
+```bash
+my-app/
+├── src
+│   └── agent.py
+├── .env
+└── langgraph.json
+```
+
+### 5. 의존성 설치
+
+:::python
+새로운 LangGraph 앱의 루트에서 의존성을 설치하세요:
+
+<CodeGroup>
+```shell pip
+pip install -e .
+```
+```shell uv
+uv sync
+```
+</CodeGroup>
+:::
+
+:::js
+```shell
+yarn install
+```
+:::
+
+### 6. Studio에서 에이전트 확인
+
+LangGraph 서버를 시작하세요:
+
+:::python
+```shell
+langgraph dev
+```
+:::
+
+:::js
+```shell
+npx @langchain/langgraph-cli dev
+```
+:::
+
+<Warning>
+Safari는 Studio로의 `localhost` 연결을 차단합니다. 이를 해결하려면 위 명령에 `--tunnel` 옵션을 추가하여 보안 터널을 통해 Studio에 접근하세요.
+</Warning>
+
+에이전트는 API(`http://127.0.0.1:2024`)와 Studio UI `https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024`를 통해 접근할 수 있습니다:
+
+<Frame>
+![Agent view in LangGraph studio UI](/oss/images/studio_create-agent.png)
+</Frame>
+
+Studio는 에이전트의 각 단계를 쉽게 관찰할 수 있게 만듭니다. 모든 입력을 다시 실행하고 정확한 프롬프트, 도구 인자, 반환 값, 토큰/지연 시간 메트릭을 검사할 수 있습니다. 도구가 예외를 발생시키면 Studio는 주변 상태와 함께 기록하므로 디버깅 시간을 줄일 수 있습니다.
+
+개발 서버를 계속 실행한 상태에서 프롬프트나 도구 시그니처를 편집하면 Studio가 핫 리로드됩니다. 대화 스레드를 어느 단계에서든 다시 실행하여 동작 변경을 확인할 수 있습니다. 자세한 내용은 [스레드 관리](/langgraph-platform/use-studio#manage-threads#edit-thread-history)를 참조하세요.
+
+에이전트가 성장함에 따라 동일한 뷰가 단일 도구 데모에서 다중 노드 그래프까지 확장되며, 결정을 명확하고 재현 가능하게 유지합니다.
+
+<Tip>
+LangGraph Studio에 대한 심층적인 내용은 포괄적인 [LangGraph Studio 개요](/langgraph-platform/langgraph-studio)를 확인하세요.
+</Tip>
