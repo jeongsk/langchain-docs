@@ -154,8 +154,13 @@
                       {
                         "group": "기능",
                         "pages": [
+                          "ko/oss/langgraph/persistence",
                           "ko/oss/langgraph/durable-execution",
-                          "ko/oss/langgraph/add-memory"
+                          "ko/oss/langgraph/streaming",
+                          "ko/oss/langgraph/interrupts",
+                          "ko/oss/langgraph/use-time-travel",
+                          "ko/oss/langgraph/add-memory",
+                          "ko/oss/langgraph/use-subgraphs"
                         ]
                       },
                       {

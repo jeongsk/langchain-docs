@@ -8,12 +8,12 @@ import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
 AI 애플리케이션은 여러 상호작용에서 컨텍스트를 공유하기 위해 [메모리](/oss/concepts/memory)가 필요합니다. LangGraph에서는 두 가지 유형의 메모리를 추가할 수 있습니다:
 
-* [단기 메모리 추가](#add-short-term-memory): 에이전트의 [상태](/oss/langgraph/graph-api#state)의 일부로 단기 메모리를 추가하여 다중 턴 대화를 활성화합니다.
-* [장기 메모리 추가](#add-long-term-memory): 세션 간에 사용자별 또는 애플리케이션 수준 데이터를 저장하기 위한 장기 메모리를 추가합니다.
+* [단기 메모리 추가](#add-short-term-memory): 에이전트의 [상태](/oss/langgraph/graph-api#state)의 일부로 단기 메모리를 추가하여 다중 턴 대화를 가능하게 합니다.
+* [장기 메모리 추가](#add-long-term-memory): 세션 간에 사용자별 또는 애플리케이션 수준 데이터를 저장합니다.
 
 ## 단기 메모리 추가
 
-**단기** 메모리(스레드 수준 [지속성](/oss/langgraph/persistence))는 에이전트가 다중 턴 대화를 추적할 수 있게 합니다. 단기 메모리를 추가하려면:
+**단기** 메모리(스레드 수준 [지속성](/oss/langgraph/persistence))를 사용하면 에이전트가 다중 턴 대화를 추적할 수 있습니다. 단기 메모리를 추가하는 방법은 다음과 같습니다:
 
 :::python
 ```python {highlight={1,4,7,11}}
@@ -48,9 +48,9 @@ await graph.invoke(
 ```
 :::
 
-### 프로덕션 환경에서 사용
+### 프로덕션 환경에서 사용하기
 
-프로덕션 환경에서는 데이터베이스로 백업되는 체크포인터를 사용하세요:
+프로덕션 환경에서는 데이터베이스를 기반으로 하는 체크포인터를 사용하세요:
 
 :::python
 ```python {highlight={4,6}}
@@ -75,7 +75,7 @@ const graph = builder.compile({ checkpointer });
 ```
 :::
 
-<Accordion title="예제: Postgres 체크포인터 사용">
+<Accordion title="예제: Postgres 체크포인터 사용하기">
   :::python
   ```
   pip install -U "psycopg[binary,pool]" langgraph langgraph-checkpoint-postgres
@@ -237,14 +237,14 @@ const graph = builder.compile({ checkpointer });
 </Accordion>
 
 :::python
-<Accordion title="예제: [MongoDB](https://pypi.org/project/langgraph-checkpoint-mongodb/) 체크포인터 사용">
+<Accordion title="예제: [MongoDB](https://pypi.org/project/langgraph-checkpoint-mongodb/) 체크포인터 사용하기">
   ```
   pip install -U pymongo langgraph langgraph-checkpoint-mongodb
   ```
 
     <Note>
     **설정**
-    MongoDB 체크포인터를 사용하려면 MongoDB 클러스터가 필요합니다. 클러스터가 없는 경우 [이 가이드](https://www.mongodb.com/docs/guides/atlas/cluster/)를 따라 클러스터를 생성하세요.
+    MongoDB 체크포인터를 사용하려면 MongoDB 클러스터가 필요합니다. 아직 클러스터가 없다면 [이 가이드](https://www.mongodb.com/docs/guides/atlas/cluster/)를 따라 클러스터를 생성하세요.
     </Note>
 
     <Tabs>
@@ -335,7 +335,7 @@ const graph = builder.compile({ checkpointer });
     </Tabs>
 </Accordion>
 
-<Accordion title="예제: [Redis](https://pypi.org/project/langgraph-checkpoint-redis/) 체크포인터 사용">
+<Accordion title="예제: [Redis](https://pypi.org/project/langgraph-checkpoint-redis/) 체크포인터 사용하기">
   ```
   pip install -U langgraph langgraph-checkpoint-redis
   ```
@@ -435,9 +435,9 @@ const graph = builder.compile({ checkpointer });
 </Accordion>
 :::
 
-### 서브그래프에서 사용
+### 서브그래프에서 사용하기
 
-그래프에 [서브그래프](/oss/langgraph/use-subgraphs)가 포함된 경우, 부모 그래프를 컴파일할 때만 체크포인터를 제공하면 됩니다. LangGraph는 자동으로 체크포인터를 자식 서브그래프로 전파합니다.
+그래프에 [서브그래프](/oss/langgraph/use-subgraphs)가 포함되어 있는 경우, 부모 그래프를 컴파일할 때만 체크포인터를 제공하면 됩니다. LangGraph가 자동으로 체크포인터를 자식 서브그래프에 전파합니다.
 
 :::python
 ```python {highlight={16,21,25}}
@@ -448,7 +448,7 @@ from typing import TypedDict
 class State(TypedDict):
     foo: str
 
-# Subgraph
+# 서브그래프
 
 def subgraph_node_1(state: State):
     return {"foo": state["foo"] + "bar"}
@@ -458,7 +458,7 @@ subgraph_builder.add_node(subgraph_node_1)
 subgraph_builder.add_edge(START, "subgraph_node_1")
 subgraph = subgraph_builder.compile()
 
-# Parent graph
+# 부모 그래프
 
 builder = StateGraph(State)
 builder.add_node("node_1", subgraph)
@@ -492,7 +492,7 @@ const graph = builder.compile({ checkpointer });
 ```
 :::
 
-서브그래프가 자체 메모리를 가지도록 하려면 적절한 체크포인터 옵션으로 컴파일할 수 있습니다. 이는 [다중 에이전트](/oss/langchain/multi-agent) 시스템에서 에이전트가 내부 메시지 히스토리를 추적하도록 하려는 경우 유용합니다.
+서브그래프가 자체 메모리를 가지도록 하려면 적절한 체크포인터 옵션으로 컴파일할 수 있습니다. 이는 [멀티 에이전트](/oss/langchain/multi-agent) 시스템에서 에이전트가 자신의 내부 메시지 히스토리를 추적하도록 하려는 경우에 유용합니다.
 
 :::python
 ```python {highlight={2}}
@@ -510,7 +510,7 @@ const subgraph = subgraphBuilder.compile({ checkpointer: true });
 
 ## 장기 메모리 추가
 
-장기 메모리를 사용하여 대화 간에 사용자별 또는 애플리케이션별 데이터를 저장합니다.
+장기 메모리를 사용하여 대화 간에 사용자별 또는 애플리케이션별 데이터를 저장하세요.
 
 :::python
 ```python {highlight={1,4,7}}
@@ -535,9 +535,9 @@ const graph = builder.compile({ store });
 ```
 :::
 
-### 프로덕션 환경에서 사용
+### 프로덕션 환경에서 사용하기
 
-프로덕션 환경에서는 데이터베이스로 백업되는 스토어를 사용하세요:
+프로덕션 환경에서는 데이터베이스를 기반으로 하는 스토어를 사용하세요:
 
 :::python
 ```python {highlight={4,6}}
@@ -562,7 +562,7 @@ const graph = builder.compile({ store });
 ```
 :::
 
-<Accordion title="예제: Postgres 스토어 사용">
+<Accordion title="예제: Postgres 스토어 사용하기">
   :::python
   ```
   pip install -U "psycopg[binary,pool]" langgraph langgraph-checkpoint-postgres
@@ -605,7 +605,7 @@ const graph = builder.compile({ store });
               info = "\n".join([d.value["data"] for d in memories])
               system_msg = f"You are a helpful assistant talking to the user. User info: {info}"
 
-              # Store new memories if the user asks the model to remember
+              # 사용자가 모델에 기억하도록 요청하면 새로운 메모리를 저장합니다
               last_message = state["messages"][-1]
               if "remember" in last_message.content.lower():
                   memory = "User name is Bob"
@@ -685,7 +685,7 @@ const graph = builder.compile({ store });
               info = "\n".join([d.value["data"] for d in memories])
               system_msg = f"You are a helpful assistant talking to the user. User info: {info}"
 
-              # Store new memories if the user asks the model to remember
+              # 사용자가 모델에 기억하도록 요청하면 새로운 메모리를 저장합니다
               last_message = state["messages"][-1]
               if "remember" in last_message.content.lower():
                   memory = "User name is Bob"
@@ -779,7 +779,7 @@ const graph = builder.compile({ store });
     const info = memories?.map(d => d.value.data).join("\n") || "";
     const systemMsg = `You are a helpful assistant talking to the user. User info: ${info}`;
 
-    // Store new memories if the user asks the model to remember
+    // 사용자가 모델에 기억하도록 요청하면 새로운 메모리를 저장합니다
     const lastMessage = state.messages.at(-1);
     if (lastMessage?.content?.toLowerCase().includes("remember")) {
       const memory = "User name is Bob";
@@ -834,7 +834,7 @@ const graph = builder.compile({ store });
 </Accordion>
 
 :::python
-<Accordion title="예제: [Redis](https://pypi.org/project/langgraph-checkpoint-redis/) 스토어 사용">
+<Accordion title="예제: [Redis](https://pypi.org/project/langgraph-checkpoint-redis/) 스토어 사용하기">
   ```
   pip install -U langgraph langgraph-checkpoint-redis
   ```
@@ -876,7 +876,7 @@ const graph = builder.compile({ store });
               info = "\n".join([d.value["data"] for d in memories])
               system_msg = f"You are a helpful assistant talking to the user. User info: {info}"
 
-              # Store new memories if the user asks the model to remember
+              # 사용자가 모델에 기억하도록 요청하면 새로운 메모리를 저장합니다
               last_message = state["messages"][-1]
               if "remember" in last_message.content.lower():
                   memory = "User name is Bob"
@@ -956,7 +956,7 @@ const graph = builder.compile({ store });
               info = "\n".join([d.value["data"] for d in memories])
               system_msg = f"You are a helpful assistant talking to the user. User info: {info}"
 
-              # Store new memories if the user asks the model to remember
+              # 사용자가 모델에 기억하도록 요청하면 새로운 메모리를 저장합니다
               last_message = state["messages"][-1]
               if "remember" in last_message.content.lower():
                   memory = "User name is Bob"
@@ -1008,16 +1008,16 @@ const graph = builder.compile({ store });
 </Accordion>
 :::
 
-### 시맨틱 검색 사용
+### 시맨틱 검색 사용하기
 
-그래프의 메모리 스토어에서 시맨틱 검색을 활성화하여 그래프 에이전트가 시맨틱 유사성으로 스토어의 항목을 검색할 수 있도록 합니다.
+그래프의 메모리 스토어에서 시맨틱 검색을 활성화하여 그래프 에이전트가 스토어의 항목을 의미적 유사성으로 검색할 수 있도록 하세요.
 
 :::python
 ```python
 from langchain.embeddings import init_embeddings
 from langgraph.store.memory import InMemoryStore
 
-# Create store with semantic search enabled
+# 시맨틱 검색이 활성화된 스토어 생성
 embeddings = init_embeddings("openai:text-embedding-3-small")
 store = InMemoryStore(
     index={
@@ -1040,7 +1040,7 @@ items = store.search(
 import { OpenAIEmbeddings } from "@langchain/openai";
 import { InMemoryStore } from "@langchain/langgraph";
 
-// Create store with semantic search enabled
+// 시맨틱 검색이 활성화된 스토어 생성
 const embeddings = new OpenAIEmbeddings({ model: "text-embedding-3-small" });
 const store = new InMemoryStore({
   index: {
@@ -1071,7 +1071,7 @@ const items = await store.search(["user_123", "memories"], {
 
   llm = init_chat_model("openai:gpt-4o-mini")
 
-  # Create store with semantic search enabled
+  # 시맨틱 검색이 활성화된 스토어 생성
   embeddings = init_embeddings("openai:text-embedding-3-small")
   store = InMemoryStore(
       index={
@@ -1084,7 +1084,7 @@ const items = await store.search(["user_123", "memories"], {
   store.put(("user_123", "memories"), "2", {"text": "I am a plumber"})
 
   def chat(state, *, store: BaseStore):
-      # Search based on user's last message
+      # 사용자의 마지막 메시지를 기반으로 검색
       items = store.search(
           ("user_123", "memories"), query=state["messages"][-1].content, limit=2
       )
@@ -1128,7 +1128,7 @@ const items = await store.search(["user_123", "memories"], {
 
   const llm = new ChatOpenAI({ model: "gpt-4o-mini" });
 
-  // Create store with semantic search enabled
+  // 시맨틱 검색이 활성화된 스토어 생성
   const embeddings = new OpenAIEmbeddings({ model: "text-embedding-3-small" });
   const store = new InMemoryStore({
     index: {
@@ -1141,7 +1141,7 @@ const items = await store.search(["user_123", "memories"], {
   await store.put(["user_123", "memories"], "2", { text: "I am a plumber" });
 
   const chat = async (state: z.infer<typeof MessagesZodState>, config) => {
-    // Search based on user's last message
+    // 사용자의 마지막 메시지를 기반으로 검색
     const items = await config.store.search(
       ["user_123", "memories"],
       { query: state.messages.at(-1)?.content, limit: 2 }
@@ -1176,22 +1176,22 @@ const items = await store.search(["user_123", "memories"], {
 
 ## 단기 메모리 관리
 
-[단기 메모리](#add-short-term-memory)를 활성화하면 긴 대화가 LLM의 컨텍스트 윈도우를 초과할 수 있습니다. 일반적인 해결책은 다음과 같습니다:
+[단기 메모리](#add-short-term-memory)가 활성화되면 긴 대화가 LLM의 컨텍스트 윈도우를 초과할 수 있습니다. 일반적인 해결 방법은 다음과 같습니다:
 
-* [메시지 자르기](#trim-messages): 처음 또는 마지막 N개의 메시지 제거(LLM 호출 전)
-* 그래프 상태에서 [메시지 영구 삭제](#delete-messages)
-* [메시지 요약](#summarize-messages): 기록의 초기 메시지를 요약하고 요약으로 대체
-* 메시지 기록을 저장하고 검색하기 위한 [체크포인트 관리](#manage-checkpoints)
-* 커스텀 전략(예: 메시지 필터링 등)
+* [메시지 잘라내기](#trim-messages): 처음 또는 마지막 N개의 메시지 제거하기 (LLM 호출 전)
+* [메시지 삭제하기](#delete-messages): LangGraph 상태에서 메시지 영구 삭제하기
+* [메시지 요약하기](#summarize-messages): 히스토리의 초기 메시지들을 요약하여 요약본으로 대체하기
+* [체크포인트 관리하기](#manage-checkpoints): 메시지 히스토리 저장 및 검색하기
+* 사용자 정의 전략 (예: 메시지 필터링 등)
 
 이를 통해 에이전트는 LLM의 컨텍스트 윈도우를 초과하지 않으면서 대화를 추적할 수 있습니다.
 
-### 메시지 자르기
+### 메시지 잘라내기
 
-대부분의 LLM에는 최대 지원 컨텍스트 윈도우(토큰으로 표시)가 있습니다. 메시지를 자를 시점을 결정하는 한 가지 방법은 메시지 기록의 토큰을 세고 해당 제한에 접근할 때마다 자르는 것입니다. LangChain을 사용하는 경우, 메시지 자르기 유틸리티를 사용하여 목록에서 유지할 토큰 수와 경계 처리에 사용할 `전략`(예: 마지막 `maxTokens` 유지)을 지정할 수 있습니다.
+대부분의 LLM에는 지원되는 최대 컨텍스트 윈도우(토큰 단위)가 있습니다. 메시지를 자를 시점을 결정하는 한 가지 방법은 메시지 히스토리의 토큰 수를 세어 해당 제한에 근접할 때마다 잘라내는 것입니다. LangChain을 사용하는 경우, trim messages 유틸리티를 사용하여 목록에서 유지할 토큰 수와 경계를 처리하기 위한 `strategy`(예: 마지막 `maxTokens` 유지)를 지정할 수 있습니다.
 
 :::python
-메시지 기록을 자르려면 [`trim_messages`](https://python.langchain.com/api_reference/core/messages/langchain_core.messages.utils.trim_messages.html) 함수를 사용하세요:
+메시지 히스토리를 자르려면 [`trim_messages`](https://python.langchain.com/api_reference/core/messages/langchain_core.messages.utils.trim_messages.html) 함수를 사용하세요:
 
 ```python {highlight={1,2,3,4,7}}
 from langchain_core.messages.utils import (
@@ -1218,7 +1218,7 @@ builder.add_node(call_model)
 :::
 
 :::js
-메시지 기록을 자르려면 [`trimMessages`](https://js.langchain.com/docs/how_to/trim_messages/) 함수를 사용하세요:
+메시지 히스토리를 자르려면 [`trimMessages`](https://js.langchain.com/docs/how_to/trim_messages/) 함수를 사용하세요:
 
 ```typescript
 import { trimMessages } from "@langchain/core/messages";
@@ -1240,7 +1240,7 @@ const builder = new StateGraph(MessagesZodState)
 ```
 :::
 
-<Accordion title="전체 예제: 메시지 자르기">
+<Accordion title="전체 예제: 메시지 잘라내기">
   :::python
   ```python {highlight={1,2,3,4,12}}
   from langchain_core.messages.utils import (
@@ -1336,9 +1336,9 @@ const builder = new StateGraph(MessagesZodState)
   :::
 </Accordion>
 
-### 메시지 삭제
+### 메시지 삭제하기
 
-그래프 상태에서 메시지를 삭제하여 메시지 기록을 관리할 수 있습니다. 이는 특정 메시지를 제거하거나 전체 메시지 기록을 지우려는 경우 유용합니다.
+그래프 상태에서 메시지를 삭제하여 메시지 히스토리를 관리할 수 있습니다. 특정 메시지를 제거하거나 전체 메시지 히스토리를 지우고 싶을 때 유용합니다.
 
 :::python
 그래프 상태에서 메시지를 삭제하려면 `RemoveMessage`를 사용할 수 있습니다. `RemoveMessage`가 작동하려면 [`MessagesState`](/oss/langgraph/graph-api#messagesstate)와 같이 @[`add_messages`][add_messages] [리듀서](/oss/langgraph/graph-api#reducers)가 있는 상태 키를 사용해야 합니다.
@@ -1351,7 +1351,7 @@ from langchain.messages import RemoveMessage
 def delete_messages(state):
     messages = state["messages"]
     if len(messages) > 2:
-        # remove the earliest two messages
+        # 가장 초기의 두 메시지 제거
         return {"messages": [RemoveMessage(id=m.id) for m in messages[:2]]}
 ```
 
@@ -1376,7 +1376,7 @@ import { RemoveMessage } from "@langchain/core/messages";
 const deleteMessages = (state) => {
   const messages = state.messages;
   if (messages.length > 2) {
-    // remove the earliest two messages
+    // 가장 초기의 두 메시지 제거
     return {
       messages: messages
         .slice(0, 2)
@@ -1388,13 +1388,13 @@ const deleteMessages = (state) => {
 :::
 
 <Warning>
-메시지를 삭제할 때는 결과 메시지 기록이 유효한지 **확인하세요**. 사용 중인 LLM 제공자의 제한 사항을 확인하세요. 예를 들어:
+메시지를 삭제할 때는 결과로 나오는 메시지 히스토리가 유효한지 **반드시 확인**하세요. 사용 중인 LLM 제공자의 제한 사항을 확인하세요. 예를 들어:
 
-* 일부 제공자는 메시지 기록이 `user` 메시지로 시작되기를 기대합니다
-* 대부분의 제공자는 도구 호출이 있는 `assistant` 메시지 다음에 해당 `tool` 결과 메시지가 와야 합니다.
+* 일부 제공자는 메시지 히스토리가 `user` 메시지로 시작할 것을 기대합니다
+* 대부분의 제공자는 도구 호출이 있는 `assistant` 메시지 다음에 해당하는 `tool` 결과 메시지가 와야 합니다.
 </Warning>
 
-<Accordion title="전체 예제: 메시지 삭제">
+<Accordion title="전체 예제: 메시지 삭제하기">
   :::python
   ```python {highlight={1,7}}
   from langchain.messages import RemoveMessage
@@ -1402,7 +1402,7 @@ const deleteMessages = (state) => {
   def delete_messages(state):
       messages = state["messages"]
       if len(messages) > 2:
-          # remove the earliest two messages
+          # 가장 초기의 두 메시지 제거
           return {"messages": [RemoveMessage(id=m.id) for m in messages[:2]]}
 
   def call_model(state: MessagesState):
@@ -1459,7 +1459,7 @@ const deleteMessages = (state) => {
   const deleteMessages = (state: z.infer<typeof MessagesZodState>) => {
     const messages = state.messages;
     if (messages.length > 2) {
-      // remove the earliest two messages
+      // 가장 초기의 두 메시지 제거
       return { messages: messages.slice(0, 2).map(m => new RemoveMessage({ id: m.id })) };
     }
     return {};
@@ -1506,15 +1506,15 @@ const deleteMessages = (state) => {
   :::
 </Accordion>
 
-### 메시지 요약
+### 메시지 요약하기
 
-위에 표시된 것처럼 메시지를 자르거나 제거하는 문제는 메시지 큐를 제거함으로써 정보를 잃을 수 있다는 것입니다. 이 때문에 일부 애플리케이션은 채팅 모델을 사용하여 메시지 기록을 요약하는 보다 정교한 접근 방식의 이점을 얻습니다.
+위에 표시된 것처럼 메시지를 자르거나 제거하는 것의 문제점은 메시지 큐를 정리함으로써 정보를 잃을 수 있다는 것입니다. 이 때문에 일부 애플리케이션은 채팅 모델을 사용하여 메시지 히스토리를 요약하는 보다 정교한 접근 방식의 이점을 얻습니다.
 
 ![](/oss/images/summary.png)
 
 
 :::python
-프롬프팅 및 오케스트레이션 로직을 사용하여 메시지 기록을 요약할 수 있습니다. 예를 들어 LangGraph에서 [`MessagesState`](/oss/langgraph/graph-api#working-with-messages-in-graph-state)를 확장하여 `summary` 키를 포함할 수 있습니다:
+프롬프팅 및 오케스트레이션 로직을 사용하여 메시지 히스토리를 요약할 수 있습니다. 예를 들어, LangGraph에서는 [`MessagesState`](/oss/langgraph/graph-api#working-with-messages-in-graph-state)를 확장하여 `summary` 키를 포함할 수 있습니다:
 
 ```python
 from langgraph.graph import MessagesState
@@ -1522,18 +1522,18 @@ class State(MessagesState):
     summary: str
 ```
 
-그런 다음 기존 요약을 다음 요약의 컨텍스트로 사용하여 채팅 기록의 요약을 생성할 수 있습니다. 이 `summarize_conversation` 노드는 `messages` 상태 키에 일정 수의 메시지가 축적된 후 호출될 수 있습니다.
+그런 다음, 기존 요약을 다음 요약의 컨텍스트로 사용하여 채팅 히스토리의 요약을 생성할 수 있습니다. 이 `summarize_conversation` 노드는 `messages` 상태 키에 일정 수의 메시지가 누적된 후에 호출될 수 있습니다.
 
 ```python
 def summarize_conversation(state: State):
 
-    # First, we get any existing summary
+    # 먼저, 기존 요약을 가져옵니다
     summary = state.get("summary", "")
 
-    # Create our summarization prompt
+    # 요약 프롬프트를 생성합니다
     if summary:
 
-        # A summary already exists
+        # 요약이 이미 존재합니다
         summary_message = (
             f"This is a summary of the conversation to date: {summary}\n\n"
             "Extend the summary by taking into account the new messages above:"
@@ -1542,18 +1542,18 @@ def summarize_conversation(state: State):
     else:
         summary_message = "Create a summary of the conversation above:"
 
-    # Add prompt to our history
+    # 히스토리에 프롬프트를 추가합니다
     messages = state["messages"] + [HumanMessage(content=summary_message)]
     response = model.invoke(messages)
 
-    # Delete all but the 2 most recent messages
+    # 가장 최근 2개를 제외한 모든 메시지를 삭제합니다
     delete_messages = [RemoveMessage(id=m.id) for m in state["messages"][:-2]]
     return {"summary": response.content, "messages": delete_messages}
 ```
 :::
 
 :::js
-프롬프팅 및 오케스트레이션 로직을 사용하여 메시지 기록을 요약할 수 있습니다. 예를 들어 LangGraph에서 `messages` 키와 함께 상태에 `summary` 키를 포함할 수 있습니다:
+프롬프팅 및 오케스트레이션 로직을 사용하여 메시지 히스토리를 요약할 수 있습니다. 예를 들어, LangGraph에서는 `messages` 키와 함께 상태에 `summary` 키를 포함할 수 있습니다:
 
 ```typescript
 import { BaseMessage } from "@langchain/core/messages";
@@ -1569,19 +1569,19 @@ const State = z.object({
 });
 ```
 
-그런 다음 기존 요약을 다음 요약의 컨텍스트로 사용하여 채팅 기록의 요약을 생성할 수 있습니다. 이 `summarizeConversation` 노드는 `messages` 상태 키에 일정 수의 메시지가 축적된 후 호출될 수 있습니다.
+그런 다음, 기존 요약을 다음 요약의 컨텍스트로 사용하여 채팅 히스토리의 요약을 생성할 수 있습니다. 이 `summarizeConversation` 노드는 `messages` 상태 키에 일정 수의 메시지가 누적된 후에 호출될 수 있습니다.
 
 ```typescript
 import { RemoveMessage, HumanMessage } from "@langchain/core/messages";
 
 const summarizeConversation = async (state: z.infer<typeof State>) => {
-  // First, we get any existing summary
+  // 먼저, 기존 요약을 가져옵니다
   const summary = state.summary || "";
 
-  // Create our summarization prompt
+  // 요약 프롬프트를 생성합니다
   let summaryMessage: string;
   if (summary) {
-    // A summary already exists
+    // 요약이 이미 존재합니다
     summaryMessage =
       `This is a summary of the conversation to date: ${summary}\n\n` +
       "Extend the summary by taking into account the new messages above:";
@@ -1589,14 +1589,14 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
     summaryMessage = "Create a summary of the conversation above:";
   }
 
-  // Add prompt to our history
+  // 히스토리에 프롬프트를 추가합니다
   const messages = [
     ...state.messages,
     new HumanMessage({ content: summaryMessage })
   ];
   const response = await model.invoke(messages);
 
-  // Delete all but the 2 most recent messages
+  // 가장 최근 2개를 제외한 모든 메시지를 삭제합니다
   const deleteMessages = state.messages
     .slice(0, -2)
     .map(m => new RemoveMessage({ id: m.id }));
@@ -1609,7 +1609,7 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
 ```
 :::
 
-<Accordion title="전체 예제: 메시지 요약">
+<Accordion title="전체 예제: 메시지 요약하기">
   :::python
   ```python {highlight={8,14,20,28,35}}
   from typing import Any, TypedDict
@@ -1651,7 +1651,7 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
   builder.add_edge("summarize", "call_model")
   graph = builder.compile(checkpointer=checkpointer)
 
-  # Invoke the graph
+  # 그래프 호출
   config = {"configurable": {"thread_id": "1"}}
   graph.invoke({"messages": "hi, my name is bob"}, config)
   graph.invoke({"messages": "write a short poem about cats"}, config)
@@ -1662,13 +1662,13 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
   print("\nSummary:", final_response["context"]["running_summary"].summary)
 ```
 
-  1. 우리는 `context` 필드에서 실행 중인 요약을 추적합니다
+  1. 실행 중인 요약을 `context` 필드에 추적합니다
 
   (`SummarizationNode`에서 예상됨).
 
-  1. `call_model` 노드에 대한 입력을 필터링하는 데만 사용될 비공개 상태를 정의합니다.
+  1. `call_model` 노드에 대한 입력을 필터링하는 데만 사용될 비공개 상태를 정의합니다
 
-  1. 여기서는 요약 노드에서 반환된 메시지를 분리하기 위해 비공개 입력 상태를 전달합니다
+  1. 여기서 비공개 입력 상태를 전달하여 요약 노드에서 반환된 메시지를 분리합니다
 
   ```
   ================================== Ai Message ==================================
@@ -1702,8 +1702,8 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
 
   const memory = new MemorySaver();
 
-  // We will add a `summary` attribute (in addition to `messages` key,
-  // which MessagesZodState already has)
+  // `messages` 키 외에 `summary` 속성을 추가합니다
+  // (MessagesZodState에 이미 있음)
   const GraphState = z.object({
     messages: z
       .array(z.custom<BaseMessage>())
@@ -1711,12 +1711,12 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
     summary: z.string().default(""),
   });
 
-  // We will use this model for both the conversation and the summarization
+  // 대화와 요약 모두에 이 모델을 사용합니다
   const model = new ChatAnthropic({ model: "claude-3-haiku-20240307" });
 
-  // Define the logic to call the model
+  // 모델을 호출하는 로직을 정의합니다
   const callModel = async (state: z.infer<typeof GraphState>) => {
-    // If a summary exists, we add this in as a system message
+    // 요약이 존재하면 이를 시스템 메시지로 추가합니다
     const { summary } = state;
     let { messages } = state;
     if (summary) {
@@ -1727,28 +1727,27 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
       messages = [systemMessage, ...messages];
     }
     const response = await model.invoke(messages);
-    // We return an object, because this will get added to the existing state
+    // 기존 상태에 추가될 것이므로 객체를 반환합니다
     return { messages: [response] };
   };
 
-  // We now define the logic for determining whether to end or summarize the conversation
+  // 이제 대화를 종료할지 요약할지 결정하는 로직을 정의합니다
   const shouldContinue = (state: z.infer<typeof GraphState>) => {
     const messages = state.messages;
-    // If there are more than six messages, then we summarize the conversation
+    // 메시지가 6개 이상이면 대화를 요약합니다
     if (messages.length > 6) {
       return "summarize_conversation";
     }
-    // Otherwise we can just end
+    // 그렇지 않으면 종료할 수 있습니다
     return END;
   };
 
   const summarizeConversation = async (state: z.infer<typeof GraphState>) => {
-    // First, we summarize the conversation
+    // 먼저, 대화를 요약합니다
     const { summary, messages } = state;
     let summaryMessage: string;
     if (summary) {
-      // If a summary already exists, we use a different system prompt
-      // to summarize it than if one didn't
+      // 요약이 이미 존재하는 경우, 존재하지 않는 경우와 다른 시스템 프롬프트를 사용하여 요약합니다
       summaryMessage =
         `This is summary of the conversation to date: ${summary}\n\n` +
         "Extend the summary by taking into account the new messages above:";
@@ -1763,8 +1762,8 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
 
     const response = await model.invoke(allMessages);
 
-    // We now need to delete messages that we no longer want to show up
-    // I will delete all but the last two messages, but you can change this
+    // 이제 더 이상 표시하지 않으려는 메시지를 삭제해야 합니다
+    // 마지막 두 메시지를 제외한 모든 메시지를 삭제하겠지만, 이를 변경할 수 있습니다
     const deleteMessages = messages
       .slice(0, -2)
       .map((m) => new RemoveMessage({ id: m.id! }));
@@ -1776,32 +1775,32 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
     return { summary: response.content, messages: deleteMessages };
   };
 
-  // Define a new graph
+  // 새로운 그래프를 정의합니다
   const workflow = new StateGraph(GraphState)
-    // Define the conversation node and the summarize node
+    // conversation 노드와 summarize 노드를 정의합니다
     .addNode("conversation", callModel)
     .addNode("summarize_conversation", summarizeConversation)
-    // Set the entrypoint as conversation
+    // 진입점을 conversation으로 설정합니다
     .addEdge(START, "conversation")
-    // We now add a conditional edge
+    // 이제 조건부 엣지를 추가합니다
     .addConditionalEdges(
-      // First, we define the start node. We use `conversation`.
-      // This means these are the edges taken after the `conversation` node is called.
+      // 먼저, 시작 노드를 정의합니다. `conversation`을 사용합니다.
+      // 이는 `conversation` 노드가 호출된 후 이 엣지들이 사용된다는 의미입니다.
       "conversation",
-      // Next, we pass in the function that will determine which node is called next.
+      // 다음으로, 어떤 노드가 다음에 호출될지 결정할 함수를 전달합니다.
       shouldContinue,
     )
-    // We now add a normal edge from `summarize_conversation` to END.
-    // This means that after `summarize_conversation` is called, we end.
+    // 이제 `summarize_conversation`에서 END로의 일반 엣지를 추가합니다.
+    // 이는 `summarize_conversation`이 호출된 후 종료한다는 의미입니다.
     .addEdge("summarize_conversation", END);
 
-  // Finally, we compile it!
+  // 마지막으로, 컴파일합니다!
   const app = workflow.compile({ checkpointer: memory });
   ```
   :::
 </Accordion>
 
-### 체크포인트 관리
+### 체크포인트 관리하기
 
 체크포인터가 저장한 정보를 보고 삭제할 수 있습니다.
 
@@ -1815,8 +1814,8 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
     config = {
         "configurable": {
             "thread_id": "1",
-            # optionally provide an ID for a specific checkpoint,
-            # otherwise the latest checkpoint is shown
+            # 선택적으로 특정 체크포인트의 ID를 제공합니다,
+            # 그렇지 않으면 최신 체크포인트가 표시됩니다
             # "checkpoint_id": "1f029ca3-1f5b-6704-8004-820c16b69a5a"
 
         }
@@ -1847,8 +1846,8 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
     config = {
         "configurable": {
             "thread_id": "1",
-            # optionally provide an ID for a specific checkpoint,
-            # otherwise the latest checkpoint is shown
+            # 선택적으로 특정 체크포인트의 ID를 제공합니다,
+            # 그렇지 않으면 최신 체크포인트가 표시됩니다
             # "checkpoint_id": "1f029ca3-1f5b-6704-8004-820c16b69a5a"
 
         }
@@ -1886,8 +1885,8 @@ const summarizeConversation = async (state: z.infer<typeof State>) => {
 const config = {
   configurable: {
     thread_id: "1",
-    // optionally provide an ID for a specific checkpoint,
-    // otherwise the latest checkpoint is shown
+    // 선택적으로 특정 체크포인트의 ID를 제공합니다,
+    // 그렇지 않으면 최신 체크포인트가 표시됩니다
     // checkpoint_id: "1f029ca3-1f5b-6704-8004-820c16b69a5a"
   },
 };
@@ -1915,7 +1914,7 @@ await graph.getState(config);
 :::
 
 <a id="checkpoints"></a>
-#### 스레드의 기록 보기
+#### 스레드의 히스토리 보기
 
 :::python
 <Tabs>
@@ -2111,7 +2110,7 @@ for await (const state of graph.getStateHistory(config)) {
 ```
 :::
 
-#### 스레드의 모든 체크포인트 삭제
+#### 스레드의 모든 체크포인트 삭제하기
 
 :::python
 ```python
@@ -2130,5 +2129,5 @@ await checkpointer.deleteThread(threadId);
 :::python
 ## 사전 구축된 메모리 도구
 
-**LangMem**은 에이전트의 장기 메모리를 관리하는 도구를 제공하는 LangChain 유지 관리 라이브러리입니다. 사용 예제는 [LangMem 문서](https://langchain-ai.github.io/langmem/)를 참조하세요.
+**LangMem**은 에이전트에서 장기 메모리를 관리하기 위한 도구를 제공하는 LangChain 유지 관리 라이브러리입니다. 사용 예제는 [LangMem 문서](https://langchain-ai.github.io/langmem/)를 참조하세요.
 :::

@@ -1,0 +1,1478 @@
+---
+title: 스트리밍
+---
+
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
+
+<AlphaCallout />
+
+LangGraph는 실시간 업데이트를 제공하기 위한 스트리밍 시스템을 구현합니다. 스트리밍은 LLM 기반 애플리케이션의 응답성을 향상시키는 데 매우 중요합니다. 완전한 응답이 준비되기 전에도 출력을 점진적으로 표시함으로써, 스트리밍은 특히 LLM의 지연 시간을 처리할 때 사용자 경험(UX)을 크게 개선합니다.
+
+LangGraph 스트리밍으로 가능한 것들:
+
+* <Icon icon="share-nodes" size={16} /> [**그래프 상태 스트리밍**](#stream-graph-state) — `updates` 및 `values` 모드로 상태 업데이트/값을 가져옵니다.
+* <Icon icon="square-poll-horizontal" size={16} /> [**서브그래프 출력 스트리밍**](#stream-subgraph-outputs) — 부모 그래프와 중첩된 서브그래프 모두의 출력을 포함합니다.
+* <Icon icon="square-binary" size={16} /> [**LLM 토큰 스트리밍**](#messages) — 노드, 서브그래프 또는 도구 내 어디서든 토큰 스트림을 캡처합니다.
+* <Icon icon="table" size={16} /> [**커스텀 데이터 스트리밍**](#stream-custom-data) — 도구 함수에서 직접 커스텀 업데이트 또는 진행 상황 신호를 전송합니다.
+* <Icon icon="layer-plus" size={16} /> [**여러 스트리밍 모드 사용**](#stream-multiple-modes) — `values` (전체 상태), `updates` (상태 변경사항), `messages` (LLM 토큰 + 메타데이터), `custom` (임의의 사용자 데이터) 또는 `debug` (상세한 추적) 중에서 선택합니다.
+
+## 지원되는 스트림 모드
+
+:::python
+다음 스트림 모드 중 하나 이상을 리스트로 @[`stream()`][CompiledStateGraph.stream] 또는 @[`astream()`][CompiledStateGraph.astream] 메서드에 전달합니다:
+:::
+
+:::js
+다음 스트림 모드 중 하나 이상을 리스트로 @[`stream()`][CompiledStateGraph.stream] 메서드에 전달합니다:
+:::
+
+| 모드       | 설명                                                                                                                                                                         |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `values`   | 그래프의 각 단계 후 상태의 전체 값을 스트리밍합니다.                                                                                                                   |
+| `updates`  | 그래프의 각 단계 후 상태에 대한 업데이트를 스트리밍합니다. 동일한 단계에서 여러 업데이트가 발생하면 (예: 여러 노드가 실행됨), 해당 업데이트는 개별적으로 스트리밍됩니다. |
+| `custom`   | 그래프 노드 내부에서 커스텀 데이터를 스트리밍합니다.                                                                                                                   |
+| `messages` | LLM이 호출되는 모든 그래프 노드에서 2-튜플 (LLM 토큰, 메타데이터)을 스트리밍합니다.                                                                                                                |
+| `debug`    | 그래프 실행 전반에 걸쳐 가능한 한 많은 정보를 스트리밍합니다.                                                                                                      |
+
+## 기본 사용 예제
+
+:::python
+LangGraph 그래프는 스트리밍 출력을 이터레이터로 생성하기 위해 @[`.stream()`][Pregel.stream] (동기) 및 @[`.astream()`][Pregel.astream] (비동기) 메서드를 제공합니다.
+
+```python
+for chunk in graph.stream(inputs, stream_mode="updates"):
+    print(chunk)
+```
+
+:::
+
+:::js
+LangGraph 그래프는 스트리밍 출력을 이터레이터로 생성하기 위해 @[`.stream()`][Pregel.stream] 메서드를 제공합니다.
+
+```typescript
+for await (const chunk of await graph.stream(inputs, {
+  streamMode: "updates",
+})) {
+  console.log(chunk);
+}
+```
+:::
+
+<Accordion title="확장 예제: 업데이트 스트리밍">
+  :::python
+  ```python {highlight={24,26}}
+  from typing import TypedDict
+  from langgraph.graph import StateGraph, START, END
+
+  class State(TypedDict):
+      topic: str
+      joke: str
+
+  def refine_topic(state: State):
+      return {"topic": state["topic"] + " and cats"}
+
+  def generate_joke(state: State):
+      return {"joke": f"This is a joke about {state['topic']}"}
+
+  graph = (
+      StateGraph(State)
+      .add_node(refine_topic)
+      .add_node(generate_joke)
+      .add_edge(START, "refine_topic")
+      .add_edge("refine_topic", "generate_joke")
+      .add_edge("generate_joke", END)
+      .compile()
+  )
+
+  # stream() 메서드는 스트리밍 출력을 생성하는 이터레이터를 반환합니다
+  for chunk in graph.stream(
+      {"topic": "ice cream"},
+      # 각 노드 후 그래프 상태에 대한 업데이트만 스트리밍하려면 stream_mode="updates"로 설정합니다
+      # 다른 스트림 모드도 사용할 수 있습니다. 지원되는 스트림 모드를 참조하세요
+      stream_mode="updates",
+  ):
+      print(chunk)
+```
+  :::
+
+  :::js
+  ```typescript
+  import { StateGraph, START, END } from "@langchain/langgraph";
+  import * as z from "zod";
+
+  const State = z.object({
+    topic: z.string(),
+    joke: z.string(),
+  });
+
+  const graph = new StateGraph(State)
+    .addNode("refineTopic", (state) => {
+      return { topic: state.topic + " and cats" };
+    })
+    .addNode("generateJoke", (state) => {
+      return { joke: `This is a joke about ${state.topic}` };
+    })
+    .addEdge(START, "refineTopic")
+    .addEdge("refineTopic", "generateJoke")
+    .addEdge("generateJoke", END)
+    .compile();
+
+  for await (const chunk of await graph.stream(
+    { topic: "ice cream" },
+    // 각 노드 후 그래프 상태에 대한 업데이트만 스트리밍하려면 streamMode: "updates"로 설정합니다
+    // 다른 스트림 모드도 사용할 수 있습니다. 지원되는 스트림 모드를 참조하세요
+    { streamMode: "updates" }
+  )) {
+    console.log(chunk);
+  }
+  ```
+  :::
+
+  ```output
+  {'refineTopic': {'topic': 'ice cream and cats'}}
+  {'generateJoke': {'joke': 'This is a joke about ice cream and cats'}}
+  ```
+</Accordion>
+
+## 여러 모드 스트리밍
+
+:::python
+`stream_mode` 매개변수에 리스트를 전달하여 여러 모드를 동시에 스트리밍할 수 있습니다.
+
+스트리밍되는 출력은 `(mode, chunk)` 튜플이 되며, 여기서 `mode`는 스트림 모드의 이름이고 `chunk`는 해당 모드에서 스트리밍된 데이터입니다.
+
+```python
+for mode, chunk in graph.stream(inputs, stream_mode=["updates", "custom"]):
+    print(chunk)
+```
+:::
+
+:::js
+`streamMode` 매개변수에 배열을 전달하여 여러 모드를 동시에 스트리밍할 수 있습니다.
+
+스트리밍되는 출력은 `[mode, chunk]` 튜플이 되며, 여기서 `mode`는 스트림 모드의 이름이고 `chunk`는 해당 모드에서 스트리밍된 데이터입니다.
+
+```typescript
+for await (const [mode, chunk] of await graph.stream(inputs, {
+  streamMode: ["updates", "custom"],
+})) {
+  console.log(chunk);
+}
+```
+:::
+
+## 그래프 상태 스트리밍
+
+`updates` 및 `values` 스트림 모드를 사용하여 그래프 실행 시 상태를 스트리밍합니다.
+
+* `updates`는 그래프의 각 단계 후 상태에 대한 **업데이트**를 스트리밍합니다.
+* `values`는 그래프의 각 단계 후 상태의 **전체 값**을 스트리밍합니다.
+
+:::python
+```python
+from typing import TypedDict
+from langgraph.graph import StateGraph, START, END
+
+
+class State(TypedDict):
+  topic: str
+  joke: str
+
+
+def refine_topic(state: State):
+    return {"topic": state["topic"] + " and cats"}
+
+
+def generate_joke(state: State):
+    return {"joke": f"This is a joke about {state['topic']}"}
+
+graph = (
+  StateGraph(State)
+  .add_node(refine_topic)
+  .add_node(generate_joke)
+  .add_edge(START, "refine_topic")
+  .add_edge("refine_topic", "generate_joke")
+  .add_edge("generate_joke", END)
+  .compile()
+)
+```
+:::
+
+:::js
+```typescript
+import { StateGraph, START, END } from "@langchain/langgraph";
+import * as z from "zod";
+
+const State = z.object({
+  topic: z.string(),
+  joke: z.string(),
+});
+
+const graph = new StateGraph(State)
+  .addNode("refineTopic", (state) => {
+    return { topic: state.topic + " and cats" };
+  })
+  .addNode("generateJoke", (state) => {
+    return { joke: `This is a joke about ${state.topic}` };
+  })
+  .addEdge(START, "refineTopic")
+  .addEdge("refineTopic", "generateJoke")
+  .addEdge("generateJoke", END)
+  .compile();
+```
+:::
+
+<Tabs>
+    <Tab title="updates">
+    각 단계 후 노드가 반환한 **상태 업데이트**만 스트리밍하려면 이 모드를 사용합니다. 스트리밍되는 출력에는 노드의 이름과 업데이트가 포함됩니다.
+
+    :::python
+    ```python {highlight={3}}
+    for chunk in graph.stream(
+        {"topic": "ice cream"},
+        stream_mode="updates",
+    ):
+        print(chunk)
+    ```
+    :::
+
+    :::js
+    ```typescript
+    for await (const chunk of await graph.stream(
+      { topic: "ice cream" },
+      { streamMode: "updates" }
+    )) {
+      console.log(chunk);
+    }
+    ```
+    :::
+    </Tab>
+    <Tab title="values">
+    각 단계 후 그래프의 **전체 상태**를 스트리밍하려면 이 모드를 사용합니다.
+
+    :::python
+    ```python {highlight={3}}
+    for chunk in graph.stream(
+        {"topic": "ice cream"},
+        stream_mode="values",
+    ):
+        print(chunk)
+    ```
+    :::
+
+    :::js
+    ```typescript
+    for await (const chunk of await graph.stream(
+      { topic: "ice cream" },
+      { streamMode: "values" }
+    )) {
+      console.log(chunk);
+    }
+    ```
+    :::
+    </Tab>
+</Tabs>
+
+## 서브그래프 출력 스트리밍
+
+:::python
+스트리밍되는 출력에 [서브그래프](/oss/langgraph/use-subgraphs)의 출력을 포함하려면, 부모 그래프의 `.stream()` 메서드에서 `subgraphs=True`로 설정할 수 있습니다. 이렇게 하면 부모 그래프와 모든 서브그래프의 출력이 스트리밍됩니다.
+
+출력은 `(namespace, data)` 튜플로 스트리밍되며, 여기서 `namespace`는 서브그래프가 호출되는 노드의 경로를 가진 튜플입니다. 예: `("parent_node:<task_id>", "child_node:<task_id>")`
+
+```python {highlight={3}}
+for chunk in graph.stream(
+    {"foo": "foo"},
+    # 서브그래프의 출력을 스트리밍하려면 subgraphs=True로 설정합니다
+    subgraphs=True,
+    stream_mode="updates",
+):
+    print(chunk)
+```
+:::
+
+:::js
+스트리밍되는 출력에 [서브그래프](/oss/langgraph/use-subgraphs)의 출력을 포함하려면, 부모 그래프의 `.stream()` 메서드에서 `subgraphs: true`로 설정할 수 있습니다. 이렇게 하면 부모 그래프와 모든 서브그래프의 출력이 스트리밍됩니다.
+
+출력은 `[namespace, data]` 튜플로 스트리밍되며, 여기서 `namespace`는 서브그래프가 호출되는 노드의 경로를 가진 튜플입니다. 예: `["parent_node:<task_id>", "child_node:<task_id>"]`
+
+```typescript
+for await (const chunk of await graph.stream(
+  { foo: "foo" },
+  {
+    // 서브그래프의 출력을 스트리밍하려면 subgraphs: true로 설정합니다
+    subgraphs: true,
+    streamMode: "updates",
+  }
+)) {
+  console.log(chunk);
+}
+```
+:::
+
+<Accordion title="확장 예제: 서브그래프에서 스트리밍">
+  :::python
+  ```python {highlight={39}}
+  from langgraph.graph import START, StateGraph
+  from typing import TypedDict
+
+  # 서브그래프 정의
+  class SubgraphState(TypedDict):
+      foo: str  # 이 키는 부모 그래프 상태와 공유됩니다
+      bar: str
+
+  def subgraph_node_1(state: SubgraphState):
+      return {"bar": "bar"}
+
+  def subgraph_node_2(state: SubgraphState):
+      return {"foo": state["foo"] + state["bar"]}
+
+  subgraph_builder = StateGraph(SubgraphState)
+  subgraph_builder.add_node(subgraph_node_1)
+  subgraph_builder.add_node(subgraph_node_2)
+  subgraph_builder.add_edge(START, "subgraph_node_1")
+  subgraph_builder.add_edge("subgraph_node_1", "subgraph_node_2")
+  subgraph = subgraph_builder.compile()
+
+  # 부모 그래프 정의
+  class ParentState(TypedDict):
+      foo: str
+
+  def node_1(state: ParentState):
+      return {"foo": "hi! " + state["foo"]}
+
+  builder = StateGraph(ParentState)
+  builder.add_node("node_1", node_1)
+  builder.add_node("node_2", subgraph)
+  builder.add_edge(START, "node_1")
+  builder.add_edge("node_1", "node_2")
+  graph = builder.compile()
+
+  for chunk in graph.stream(
+      {"foo": "foo"},
+      stream_mode="updates",
+      # 서브그래프의 출력을 스트리밍하려면 subgraphs=True로 설정합니다
+      subgraphs=True,
+  ):
+      print(chunk)
+  ```
+  :::
+
+  :::js
+  ```typescript
+  import { StateGraph, START } from "@langchain/langgraph";
+  import * as z from "zod";
+
+  // 서브그래프 정의
+  const SubgraphState = z.object({
+    foo: z.string(), // 이 키는 부모 그래프 상태와 공유됩니다
+    bar: z.string(),
+  });
+
+  const subgraphBuilder = new StateGraph(SubgraphState)
+    .addNode("subgraphNode1", (state) => {
+      return { bar: "bar" };
+    })
+    .addNode("subgraphNode2", (state) => {
+      return { foo: state.foo + state.bar };
+    })
+    .addEdge(START, "subgraphNode1")
+    .addEdge("subgraphNode1", "subgraphNode2");
+  const subgraph = subgraphBuilder.compile();
+
+  // 부모 그래프 정의
+  const ParentState = z.object({
+    foo: z.string(),
+  });
+
+  const builder = new StateGraph(ParentState)
+    .addNode("node1", (state) => {
+      return { foo: "hi! " + state.foo };
+    })
+    .addNode("node2", subgraph)
+    .addEdge(START, "node1")
+    .addEdge("node1", "node2");
+  const graph = builder.compile();
+
+  for await (const chunk of await graph.stream(
+    { foo: "foo" },
+    {
+      streamMode: "updates",
+      // 서브그래프의 출력을 스트리밍하려면 subgraphs: true로 설정합니다
+      subgraphs: true,
+    }
+  )) {
+    console.log(chunk);
+  }
+  ```
+  :::
+
+  :::python
+  ```
+  ((), {'node_1': {'foo': 'hi! foo'}})
+  (('node_2:dfddc4ba-c3c5-6887-5012-a243b5b377c2',), {'subgraph_node_1': {'bar': 'bar'}})
+  (('node_2:dfddc4ba-c3c5-6887-5012-a243b5b377c2',), {'subgraph_node_2': {'foo': 'hi! foobar'}})
+  ((), {'node_2': {'foo': 'hi! foobar'}})
+  ```
+  :::
+
+  :::js
+  ```
+  [[], {'node1': {'foo': 'hi! foo'}}]
+  [['node2:dfddc4ba-c3c5-6887-5012-a243b5b377c2'], {'subgraphNode1': {'bar': 'bar'}}]
+  [['node2:dfddc4ba-c3c5-6887-5012-a243b5b377c2'], {'subgraphNode2': {'foo': 'hi! foobar'}}]
+  [[], {'node2': {'foo': 'hi! foobar'}}]
+  ```
+  :::
+
+  **참고** 노드 업데이트뿐만 아니라 어떤 그래프(또는 서브그래프)에서 스트리밍하고 있는지 알려주는 네임스페이스도 받고 있습니다.
+</Accordion>
+
+<a id="debug"></a>
+### 디버깅
+
+`debug` 스트리밍 모드를 사용하여 그래프 실행 전반에 걸쳐 가능한 한 많은 정보를 스트리밍합니다. 스트리밍되는 출력에는 노드의 이름과 전체 상태가 포함됩니다.
+
+:::python
+```python {highlight={3}}
+for chunk in graph.stream(
+    {"topic": "ice cream"},
+    stream_mode="debug",
+):
+    print(chunk)
+```
+:::
+
+:::js
+```typescript
+for await (const chunk of await graph.stream(
+  { topic: "ice cream" },
+  { streamMode: "debug" }
+)) {
+  console.log(chunk);
+}
+```
+:::
+
+<a id="messages"></a>
+## LLM 토큰
+
+`messages` 스트리밍 모드를 사용하여 노드, 도구, 서브그래프 또는 태스크를 포함한 그래프의 모든 부분에서 대규모 언어 모델(LLM) 출력을 **토큰 단위로** 스트리밍합니다.
+
+:::python
+[`messages` 모드](#supported-stream-modes)에서 스트리밍되는 출력은 `(message_chunk, metadata)` 튜플입니다:
+
+* `message_chunk`: LLM에서 나온 토큰 또는 메시지 세그먼트입니다.
+* `metadata`: 그래프 노드 및 LLM 호출에 대한 세부 정보가 포함된 딕셔너리입니다.
+
+> LLM이 LangChain 통합으로 제공되지 않는 경우, `custom` 모드를 사용하여 출력을 스트리밍할 수 있습니다. 자세한 내용은 [모든 LLM과 함께 사용](#use-with-any-llm)을 참조하세요.
+
+<Warning>
+**Python < 3.11에서 async 사용 시 수동 구성 필요**
+Python < 3.11에서 async 코드를 사용할 때는 적절한 스트리밍을 활성화하기 위해 명시적으로 `RunnableConfig`를 `ainvoke()`에 전달해야 합니다. 자세한 내용은 [Python < 3.11에서 Async](#async)를 참조하거나 Python 3.11+로 업그레이드하세요.
+</Warning>
+
+```python {highlight={17,33}}
+from dataclasses import dataclass
+
+from langchain.chat_models import init_chat_model
+from langgraph.graph import StateGraph, START
+
+
+@dataclass
+class MyState:
+    topic: str
+    joke: str = ""
+
+
+llm = init_chat_model(model="openai:gpt-4o-mini")
+
+def call_model(state: MyState):
+    """주제에 대한 농담을 생성하기 위해 LLM을 호출합니다"""
+    # LLM이 .stream이 아닌 .invoke를 사용하여 실행되더라도 메시지 이벤트가 발생합니다
+    llm_response = llm.invoke(
+        [
+            {"role": "user", "content": f"Generate a joke about {state.topic}"}
+        ]
+    )
+    return {"joke": llm_response.content}
+
+graph = (
+    StateGraph(MyState)
+    .add_node(call_model)
+    .add_edge(START, "call_model")
+    .compile()
+)
+
+# "messages" 스트림 모드는 (message_chunk, metadata) 튜플의 이터레이터를 반환합니다
+# 여기서 message_chunk는 LLM이 스트리밍한 토큰이고 metadata는 딕셔너리입니다
+# LLM이 호출된 그래프 노드에 대한 정보 및 기타 정보가 포함됩니다
+for message_chunk, metadata in graph.stream(
+    {"topic": "ice cream"},
+    stream_mode="messages",
+):
+    if message_chunk.content:
+        print(message_chunk.content, end="|", flush=True)
+```
+:::
+
+:::js
+[`messages` 모드](#supported-stream-modes)에서 스트리밍되는 출력은 `[message_chunk, metadata]` 튜플입니다:
+
+* `message_chunk`: LLM에서 나온 토큰 또는 메시지 세그먼트입니다.
+* `metadata`: 그래프 노드 및 LLM 호출에 대한 세부 정보가 포함된 딕셔너리입니다.
+
+> LLM이 LangChain 통합으로 제공되지 않는 경우, `custom` 모드를 사용하여 출력을 스트리밍할 수 있습니다. 자세한 내용은 [모든 LLM과 함께 사용](#use-with-any-llm)을 참조하세요.
+
+```typescript
+import { ChatOpenAI } from "@langchain/openai";
+import { StateGraph, START } from "@langchain/langgraph";
+import * as z from "zod";
+
+const MyState = z.object({
+  topic: z.string(),
+  joke: z.string().default(""),
+});
+
+const llm = new ChatOpenAI({ model: "gpt-4o-mini" });
+
+const callModel = async (state: z.infer<typeof MyState>) => {
+  // 주제에 대한 농담을 생성하기 위해 LLM을 호출합니다
+  // LLM이 .stream이 아닌 .invoke를 사용하여 실행되더라도 메시지 이벤트가 발생합니다
+  const llmResponse = await llm.invoke([
+    { role: "user", content: `Generate a joke about ${state.topic}` },
+  ]);
+  return { joke: llmResponse.content };
+};
+
+const graph = new StateGraph(MyState)
+  .addNode("callModel", callModel)
+  .addEdge(START, "callModel")
+  .compile();
+
+// "messages" 스트림 모드는 [messageChunk, metadata] 튜플의 이터레이터를 반환합니다
+// 여기서 messageChunk는 LLM이 스트리밍한 토큰이고 metadata는 딕셔너리입니다
+// LLM이 호출된 그래프 노드에 대한 정보 및 기타 정보가 포함됩니다
+for await (const [messageChunk, metadata] of await graph.stream(
+  { topic: "ice cream" },
+  { streamMode: "messages" }
+)) {
+  if (messageChunk.content) {
+    console.log(messageChunk.content + "|");
+  }
+}
+```
+:::
+
+#### LLM 호출별 필터링
+
+LLM 호출에 `tags`를 연결하여 LLM 호출별로 스트리밍된 토큰을 필터링할 수 있습니다.
+
+:::python
+```python {highlight={10}}
+from langchain.chat_models import init_chat_model
+
+# llm_1은 "joke" 태그가 지정됩니다
+llm_1 = init_chat_model(model="openai:gpt-4o-mini", tags=['joke'])
+# llm_2는 "poem" 태그가 지정됩니다
+llm_2 = init_chat_model(model="openai:gpt-4o-mini", tags=['poem'])
+
+graph = ... # 이러한 LLM을 사용하는 그래프를 정의합니다
+
+# stream_mode를 "messages"로 설정하여 LLM 토큰을 스트리밍합니다
+# metadata에는 태그를 포함한 LLM 호출에 대한 정보가 포함됩니다
+async for msg, metadata in graph.astream(
+    {"topic": "cats"},
+    stream_mode="messages",
+):
+    # metadata의 tags 필드로 스트리밍된 토큰을 필터링하여
+    # "joke" 태그가 있는 LLM 호출의 토큰만 포함합니다
+    if metadata["tags"] == ["joke"]:
+        print(msg.content, end="|", flush=True)
+```
+:::
+
+:::js
+```typescript
+import { ChatOpenAI } from "@langchain/openai";
+
+// llm1은 "joke" 태그가 지정됩니다
+const llm1 = new ChatOpenAI({
+  model: "gpt-4o-mini",
+  tags: ['joke']
+});
+// llm2는 "poem" 태그가 지정됩니다
+const llm2 = new ChatOpenAI({
+  model: "gpt-4o-mini",
+  tags: ['poem']
+});
+
+const graph = // ... 이러한 LLM을 사용하는 그래프를 정의합니다
+
+// streamMode를 "messages"로 설정하여 LLM 토큰을 스트리밍합니다
+// metadata에는 태그를 포함한 LLM 호출에 대한 정보가 포함됩니다
+for await (const [msg, metadata] of await graph.stream(
+  { topic: "cats" },
+  { streamMode: "messages" }
+)) {
+  // metadata의 tags 필드로 스트리밍된 토큰을 필터링하여
+  // "joke" 태그가 있는 LLM 호출의 토큰만 포함합니다
+  if (metadata.tags?.includes("joke")) {
+    console.log(msg.content + "|");
+  }
+}
+```
+:::
+
+<Accordion title="확장 예제: 태그로 필터링">
+  :::python
+  ```python {highlight={42}}
+  from typing import TypedDict
+
+  from langchain.chat_models import init_chat_model
+  from langgraph.graph import START, StateGraph
+
+  # joke_model은 "joke" 태그가 지정됩니다
+  joke_model = init_chat_model(model="openai:gpt-4o-mini", tags=["joke"])
+  # poem_model은 "poem" 태그가 지정됩니다
+  poem_model = init_chat_model(model="openai:gpt-4o-mini", tags=["poem"])
+
+
+  class State(TypedDict):
+        topic: str
+        joke: str
+        poem: str
+
+
+  async def call_model(state, config):
+        topic = state["topic"]
+        print("Writing joke...")
+        # 참고: Python < 3.11에서는 config를 명시적으로 전달해야 합니다
+        # 그 이전에는 컨텍스트 변수 지원이 추가되지 않았기 때문입니다: https://docs.python.org/3/library/asyncio-task.html#creating-tasks
+        # 컨텍스트 변수가 올바르게 전파되도록 config를 명시적으로 전달합니다
+        # Python < 3.11에서 async 코드를 사용할 때 이것이 필요합니다. 자세한 내용은 async 섹션을 참조하세요
+        joke_response = await joke_model.ainvoke(
+              [{"role": "user", "content": f"Write a joke about {topic}"}],
+              config,
+        )
+        print("\n\nWriting poem...")
+        poem_response = await poem_model.ainvoke(
+              [{"role": "user", "content": f"Write a short poem about {topic}"}],
+              config,
+        )
+        return {"joke": joke_response.content, "poem": poem_response.content}
+
+
+  graph = (
+        StateGraph(State)
+        .add_node(call_model)
+        .add_edge(START, "call_model")
+        .compile()
+  )
+
+  # stream_mode를 "messages"로 설정하여 LLM 토큰을 스트리밍합니다
+  # metadata에는 태그를 포함한 LLM 호출에 대한 정보가 포함됩니다
+  async for msg, metadata in graph.astream(
+        {"topic": "cats"},
+        stream_mode="messages",
+  ):
+      if metadata["tags"] == ["joke"]:
+          print(msg.content, end="|", flush=True)
+```
+  :::
+
+  :::js
+  ```typescript
+  import { ChatOpenAI } from "@langchain/openai";
+  import { StateGraph, START } from "@langchain/langgraph";
+  import * as z from "zod";
+
+  // jokeModel은 "joke" 태그가 지정됩니다
+  const jokeModel = new ChatOpenAI({
+    model: "gpt-4o-mini",
+    tags: ["joke"]
+  });
+  // poemModel은 "poem" 태그가 지정됩니다
+  const poemModel = new ChatOpenAI({
+    model: "gpt-4o-mini",
+    tags: ["poem"]
+  });
+
+  const State = z.object({
+    topic: z.string(),
+    joke: z.string(),
+    poem: z.string(),
+  });
+
+  const graph = new StateGraph(State)
+    .addNode("callModel", (state) => {
+      const topic = state.topic;
+      console.log("Writing joke...");
+
+      const jokeResponse = await jokeModel.invoke([
+        { role: "user", content: `Write a joke about ${topic}` }
+      ]);
+
+      console.log("\n\nWriting poem...");
+      const poemResponse = await poemModel.invoke([
+        { role: "user", content: `Write a short poem about ${topic}` }
+      ]);
+
+      return {
+        joke: jokeResponse.content,
+        poem: poemResponse.content
+      };
+    })
+    .addEdge(START, "callModel")
+    .compile();
+
+  // streamMode를 "messages"로 설정하여 LLM 토큰을 스트리밍합니다
+  // metadata에는 태그를 포함한 LLM 호출에 대한 정보가 포함됩니다
+  for await (const [msg, metadata] of await graph.stream(
+    { topic: "cats" },
+    { streamMode: "messages" }
+  )) {
+    // metadata의 tags 필드로 스트리밍된 토큰을 필터링하여
+    // "joke" 태그가 있는 LLM 호출의 토큰만 포함합니다
+    if (metadata.tags?.includes("joke")) {
+      console.log(msg.content + "|");
+    }
+  }
+  ```
+  :::
+</Accordion>
+
+#### 노드별 필터링
+
+특정 노드에서만 토큰을 스트리밍하려면, `stream_mode="messages"`를 사용하고 스트리밍된 메타데이터의 `langgraph_node` 필드로 출력을 필터링합니다:
+
+:::python
+```python {highlight={3,5}}
+# "messages" 스트림 모드는 (message_chunk, metadata) 튜플을 반환합니다
+# 여기서 message_chunk는 LLM이 스트리밍한 토큰이고 metadata는 딕셔너리입니다
+# LLM이 호출된 그래프 노드에 대한 정보 및 기타 정보가 포함됩니다
+for msg, metadata in graph.stream(
+    inputs,
+    stream_mode="messages",
+):
+    # metadata의 langgraph_node 필드로 스트리밍된 토큰을 필터링하여
+    # 지정된 노드의 토큰만 포함합니다
+    if msg.content and metadata["langgraph_node"] == "some_node_name":
+        ...
+```
+:::
+
+:::js
+```typescript
+// "messages" 스트림 모드는 [messageChunk, metadata] 튜플을 반환합니다
+// 여기서 messageChunk는 LLM이 스트리밍한 토큰이고 metadata는 딕셔너리입니다
+// LLM이 호출된 그래프 노드에 대한 정보 및 기타 정보가 포함됩니다
+for await (const [msg, metadata] of await graph.stream(
+  inputs,
+  { streamMode: "messages" }
+)) {
+  // metadata의 langgraph_node 필드로 스트리밍된 토큰을 필터링하여
+  // 지정된 노드의 토큰만 포함합니다
+  if (msg.content && metadata.langgraph_node === "some_node_name") {
+    // ...
+  }
+}
+```
+:::
+
+<Accordion title="확장 예제: 특정 노드에서 LLM 토큰 스트리밍">
+  :::python
+  ```python {highlight={40,44}}
+  from typing import TypedDict
+  from langgraph.graph import START, StateGraph
+  from langchain_openai import ChatOpenAI
+
+  model = ChatOpenAI(model="gpt-4o-mini")
+
+
+  class State(TypedDict):
+        topic: str
+        joke: str
+        poem: str
+
+
+  def write_joke(state: State):
+        topic = state["topic"]
+        joke_response = model.invoke(
+              [{"role": "user", "content": f"Write a joke about {topic}"}]
+        )
+        return {"joke": joke_response.content}
+
+
+  def write_poem(state: State):
+        topic = state["topic"]
+        poem_response = model.invoke(
+              [{"role": "user", "content": f"Write a short poem about {topic}"}]
+        )
+        return {"poem": poem_response.content}
+
+
+  graph = (
+        StateGraph(State)
+        .add_node(write_joke)
+        .add_node(write_poem)
+        # 농담과 시를 동시에 작성합니다
+        .add_edge(START, "write_joke")
+        .add_edge(START, "write_poem")
+        .compile()
+  )
+
+  # "messages" 스트림 모드는 (message_chunk, metadata) 튜플을 반환합니다
+  # 여기서 message_chunk는 LLM이 스트리밍한 토큰이고 metadata는 딕셔너리입니다
+  # LLM이 호출된 그래프 노드에 대한 정보 및 기타 정보가 포함됩니다
+  for msg, metadata in graph.stream(
+      {"topic": "cats"},
+      stream_mode="messages",
+  ):
+      # metadata의 langgraph_node 필드로 스트리밍된 토큰을 필터링하여
+      # write_poem 노드의 토큰만 포함합니다
+      if msg.content and metadata["langgraph_node"] == "write_poem":
+          print(msg.content, end="|", flush=True)
+  ```
+  :::
+
+  :::js
+  ```typescript
+  import { ChatOpenAI } from "@langchain/openai";
+  import { StateGraph, START } from "@langchain/langgraph";
+  import * as z from "zod";
+
+  const model = new ChatOpenAI({ model: "gpt-4o-mini" });
+
+  const State = z.object({
+    topic: z.string(),
+    joke: z.string(),
+    poem: z.string(),
+  });
+
+  const graph = new StateGraph(State)
+    .addNode("writeJoke", async (state) => {
+      const topic = state.topic;
+      const jokeResponse = await model.invoke([
+        { role: "user", content: `Write a joke about ${topic}` }
+      ]);
+      return { joke: jokeResponse.content };
+    })
+    .addNode("writePoem", async (state) => {
+      const topic = state.topic;
+      const poemResponse = await model.invoke([
+        { role: "user", content: `Write a short poem about ${topic}` }
+      ]);
+      return { poem: poemResponse.content };
+    })
+    // 농담과 시를 동시에 작성합니다
+    .addEdge(START, "writeJoke")
+    .addEdge(START, "writePoem")
+    .compile();
+
+  // "messages" 스트림 모드는 [messageChunk, metadata] 튜플을 반환합니다
+  // 여기서 messageChunk는 LLM이 스트리밍한 토큰이고 metadata는 딕셔너리입니다
+  // LLM이 호출된 그래프 노드에 대한 정보 및 기타 정보가 포함됩니다
+  for await (const [msg, metadata] of await graph.stream(
+    { topic: "cats" },
+    { streamMode: "messages" }
+  )) {
+    // metadata의 langgraph_node 필드로 스트리밍된 토큰을 필터링하여
+    // writePoem 노드의 토큰만 포함합니다
+    if (msg.content && metadata.langgraph_node === "writePoem") {
+      console.log(msg.content + "|");
+    }
+  }
+  ```
+  :::
+</Accordion>
+
+## 커스텀 데이터 스트리밍
+
+:::python
+LangGraph 노드 또는 도구 내부에서 **커스텀 사용자 정의 데이터**를 전송하려면 다음 단계를 따르세요:
+
+1. `get_stream_writer()`를 사용하여 스트림 라이터에 액세스하고 커스텀 데이터를 발생시킵니다.
+2. `.stream()` 또는 `.astream()`을 호출할 때 `stream_mode="custom"`으로 설정하여 스트림에서 커스텀 데이터를 가져옵니다. 여러 모드를 결합할 수 있지만 (예: `["updates", "custom"]`), 적어도 하나는 `"custom"`이어야 합니다.
+
+<Warning>
+**Python < 3.11에서 async에서 `get_stream_writer()` 사용 불가**
+Python < 3.11에서 실행되는 async 코드에서는 `get_stream_writer()`가 작동하지 않습니다.
+대신, 노드 또는 도구에 `writer` 매개변수를 추가하고 수동으로 전달하세요.
+사용 예제는 [Python < 3.11에서 Async](#async)를 참조하세요.
+</Warning>
+
+<Tabs>
+    <Tab title="node">
+    ```python
+    from typing import TypedDict
+    from langgraph.config import get_stream_writer
+    from langgraph.graph import StateGraph, START
+
+    class State(TypedDict):
+        query: str
+        answer: str
+
+    def node(state: State):
+        # 커스텀 데이터를 전송하기 위해 스트림 라이터를 가져옵니다
+        writer = get_stream_writer()
+        # 커스텀 키-값 쌍을 발생시킵니다 (예: 진행 상황 업데이트)
+        writer({"custom_key": "Generating custom data inside node"})
+        return {"answer": "some data"}
+
+    graph = (
+        StateGraph(State)
+        .add_node(node)
+        .add_edge(START, "node")
+        .compile()
+    )
+
+    inputs = {"query": "example"}
+
+    # 스트림에서 커스텀 데이터를 받으려면 stream_mode="custom"으로 설정합니다
+    for chunk in graph.stream(inputs, stream_mode="custom"):
+        print(chunk)
+    ```
+    </Tab>
+    <Tab title="tool">
+    ```python {highlight={8,10}}
+    from langchain.tools import tool
+    from langgraph.config import get_stream_writer
+
+    @tool
+    def query_database(query: str) -> str:
+        """데이터베이스를 쿼리합니다."""
+        # 커스텀 데이터를 전송하기 위해 스트림 라이터에 액세스합니다
+        writer = get_stream_writer()
+        # 커스텀 키-값 쌍을 발생시킵니다 (예: 진행 상황 업데이트)
+        writer({"data": "Retrieved 0/100 records", "type": "progress"})
+        # 쿼리 수행
+        # 또 다른 커스텀 키-값 쌍을 발생시킵니다
+        writer({"data": "Retrieved 100/100 records", "type": "progress"})
+        return "some-answer"
+
+
+    graph = ... # 이 도구를 사용하는 그래프를 정의합니다
+
+    # 스트림에서 커스텀 데이터를 받으려면 stream_mode="custom"으로 설정합니다
+    for chunk in graph.stream(inputs, stream_mode="custom"):
+        print(chunk)
+```
+    </Tab>
+</Tabs>
+:::
+
+:::js
+LangGraph 노드 또는 도구 내부에서 **커스텀 사용자 정의 데이터**를 전송하려면 다음 단계를 따르세요:
+
+1. `LangGraphRunnableConfig`의 `writer` 매개변수를 사용하여 커스텀 데이터를 발생시킵니다.
+2. `.stream()`을 호출할 때 `streamMode: "custom"`으로 설정하여 스트림에서 커스텀 데이터를 가져옵니다. 여러 모드를 결합할 수 있지만 (예: `["updates", "custom"]`), 적어도 하나는 `"custom"`이어야 합니다.
+
+<Tabs>
+    <Tab title="node">
+    ```typescript
+    import { StateGraph, START, LangGraphRunnableConfig } from "@langchain/langgraph";
+    import * as z from "zod";
+
+    const State = z.object({
+      query: z.string(),
+      answer: z.string(),
+    });
+
+    const graph = new StateGraph(State)
+      .addNode("node", async (state, config) => {
+        // 커스텀 키-값 쌍을 발생시키기 위해 writer를 사용합니다 (예: 진행 상황 업데이트)
+        config.writer({ custom_key: "Generating custom data inside node" });
+        return { answer: "some data" };
+      })
+      .addEdge(START, "node")
+      .compile();
+
+    const inputs = { query: "example" };
+
+    // 스트림에서 커스텀 데이터를 받으려면 streamMode: "custom"으로 설정합니다
+    for await (const chunk of await graph.stream(inputs, { streamMode: "custom" })) {
+      console.log(chunk);
+    }
+    ```
+    </Tab>
+    <Tab title="tool">
+    ```typescript
+    import { tool } from "@langchain/core/tools";
+    import { LangGraphRunnableConfig } from "@langchain/langgraph";
+    import * as z from "zod";
+
+    const queryDatabase = tool(
+      async (input, config: LangGraphRunnableConfig) => {
+        // 커스텀 키-값 쌍을 발생시키기 위해 writer를 사용합니다 (예: 진행 상황 업데이트)
+        config.writer({ data: "Retrieved 0/100 records", type: "progress" });
+        // 쿼리 수행
+        // 또 다른 커스텀 키-값 쌍을 발생시킵니다
+        config.writer({ data: "Retrieved 100/100 records", type: "progress" });
+        return "some-answer";
+      },
+      {
+        name: "query_database",
+        description: "Query the database.",
+        schema: z.object({
+          query: z.string().describe("The query to execute."),
+        }),
+      }
+    );
+
+    const graph = // ... 이 도구를 사용하는 그래프를 정의합니다
+
+    // 스트림에서 커스텀 데이터를 받으려면 streamMode: "custom"으로 설정합니다
+    for await (const chunk of await graph.stream(inputs, { streamMode: "custom" })) {
+      console.log(chunk);
+    }
+    ```
+    </Tab>
+</Tabs>
+:::
+
+## 모든 LLM과 함께 사용
+
+:::python
+`stream_mode="custom"`을 사용하여 **모든 LLM API**에서 데이터를 스트리밍할 수 있습니다 — 해당 API가 LangChain 채팅 모델 인터페이스를 구현하지 **않더라도** 말입니다.
+
+이를 통해 자체 스트리밍 인터페이스를 제공하는 원시 LLM 클라이언트 또는 외부 서비스를 통합할 수 있어, LangGraph를 커스텀 설정에 매우 유연하게 사용할 수 있습니다.
+
+```python {highlight={5,8,20}}
+from langgraph.config import get_stream_writer
+
+def call_arbitrary_model(state):
+    """임의의 모델을 호출하고 출력을 스트리밍하는 예제 노드"""
+    # 커스텀 데이터를 전송하기 위해 스트림 라이터를 가져옵니다
+    writer = get_stream_writer()
+    # 청크를 생성하는 스트리밍 클라이언트가 있다고 가정합니다
+    # 커스텀 스트리밍 클라이언트를 사용하여 LLM 토큰을 생성합니다
+    for chunk in your_custom_streaming_client(state["topic"]):
+        # writer를 사용하여 스트림에 커스텀 데이터를 전송합니다
+        writer({"custom_llm_chunk": chunk})
+    return {"result": "completed"}
+
+graph = (
+    StateGraph(State)
+    .add_node(call_arbitrary_model)
+    # 필요에 따라 다른 노드와 엣지를 추가합니다
+    .compile()
+)
+
+# 스트림에서 커스텀 데이터를 받으려면 stream_mode="custom"으로 설정합니다
+for chunk in graph.stream(
+    {"topic": "cats"},
+    stream_mode="custom",
+):
+    # 청크에는 LLM에서 스트리밍된 커스텀 데이터가 포함됩니다
+    print(chunk)
+```
+:::
+
+:::js
+`streamMode: "custom"`을 사용하여 **모든 LLM API**에서 데이터를 스트리밍할 수 있습니다 — 해당 API가 LangChain 채팅 모델 인터페이스를 구현하지 **않더라도** 말입니다.
+
+이를 통해 자체 스트리밍 인터페이스를 제공하는 원시 LLM 클라이언트 또는 외부 서비스를 통합할 수 있어, LangGraph를 커스텀 설정에 매우 유연하게 사용할 수 있습니다.
+
+```typescript
+import { LangGraphRunnableConfig } from "@langchain/langgraph";
+
+const callArbitraryModel = async (
+  state: any,
+  config: LangGraphRunnableConfig
+) => {
+  // 임의의 모델을 호출하고 출력을 스트리밍하는 예제 노드
+  // 청크를 생성하는 스트리밍 클라이언트가 있다고 가정합니다
+  // 커스텀 스트리밍 클라이언트를 사용하여 LLM 토큰을 생성합니다
+  for await (const chunk of yourCustomStreamingClient(state.topic)) {
+    // writer를 사용하여 스트림에 커스텀 데이터를 전송합니다
+    config.writer({ custom_llm_chunk: chunk });
+  }
+  return { result: "completed" };
+};
+
+const graph = new StateGraph(State)
+  .addNode("callArbitraryModel", callArbitraryModel)
+  // 필요에 따라 다른 노드와 엣지를 추가합니다
+  .compile();
+
+// 스트림에서 커스텀 데이터를 받으려면 streamMode: "custom"으로 설정합니다
+for await (const chunk of await graph.stream(
+  { topic: "cats" },
+  { streamMode: "custom" }
+)) {
+  // 청크에는 LLM에서 스트리밍된 커스텀 데이터가 포함됩니다
+  console.log(chunk);
+}
+```
+:::
+
+<Accordion title="확장 예제: 임의의 채팅 모델 스트리밍">
+  :::python
+  ```python
+  import operator
+  import json
+
+  from typing import TypedDict
+  from typing_extensions import Annotated
+  from langgraph.graph import StateGraph, START
+
+  from openai import AsyncOpenAI
+
+  openai_client = AsyncOpenAI()
+  model_name = "gpt-4o-mini"
+
+
+  async def stream_tokens(model_name: str, messages: list[dict]):
+      response = await openai_client.chat.completions.create(
+          messages=messages, model=model_name, stream=True
+      )
+      role = None
+      async for chunk in response:
+          delta = chunk.choices[0].delta
+
+          if delta.role is not None:
+              role = delta.role
+
+          if delta.content:
+              yield {"role": role, "content": delta.content}
+
+
+  # 이것은 우리의 도구입니다
+  async def get_items(place: str) -> str:
+      """질문한 장소에서 찾을 수 있는 항목을 나열하기 위해 이 도구를 사용합니다."""
+      writer = get_stream_writer()
+      response = ""
+      async for msg_chunk in stream_tokens(
+          model_name,
+          [
+              {
+                  "role": "user",
+                  "content": (
+                      "Can you tell me what kind of items "
+                      f"i might find in the following place: '{place}'. "
+                      "List at least 3 such items separating them by a comma. "
+                      "And include a brief description of each item."
+                  ),
+              }
+          ],
+      ):
+          response += msg_chunk["content"]
+          writer(msg_chunk)
+
+      return response
+
+
+  class State(TypedDict):
+      messages: Annotated[list[dict], operator.add]
+
+
+  # 이것은 도구 호출 그래프 노드입니다
+  async def call_tool(state: State):
+      ai_message = state["messages"][-1]
+      tool_call = ai_message["tool_calls"][-1]
+
+      function_name = tool_call["function"]["name"]
+      if function_name != "get_items":
+          raise ValueError(f"Tool {function_name} not supported")
+
+      function_arguments = tool_call["function"]["arguments"]
+      arguments = json.loads(function_arguments)
+
+      function_response = await get_items(**arguments)
+      tool_message = {
+          "tool_call_id": tool_call["id"],
+          "role": "tool",
+          "name": function_name,
+          "content": function_response,
+      }
+      return {"messages": [tool_message]}
+
+
+  graph = (
+      StateGraph(State)
+      .add_node(call_tool)
+      .add_edge(START, "call_tool")
+      .compile()
+  )
+  ```
+
+  도구 호출을 포함하는 AI 메시지로 그래프를 호출해 봅시다:
+
+  ```python
+  inputs = {
+      "messages": [
+          {
+              "content": None,
+              "role": "assistant",
+              "tool_calls": [
+                  {
+                      "id": "1",
+                      "function": {
+                          "arguments": '{"place":"bedroom"}',
+                          "name": "get_items",
+                      },
+                      "type": "function",
+                  }
+              ],
+          }
+      ]
+  }
+
+  async for chunk in graph.astream(
+      inputs,
+      stream_mode="custom",
+  ):
+      print(chunk["content"], end="|", flush=True)
+  ```
+  :::
+
+  :::js
+  ```typescript
+  import { StateGraph, START, MessagesZodMeta, LangGraphRunnableConfig } from "@langchain/langgraph";
+  import { BaseMessage } from "@langchain/core/messages";
+  import { registry } from "@langchain/langgraph/zod";
+  import * as z from "zod";
+  import OpenAI from "openai";
+
+  const openaiClient = new OpenAI();
+  const modelName = "gpt-4o-mini";
+
+  async function* streamTokens(modelName: string, messages: any[]) {
+    const response = await openaiClient.chat.completions.create({
+      messages,
+      model: modelName,
+      stream: true,
+    });
+
+    let role: string | null = null;
+    for await (const chunk of response) {
+      const delta = chunk.choices[0]?.delta;
+
+      if (delta?.role) {
+        role = delta.role;
+      }
+
+      if (delta?.content) {
+        yield { role, content: delta.content };
+      }
+    }
+  }
+
+  // 이것은 우리의 도구입니다
+  const getItems = tool(
+    async (input, config: LangGraphRunnableConfig) => {
+      let response = "";
+      for await (const msgChunk of streamTokens(
+        modelName,
+        [
+          {
+            role: "user",
+            content: `Can you tell me what kind of items i might find in the following place: '${input.place}'. List at least 3 such items separating them by a comma. And include a brief description of each item.`,
+          },
+        ]
+      )) {
+        response += msgChunk.content;
+        config.writer?.(msgChunk);
+      }
+      return response;
+    },
+    {
+      name: "get_items",
+      description: "Use this tool to list items one might find in a place you're asked about.",
+      schema: z.object({
+        place: z.string().describe("The place to look up items for."),
+      }),
+    }
+  );
+
+  const State = z.object({
+    messages: z
+      .array(z.custom<BaseMessage>())
+      .register(registry, MessagesZodMeta),
+  });
+
+  const graph = new StateGraph(State)
+    // 이것은 도구 호출 그래프 노드입니다
+    .addNode("callTool", async (state) => {
+      const aiMessage = state.messages.at(-1);
+      const toolCall = aiMessage.tool_calls?.at(-1);
+
+      const functionName = toolCall?.function?.name;
+      if (functionName !== "get_items") {
+        throw new Error(`Tool ${functionName} not supported`);
+      }
+
+      const functionArguments = toolCall?.function?.arguments;
+      const args = JSON.parse(functionArguments);
+
+      const functionResponse = await getItems.invoke(args);
+      const toolMessage = {
+        tool_call_id: toolCall.id,
+        role: "tool",
+        name: functionName,
+        content: functionResponse,
+      };
+      return { messages: [toolMessage] };
+    })
+    .addEdge(START, "callTool")
+    .compile();
+  ```
+
+  도구 호출을 포함하는 AI 메시지로 그래프를 호출해 봅시다:
+
+  ```typescript
+  const inputs = {
+    messages: [
+      {
+        content: null,
+        role: "assistant",
+        tool_calls: [
+          {
+            id: "1",
+            function: {
+              arguments: '{"place":"bedroom"}',
+              name: "get_items",
+            },
+            type: "function",
+          }
+        ],
+      }
+    ]
+  };
+
+  for await (const chunk of await graph.stream(
+    inputs,
+    { streamMode: "custom" }
+  )) {
+    console.log(chunk.content + "|");
+  }
+  ```
+  :::
+</Accordion>
+
+## 특정 채팅 모델에 대한 스트리밍 비활성화
+
+애플리케이션에서 스트리밍을 지원하는 모델과 지원하지 않는 모델을 혼합하여 사용하는 경우, 스트리밍을 지원하지 않는 모델에 대해 명시적으로 스트리밍을 비활성화해야 할 수 있습니다.
+
+:::python
+모델을 초기화할 때 `disable_streaming=True`로 설정합니다.
+
+<Tabs>
+    <Tab title="init_chat_model">
+    ```python {highlight={5}}
+    from langchain.chat_models import init_chat_model
+
+    model = init_chat_model(
+        "anthropic:claude-3-7-sonnet-latest",
+        # 채팅 모델에 대한 스트리밍을 비활성화하려면 disable_streaming=True로 설정합니다
+        disable_streaming=True
+    )
+    ```
+    </Tab>
+    <Tab title="chat model interface">
+    ```python
+    from langchain_openai import ChatOpenAI
+
+    # 채팅 모델에 대한 스트리밍을 비활성화하려면 disable_streaming=True로 설정합니다
+    llm = ChatOpenAI(model="o1-preview", disable_streaming=True)
+    ```
+    </Tab>
+</Tabs>
+:::
+
+:::js
+모델을 초기화할 때 `streaming: false`로 설정합니다.
+
+```typescript
+import { ChatOpenAI } from "@langchain/openai";
+
+const model = new ChatOpenAI({
+  model: "o1-preview",
+  // 채팅 모델에 대한 스트리밍을 비활성화하려면 streaming: false로 설정합니다
+  streaming: false,
+});
+```
+:::
+
+:::python
+<a id="async"></a>
+### Python < 3.11에서 Async
+
+Python 버전 < 3.11에서는 [asyncio 태스크](https://docs.python.org/3/library/asyncio-task.html#asyncio.create_task)가 `context` 매개변수를 지원하지 않습니다.
+이는 LangGraph가 컨텍스트를 자동으로 전파하는 기능을 제한하며, LangGraph의 스트리밍 메커니즘에 두 가지 주요 방식으로 영향을 미칩니다:
+
+1. 콜백이 자동으로 전파되지 않으므로, async LLM 호출(예: `ainvoke()`)에 명시적으로 [`RunnableConfig`](https://python.langchain.com/docs/concepts/runnables/#runnableconfig)를 전달**해야 합니다**.
+2. async 노드 또는 도구에서 `get_stream_writer()`를 사용할 수 **없습니다** — `writer` 인수를 직접 전달해야 합니다.
+
+<Accordion title="확장 예제: 수동 구성을 사용한 async LLM 호출">
+  ```python {highlight={16,29}}
+  from typing import TypedDict
+  from langgraph.graph import START, StateGraph
+  from langchain.chat_models import init_chat_model
+
+  llm = init_chat_model(model="openai:gpt-4o-mini")
+
+  class State(TypedDict):
+      topic: str
+      joke: str
+
+  # async 노드 함수에서 config를 인수로 받습니다
+  async def call_model(state, config):
+      topic = state["topic"]
+      print("Generating joke...")
+      # 적절한 컨텍스트 전파를 보장하기 위해 llm.ainvoke()에 config를 전달합니다
+      joke_response = await llm.ainvoke(
+          [{"role": "user", "content": f"Write a joke about {topic}"}],
+          config,
+      )
+      return {"joke": joke_response.content}
+
+  graph = (
+      StateGraph(State)
+      .add_node(call_model)
+      .add_edge(START, "call_model")
+      .compile()
+  )
+
+  # LLM 토큰을 스트리밍하려면 stream_mode="messages"로 설정합니다
+  async for chunk, metadata in graph.astream(
+      {"topic": "ice cream"},
+      stream_mode="messages",
+  ):
+      if chunk.content:
+          print(chunk.content, end="|", flush=True)
+  ```
+</Accordion>
+
+<Accordion title="확장 예제: 스트림 라이터를 사용한 async 커스텀 스트리밍">
+  ```python {highlight={8,21}}
+  from typing import TypedDict
+  from langgraph.types import StreamWriter
+
+  class State(TypedDict):
+        topic: str
+        joke: str
+
+  # async 노드 또는 도구의 함수 시그니처에 writer를 인수로 추가합니다
+  # LangGraph는 자동으로 스트림 라이터를 함수에 전달합니다
+  async def generate_joke(state: State, writer: StreamWriter):
+        writer({"custom_key": "Streaming custom data while generating a joke"})
+        return {"joke": f"This is a joke about {state['topic']}"}
+
+  graph = (
+        StateGraph(State)
+        .add_node(generate_joke)
+        .add_edge(START, "generate_joke")
+        .compile()
+  )
+
+  # 스트림에서 커스텀 데이터를 받으려면 stream_mode="custom"으로 설정합니다
+  async for chunk in graph.astream(
+        {"topic": "ice cream"},
+        stream_mode="custom",
+  ):
+        print(chunk)
+  ```
+</Accordion>
+:::
