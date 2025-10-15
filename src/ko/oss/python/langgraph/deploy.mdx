@@ -6,7 +6,7 @@ import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
 <AlphaCallout />
 
-LangGraph Platform은 에이전트를 프로덕션 시스템으로 전환하는 가장 빠른 방법입니다. 기존 호스팅 플랫폼은 상태 비저장, 단기 실행 웹 앱을 위해 구축되었지만, LangGraph는 **상태 기반의 장기 실행 에이전트를 위해 특별히 설계**되어 있어 저장소에서 안정적인 클라우드 배포까지 몇 분 만에 완료할 수 있습니다.
+LangSmith는 에이전트를 프로덕션 시스템으로 전환하는 가장 빠른 방법입니다. 기존 호스팅 플랫폼은 상태 비저장, 단기 실행 웹 앱을 위해 구축되었지만, LangGraph는 **상태 기반의 장기 실행 에이전트를 위해 특별히 설계**되어 있어 저장소에서 안정적인 클라우드 배포까지 몇 분 만에 완료할 수 있습니다.
 
 ## 사전 요구사항
 
@@ -19,9 +19,9 @@ LangGraph Platform은 에이전트를 프로덕션 시스템으로 전환하는 
 
 ### 1. GitHub에 저장소 생성하기
 
-애플리케이션의 코드는 LangGraph Platform에 배포하기 위해 GitHub 저장소에 있어야 합니다. 공개 및 비공개 저장소가 모두 지원됩니다. 이 빠른 시작에서는 먼저 [로컬 서버 설정 가이드](/oss/langgraph/studio#setup-local-langgraph-server)를 따라 앱이 LangGraph와 호환되는지 확인한 다음, 코드를 저장소에 푸시하세요.
+애플리케이션의 코드는 LangSmith에 배포하기 위해 GitHub 저장소에 있어야 합니다. 공개 및 비공개 저장소가 모두 지원됩니다. 이 빠른 시작에서는 먼저 [로컬 서버 설정 가이드](/oss/langgraph/studio#setup-local-langgraph-server)를 따라 앱이 LangGraph와 호환되는지 확인한 다음, 코드를 저장소에 푸시하세요.
 
-### 2. LangGraph Platform에 배포하기
+### 2. LangSmith에 배포하기
 
 <Steps>
 <Step title="LangSmith Deployments로 이동">
@@ -38,12 +38,12 @@ LangGraph Platform은 에이전트를 프로덕션 시스템으로 전환하는 
 </Step>
 </Steps>
 
-### 3. LangGraph Studio에서 애플리케이션 테스트하기
+### 3. Studio에서 애플리케이션 테스트하기
 
 애플리케이션이 배포되면:
 
 1. 방금 생성한 배포를 선택하여 자세한 정보를 확인하세요.
-2. 오른쪽 상단의 **LangGraph Studio** 버튼을 클릭하세요. LangGraph Studio가 열리면서 그래프를 표시합니다.
+2. 오른쪽 상단의 **Studio** 버튼을 클릭하세요. Studio가 열리면서 그래프를 표시합니다.
 
 ### 4. 배포의 API URL 가져오기
 
@@ -140,5 +140,5 @@ curl -s --request POST \
 </Tabs>
 
 <Tip>
-LangGraph Platform은 자체 호스팅 및 하이브리드를 포함한 추가 배포 옵션을 제공합니다. 자세한 내용은 [배포 옵션](/langgraph-platform/deployment-options)을 참조하세요.
+LangSmith는 자체 호스팅 및 하이브리드를 포함한 추가 배포 옵션을 제공합니다. 자세한 내용은 [호스팅 개요](/langsmith/hosting)를 참조하세요.
 </Tip>
