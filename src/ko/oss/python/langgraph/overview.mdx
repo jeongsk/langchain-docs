@@ -1,0 +1,109 @@
+---
+title: LangGraph 개요
+sidebarTitle: 개요
+---
+
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
+
+<AlphaCallout />
+
+Klarna, Replit, Elastic 등 에이전트의 미래를 만들어가는 기업들의 신뢰를 받는 LangGraph는 장기 실행 상태 기반 에이전트를 구축, 관리, 배포하기 위한 저수준 오케스트레이션 프레임워크이자 런타임입니다.
+
+LangGraph는 매우 저수준이며, 에이전트 **오케스트레이션**에만 전적으로 집중합니다. LangGraph를 사용하기 전에 [모델](/oss/langchain/models)과 [도구](/oss/langchain/tools)부터 시작하여 에이전트를 구축하는 데 사용되는 일부 구성 요소에 익숙해지는 것을 권장합니다.
+
+문서 전반에 걸쳐 모델과 도구를 통합하기 위해 [LangChain](/oss/langchain/overview) 구성 요소를 일반적으로 사용하지만, LangGraph를 사용하기 위해 LangChain이 반드시 필요한 것은 아닙니다. 에이전트를 처음 시작하거나 더 높은 수준의 추상화를 원하는 경우, 일반적인 LLM 및 도구 호출 루프를 위해 사전 구축된 아키텍처를 제공하는 LangChain의 [에이전트](/oss/langchain/agents)를 사용하는 것을 권장합니다.
+
+LangGraph는 에이전트 오케스트레이션에 중요한 기본 기능에 집중합니다: 지속 가능한 실행, 스트리밍, 휴먼-인-더-루프 등입니다.
+
+## <Icon icon="download" size={20} /> 설치
+
+:::python
+<CodeGroup>
+```bash pip
+pip install --pre -U langgraph
+```
+
+```bash uv
+uv add --prerelease=allow langgraph
+```
+</CodeGroup>
+:::
+
+:::js
+<CodeGroup>
+```bash npm
+npm install @langchain/langgraph@next @langchain/core@next
+```
+
+```bash pnpm
+pnpm add @langchain/langgraph@next @langchain/core@next
+```
+
+```bash yarn
+yarn add @langchain/langgraph@next @langchain/core@next
+```
+
+```bash bun
+bun add @langchain/langgraph@next @langchain/core@next
+```
+</CodeGroup>
+:::
+
+그런 다음, 간단한 hello world 예제를 만들어보세요:
+
+:::python
+```python
+from langgraph.graph import StateGraph, MessagesState, START, END
+
+def mock_llm(state: MessagesState):
+    return {"messages": [{"role": "ai", "content": "hello world"}]}
+
+graph = StateGraph(MessagesState)
+graph.add_node(mock_llm)
+graph.add_edge(START, "mock_llm")
+graph.add_edge("mock_llm", END)
+graph = graph.compile()
+
+graph.invoke({"messages": [{"role": "user", "content": "hi!"}]})
+```
+:::
+
+:::js
+```typescript
+import { MessagesAnnotation, StateGraph, START, END } from "@langchain/langgraph";
+
+const mockLlm = (state: typeof MessagesAnnotation.State) => {
+  return { messages: [{ role: "ai", content: "hello world" }] };
+};
+
+const graph = new StateGraph(MessagesAnnotation)
+  .addNode("mock_llm", mockLlm)
+  .addEdge(START, "mock_llm")
+  .addEdge("mock_llm", END)
+  .compile();
+
+await graph.invoke({ messages: [{ role: "user", content: "hi!" }] });
+```
+:::
+
+## 핵심 이점
+
+LangGraph는 *모든* 장기 실행 상태 기반 워크플로우 또는 에이전트를 위한 저수준 지원 인프라를 제공합니다. LangGraph는 프롬프트나 아키텍처를 추상화하지 않으며, 다음과 같은 핵심 이점을 제공합니다:
+
+* [지속 가능한 실행](/oss/langgraph/durable-execution): 실패를 견디고 장기간 실행될 수 있으며, 중단된 지점부터 재개할 수 있는 에이전트를 구축합니다.
+* [휴먼-인-더-루프](/oss/langgraph/interrupts): 모든 시점에서 에이전트 상태를 검사하고 수정하여 사람의 감독을 통합합니다.
+* [포괄적인 메모리](/oss/concepts/memory): 진행 중인 추론을 위한 단기 작업 메모리와 세션 간 장기 메모리를 모두 갖춘 상태 기반 에이전트를 생성합니다.
+* [LangSmith를 사용한 디버깅](/langsmith/home): 실행 경로를 추적하고, 상태 전환을 캡처하며, 상세한 런타임 메트릭을 제공하는 시각화 도구를 통해 복잡한 에이전트 동작에 대한 깊은 가시성을 확보합니다.
+* [프로덕션 준비 배포](/langsmith/deployments): 상태 기반의 장기 실행 워크플로우의 고유한 과제를 처리하도록 설계된 확장 가능한 인프라로 정교한 에이전트 시스템을 자신 있게 배포합니다.
+
+## LangGraph 생태계
+
+LangGraph는 독립적으로 사용할 수 있지만, 모든 LangChain 제품과 원활하게 통합되어 개발자에게 에이전트 구축을 위한 완전한 도구 세트를 제공합니다. LLM 애플리케이션 개발을 개선하려면 LangGraph를 다음과 함께 사용하세요:
+
+* [LangSmith](http://www.langchain.com/langsmith) — 에이전트 평가 및 관찰성에 유용합니다. 성능이 낮은 LLM 앱 실행을 디버깅하고, 에이전트 궤적을 평가하며, 프로덕션에서 가시성을 확보하고, 시간이 지남에 따라 성능을 개선합니다.
+* [LangSmith](/langsmith/home) — 장기 실행 상태 기반 워크플로우를 위해 특별히 구축된 배포 플랫폼으로 에이전트를 손쉽게 배포하고 확장합니다. [Studio](/langsmith/studio)에서 시각적 프로토타이핑을 통해 팀 간에 에이전트를 발견, 재사용, 구성 및 공유하고 빠르게 반복합니다.
+* [LangChain](/oss/langchain/overview) - LLM 애플리케이션 개발을 간소화하는 통합 및 조합 가능한 구성 요소를 제공합니다. LangGraph 위에 구축된 에이전트 추상화를 포함합니다.
+
+## 감사의 말
+
+LangGraph는 [Pregel](https://research.google/pubs/pub37252/)과 [Apache Beam](https://beam.apache.org/)에서 영감을 받았습니다. 공개 인터페이스는 [NetworkX](https://networkx.org/documentation/latest/)에서 영감을 받았습니다. LangGraph는 LangChain의 제작자인 LangChain Inc에서 구축했지만, LangChain 없이도 사용할 수 있습니다.

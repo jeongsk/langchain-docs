@@ -10,7 +10,7 @@ import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
 Structured output allows agents to return data in a specific, predictable format. Instead of parsing natural language responses, you get structured data in the form of JSON objects, Pydantic models, or dataclasses that your application can directly use.
 
-LangChain's prebuilt ReAct agent `create_agent()` handles structured output automatically. The user sets their desired structured output schema, and when the model generates the structured data, it's captured, validated, and returned in the `'structured_response'` key of the agent's state.
+LangChain's `create_agent()` handles structured output automatically. The user sets their desired structured output schema, and when the model generates the structured data, it's captured, validated, and returned in the `'structured_response'` key of the agent's state.
 
 ```python
 def create_agent(
@@ -22,20 +22,19 @@ def create_agent(
     ]
 ```
 
-<ParamField path="response_format">
-    Controls how the agent returns structured data:
+## Response Format
+Controls how the agent returns structured data:
 
-    - **`ToolStrategy[StructuredResponseT]`**: `Uses tool calling for structured output
-    - **`ProviderStrategy[StructuredResponseT]`**: Uses provider-native structured output
-    - **`type[StructuredResponseT]`**: Schema type - automatically selects best strategy based on model capabilities
-    - **`None`**: No structured output
+- **`ToolStrategy[StructuredResponseT]`**: Uses tool calling for structured output
+- **`ProviderStrategy[StructuredResponseT]`**: Uses provider-native structured output
+- **`type[StructuredResponseT]`**: Schema type - automatically selects best strategy based on model capabilities
+- **`None`**: No structured output
 
-    When a schema type is provided directly, LangChain automatically chooses:
-    - `ProviderStrategy` for models supporting native structured output (OpenAI, Grok)
-    - `ToolStrategy` for all other models
+When a schema type is provided directly, LangChain automatically chooses:
+- `ProviderStrategy` for models supporting native structured output (OpenAI, Grok)
+- `ToolStrategy` for all other models
 
-    The structured response is returned in the `structured_response` key of the agent's final state.
-</ParamField>
+The structured response is returned in the `structured_response` key of the agent's final state.
 :::
 :::js
 Structured output allows agents to return data in a specific, predictable format. Instead of parsing natural language responses, you get typed structured data.
@@ -54,7 +53,7 @@ const agent = createAgent({
 })
 ```
 
-<ParamField path="responseFormat">
+## Response Format
     Controls how the agent returns structured data. You can provide either a Zod object or JSON schema. By default, the agent uses a tool calling strategy, in which the output is created by an additional tool call. Certain models support native structured output, in which case the agent will use that strategy instead.
 
     You can control the behavior by wrapping `ResponseFormat` in a `toolStrategy` or `providerStrategy` function call:
@@ -71,7 +70,6 @@ const agent = createAgent({
     ```
 
     The structured response is returned in the `structuredResponse` key of the agent's final state.
-</ParamField>
 :::
 
 ## Provider strategy
@@ -216,7 +214,7 @@ LangChain automatically uses `ProviderStrategy` when you pass a schema type dire
 
 <CodeGroup>
     ```ts Zod Schema
-    import { z } from "zod";
+    import * as z from "zod";
     import { createAgent, providerStrategy } from "langchain";
 
     const ContactInfo = z.object({
@@ -565,7 +563,7 @@ function toolStrategy<StructuredResponseT>(
 
 <CodeGroup>
     ```ts Zod Schema
-    import { z } from "zod";
+    import * as z from "zod";
     import { createAgent, toolStrategy } from "langchain";
 
     const ProductReview = z.object({
@@ -630,7 +628,7 @@ function toolStrategy<StructuredResponseT>(
     ```
 
     ```ts Union Types
-    import { z } from "zod";
+    import * as z from "zod";
     import { createAgent, toolStrategy } from "langchain";
 
     const ProductReview = z.object({
@@ -665,7 +663,7 @@ function toolStrategy<StructuredResponseT>(
 The `toolMessageContent` parameter allows you to customize the message that appears in the conversation history when structured output is generated:
 
 ```ts
-import { z } from "zod";
+import * as z from "zod";
 import { createAgent, toolStrategy } from "langchain";
 
 const MeetingAction = z.object({
@@ -791,7 +789,7 @@ Returning structured response: {'name': 'John Doe', 'email': 'john@email.com'}
 :::
 :::js
 ```ts
-import { z } from "zod";
+import * as z from "zod";
 import { createAgent, toolStrategy } from "langchain";
 
 const ContactInfo = z.object({
@@ -985,7 +983,7 @@ response_format = ToolStrategy(
 :::
 :::js
 ```ts
-import { z } from "zod";
+import * as z from "zod";
 import { createAgent, toolStrategy } from "langchain";
 
 const ProductRating = z.object({
