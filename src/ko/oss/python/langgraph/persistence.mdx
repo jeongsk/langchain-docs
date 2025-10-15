@@ -17,7 +17,7 @@ LangGraph API를 사용할 때는 체크포인터를 수동으로 구현하거�
 
 ## Threads
 
-Thread는 체크포인터가 저장하는 각 체크포인트에 할당된 고유 ID 또는 스레드 식별자입니다. Thread는 일련의 [runs](/langgraph-platform/assistants#execution)의 누적된 상태를 포함합니다. Run이 실행되면, 어시스턴트의 기본 그래프의 [state](/oss/langgraph/graph-api#state)가 스레드에 영속화됩니다.
+Thread는 체크포인터가 저장하는 각 체크포인트에 할당된 고유 ID 또는 스레드 식별자입니다. Thread는 일련의 [runs](/langsmith/assistants#execution)의 누적된 상태를 포함합니다. Run이 실행되면, 어시스턴트의 기본 그래프의 [state](/oss/langgraph/graph-api#state)가 스레드에 영속화됩니다.
 
 체크포인터와 함께 그래프를 호출할 때, config의 `configurable` 부분에 `thread_id`를 **반드시** 지정해야 합니다.
 
@@ -1061,7 +1061,7 @@ LangGraph Platform을 로컬(예: LangGraph Studio) 또는 LangGraph Platform과
 }
 ```
 
-자세한 내용과 구성 옵션은 [배포 가이드](/langgraph-platform/semantic-search)를 참조하세요.
+자세한 내용과 구성 옵션은 [배포 가이드](/langsmith/semantic-search)를 참조하세요.
 
 ## Checkpointer libraries
 
