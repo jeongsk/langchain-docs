@@ -322,7 +322,7 @@ Models can request to call tools that perform tasks such as fetching data from a
 To make tools that you have defined available for use by a model, you must bind them using [`bindTools()`](https://v03.api.js.langchain.com/classes/langchain.chat_models_universal.ConfigurableModel.html#bindTools). In subsequent invocations, the model can choose to call any of the bound tools as needed.
 
 
-Some model providers offer built-in tools that can be enabled via model parameters. Check the respective [provider reference](/oss/javascript/integrations/providers) for details.
+Some model providers offer built-in tools that can be enabled via model or invocation parameters. Check the respective [provider reference](/oss/javascript/integrations/providers) for details.
 
 <Tip>
     See the [tools guide](/oss/javascript/langchain/tools) for details and other options for creating tools.
@@ -330,9 +330,9 @@ Some model providers offer built-in tools that can be enabled via model paramete
 
 
 
-```typescript Binding user tools highlight={17}
+```typescript Binding user tools
 import { tool } from "langchain";
-import { z } from "zod";
+import * as z from "zod";
 import { ChatOpenAI } from "@langchain/openai";
 
 const getWeather = tool(
@@ -347,7 +347,7 @@ const getWeather = tool(
 );
 
 const model = new ChatOpenAI({ model: "gpt-4o" });
-const modelWithTools = model.bindTools([getWeather]);
+const modelWithTools = model.bindTools([getWeather]);  // [!code highlight]
 
 const response = await modelWithTools.invoke("What's the weather like in Boston?");
 const toolCalls = response.tool_calls || [];
@@ -402,10 +402,10 @@ Below, we show some common ways you can use tool calling.
 
         <CodeGroup>
             ```typescript Force use of any tool
-                const modelWithTools = model.bindTools([tool_1], { toolChoice: "any" })
+            const modelWithTools = model.bindTools([tool_1], { toolChoice: "any" })
             ```
             ```typescript Force use of specific tools
-                const modelWithTools = model.bindTools([tool_1], { toolChoice: "tool_1" })
+            const modelWithTools = model.bindTools([tool_1], { toolChoice: "tool_1" })
             ```
         </CodeGroup>
 
@@ -510,7 +510,7 @@ Models can be requested to provide their response in a format matching a given s
         A [zod schema](https://zod.dev/) is the preferred method of defining an output schema. Note that when a zod schema is provided, the model output will also be validated against the schema using zod's parse methods.
 
         ```typescript
-        import { z } from "zod";
+        import * as z from "zod";
 
         const Movie = z.object({
           title: z.string().describe("The title of the movie"),
@@ -589,8 +589,8 @@ It can be useful to return the raw `AIMessage` object alongside the parsed repre
 
 
 
-    ```typescript highlight={10}
-    import { z } from "zod";
+    ```typescript
+    import * as z from "zod";
 
     const Movie = z.object({
       title: z.string().describe("The title of the movie"),
@@ -599,7 +599,7 @@ It can be useful to return the raw `AIMessage` object alongside the parsed repre
       rating: z.number().describe("The movie's rating out of 10"),
       title: z.string().describe("The title of the movie"),
       year: z.number().describe("The year the movie was released"),
-      director: z.string().describe("The director of the movie"),
+      director: z.string().describe("The director of the movie"),  // [!code highlight]
       rating: z.number().describe("The movie's rating out of 10"),
     });
 
@@ -619,7 +619,7 @@ It can be useful to return the raw `AIMessage` object alongside the parsed repre
 
 
     ```typescript
-    import { z } from "zod";
+    import * as z from "zod";
 
     const Actor = z.object({
       name: str

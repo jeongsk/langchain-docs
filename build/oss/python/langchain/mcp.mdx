@@ -10,8 +10,6 @@ import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
 
 
-![MCP](/oss/images/mcp.png)
-
 ## Install
 
 Install the `langchain-mcp-adapters` library to use MCP tools in LangGraph:
@@ -41,11 +39,11 @@ MCP supports different transport mechanisms for client-server communication:
 
 `langchain-mcp-adapters` enables agents to use tools defined across one or more MCP server.
 
-```python Accessing multiple MCP servers {highlight={1,4,19,22}} icon="server"
-from langchain_mcp_adapters.client import MultiServerMCPClient
+```python Accessing multiple MCP servers icon="server"
+from langchain_mcp_adapters.client import MultiServerMCPClient  # [!code highlight]
 from langchain.agents import create_agent
 
-client = MultiServerMCPClient(
+client = MultiServerMCPClient(  # [!code highlight]
     {
         "math": {
             "transport": "stdio",  # Local subprocess communication
@@ -61,10 +59,10 @@ client = MultiServerMCPClient(
     }
 )
 
-tools = await client.get_tools()
+tools = await client.get_tools()  # [!code highlight]
 agent = create_agent(
     "anthropic:claude-3-7-sonnet-latest",
-    tools
+    tools  # [!code highlight]
 )
 math_response = await agent.ainvoke(
     {"messages": [{"role": "user", "content": "what's (3 + 5) x 12?"}]}
@@ -135,36 +133,6 @@ if __name__ == "__main__":
 ```
 
 
-
-
-## Expose LangChain tools via MCP
-
-You can also expose existing LangChain tools through an MCP server using the `to_fastmcp` function. This allows you to make your LangChain tools available to any MCP client.
-
-```python Make LangChain tools available via MCP icon="tool"
-from langchain.tools import tool
-from langchain_mcp_adapters.tools import to_fastmcp
-from mcp.server.fastmcp import FastMCP
-
-
-@tool
-def add(a: int, b: int) -> int:
-    """Add two numbers"""
-    return a + b
-
-@tool
-def get_user_info(user_id: str) -> str:
-    """Get information about a user"""
-    return f"User {user_id} is active"
-
-
-# Convert LangChain tools to FastMCP
-fastmcp_tools = [to_fastmcp(tool) for tool in (add, get_user_info)]
-
-# Create server using converted tools
-mcp = FastMCP("LangChain Tools", tools=fastmcp_tools)
-mcp.run(transport="stdio")
-```
 
 
 ## Stateful tool usage

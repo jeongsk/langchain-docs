@@ -1,0 +1,53 @@
+---
+title: LangGraph 설치
+sidebarTitle: 설치
+---
+
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
+
+<AlphaCallout />
+
+기본 LangGraph 패키지를 설치하려면:
+
+<CodeGroup>
+```bash pip
+pip install --pre -U langgraph
+```
+
+```bash uv
+uv add --prerelease=allow langgraph
+```
+</CodeGroup>
+
+
+
+
+LangGraph를 사용하려면 일반적으로 LLM에 액세스하고 도구를 정의해야 합니다.
+원하는 방법으로 이 작업을 수행할 수 있습니다.
+
+한 가지 방법은 (문서에서 사용할 예정인) [LangChain](/oss/python/langchain/overview)을 사용하는 것입니다.
+
+LangChain 설치:
+
+<CodeGroup>
+```bash pip
+pip install --pre -U langchain
+```
+
+```bash uv
+uv add --prerelease=allow langchain
+```
+</CodeGroup>
+
+
+
+
+특정 LLM 제공업체 패키지와 함께 작업하려면 별도로 설치해야 합니다.
+
+제공업체별 설치 지침은 [통합](/oss/python/integrations/providers) 페이지를 참조하세요.
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/ko/oss/python/langgraph/install.mdx)
+</Callout>

@@ -1,0 +1,856 @@
+---
+title: 인터럽트
+---
+
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
+
+<AlphaCallout />
+
+인터럽트를 사용하면 특정 지점에서 그래프 실행을 일시 중지하고 외부 입력을 기다린 후 계속 진행할 수 있습니다. 이를 통해 진행하기 위해 외부 입력이 필요한 휴먼-인-더-루프 패턴을 구현할 수 있습니다. 인터럽트가 트리거되면 LangGraph는 [영속성](/oss/python/langgraph/persistence) 레이어를 사용하여 그래프 상태를 저장하고 실행을 재개할 때까지 무기한 대기합니다.
+
+인터럽트는 그래프 노드의 어느 지점에서나 `interrupt()` 함수를 호출하여 작동합니다. 이 함수는 JSON 직렬화 가능한 모든 값을 받아 호출자에게 노출합니다. 계속할 준비가 되면 `Command`를 사용하여 그래프를 다시 호출하여 실행을 재개하며, 이는 노드 내부에서 `interrupt()` 호출의 반환 값이 됩니다.
+
+정적 중단점(특정 노드 전후에 일시 중지)과 달리 인터럽트는 **동적**입니다. 코드의 어디에나 배치할 수 있으며 애플리케이션 로직에 따라 조건부로 실행될 수 있습니다.
+
+- **체크포인팅으로 위치 유지:** 체크포인터는 정확한 그래프 상태를 기록하여 나중에, 심지어 오류 상태에서도 재개할 수 있습니다.
+- **`thread_id`는 포인터:** `config={"configurable": {"thread_id": ...}}`를 설정하여 체크포인터에 어떤 상태를 로드할지 알려줍니다.
+- **인터럽트 페이로드는 `__interrupt__`로 노출:** `interrupt()`에 전달한 값은 `__interrupt__` 필드로 호출자에게 반환되어 그래프가 무엇을 기다리고 있는지 알 수 있습니다.
+
+
+
+선택한 `thread_id`는 효과적으로 영속적인 커서입니다. 이를 재사용하면 동일한 체크포인트를 재개하고, 새 값을 사용하면 빈 상태로 새로운 스레드를 시작합니다.
+
+## `interrupt`를 사용한 일시 중지
+
+`interrupt` 함수는 그래프 실행을 일시 중지하고 호출자에게 값을 반환합니다. 노드 내에서 `interrupt`를 호출하면 LangGraph는 현재 그래프 상태를 저장하고 입력과 함께 실행을 재개할 때까지 기다립니다.
+
+`interrupt`를 사용하려면 다음이 필요합니다:
+1. 그래프 상태를 유지하기 위한 **체크포인터** (프로덕션에서는 영속적인 체크포인터 사용)
+2. 런타임이 어떤 상태에서 재개할지 알 수 있도록 config에 **thread ID**
+3. 일시 중지하려는 위치에서 `interrupt()` 호출 (페이로드는 JSON 직렬화 가능해야 함)
+
+```python
+from langgraph.types import interrupt
+
+def approval_node(state: State):
+    # 일시 중지하고 승인 요청
+    approved = interrupt("Do you approve this action?")
+
+    # 재개할 때 Command(resume=...)가 여기에 해당 값을 반환
+    return {"approved": approved}
+```
+
+
+
+
+`interrupt`를 호출하면 다음과 같은 일이 발생합니다:
+
+1. **그래프 실행이 일시 중단됩니다** `interrupt`가 호출된 정확한 지점에서
+2. **상태가 저장됩니다** 체크포인터를 사용하여 나중에 실행을 재개할 수 있도록. 프로덕션에서는 영속적인 체크포인터(예: 데이터베이스 기반)를 사용해야 합니다
+3. **값이 반환됩니다** `__interrupt__` 하위에서 호출자에게. JSON 직렬화 가능한 모든 값(문자열, 객체, 배열 등)이 될 수 있습니다
+4. **그래프가 무기한 대기합니다** 응답과 함께 실행을 재개할 때까지
+5. **응답이 다시 전달됩니다** 재개할 때 노드로, `interrupt()` 호출의 반환 값이 됩니다
+
+## 인터럽트 재개
+
+인터럽트가 실행을 일시 중지한 후, 재개 값을 포함하는 `Command`를 사용하여 그래프를 다시 호출하여 재개합니다. 재개 값은 `interrupt` 호출로 다시 전달되어 노드가 외부 입력과 함께 실행을 계속할 수 있습니다.
+
+```python
+from langgraph.types import Command
+
+# 초기 실행 - 인터럽트를 만나 일시 중지
+# thread_id는 영속적 포인터 (프로덕션에서는 안정적인 ID 저장)
+config = {"configurable": {"thread_id": "thread-1"}}
+result = graph.invoke({"input": "data"}, config=config)
+
+# 무엇이 중단되었는지 확인
+# __interrupt__는 interrupt()에 전달된 페이로드를 포함
+print(result["__interrupt__"])
+# > [Interrupt(value='Do you approve this action?')]
+
+# 사용자의 응답으로 재개
+# 재개 페이로드는 노드 내부에서 interrupt()의 반환 값이 됨
+graph.invoke(Command(resume=True), config=config)
+```
+
+
+
+
+**재개에 대한 주요 사항:**
+
+- 인터럽트가 발생했을 때 사용된 것과 **동일한 thread ID**를 재개 시 사용해야 합니다
+- `Command(resume=...)`에 전달된 값이 `interrupt` 호출의 반환 값이 됩니다
+- 재개 시 `interrupt`가 호출된 노드의 시작 부분부터 재시작되므로 `interrupt` 이전의 모든 코드가 다시 실행됩니다
+- 재개 값으로 JSON 직렬화 가능한 모든 값을 전달할 수 있습니다
+
+## 일반적인 패턴
+
+인터럽트가 가능하게 하는 핵심 기능은 실행을 일시 중지하고 외부 입력을 기다리는 능력입니다. 이는 다음을 포함한 다양한 사용 사례에 유용합니다:
+
+- <Icon icon="check-circle" /> [승인 워크플로](#approve-or-reject): 중요한 작업(API 호출, 데이터베이스 변경, 금융 거래) 실행 전 일시 중지
+- <Icon icon="pencil" /> [검토 및 수정](#review-and-edit-state): 계속하기 전에 사람이 LLM 출력 또는 도구 호출을 검토하고 수정할 수 있도록 허용
+- <Icon icon="wrench" /> [도구 호출 중단](#interrupts-in-tools): 도구 호출 실행 전 일시 중지하여 도구 호출을 검토하고 수정
+- <Icon icon="shield-check" /> [사용자 입력 검증](#validating-human-input): 다음 단계로 진행하기 전 일시 중지하여 사용자 입력 검증
+
+### 승인 또는 거부
+
+인터럽트의 가장 일반적인 사용 사례 중 하나는 중요한 작업 전에 일시 중지하고 승인을 요청하는 것입니다. 예를 들어, API 호출, 데이터베이스 변경 또는 기타 중요한 결정을 승인하도록 사람에게 요청할 수 있습니다.
+
+```python
+from typing import Literal
+from langgraph.types import interrupt, Command
+
+def approval_node(state: State) -> Command[Literal["proceed", "cancel"]]:
+    # 실행 일시 중지; 페이로드는 result["__interrupt__"]에 표시됨
+    is_approved = interrupt({
+        "question": "Do you want to proceed with this action?",
+        "details": state["action_details"]
+    })
+
+    # 응답에 따라 라우팅
+    if is_approved:
+        return Command(goto="proceed")  # 재개 페이로드가 제공된 후 실행
+    else:
+        return Command(goto="cancel")
+```
+
+
+
+
+그래프를 재개할 때, 승인하려면 `true`를, 거부하려면 `false`를 전달합니다:
+
+```python
+# 승인하려면
+graph.invoke(Command(resume=True), config=config)
+
+# 거부하려면
+graph.invoke(Command(resume=False), config=config)
+```
+
+
+
+
+<Accordion title="전체 예제">
+    ```python
+    import sqlite3
+    from typing import Literal, Optional, TypedDict
+
+    from langgraph.checkpoint.memory import MemorySaver
+    from langgraph.graph import StateGraph, START, END
+    from langgraph.types import Command, interrupt
+
+
+    class ApprovalState(TypedDict):
+        action_details: str
+        status: Optional[Literal["pending", "approved", "rejected"]]
+
+
+    def approval_node(state: ApprovalState) -> Command[Literal["proceed", "cancel"]]:
+        # 호출자가 UI에서 렌더링할 수 있도록 세부 정보 노출
+        decision = interrupt({
+            "question": "Approve this action?",
+            "details": state["action_details"],
+        })
+
+        # 재개 후 적절한 노드로 라우팅
+        return Command(goto="proceed" if decision else "cancel")
+
+
+    def proceed_node(state: ApprovalState):
+        return {"status": "approved"}
+
+
+    def cancel_node(state: ApprovalState):
+        return {"status": "rejected"}
+
+
+    builder = StateGraph(ApprovalState)
+    builder.add_node("approval", approval_node)
+    builder.add_node("proceed", proceed_node)
+    builder.add_node("cancel", cancel_node)
+    builder.add_edge(START, "approval")
+    builder.add_edge("approval", "proceed")
+    builder.add_edge("approval", "cancel")
+    builder.add_edge("proceed", END)
+    builder.add_edge("cancel", END)
+
+    # 프로덕션에서는 더 영속적인 체크포인터 사용
+    checkpointer = MemorySaver()
+    graph = builder.compile(checkpointer=checkpointer)
+
+    config = {"configurable": {"thread_id": "approval-123"}}
+    initial = graph.invoke(
+        {"action_details": "Transfer $500", "status": "pending"},
+        config=config,
+    )
+    print(initial["__interrupt__"])  # -> [Interrupt(value={'question': ..., 'details': ...})]
+
+    # 결정으로 재개; True는 proceed로, False는 cancel로 라우팅
+    resumed = graph.invoke(Command(resume=True), config=config)
+    print(resumed["status"])  # -> "approved"
+    ```
+
+
+
+
+</Accordion>
+
+### 상태 검토 및 수정
+
+때때로 계속하기 전에 사람이 그래프 상태의 일부를 검토하고 수정하도록 할 수 있습니다. 이는 LLM을 수정하거나, 누락된 정보를 추가하거나, 조정하는 데 유용합니다.
+
+```python
+from langgraph.types import interrupt
+
+def review_node(state: State):
+    # 일시 중지하고 검토를 위해 현재 내용 표시 (result["__interrupt__"]에 표시됨)
+    edited_content = interrupt({
+        "instruction": "Review and edit this content",
+        "content": state["generated_text"]
+    })
+
+    # 수정된 버전으로 상태 업데이트
+    return {"generated_text": edited_content}
+```
+
+
+
+
+재개할 때 수정된 내용을 제공합니다:
+
+```python
+graph.invoke(
+    Command(resume="The edited and improved text"),  # 값이 interrupt()의 반환값이 됨
+    config=config
+)
+```
+
+
+
+
+<Accordion title="전체 예제">
+    ```python
+    import sqlite3
+    from typing import TypedDict
+
+    from langgraph.checkpoint.memory import MemorySaver
+    from langgraph.graph import StateGraph, START, END
+    from langgraph.types import Command, interrupt
+
+
+    class ReviewState(TypedDict):
+        generated_text: str
+
+
+    def review_node(state: ReviewState):
+        # 검토자에게 생성된 내용 수정 요청
+        updated = interrupt({
+            "instruction": "Review and edit this content",
+            "content": state["generated_text"],
+        })
+        return {"generated_text": updated}
+
+
+    builder = StateGraph(ReviewState)
+    builder.add_node("review", review_node)
+    builder.add_edge(START, "review")
+    builder.add_edge("review", END)
+
+    checkpointer = MemorySaver()
+    graph = builder.compile(checkpointer=checkpointer)
+
+    config = {"configurable": {"thread_id": "review-42"}}
+    initial = graph.invoke({"generated_text": "Initial draft"}, config=config)
+    print(initial["__interrupt__"])  # -> [Interrupt(value={'instruction': ..., 'content': ...})]
+
+    # 검토자의 수정된 텍스트로 재개
+    final_state = graph.invoke(
+        Command(resume="Improved draft after review"),
+        config=config,
+    )
+    print(final_state["generated_text"])  # -> "Improved draft after review"
+    ```
+
+
+
+
+</Accordion>
+
+### 도구에서의 인터럽트
+
+도구 함수 내부에 직접 인터럽트를 배치할 수도 있습니다. 이렇게 하면 도구가 호출될 때마다 도구 자체가 승인을 위해 일시 중지되며, 실행되기 전에 도구 호출을 사람이 검토하고 수정할 수 있습니다.
+
+먼저 `interrupt`를 사용하는 도구를 정의합니다:
+
+```python
+from langchain.tools import tool
+from langgraph.types import interrupt
+
+@tool
+def send_email(to: str, subject: str, body: str):
+    """Send an email to a recipient."""
+
+    # 전송 전 일시 중지; 페이로드는 result["__interrupt__"]에 표시됨
+    response = interrupt({
+        "action": "send_email",
+        "to": to,
+        "subject": subject,
+        "body": body,
+        "message": "Approve sending this email?"
+    })
+
+    if response.get("action") == "approve":
+        # 재개 값이 실행 전에 입력을 재정의할 수 있음
+        final_to = response.get("to", to)
+        final_subject = response.get("subject", subject)
+        final_body = response.get("body", body)
+        return f"Email sent to {final_to} with subject '{final_subject}'"
+    return "Email cancelled by user"
+```
+
+
+
+
+이 접근 방식은 승인 로직이 도구 자체와 함께 있어 그래프의 여러 부분에서 재사용할 수 있게 하려는 경우 유용합니다. LLM은 도구를 자연스럽게 호출할 수 있으며, 도구가 호출될 때마다 인터럽트가 실행을 일시 중지하여 작업을 승인, 수정 또는 취소할 수 있습니다.
+
+<Accordion title="전체 예제">
+    ```python
+    import sqlite3
+    from typing import TypedDict
+
+    from langchain.tools import tool
+    from langchain_anthropic import ChatAnthropic
+    from langgraph.checkpoint.sqlite import SqliteSaver
+    from langgraph.graph import StateGraph, START, END
+    from langgraph.types import Command, interrupt
+
+
+    class AgentState(TypedDict):
+        messages: list[dict]
+
+
+    @tool
+    def send_email(to: str, subject: str, body: str):
+        """Send an email to a recipient."""
+
+        # 전송 전 일시 중지; 페이로드는 result["__interrupt__"]에 표시됨
+        response = interrupt({
+            "action": "send_email",
+            "to": to,
+            "subject": subject,
+            "body": body,
+            "message": "Approve sending this email?",
+        })
+
+        if response.get("action") == "approve":
+            final_to = response.get("to", to)
+            final_subject = response.get("subject", subject)
+            final_body = response.get("body", body)
+
+            # 실제로 이메일 전송 (여기에 구현)
+            print(f"[send_email] to={final_to} subject={final_subject} body={final_body}")
+            return f"Email sent to {final_to}"
+
+        return "Email cancelled by user"
+
+
+    model = ChatAnthropic(model="claude-sonnet-4-5").bind_tools([send_email])
+
+
+    def agent_node(state: AgentState):
+        # LLM이 도구 호출을 결정할 수 있음; 인터럽트가 전송 전에 일시 중지
+        result = model.invoke(state["messages"])
+        return {"messages": state["messages"] + [result]}
+
+
+    builder = StateGraph(AgentState)
+    builder.add_node("agent", agent_node)
+    builder.add_edge(START, "agent")
+    builder.add_edge("agent", END)
+
+    checkpointer = SqliteSaver(sqlite3.connect("tool-approval.db"))
+    graph = builder.compile(checkpointer=checkpointer)
+
+    config = {"configurable": {"thread_id": "email-workflow"}}
+    initial = graph.invoke(
+        {
+            "messages": [
+                {"role": "user", "content": "Send an email to alice@example.com about the meeting"}
+            ]
+        },
+        config=config,
+    )
+    print(initial["__interrupt__"])  # -> [Interrupt(value={'action': 'send_email', ...})]
+
+    # 승인 및 선택적으로 수정된 인수로 재개
+    resumed = graph.invoke(
+        Command(resume={"action": "approve", "subject": "Updated subject"}),
+        config=config,
+    )
+    print(resumed["messages"][-1])  # -> send_email에서 반환된 도구 결과
+    ```
+
+
+
+
+</Accordion>
+
+### 사용자 입력 검증
+
+때때로 사람의 입력을 검증하고 유효하지 않으면 다시 요청해야 합니다. 루프에서 여러 `interrupt` 호출을 사용하여 이를 수행할 수 있습니다.
+
+```python
+from langgraph.types import interrupt
+
+def get_age_node(state: State):
+    prompt = "What is your age?"
+
+    while True:
+        answer = interrupt(prompt)  # 페이로드는 result["__interrupt__"]에 표시됨
+
+        # 입력 검증
+        if isinstance(answer, int) and answer > 0:
+            # 유효한 입력 - 계속
+            break
+        else:
+            # 유효하지 않은 입력 - 더 구체적인 프롬프트로 다시 요청
+            prompt = f"'{answer}' is not a valid age. Please enter a positive number."
+
+    return {"age": answer}
+```
+
+
+
+
+유효하지 않은 입력으로 그래프를 재개할 때마다 더 명확한 메시지로 다시 요청합니다. 유효한 입력이 제공되면 노드가 완료되고 그래프가 계속됩니다.
+
+<Accordion title="전체 예제">
+    ```python
+    import sqlite3
+    from typing import TypedDict
+
+    from langgraph.checkpoint.sqlite import SqliteSaver
+    from langgraph.graph import StateGraph, START, END
+    from langgraph.types import Command, interrupt
+
+
+    class FormState(TypedDict):
+        age: int | None
+
+
+    def get_age_node(state: FormState):
+        prompt = "What is your age?"
+
+        while True:
+            answer = interrupt(prompt)  # 페이로드는 result["__interrupt__"]에 표시됨
+
+            if isinstance(answer, int) and answer > 0:
+                return {"age": answer}
+
+            prompt = f"'{answer}' is not a valid age. Please enter a positive number."
+
+
+    builder = StateGraph(FormState)
+    builder.add_node("collect_age", get_age_node)
+    builder.add_edge(START, "collect_age")
+    builder.add_edge("collect_age", END)
+
+    checkpointer = SqliteSaver(sqlite3.connect("forms.db"))
+    graph = builder.compile(checkpointer=checkpointer)
+
+    config = {"configurable": {"thread_id": "form-1"}}
+    first = graph.invoke({"age": None}, config=config)
+    print(first["__interrupt__"])  # -> [Interrupt(value='What is your age?', ...)]
+
+    # 유효하지 않은 데이터 제공; 노드가 다시 프롬프트
+    retry = graph.invoke(Command(resume="thirty"), config=config)
+    print(retry["__interrupt__"])  # -> [Interrupt(value="'thirty' is not a valid age...", ...)]
+
+    # 유효한 데이터 제공; 루프 종료 및 상태 업데이트
+    final = graph.invoke(Command(resume=30), config=config)
+    print(final["age"])  # -> 30
+    ```
+
+
+
+
+</Accordion>
+
+## 인터럽트의 규칙
+
+노드 내에서 `interrupt`를 호출하면 LangGraph는 런타임에 일시 중지하도록 신호를 보내는 예외를 발생시켜 실행을 중단합니다. 이 예외는 호출 스택을 통해 전파되고 런타임에 의해 포착되며, 런타임은 그래프에 현재 상태를 저장하고 외부 입력을 기다리도록 알립니다.
+
+실행이 재개될 때(요청된 입력을 제공한 후), 런타임은 전체 노드를 처음부터 다시 시작합니다. `interrupt`가 호출된 정확한 줄에서 재개되지 않습니다. 이는 `interrupt` 전에 실행된 모든 코드가 다시 실행된다는 것을 의미합니다. 따라서 인터럽트가 예상대로 동작하도록 하려면 따라야 할 몇 가지 중요한 규칙이 있습니다.
+
+### `interrupt` 호출을 try/except로 래핑하지 마세요
+
+`interrupt`가 호출 지점에서 실행을 일시 중지하는 방식은 특수 예외를 발생시키는 것입니다. `interrupt` 호출을 try/except 블록으로 래핑하면 이 예외를 포착하게 되고 인터럽트가 그래프로 다시 전달되지 않습니다.
+
+* ✅ `interrupt` 호출을 오류가 발생하기 쉬운 코드와 분리
+* ✅ try/except 블록에서 특정 예외 타입 사용
+
+<CodeGroup>
+```python 로직 분리
+def node_a(state: State):
+    # ✅ 좋음: 먼저 인터럽트하고 오류 조건을
+    # 별도로 처리
+    interrupt("What's your name?")
+    try:
+        fetch_data()  # 이것은 실패할 수 있음
+    except Exception as e:
+        print(e)
+    return state
+```
+```python 명시적 예외 처리
+def node_a(state: State):
+    # ✅ 좋음: 특정 예외 타입 포착은
+    # 인터럽트 예외를 포착하지 않음
+    try:
+        name = interrupt("What's your name?")
+        fetch_data()  # 이것은 실패할 수 있음
+    except NetworkException as e:
+        print(e)
+    return state
+```
+</CodeGroup>
+
+* 🔴 `interrupt` 호출을 일반 try/except 블록으로 래핑하지 마세요
+
+```python
+def node_a(state: State):
+    # ❌ 나쁨: 인터럽트를 일반 try/except로 래핑하면
+    # 인터럽트 예외를 포착하게 됨
+    try:
+        interrupt("What's your name?")
+    except Exception as e:
+        print(e)
+    return state
+```
+
+
+
+
+### 노드 내에서 `interrupt` 호출 순서를 변경하지 마세요
+
+단일 노드에서 여러 인터럽트를 사용하는 것은 일반적이지만, 주의하지 않으면 예상치 못한 동작이 발생할 수 있습니다.
+
+노드에 여러 인터럽트 호출이 포함된 경우 LangGraph는 노드를 실행하는 작업에 특정한 재개 값 목록을 유지합니다. 실행이 재개될 때마다 노드의 시작 부분에서 시작합니다. 발생하는 각 인터럽트에 대해 LangGraph는 작업의 재개 목록에 일치하는 값이 있는지 확인합니다. 일치는 **엄격하게 인덱스 기반**이므로 노드 내 인터럽트 호출 순서가 중요합니다.
+
+* ✅ 노드 실행 전반에 걸쳐 `interrupt` 호출을 일관되게 유지
+
+```python
+def node_a(state: State):
+    # ✅ 좋음: 인터럽트 호출이 매번 같은 순서로 발생
+    name = interrupt("What's your name?")
+    age = interrupt("What's your age?")
+    city = interrupt("What's your city?")
+
+    return {
+        "name": name,
+        "age": age,
+        "city": city
+    }
+```
+
+
+
+* 🔴 노드 내에서 조건부로 `interrupt` 호출을 건너뛰지 마세요
+* 🔴 실행 전반에 걸쳐 결정적이지 않은 로직을 사용하여 `interrupt` 호출을 루프하지 마세요
+
+<CodeGroup>
+```python 인터럽트 건너뛰기
+def node_a(state: State):
+    # ❌ 나쁨: 조건부로 인터럽트를 건너뛰면 순서가 변경됨
+    name = interrupt("What's your name?")
+
+    # 첫 실행에서는 인터럽트를 건너뛸 수 있음
+    # 재개 시에는 건너뛰지 않을 수 있음 - 인덱스 불일치 발생
+    if state.get("needs_age"):
+        age = interrupt("What's your age?")
+
+    city = interrupt("What's your city?")
+
+    return {"name": name, "city": city}
+```
+```python 인터럽트 루프
+def node_a(state: State):
+    # ❌ 나쁨: 비결정적 데이터 기반 루프
+    # 실행 간 인터럽트 수가 변경됨
+    results = []
+    for item in state.get("dynamic_list", []):  # 실행 간 리스트가 변경될 수 있음
+        result = interrupt(f"Approve {item}?")
+        results.append(result)
+
+    return {"results": results}
+```
+</CodeGroup>
+
+
+
+### `interrupt` 호출에 복잡한 값을 반환하지 마세요
+
+사용하는 체크포인터에 따라 복잡한 값은 직렬화할 수 없을 수 있습니다(예: 함수는 직렬화할 수 없음). 그래프를 모든 배포에 적응 가능하게 만들려면 합리적으로 직렬화할 수 있는 값만 사용하는 것이 모범 사례입니다.
+
+* ✅ `interrupt`에 간단한 JSON 직렬화 가능 타입 전달
+* ✅ 간단한 값을 가진 딕셔너리/객체 전달
+
+<CodeGroup>
+```python 간단한 값
+def node_a(state: State):
+    # ✅ 좋음: 직렬화 가능한 간단한 타입 전달
+    name = interrupt("What's your name?")
+    count = interrupt(42)
+    approved = interrupt(True)
+
+    return {"name": name, "count": count, "approved": approved}
+```
+```python 구조화된 데이터
+def node_a(state: State):
+    # ✅ 좋음: 간단한 값을 가진 딕셔너리 전달
+    response = interrupt({
+        "question": "Enter user details",
+        "fields": ["name", "email", "age"],
+        "current_values": state.get("user", {})
+    })
+
+    return {"user": response}
+```
+</CodeGroup>
+
+
+
+
+* 🔴 함수, 클래스 인스턴스 또는 기타 복잡한 객체를 `interrupt`에 전달하지 마세요
+
+<CodeGroup>
+```python 함수
+def validate_input(value):
+    return len(value) > 0
+
+def node_a(state: State):
+    # ❌ 나쁨: 함수를 인터럽트에 전달
+    # 함수는 직렬화할 수 없음
+    response = interrupt({
+        "question": "What's your name?",
+        "validator": validate_input  # 실패함
+    })
+    return {"name": response}
+```
+```python 클래스 인스턴스
+class DataProcessor:
+    def __init__(self, config):
+        self.config = config
+
+def node_a(state: State):
+    processor = DataProcessor({"mode": "strict"})
+
+    # ❌ 나쁨: 클래스 인스턴스를 인터럽트에 전달
+    # 인스턴스는 직렬화할 수 없음
+    response = interrupt({
+        "question": "Enter data to process",
+        "processor": processor  # 실패함
+    })
+    return {"result": response}
+```
+</CodeGroup>
+
+
+
+
+### `interrupt` 전에 호출되는 부수 효과는 멱등성이 있어야 합니다
+
+인터럽트는 호출된 노드를 다시 실행하여 작동하므로 `interrupt` 전에 호출되는 부수 효과는 (이상적으로) 멱등성이 있어야 합니다. 맥락상 멱등성은 동일한 연산을 여러 번 적용해도 초기 실행 이후 결과가 변경되지 않는다는 것을 의미합니다.
+
+예를 들어, 노드 내부에 레코드를 업데이트하는 API 호출이 있을 수 있습니다. 해당 호출이 이루어진 후 `interrupt`가 호출되면 노드가 재개될 때 여러 번 다시 실행되어 초기 업데이트를 덮어쓰거나 중복 레코드를 생성할 수 있습니다.
+
+* ✅ `interrupt` 전에 멱등성 연산 사용
+* ✅ `interrupt` 호출 후에 부수 효과 배치
+* ✅ 가능한 경우 부수 효과를 별도 노드로 분리
+
+<CodeGroup>
+```python 멱등성 연산
+def node_a(state: State):
+    # ✅ 좋음: 멱등성이 있는 upsert 연산 사용
+    # 여러 번 실행해도 동일한 결과
+    db.upsert_user(
+        user_id=state["user_id"],
+        status="pending_approval"
+    )
+
+    approved = interrupt("Approve this change?")
+
+    return {"approved": approved}
+```
+```python 인터럽트 후 부수 효과
+def node_a(state: State):
+    # ✅ 좋음: 인터럽트 후에 부수 효과 배치
+    # 승인을 받은 후 한 번만 실행됨
+    approved = interrupt("Approve this change?")
+
+    if approved:
+        db.create_audit_log(
+            user_id=state["user_id"],
+            action="approved"
+        )
+
+    return {"approved": approved}
+```
+```python 다른 노드로 분리
+def approval_node(state: State):
+    # ✅ 좋음: 이 노드에서는 인터럽트만 처리
+    approved = interrupt("Approve this change?")
+
+    return {"approved": approved}
+
+def notification_node(state: State):
+    # ✅ 좋음: 부수 효과는 별도 노드에서 발생
+    # 승인 후 실행되므로 한 번만 실행됨
+    if (state.approved):
+        send_notification(
+            user_id=state["user_id"],
+            status="approved"
+        )
+
+    return state
+```
+</CodeGroup>
+
+
+
+
+* 🔴 `interrupt` 전에 비멱등성 연산을 수행하지 마세요
+* 🔴 존재 여부를 확인하지 않고 새 레코드를 생성하지 마세요
+
+<CodeGroup>
+```python 레코드 생성
+def node_a(state: State):
+    # ❌ 나쁨: 인터럽트 전에 새 레코드 생성
+    # 재개할 때마다 중복 레코드가 생성됨
+    audit_id = db.create_audit_log({
+        "user_id": state["user_id"],
+        "action": "pending_approval",
+        "timestamp": datetime.now()
+    })
+
+    approved = interrupt("Approve this change?")
+
+    return {"approved": approved, "audit_id": audit_id}
+```
+```python 리스트에 추가
+def node_a(state: State):
+    # ❌ 나쁨: 인터럽트 전에 리스트에 추가
+    # 재개할 때마다 중복 항목이 추가됨
+    db.append_to_history(state["user_id"], "approval_requested")
+
+    approved = interrupt("Approve this change?")
+
+    return {"approved": approved}
+```
+</CodeGroup>
+
+
+
+
+## 함수로 호출되는 서브그래프와 함께 사용
+
+노드 내에서 서브그래프를 호출할 때, 부모 그래프는 서브그래프가 호출되고 `interrupt`가 트리거된 **노드의 시작 부분**에서 실행을 재개합니다. 마찬가지로 **서브그래프**도 `interrupt`가 호출된 노드의 시작 부분에서 재개합니다.
+
+```python
+def node_in_parent_graph(state: State):
+    some_code()  # <-- 재개 시 다시 실행됨
+    # 서브그래프를 함수로 호출
+    # 서브그래프에는 `interrupt` 호출이 포함됨
+    subgraph_result = subgraph.invoke(some_input)
+
+async function node_in_subgraph(state: State) {
+    someOtherCode(); # <-- 재개 시 다시 실행됨
+    result = interrupt("What's your name?")
+    ...
+}
+```
+
+
+
+## 인터럽트로 디버깅
+
+그래프를 디버깅하고 테스트하려면 정적 인터럽트를 중단점으로 사용하여 그래프 실행을 한 번에 한 노드씩 단계별로 진행할 수 있습니다. 정적 인터럽트는 노드 실행 전후의 정의된 지점에서 트리거됩니다. 그래프를 컴파일할 때 `interrupt_before`와 `interrupt_after`를 지정하여 이를 설정할 수 있습니다.
+
+
+
+<Note>
+정적 인터럽트는 휴먼-인-더-루프 워크플로에 **권장되지 않습니다**. 대신 `interrupt` 메서드를 사용하세요.
+</Note>
+
+<Tabs>
+    <Tab title="컴파일 시">
+        ```python highlight={2,3,15,18}
+        graph = builder.compile(
+            interrupt_before=["node_a"],
+            interrupt_after=["node_b", "node_c"],
+            checkpointer=checkpointer,
+        )
+
+        # 그래프에 thread ID 전달
+        config = {
+            "configurable": {
+                "thread_id": "some_thread"
+            }
+        }
+
+        # 중단점까지 그래프 실행
+        graph.invoke(inputs, config=config)
+
+        # 그래프 재개
+        graph.invoke(None, config=config)
+        ```
+
+        1. 중단점은 `compile` 시점에 설정됩니다.
+        2. `interrupt_before`는 노드 실행 전에 일시 중지해야 하는 노드를 지정합니다.
+        3. `interrupt_after`는 노드 실행 후에 일시 중지해야 하는 노드를 지정합니다.
+        4. 중단점을 활성화하려면 체크포인터가 필요합니다.
+        5. 첫 번째 중단점에 도달할 때까지 그래프가 실행됩니다.
+        6. 입력으로 `None`을 전달하여 그래프를 재개합니다. 이렇게 하면 다음 중단점에 도달할 때까지 그래프가 실행됩니다.
+
+
+    </Tab>
+    <Tab title="런타임 시">
+        ```python highlight={10,11,16}
+        config = {
+            "configurable": {
+                "thread_id": "some_thread"
+            }
+        }
+
+        # 중단점까지 그래프 실행
+        graph.invoke(
+            inputs,
+            interrupt_before=["node_a"],
+            interrupt_after=["node_b", "node_c"],
+            config=config,
+        )
+
+        # 그래프 재개
+        graph.invoke(None, config=config)
+        ```
+
+        1. `graph.invoke`는 `interrupt_before` 및 `interrupt_after` 매개변수와 함께 호출됩니다. 이는 런타임 구성이며 모든 호출마다 변경될 수 있습니다.
+        2. `interrupt_before`는 노드 실행 전에 일시 중지해야 하는 노드를 지정합니다.
+        3. `interrupt_after`는 노드 실행 후에 일시 중지해야 하는 노드를 지정합니다.
+        4. 첫 번째 중단점에 도달할 때까지 그래프가 실행됩니다.
+        5. 입력으로 `None`을 전달하여 그래프를 재개합니다. 이렇게 하면 다음 중단점에 도달할 때까지 그래프가 실행됩니다.
+
+
+    </Tab>
+</Tabs>
+
+### Studio 사용
+
+[Studio](/langsmith/studio)를 사용하여 그래프를 실행하기 전에 UI에서 그래프에 정적 인터럽트를 설정할 수 있습니다. 또한 UI를 사용하여 실행의 모든 지점에서 그래프 상태를 검사할 수 있습니다.
+
+![image](/oss/images/static-interrupt.png)
+
+---
+
+<Callout icon="pen-to-square" iconType="regular">
+  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/ko/oss/python/langgraph/interrupts.mdx)
+</Callout>
