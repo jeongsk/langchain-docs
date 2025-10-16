@@ -84,34 +84,36 @@ Your translation should:
 
 ## Updating docs.json Navigation
 
-After creating or updating a Korean translation, **ALWAYS update the `src/docs.json` file** to include the translated page in the Korean navigation:
+After creating or updating a Korean translation, **ALWAYS update the `src/docs.json` file** to include the translated page in the navigation:
 
-1. **Locate the Korean navigation section**: Find the navigation object with `"language": "ko"` in the `src/docs.json` file
-2. **Add the page path**: Add the translated page path to the appropriate `pages` array within the Korean navigation structure
-3. **Mirror the English structure**: The Korean navigation should mirror the English navigation structure, but with paths pointing to files under `src/ko/`
-4. **Use relative paths without extension**: Use paths like `"ko/docs/api/authentication"` (no `.mdx` extension)
-5. **Preserve group structure**: If the original page is in a specific group, ensure the Korean version is in the corresponding Korean group
+1. **Find the original English page path** in the docs.json navigation structure
+2. **Add `ko/` prefix**: Simply prefix the original path with `ko/` to create the Korean version
+3. **Add to the same navigation location**: Insert the Korean path right after (or near) the original English path in the same `pages` array
+4. **Preserve group structure**: Keep the Korean page in the same group as its English counterpart
 
 ### Example
 
-If you translate `src/docs/api/authentication.mdx` to `src/ko/docs/api/authentication.mdx`, find this structure in `src/docs.json`:
+If you translate `src/docs/api/authentication.mdx`, find the original path in `src/docs.json`:
 
 ```json
 {
-  "language": "ko",
+  "group": "API",
   "pages": [
-    "ko/docs/api/overview"
+    "docs/api/overview",
+    "docs/api/authentication"
   ]
 }
 ```
 
-And update it to:
+Add the Korean version by prefixing with `ko/`:
 
 ```json
 {
-  "language": "ko",
+  "group": "API",
   "pages": [
+    "docs/api/overview",
     "ko/docs/api/overview",
+    "docs/api/authentication",
     "ko/docs/api/authentication"
   ]
 }
@@ -119,8 +121,9 @@ And update it to:
 
 ### Important Notes
 
-- If creating a new group in Korean navigation, ensure the group's index page is included first in the `pages` array (e.g., `"ko/new-group/index"`)
-- Maintain the same order and hierarchy as the English navigation for consistency
+- The Korean path is simply the English path with `ko/` prefix (e.g., `"docs/guide"` → `"ko/docs/guide"`)
+- Place Korean paths adjacent to their English counterparts for better organization
+- Use relative paths without file extensions (no `.mdx`)
 - Always verify the updated docs.json is valid JSON before completing the translation task
 
 ## Example Workflow
