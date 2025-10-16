@@ -3,33 +3,33 @@ title: Build a custom SQL agent
 sidebarTitle: Custom SQL agent
 ---
 
-import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
-import ChatModelTabsJS from '/snippets/chat-model-tabs-js.mdx';
+import ChatModelTabsPy from '/ko/snippets/chat-model-tabs.mdx';
+import ChatModelTabsJS from '/ko/snippets/chat-model-tabs-js.mdx';
 
 :::python
-In this tutorial we will build a custom agent that can answer questions about a SQL database using LangGraph.
+이 튜토리얼에서는 LangGraph를 사용하여 SQL 데이터베이스에 대한 질문에 답할 수 있는 커스텀 에이전트를 구축합니다.
 
-LangChain offers built-in [agent](/oss/langchain/agents) implementations, implemented using [LangGraph](/oss/langgraph/overview) primitives. If deeper customization is required, agents can be implemented directly in LangGraph. This guide demonstrates an example implementation of a SQL agent. You can find a tutorial building a SQL agent using higher-level LangChain abstractions [here](/oss/langchain/sql-agent).
+LangChain은 [LangGraph](/oss/langgraph/overview) 프리미티브를 사용하여 구현된 내장 [에이전트](/oss/langchain/agents) 구현을 제공합니다. 더 깊은 커스터마이징이 필요한 경우, LangGraph에서 직접 에이전트를 구현할 수 있습니다. 이 가이드는 SQL 에이전트의 예제 구현을 보여줍니다. 상위 레벨의 LangChain 추상화를 사용하여 SQL 에이전트를 구축하는 튜토리얼은 [여기](/oss/langchain/sql-agent)에서 찾을 수 있습니다.
 
 <Warning>
-Building Q&A systems of SQL databases requires executing model-generated SQL queries. There are inherent risks in doing this. Make sure that your database connection permissions are always scoped as narrowly as possible for your agent's needs. This will mitigate, though not eliminate, the risks of building a model-driven system.
+SQL 데이터베이스의 Q&A 시스템을 구축하려면 모델이 생성한 SQL 쿼리를 실행해야 합니다. 이 과정에는 내재된 위험이 있습니다. 데이터베이스 연결 권한을 항상 에이전트의 필요에 따라 최대한 좁게 범위를 지정하세요. 이는 모델 기반 시스템 구축의 위험을 완화할 수 있지만 완전히 제거하지는 못합니다.
 </Warning>
 
-The [prebuilt agent](/oss/langchain/sql-agent) lets us get started quickly, but we relied on the system prompt to constrain its behavior— for example, we instructed the agent to always start with the "list tables" tool, and to always run a query-checker tool before executing the query.
+[사전 구축된 에이전트](/oss/langchain/sql-agent)를 사용하면 빠르게 시작할 수 있지만, 시스템 프롬프트를 사용하여 동작을 제한했습니다. 예를 들어, 에이전트에게 항상 "list tables" 도구로 시작하고, 쿼리를 실행하기 전에 항상 query-checker 도구를 실행하도록 지시했습니다.
 
-We can enforce a higher degree of control in LangGraph by customizing the agent. Here, we implement a simple ReAct-agent setup, with dedicated nodes for specific tool-calls. We will use the same [state] as the pre-built agent.
+LangGraph에서 에이전트를 커스터마이징하여 더 높은 수준의 제어를 적용할 수 있습니다. 여기서는 특정 도구 호출을 위한 전용 노드가 있는 간단한 ReAct 에이전트 설정을 구현합니다. 사전 구축된 에이전트와 동일한 [상태]를 사용할 것입니다.
 
-### Concepts
+### 개념
 
-We will cover the following concepts:
+다음 개념을 다룰 것입니다:
 
-- [Tools](/oss/langchain/tools) for reading from SQL databases
-- The LangGraph [Graph API](/oss/langgraph/graph-api), including state, nodes, edges, and conditional edges.
-- [Human-in-the-loop](/oss/langgraph/add-human-in-the-loop) processes
+- SQL 데이터베이스에서 읽기 위한 [도구](/oss/langchain/tools)
+- state, 노드, 엣지, 조건부 엣지를 포함한 LangGraph [Graph API](/oss/langgraph/graph-api)
+- [Human-in-the-loop](/oss/langgraph/add-human-in-the-loop) 프로세스
 
-## Setup
+## 설정
 
-### Installation
+### 설치
 
     <CodeGroup>
     ```bash pip
@@ -38,26 +38,26 @@ We will cover the following concepts:
     </CodeGroup>
 
 ### LangSmith
-Set up [LangSmith](https://smith.langchain.com) to inspect what is happening inside your chain or agent. Then set the following environment variables:
+체인이나 에이전트 내부에서 무슨 일이 일어나는지 검사하려면 [LangSmith](https://smith.langchain.com)를 설정하세요. 그런 다음 다음 환경 변수를 설정하세요:
 
     ```shell
     export LANGSMITH_TRACING="true"
     export LANGSMITH_API_KEY="..."
     ```
 
-## 1. Select an LLM
+## 1. LLM 선택
 
-Select a model that supports [tool-calling](/oss/integrations/providers):
+[도구 호출](/oss/integrations/providers)을 지원하는 모델을 선택하세요:
 
 <ChatModelTabsPy />
 
-The output shown in the examples below used OpenAI.
+아래 예제에 표시된 출력은 OpenAI를 사용했습니다.
 
-## 2. Configure the database
+## 2. 데이터베이스 구성
 
-You will be creating a [SQLite database](https://www.sqlitetutorial.net/sqlite-sample-database/) for this tutorial. SQLite is a lightweight database that is easy to set up and use. We will be loading the `chinook` database, which is a sample database that represents a digital media store.
+이 튜토리얼을 위해 [SQLite 데이터베이스](https://www.sqlitetutorial.net/sqlite-sample-database/)를 생성합니다. SQLite는 설정하고 사용하기 쉬운 경량 데이터베이스입니다. 디지털 미디어 스토어를 나타내는 샘플 데이터베이스인 `chinook` 데이터베이스를 로드할 것입니다.
 
-For convenience, we have hosted the database (`Chinook.db`) on a public GCS bucket.
+편의를 위해 공개 GCS 버킷에 데이터베이스(`Chinook.db`)를 호스팅했습니다.
 
 ```python
 import requests, pathlib
@@ -76,7 +76,7 @@ else:
         print(f"Failed to download the file. Status code: {response.status_code}")
 ```
 
-We will use a handy SQL database wrapper available in the `langchain_community` package to interact with the database. The wrapper provides a simple interface to execute SQL queries and fetch results:
+`langchain_community` 패키지에서 사용 가능한 편리한 SQL 데이터베이스 래퍼를 사용하여 데이터베이스와 상호작용합니다. 래퍼는 SQL 쿼리를 실행하고 결과를 가져오는 간단한 인터페이스를 제공합니다:
 
 ```python
 from langchain_community.utilities import SQLDatabase
@@ -93,9 +93,9 @@ Available tables: ['Album', 'Artist', 'Customer', 'Employee', 'Genre', 'Invoice'
 Sample output: [(1, 'AC/DC'), (2, 'Accept'), (3, 'Aerosmith'), (4, 'Alanis Morissette'), (5, 'Alice In Chains')]
 ```
 
-## 3. Add tools for database interactions
+## 3. 데이터베이스 상호작용을 위한 도구 추가
 
-Use the `SQLDatabase` wrapper available in the `langchain_community` package to interact with the database. The wrapper provides a simple interface to execute SQL queries and fetch results:
+`langchain_community` 패키지에서 사용 가능한 `SQLDatabase` 래퍼를 사용하여 데이터베이스와 상호작용합니다. 래퍼는 SQL 쿼리를 실행하고 결과를 가져오는 간단한 인터페이스를 제공합니다:
 
 ```python
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
@@ -117,16 +117,16 @@ sql_db_list_tables: Input is an empty string, output is a comma-separated list o
 sql_db_query_checker: Use this tool to double check if your query is correct before executing it. Always use this tool before executing a query with sql_db_query!
 ```
 
-## 4. Define application steps
+## 4. 애플리케이션 단계 정의
 
-We construct dedicated nodes for the following steps:
+다음 단계를 위한 전용 노드를 구성합니다:
 
-- Listing DB tables
-- Calling the "get schema" tool
-- Generating a query
-- Checking the query
+- DB 테이블 나열
+- "get schema" 도구 호출
+- 쿼리 생성
+- 쿼리 확인
 
-Putting these steps in dedicated nodes lets us (1) force tool-calls when needed, and (2) customize the prompts associated with each step.
+이러한 단계를 전용 노드에 배치하면 (1) 필요할 때 도구 호출을 강제하고, (2) 각 단계와 관련된 프롬프트를 커스터마이징할 수 있습니다.
 
 ```python
 from typing import Literal
@@ -144,7 +144,7 @@ run_query_tool = next(tool for tool in tools if tool.name == "sql_db_query")
 run_query_node = ToolNode([run_query_tool], name="run_query")
 
 
-# Example: create a predetermined tool call
+# 예제: 미리 정의된 도구 호출 생성
 def list_tables(state: MessagesState):
     tool_call = {
         "name": "sql_db_list_tables",
@@ -161,10 +161,10 @@ def list_tables(state: MessagesState):
     return {"messages": [tool_call_message, tool_message, response]}
 
 
-# Example: force a model to create a tool call
+# 예제: 모델이 도구 호출을 생성하도록 강제
 def call_get_schema(state: MessagesState):
-    # Note that LangChain enforces that all models accept `tool_choice="any"`
-    # as well as `tool_choice=<string name of tool>`.
+    # 참고: LangChain은 모든 모델이 `tool_choice="any"` 및
+    # `tool_choice=<string name of tool>`을 받아들이도록 강제합니다.
     llm_with_tools = llm.bind_tools([get_schema_tool], tool_choice="any")
     response = llm_with_tools.invoke(state["messages"])
 
@@ -194,8 +194,8 @@ def generate_query(state: MessagesState):
         "role": "system",
         "content": generate_query_system_prompt,
     }
-    # We do not force a tool call here, to allow the model to
-    # respond naturally when it obtains the solution.
+    # 여기서는 도구 호출을 강제하지 않으며, 모델이 솔루션을 얻었을 때
+    # 자연스럽게 응답할 수 있도록 합니다.
     llm_with_tools = llm.bind_tools([run_query_tool])
     response = llm_with_tools.invoke([system_message] + state["messages"])
 
@@ -227,7 +227,7 @@ def check_query(state: MessagesState):
         "content": check_query_system_prompt,
     }
 
-    # Generate an artificial user message to check
+    # 확인을 위한 인공적인 사용자 메시지 생성
     tool_call = state["messages"][-1].tool_calls[0]
     user_message = {"role": "user", "content": tool_call["args"]["query"]}
     llm_with_tools = llm.bind_tools([run_query_tool], tool_choice="any")
@@ -237,9 +237,9 @@ def check_query(state: MessagesState):
     return {"messages": [response]}
 ```
 
-## 5. Implement the agent
+## 5. 에이전트 구현
 
-We can now assemble these steps into a workflow using the [Graph API](/oss/langgraph/graph-api). We define a [conditional edge](/oss/langgraph/graph-api#conditional-edges) at the query generation step that will route to the query checker if a query is generated, or end if there are no tool calls present, such that the LLM has delivered a response to the query.
+이제 [Graph API](/oss/langgraph/graph-api)를 사용하여 이러한 단계를 워크플로우로 조합할 수 있습니다. 쿼리 생성 단계에서 [조건부 엣지](/oss/langgraph/graph-api#conditional-edges)를 정의하여 쿼리가 생성되면 쿼리 체커로 라우팅하고, 도구 호출이 없으면(LLM이 쿼리에 대한 응답을 제공한 경우) 종료합니다.
 
 ```python
 def should_continue(state: MessagesState) -> Literal[END, "check_query"]:
@@ -272,7 +272,7 @@ builder.add_edge("run_query", "generate_query")
 
 agent = builder.compile()
 ```
-We visualize the application below:
+아래에서 애플리케이션을 시각화합니다:
 ```python
 from IPython.display import Image, display
 from langchain_core.runnables.graph import CurveStyle, MermaidDrawMethod, NodeStyles
@@ -285,7 +285,7 @@ display(Image(agent.get_graph().draw_mermaid_png()))
   style={{ height: "800px" }}
 />
 
-We can now invoke the graph:
+이제 그래프를 호출할 수 있습니다:
 ```python
 question = "Which genre on average has the longest tracks?"
 
@@ -371,16 +371,16 @@ Name: sql_db_query
 The genre with the longest tracks on average is "Sci Fi & Fantasy," with an average track length of approximately 2,911,783 milliseconds. Other genres with relatively long tracks include "Science Fiction," "Drama," "TV Shows," and "Comedy."
 ```
 <Tip>
-See [LangSmith trace](https://smith.langchain.com/public/94b8c9ac-12f7-4692-8706-836a1f30f1ea/r) for the above run.
+위 실행에 대한 [LangSmith 추적](https://smith.langchain.com/public/94b8c9ac-12f7-4692-8706-836a1f30f1ea/r)을 참조하세요.
 </Tip>
 
-## 6. Implement human-in-the-loop review
+## 6. Human-in-the-loop 검토 구현
 
-It can be prudent to check the agent's SQL queries before they are executed for any unintended actions or inefficiencies.
+SQL 쿼리를 실행하기 전에 에이전트의 SQL 쿼리를 확인하여 의도하지 않은 작업이나 비효율성을 방지하는 것이 현명할 수 있습니다.
 
-Here we leverage LangGraph's [human-in-the-loop](/oss/langgraph/add-human-in-the-loop) features to pause the run before executing a SQL query and wait for human review. Using LangGraph's [persistence layer](/oss/langgraph/persistence), we can pause the run indefinitely (or at least as long as the persistence layer is alive).
+여기서는 LangGraph의 [human-in-the-loop](/oss/langgraph/add-human-in-the-loop) 기능을 활용하여 SQL 쿼리를 실행하기 전에 실행을 일시 중지하고 사람의 검토를 기다립니다. LangGraph의 [지속성 레이어](/oss/langgraph/persistence)를 사용하여 실행을 무기한(또는 최소한 지속성 레이어가 살아있는 한) 일시 중지할 수 있습니다.
 
-Let's wrap the `sql_db_query` tool in a node that receives human input. We can implement this using the [interrupt](/oss/langgraph/add-human-in-the-loop) function. Below, we allow for input to approve the tool call, edit its arguments, or provide user feedback.
+사람의 입력을 받는 노드에서 `sql_db_query` 도구를 래핑해 보겠습니다. [interrupt](/oss/langgraph/add-human-in-the-loop) 함수를 사용하여 이를 구현할 수 있습니다. 아래에서는 도구 호출을 승인하거나, 인수를 편집하거나, 사용자 피드백을 제공할 수 있는 입력을 허용합니다.
 ```python
 from langchain_core.runnables import RunnableConfig
 from langchain.tools import tool
@@ -398,14 +398,14 @@ def run_query_tool_with_interrupt(config: RunnableConfig, **tool_input):
         "description": "Please review the tool call"
     }
     response = interrupt([request]) # [!code highlight]
-    # approve the tool call
+    # 도구 호출 승인
     if response["type"] == "accept":
         tool_response = run_query_tool.invoke(tool_input, config)
-    # update tool call args
+    # 도구 호출 인수 업데이트
     elif response["type"] == "edit":
         tool_input = response["args"]["args"]
         tool_response = run_query_tool.invoke(tool_input, config)
-    # respond to the LLM with user feedback
+    # 사용자 피드백으로 LLM에 응답
     elif response["type"] == "response":
         user_feedback = response["args"]
         tool_response = user_feedback
@@ -415,10 +415,10 @@ def run_query_tool_with_interrupt(config: RunnableConfig, **tool_input):
     return tool_response
 ```
 <Note>
-The above implementation follows the [tool interrupt example](/oss/langgraph/add-human-in-the-loop#add-interrupts-to-any-tool) in the broader [human-in-the-loop](/oss/langgraph/add-human-in-the-loop) guide. Refer to that guide for details and alternatives.
+위 구현은 더 넓은 [human-in-the-loop](/oss/langgraph/add-human-in-the-loop) 가이드의 [도구 interrupt 예제](/oss/langgraph/add-human-in-the-loop#add-interrupts-to-any-tool)를 따릅니다. 자세한 내용과 대안은 해당 가이드를 참조하세요.
 </Note>
 
-Let's now re-assemble our graph. We will replace the programmatic check with human review. Note that we now include a [checkpointer](/oss/python/langgraph/persistence); this is required to pause and resume the run.
+이제 그래프를 다시 조합해 보겠습니다. 프로그래밍 방식의 확인을 사람의 검토로 대체할 것입니다. 이제 [checkpointer](/oss/python/langgraph/persistence)를 포함합니다. 실행을 일시 중지하고 재개하려면 이것이 필요합니다.
 ```python
 from langgraph.checkpoint.memory import InMemorySaver
 
@@ -450,7 +450,7 @@ builder.add_edge("run_query", "generate_query")
 checkpointer = InMemorySaver() # [!code highlight]
 agent = builder.compile(checkpointer=checkpointer) # [!code highlight]
 ```
-We can invoke the graph as before. This time, execution is interrupted:
+이전과 같이 그래프를 호출할 수 있습니다. 이번에는 실행이 중단됩니다:
 ```python
 import json
 
@@ -485,7 +485,7 @@ INTERRUPTED:
   "description": "Please review the tool call"
 }
 ```
-We can accept or edit the tool call using [Command](/oss/langgraph/use-graph-api#combine-control-flow-and-state-updates-with-command):
+[Command](/oss/langgraph/use-graph-api#combine-control-flow-and-state-updates-with-command)를 사용하여 도구 호출을 승인하거나 편집할 수 있습니다:
 ```python
 from langgraph.types import Command
 
@@ -522,13 +522,13 @@ Name: sql_db_query
 The genre with the longest average track length is "Sci Fi & Fantasy" with an average length of about 2,911,783 milliseconds. Other genres with long average track lengths include "Science Fiction," "Drama," "TV Shows," and "Comedy."
 ```
 
-Refer to the [human-in-the-loop guide](/oss/langgraph/human-in-the-loop) for details.
+자세한 내용은 [human-in-the-loop 가이드](/oss/langgraph/human-in-the-loop)를 참조하세요.
 
-## Next steps
-Check out the [Evaluate a graph](/langsmith/evaluate-graph) guide for evaluating LangGraph applications, including SQL agents like this one, using LangSmith.
+## 다음 단계
+LangSmith를 사용하여 이와 같은 SQL 에이전트를 포함한 LangGraph 애플리케이션을 평가하는 방법은 [그래프 평가](/langsmith/evaluate-graph) 가이드를 확인하세요.
 :::
 :::js
-## <Icon icon="triangle-person-digging" /> Under construction
+## <Icon icon="triangle-person-digging" /> 개발 중
 
-This tutorial has not yet been implemented in Typescript. Refer to the LangChain [SQL agent guide](/oss/langchain/sql-agent) for a reference implementation.
+이 튜토리얼은 아직 Typescript로 구현되지 않았습니다. 참조 구현은 LangChain [SQL 에이전트 가이드](/oss/langchain/sql-agent)를 참조하세요.
 :::
