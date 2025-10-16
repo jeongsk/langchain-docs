@@ -2,7 +2,7 @@
 title: 빠른 시작
 ---
 
-import AlphaCallout from "/snippets/alpha-lg-callout.mdx";
+import AlphaCallout from "/ko/snippets/alpha-lg-callout.mdx";
 
 <AlphaCallout />
 
@@ -14,6 +14,10 @@ import AlphaCallout from "/snippets/alpha-lg-callout.mdx";
 <Tip>
 개념적인 정보는 [Graph API 개요](/oss/python/langgraph/graph-api)와 [Functional API 개요](/oss/python/langgraph/functional-api)를 참조하세요.
 </Tip>
+
+<Info>
+이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 발급받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
+</Info>
 
 <Tabs>
 <Tab title="Use the Graph API">
@@ -78,6 +82,10 @@ llm_with_tools = llm.bind_tools(tools)
 ## 2. 상태 정의
 
 그래프의 상태는 메시지와 LLM 호출 횟수를 저장하는 데 사용됩니다.
+
+<Tip>
+    LangGraph의 State는 에이전트 실행 전반에 걸쳐 지속됩니다. `operator.add`와 함께 사용된 `Annotated` 타입은 새로운 메시지가 기존 목록을 대체하는 대신 추가되도록 보장합니다.
+</Tip>
 
 ```python
 from langchain.messages import AnyMessage
@@ -430,6 +438,10 @@ from langgraph.func import entrypoint, task
 
 모델 노드는 LLM을 호출하고 도구를 호출할지 여부를 결정하는 데 사용됩니다.
 
+<Tip>
+    `@task` 데코레이터는 함수를 에이전트의 일부로 실행할 수 있는 작업으로 표시합니다. 작업은 진입점 함수 내에서 동기적 또는 비동기적으로 호출될 수 있습니다.
+</Tip>
+
 ```python
 @task
 def call_llm(messages: list[BaseMessage]):
@@ -466,6 +478,10 @@ def call_tool(tool_call: ToolCall):
 ## 4. 에이전트 정의
 
 에이전트는 `entrypoint` 함수를 사용하여 빌드합니다.
+
+<Note>
+    Functional API에서는 노드와 에지를 명시적으로 정의하는 대신, 단일 함수 내에서 표준 제어 흐름 로직(루프, 조건문)을 작성합니다.
+</Note>
 
 ```python
 @entrypoint()
