@@ -100,7 +100,12 @@ class DocumentationBuilder:
 
         logger.info("Building Korean content...")
         self._build_unversioned_content("ko", "ko")
-        self._build_unversioned_content("ko/snippets", "snippets")
+
+        # Remove existing snippets directory before building Korean snippets
+        snippets_dir = self.build_dir / "snippets"
+        if snippets_dir.exists():
+            shutil.rmtree(snippets_dir)
+            logger.info("Removed existing snippets directory")
 
         # Copy shared files (docs.json, images, etc.)
         logger.info("Copying shared files...")
