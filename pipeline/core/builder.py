@@ -100,6 +100,7 @@ class DocumentationBuilder:
 
         logger.info("Building Korean content...")
         self._build_unversioned_content("ko", "ko")
+        self._build_unversioned_content("ko/snippets", "snippets")
 
         # Copy shared files (docs.json, images, etc.)
         logger.info("Copying shared files...")
