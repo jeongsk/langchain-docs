@@ -19,6 +19,14 @@ jobs:
     - name: Install dependencies
       shell: bash
       run: uv sync --group test
+    - name: Copy src-ko to src
+      run: |
+        if [ -d src-ko ]; then
+          cp -r src-ko/* src/
+          echo "Copied src-ko contents to src/"
+        else
+          echo "Warning: src-ko directory not found, skipping copy"
+        fi
     - name: Build documentation
       run: make build
     - name: Verify build output exists
