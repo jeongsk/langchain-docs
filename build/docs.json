@@ -171,6 +171,7 @@
                     "group": "Advanced usage",
                     "pages": [
                       "oss/python/langchain/middleware",
+                      "oss/python/langchain/guardrails",
                       "oss/python/langchain/structured-output",
                       "oss/python/langchain/runtime",
                       "oss/python/langchain/context-engineering",
@@ -196,59 +197,59 @@
               {
                 "tab": "LangGraph",
                 "pages": [
-                  "ko/oss/python/langgraph/overview",
+                  "oss/python/langgraph/overview",
                   {
                     "group": "Get started",
                     "pages": [
-                      "ko/oss/python/langgraph/install",
-                      "ko/oss/python/langgraph/quickstart",
-                      "ko/oss/python/langgraph/local-server",
-                      "ko/oss/python/langgraph/thinking-in-langgraph",
-                      "ko/oss/python/langgraph/workflows-agents"
+                      "oss/python/langgraph/install",
+                      "oss/python/langgraph/quickstart",
+                      "oss/python/langgraph/local-server",
+                      "oss/python/langgraph/thinking-in-langgraph",
+                      "oss/python/langgraph/workflows-agents"
                     ]
                   },
                   {
                     "group": "Capabilities",
                     "pages": [
-                      "ko/oss/python/langgraph/persistence",
-                      "ko/oss/python/langgraph/durable-execution",
-                      "ko/oss/python/langgraph/streaming",
-                      "ko/oss/python/langgraph/interrupts",
-                      "ko/oss/python/langgraph/use-time-travel",
-                      "ko/oss/python/langgraph/add-memory",
-                      "ko/oss/python/langgraph/use-subgraphs"
+                      "oss/python/langgraph/persistence",
+                      "oss/python/langgraph/durable-execution",
+                      "oss/python/langgraph/streaming",
+                      "oss/python/langgraph/interrupts",
+                      "oss/python/langgraph/use-time-travel",
+                      "oss/python/langgraph/add-memory",
+                      "oss/python/langgraph/use-subgraphs"
                     ]
                   },
                   {
                     "group": "Production",
                     "pages": [
-                      "ko/oss/python/langgraph/application-structure",
-                      "ko/oss/python/langgraph/studio",
-                      "ko/oss/python/langgraph/test",
-                      "ko/oss/python/langgraph/deploy",
-                      "ko/oss/python/langgraph/ui",
-                      "ko/oss/python/langgraph/observability"
+                      "oss/python/langgraph/application-structure",
+                      "oss/python/langgraph/studio",
+                      "oss/python/langgraph/test",
+                      "oss/python/langgraph/deploy",
+                      "oss/python/langgraph/ui",
+                      "oss/python/langgraph/observability"
                     ]
                   },
                   {
                     "group": "LangGraph APIs",
                     "pages": [
-                      {
-                        "group": "Graph API",
-                        "pages": [
-                          "ko/oss/python/langgraph/graph-api",
-                          "ko/oss/python/langgraph/use-graph-api"
-                        ]
-                      },
-                      {
+                        {
+                          "group": "Graph API",
+                          "pages": [
+                            "oss/python/langgraph/graph-api",
+                            "oss/python/langgraph/use-graph-api"
+                          ]
+                        },
+                        {
                         "group": "Functional API",
                         "pages": [
-                          "ko/oss/python/langgraph/functional-api",
-                          "ko/oss/python/langgraph/use-functional-api"
+                          "oss/python/langgraph/functional-api",
+                          "oss/python/langgraph/use-functional-api"
                         ]
                       },
-                      "ko/oss/python/langgraph/pregel"
-                    ]
+                        "oss/python/langgraph/pregel"
+                        ]
                   }
                 ]
               },
@@ -339,14 +340,9 @@
                 "pages": [
                   "oss/python/reference/overview",
                   {
-                    "group": "LangChain",
+                    "group": "Reference",
                     "pages": [
-                      "oss/python/reference/langchain-python"
-                    ]
-                  },
-                  {
-                    "group": "LangGraph",
-                    "pages": [
+                      "oss/python/reference/langchain-python",
                       "oss/python/reference/langgraph-python"
                     ]
                   },
@@ -357,12 +353,12 @@
                       {
                         "group": "Errors",
                         "pages": [
-                          "ko/oss/python/langgraph/GRAPH_RECURSION_LIMIT",
-                          "ko/oss/python/langgraph/INVALID_CHAT_HISTORY",
-                          "ko/oss/python/langgraph/INVALID_CONCURRENT_GRAPH_UPDATE",
-                          "ko/oss/python/langgraph/INVALID_GRAPH_NODE_RETURN_VALUE",
-                          "ko/oss/python/langgraph/MULTIPLE_SUBGRAPHS",
-                          "ko/oss/python/langgraph/MISSING_CHECKPOINTER"
+                          "oss/python/langgraph/GRAPH_RECURSION_LIMIT",
+                          "oss/python/langgraph/INVALID_CHAT_HISTORY",
+                          "oss/python/langgraph/INVALID_CONCURRENT_GRAPH_UPDATE",
+                          "oss/python/langgraph/INVALID_GRAPH_NODE_RETURN_VALUE",
+                          "oss/python/langgraph/MULTIPLE_SUBGRAPHS",
+                          "oss/python/langgraph/MISSING_CHECKPOINTER"
                         ]
                       }
                     ]
@@ -467,6 +463,7 @@
                     "group": "Advanced usage",
                     "pages": [
                       "oss/javascript/langchain/middleware",
+                      "oss/javascript/langchain/guardrails",
                       "oss/javascript/langchain/structured-output",
                       "oss/javascript/langchain/runtime",
                       "oss/javascript/langchain/context-engineering",
@@ -513,7 +510,7 @@
                       "oss/javascript/langgraph/use-time-travel",
                       "oss/javascript/langgraph/add-memory",
                       "oss/javascript/langgraph/use-subgraphs"
-                    ]
+                      ]
                   },
                   {
                     "group": "Production",
@@ -668,16 +665,11 @@
               {
                 "tab": "Reference",
                 "pages": [
-                  "oss/python/reference/overview",
+                  "oss/javascript/reference/overview",
                   {
-                    "group": "LangChain ",
+                    "group": "Reference",
                     "pages": [
-                      "oss/javascript/reference/langchain-javascript"
-                    ]
-                  },
-                  {
-                    "group": "LangGraph",
-                    "pages": [
+                      "oss/javascript/reference/langchain-javascript",
                       "oss/javascript/reference/langgraph-javascript"
                     ]
                   },
@@ -772,11 +764,11 @@
             "pages": [
               "langsmith/home",
               "langsmith/pricing-plans",
+              "langsmith/create-account-api-key",
               {
                 "group": "Account administration",
                 "pages": [
                   "langsmith/administration-overview",
-                  "langsmith/create-account-api-key",
                   "langsmith/set-up-a-workspace",
                   "langsmith/manage-organization-by-api",
                   "langsmith/billing",
@@ -793,19 +785,12 @@
                   "langsmith/langgraph-js-ts-sdk",
                   "langsmith/smith-api-ref",
                   "langsmith/server-api-ref",
-                  "langsmith/api-ref-control-plane",
-                  "langsmith/remote-graph",
-                  "langsmith/cli",
-                  "langsmith/env-var"
+                  "langsmith/api-ref-control-plane"
                 ]
               },
               {
                 "group": "Additional resources",
                 "pages": [
-                  "langsmith/faq",
-                  "langsmith/regions-faq",
-                  "langsmith/pricing-faq",
-                  "langsmith/authentication-methods",
                   {
                     "group": "Releases & changelogs",
                     "pages": [
@@ -816,10 +801,14 @@
                   {
                     "group": "Data management",
                     "pages": [
-                      "langsmith/data-storage-and-privacy",
+                       "langsmith/data-storage-and-privacy",
                       "langsmith/data-purging-compliance"
                     ]
-                  }
+                  },
+                  "langsmith/authentication-methods",
+                  "langsmith/faq",
+                  "langsmith/regions-faq",
+                  "langsmith/pricing-faq"
                 ]
               }
             ]
@@ -843,6 +832,7 @@
                       "langsmith/trace-anthropic",
                       "langsmith/trace-openai",
                       "langsmith/trace-with-autogen",
+                      "langsmith/trace-claude-agent-sdk",
                       "langsmith/trace-claude-code",
                       "langsmith/trace-with-crewai",
                       "langsmith/trace-with-google-adk",
@@ -865,7 +855,7 @@
                 ]
               },
               {
-                "group": "Configuration & troubleshooting",
+                "group":"Configuration & troubleshooting",
                 "pages": [
                   {
                     "group": "Project & environment settings",
@@ -1104,6 +1094,7 @@
             "pages": [
               "langsmith/deployments",
               "langsmith/local-server",
+              "langsmith/app-development",
               {
                 "group": "Configure for deployment",
                 "pages": [
@@ -1115,18 +1106,26 @@
                       "langsmith/setup-pyproject",
                       "langsmith/setup-javascript",
                       "langsmith/monorepo-support"
-                    ]
-                  },
-                  "langsmith/graph-rebuild",
-                  "langsmith/use-remote-graph",
-                  "langsmith/semantic-search",
-                  "langsmith/configure-ttl"
-                ]
+                      ]
+                    },
+                    {
+                      "group": "Deployment components",
+                      "pages": [
+                        "langsmith/components",
+                        "langsmith/langgraph-server",
+                        "langsmith/data-plane",
+                        "langsmith/control-plane"
+                      ]
+                    },
+                    "langsmith/graph-rebuild",
+                    "langsmith/use-remote-graph",
+                    "langsmith/semantic-search",
+                    "langsmith/configure-ttl"
+                  ]
               },
               {
                 "group": "App development",
                 "pages": [
-                  "langsmith/why-langgraph",
                   {
                     "group": "Data models",
                     "pages": [
@@ -1206,9 +1205,17 @@
               {
                 "group": "Server customization",
                 "pages": [
-                  "langsmith/custom-lifespan",
-                  "langsmith/custom-middleware",
-                  "langsmith/custom-routes"
+                    "langsmith/custom-lifespan",
+                    "langsmith/custom-middleware",
+                    "langsmith/custom-routes"
+                ]
+              },
+              {
+                "group": "Reference",
+                "pages": [
+                  "langsmith/remote-graph",
+                  "langsmith/cli",
+                  "langsmith/env-var"
                 ]
               }
             ]
@@ -1291,15 +1298,6 @@
                     ]
                   },
                   {
-                    "group": "Deployment components",
-                    "pages": [
-                      "langsmith/components",
-                      "langsmith/langgraph-server",
-                      "langsmith/data-plane",
-                      "langsmith/control-plane"
-                    ]
-                  },
-                  {
                     "group": "Platform auth & access control",
                     "pages": [
                       "langsmith/self-host-basic-auth",
@@ -1348,105 +1346,109 @@
     }
   },
   "redirects": [
-    {
-      "source": "/oss/python/langchain-agents",
-      "destination": "/oss/python/langchain/agents"
-    },
-    {
-      "source": "/oss/javascript/langchain-agents",
-      "destination": "/oss/javascript/langchain/agents"
-    },
-    {
-      "source": "/oss/python/langchain-models",
-      "destination": "/oss/python/langchain/models"
-    },
-    {
-      "source": "/oss/javascript/langchain-models",
-      "destination": "/oss/javascript/langchain/models"
-    },
-    {
-      "source": "/oss/python/langchain-messages",
-      "destination": "/oss/python/langchain/messages"
-    },
-    {
-      "source": "/oss/javascript/langchain-messages",
-      "destination": "/oss/javascript/langchain/messages"
-    },
-    {
-      "source": "/oss/python/langchain-tools",
-      "destination": "/oss/python/langchain/tools"
-    },
-    {
-      "source": "/oss/javascript/langchain-tools",
-      "destination": "/oss/javascript/langchain/tools"
-    },
-    {
-      "source": "/oss/python/langchain-memory",
-      "destination": "/oss/python/langchain/short-term-memory"
-    },
-    {
-      "source": "/oss/javascript/langchain-memory",
-      "destination": "/oss/javascript/langchain/short-term-memory"
-    },
-    {
-      "source": "/oss/python/langchain-streaming",
-      "destination": "/oss/python/langchain/streaming"
-    },
-    {
-      "source": "/oss/javascript/langchain-streaming",
-      "destination": "/oss/javascript/langchain/streaming"
-    },
-    {
-      "source": "/oss/python/releases-v1",
-      "destination": "/oss/python/releases/langchain-v1"
-    },
-    {
-      "source": "/oss/javascript/releases-v1",
-      "destination": "/oss/javascript/releases/langchain-v1"
-    },
-    {
-      "source": "/ko/oss/python/langgraph/human-in-the-loop",
-      "destination": "/ko/oss/python/langgraph/interrupts"
-    },
-    {
-      "source": "/oss/javascript/langgraph/human-in-the-loop",
-      "destination": "/oss/javascript/langgraph/interrupts"
-    },
-    {
-      "source": "/langgraph-platform/index",
-      "destination": "/langsmith/deployments"
-    },
-    {
-      "source": "/langsmith/langgraph-platform-logs",
-      "destination": "/langsmith/platform-logs"
-    },
-    {
-      "source": "/langgraph-platform/deployment-options",
-      "destination": "/langsmith/hosting"
-    },
-    {
-      "source": "/langgraph-platform/langgraph-studio",
-      "destination": "/langsmith/studio"
-    },
-    {
-      "source": "/langgraph-platform/langgraph-cli",
-      "destination": "/langsmith/cli"
-    },
-    {
-      "source": "/langsmith/api-ref",
-      "destination": "/langsmith/smith-api-ref"
-    },
-    {
-      "source": "/langsmith/js-ts-sdk",
-      "destination": "/langsmith/smith-js-ts-sdk"
-    },
-    {
-      "source": "/langsmith/python-sdk",
-      "destination": "/langsmith/smith-python-sdk"
-    },
-    {
-      "source": "/langgraph-platform/:path*",
-      "destination": "/langsmith/:path*"
-    }
-  ]
+  {
+    "source": "/oss/python/langchain-agents",
+    "destination": "/oss/python/langchain/agents"
+  },
+  {
+    "source": "/oss/javascript/langchain-agents",
+    "destination": "/oss/javascript/langchain/agents"
+  },
+  {
+    "source": "/oss/python/langchain-models",
+    "destination": "/oss/python/langchain/models"
+  },
+  {
+    "source": "/oss/javascript/langchain-models",
+    "destination": "/oss/javascript/langchain/models"
+  },
+  {
+    "source": "/oss/python/langchain-messages",
+    "destination": "/oss/python/langchain/messages"
+  },
+  {
+    "source": "/oss/javascript/langchain-messages",
+    "destination": "/oss/javascript/langchain/messages"
+  },
+  {
+    "source": "/oss/python/langchain-tools",
+    "destination": "/oss/python/langchain/tools"
+  },
+  {
+    "source": "/oss/javascript/langchain-tools",
+    "destination": "/oss/javascript/langchain/tools"
+  },
+  {
+    "source": "/oss/python/langchain-memory",
+    "destination": "/oss/python/langchain/short-term-memory"
+  },
+  {
+    "source": "/oss/javascript/langchain-memory",
+    "destination": "/oss/javascript/langchain/short-term-memory"
+  },
+  {
+    "source": "/oss/python/langchain-streaming",
+    "destination": "/oss/python/langchain/streaming"
+  },
+  {
+    "source": "/oss/javascript/langchain-streaming",
+    "destination": "/oss/javascript/langchain/streaming"
+  },
+  {
+    "source": "/oss/python/releases-v1",
+    "destination": "/oss/python/releases/langchain-v1"
+  },
+  {
+    "source": "/oss/javascript/releases-v1",
+    "destination": "/oss/javascript/releases/langchain-v1"
+  },
+  {
+    "source": "/oss/python/langgraph/human-in-the-loop",
+    "destination": "/oss/python/langgraph/interrupts"
+  },
+  {
+    "source": "/oss/javascript/langgraph/human-in-the-loop",
+    "destination": "/oss/javascript/langgraph/interrupts"
+  },
+  {
+    "source": "/langgraph-platform/index",
+    "destination": "/langsmith/deployments"
+  },
+  {
+    "source": "/langsmith/langgraph-platform-logs",
+    "destination": "/langsmith/platform-logs"
+  },
+  {
+    "source": "/langgraph-platform/deployment-options",
+    "destination": "/langsmith/hosting"
+  },
+  {
+    "source": "/langgraph-platform/langgraph-studio",
+    "destination": "/langsmith/studio"
+  },
+  {
+    "source": "/langgraph-platform/langgraph-cli",
+    "destination": "/langsmith/cli"
+  },
+  {
+    "source": "/langsmith/api-ref",
+    "destination": "/langsmith/smith-api-ref"
+  },
+  {
+    "source": "/langsmith/js-ts-sdk",
+    "destination": "/langsmith/smith-js-ts-sdk"
+  },
+  {
+    "source": "/langsmith/python-sdk",
+    "destination": "/langsmith/smith-python-sdk"
+  },
+  {
+    "source": "/langgraph-platform/why-langgraph",
+    "destination": "/langsmith/app-development"
+  },
+  {
+    "source": "/langgraph-platform/:path*",
+    "destination": "/langsmith/:path*"
+  }
+]
 }

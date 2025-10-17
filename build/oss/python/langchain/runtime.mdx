@@ -2,13 +2,16 @@
 title: Runtime
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
+<AlphaCalloutPy />
+
+
 
 ## Overview
 
-LangChain's `create_agent` runs on LangGraph's runtime under the hood.
+LangChain's [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent) runs on LangGraph's runtime under the hood.
 
 
 LangGraph exposes a [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) object with the following information:
@@ -21,7 +24,7 @@ You can access the runtime information within [tools](#inside-tools) and [middle
 
 ## Access
 
-When creating an agent with `create_agent`, you can specify a `context_schema` to define the structure of the `context` stored in the agent [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime).
+When creating an agent with [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent), you can specify a `context_schema` to define the structure of the `context` stored in the agent [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime).
 
 
 
@@ -58,16 +61,19 @@ You can access the runtime information inside tools to:
 * Read or write long-term memory
 * Write to the [custom stream](/oss/python/langchain/streaming#custom-updates) (ex, tool progress / updates)
 
-Use the [get_runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.get_runtime) function from `langgraph.runtime` to access the [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) object inside a tool.
+Use the `ToolRuntime` parameter to access the [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) object inside a tool.
 
 ```python
-from langchain.tools import tool
-from langgraph.runtime import get_runtime  # [!code highlight]
+from dataclasses import dataclass
+from langchain.tools import tool, ToolRuntime  # [!code highlight]
+
+@dataclass
+class Context:
+    user_id: str
 
 @tool
-def fetch_user_email_preferences() -> str:
+def fetch_user_email_preferences(runtime: ToolRuntime[Context]) -> str:  # [!code highlight]
     """Fetch the user's email preferences from the store."""
-    runtime = get_runtime(Context)  # [!code highlight]
     user_id = runtime.context.user_id  # [!code highlight]
 
     preferences: str = "The user prefers you to write a brief and polite email."
@@ -84,7 +90,7 @@ def fetch_user_email_preferences() -> str:
 
 You can access runtime information in middleware to create dynamic prompts, modify messages, or control agent behavior based on user context.
 
-Use `request.runtime` to access the [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) object inside middleware decorators. The runtime object is available in the `ModelRequest` parameter passed to middleware functions.
+Use `request.runtime` to access the [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) object inside middleware decorators. The runtime object is available in the [`ModelRequest`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.ModelRequest) parameter passed to middleware functions.
 
 ```python
 from dataclasses import dataclass

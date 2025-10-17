@@ -2,13 +2,16 @@
 title: Test
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
+
+<AlphaCalloutJS />
+
 
 After you've prototyped your LangGraph agent, a natural next step is to add tests. This guide covers some useful patterns you can use when writing unit tests.
 
-Note that this guide is LangGraph-specific and covers scenarios around graphs with custom structures - if you are just getting started, check out [this section](/oss/javascript/langchain/test/) that uses LangChain's built-in `create_agent()` instead.
+Note that this guide is LangGraph-specific and covers scenarios around graphs with custom structures - if you are just getting started, check out [this section](/oss/javascript/langchain/test/) that uses LangChain's built-in @[`create_agent`] instead.
 
 ## Prerequisites
 

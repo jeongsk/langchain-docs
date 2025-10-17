@@ -2,9 +2,12 @@
 title: Add and manage memory
 ---
 
-import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
 
-<AlphaCallout />
+
+<AlphaCalloutJS />
+
 
 AI applications need [memory](/oss/javascript/concepts/memory) to share context across multiple interactions. In LangGraph, you can add two types of memory:
 
@@ -175,7 +178,7 @@ In production, use a store backed by a database:
 
 
 ```typescript
-import { PostgresStore } from "@langchain/langgraph-checkpoint-postgres";
+import { PostgresStore } from "@langchain/langgraph-checkpoint-postgres/store";
 
 const DB_URI = "postgresql://postgres:postgres@localhost:5442/postgres?sslmode=disable";
 const store = PostgresStore.fromConnString(DB_URI);
@@ -199,7 +202,8 @@ const graph = builder.compile({ store });
   ```typescript
   import { ChatAnthropic } from "@langchain/anthropic";
   import { StateGraph, MessagesZodMeta, START, LangGraphRunnableConfig } from "@langchain/langgraph";
-  import { PostgresSaver, PostgresStore } from "@langchain/langgraph-checkpoint-postgres";
+  import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
+  import { PostgresStore } from "@langchain/langgraph-checkpoint-postgres/store";
   import { BaseMessage } from "@langchain/core/messages";
   import { registry } from "@langchain/langgraph/zod";
   import * as z from "zod";
@@ -393,7 +397,9 @@ This allows the agent to keep track of the conversation without exceeding the LL
 
 ### Trim messages
 
+
 Most LLMs have a maximum supported context window (denominated in tokens). One way to decide when to truncate messages is to count the tokens in the message history and truncate whenever it approaches that limit. If you're using LangChain, you can use the trim messages utility and specify the number of tokens to keep from the list, as well as the `strategy` (e.g., keep the last `maxTokens`) to use for handling the boundary.
+
 
 
 

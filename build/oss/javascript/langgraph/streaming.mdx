@@ -2,9 +2,12 @@
 title: Streaming
 ---
 
-import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
 
-<AlphaCallout />
+
+<AlphaCalloutJS />
+
 
 LangGraph implements a streaming system to surface real-time updates. Streaming is crucial for enhancing the responsiveness of applications built on LLMs. By displaying output progressively, even before a complete response is ready, streaming significantly improves user experience (UX), particularly when dealing with the latency of LLMs.
 
@@ -709,7 +712,7 @@ for await (const chunk of await graph.stream(
     .compile();
   ```
 
-  Let's invoke the graph with an AI message that includes a tool call:
+  Let's invoke the graph with an [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html) that includes a tool call:
 
   ```typescript
   const inputs = {
