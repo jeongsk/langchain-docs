@@ -98,9 +98,6 @@ class DocumentationBuilder:
         logger.info("Building LangSmith content...")
         self._build_unversioned_content("langsmith", "langsmith")
 
-        logger.info("Building Korean content...")
-        self._build_unversioned_content("ko", "ko")
-
         # Copy shared files (docs.json, images, etc.)
         logger.info("Copying shared files...")
         self._copy_shared_files()
@@ -304,7 +301,7 @@ class DocumentationBuilder:
         if relative_path.parts[0] == "oss":
             self._build_oss_file(file_path, relative_path)
         # Check if this is unversioned content
-        elif relative_path.parts[0] in {"labs", "langsmith", "ko"}:
+        elif relative_path.parts[0] in {"labs", "langsmith"}:
             self._build_unversioned_file(file_path, relative_path)
         # Handle shared files (images, docs.json, etc.)
         elif self.is_shared_file(file_path):
