@@ -2,35 +2,35 @@
 title: PromptLayer
 ---
 
->[PromptLayer](https://docs.promptlayer.com/introduction) is a platform for prompt engineering. It also helps with the LLM observability to visualize requests, version prompts, and track usage.
+>[PromptLayer](https://docs.promptlayer.com/introduction)는 프롬프트 엔지니어링을 위한 플랫폼입니다. 또한 요청을 시각화하고, 프롬프트 버전을 관리하며, 사용량을 추적하는 LLM 관찰성 기능을 제공합니다.
 >
->While `PromptLayer` does have LLMs that integrate directly with LangChain (e.g. [`PromptLayerOpenAI`](/oss/integrations/llms/promptlayer_openai)), using a callback is the recommended way to integrate `PromptLayer` with LangChain.
+>`PromptLayer`는 LangChain과 직접 통합되는 LLM(예: [`PromptLayerOpenAI`](/oss/integrations/llms/promptlayer_openai))을 제공하지만, 콜백을 사용하는 것이 `PromptLayer`를 LangChain과 통합하는 권장 방법입니다.
 
-In this guide, we will go over how to setup the `PromptLayerCallbackHandler`.
+이 가이드에서는 `PromptLayerCallbackHandler`를 설정하는 방법을 안내합니다.
 
-See [PromptLayer docs](https://docs.promptlayer.com/languages/langchain) for more information.
+자세한 내용은 [PromptLayer 문서](https://docs.promptlayer.com/languages/langchain)를 참조하세요.
 
-## Installation and Setup
+## 설치 및 설정
 
 ```python
 %pip install -qU  langchain-community promptlayer --upgrade
 ```
 
-### Getting API Credentials
+### API 자격 증명 얻기
 
-If you do not have a PromptLayer account, create one on [promptlayer.com](https://www.promptlayer.com). Then get an API key by clicking on the settings cog in the navbar and
-set it as an environment variable called `PROMPTLAYER_API_KEY`
+PromptLayer 계정이 없다면 [promptlayer.com](https://www.promptlayer.com)에서 계정을 생성하세요. 그런 다음 네비게이션 바의 설정 톱니바퀴를 클릭하여 API 키를 받고,
+`PROMPTLAYER_API_KEY`라는 환경 변수로 설정하세요.
 
-## Usage
+## 사용법
 
-Getting started with `PromptLayerCallbackHandler` is fairly simple, it takes two optional arguments:
+`PromptLayerCallbackHandler`를 시작하는 것은 매우 간단합니다. 두 개의 선택적 인자를 받습니다:
 
-1. `pl_tags` - an optional list of strings that will be tracked as tags on PromptLayer.
-2. `pl_id_callback` - an optional function that will take `promptlayer_request_id` as an argument. This ID can be used with all of PromptLayer's tracking features to track, metadata, scores, and prompt usage.
+1. `pl_tags` - PromptLayer에서 태그로 추적될 문자열 리스트입니다(선택사항).
+2. `pl_id_callback` - `promptlayer_request_id`를 인자로 받는 함수입니다(선택사항). 이 ID는 PromptLayer의 모든 추적 기능에서 메타데이터, 점수, 프롬프트 사용량을 추적하는 데 사용할 수 있습니다.
 
-## Simple OpenAI Example
+## 간단한 OpenAI 예제
 
-In this simple example we use `PromptLayerCallbackHandler` with `ChatOpenAI`. We add a PromptLayer tag named `chatopenai`
+이 간단한 예제에서는 `ChatOpenAI`와 함께 `PromptLayerCallbackHandler`를 사용합니다. `chatopenai`라는 PromptLayer 태그를 추가합니다.
 
 ```python
 import promptlayer  # Don't forget this 🍰
@@ -56,7 +56,7 @@ llm_results = chat_llm.invoke(
 print(llm_results)
 ```
 
-## GPT4All Example
+## GPT4All 예제
 
 ```python
 from langchain_community.llms import GPT4All
@@ -70,13 +70,13 @@ response = model.invoke(
 )
 ```
 
-## Full Featured Example
+## 전체 기능 예제
 
-In this example, we unlock more of the power of `PromptLayer`.
+이 예제에서는 `PromptLayer`의 더 많은 기능을 활용합니다.
 
-PromptLayer allows you to visually create, version, and track prompt templates. Using the [Prompt Registry](https://docs.promptlayer.com/features/prompt-registry), we can programmatically fetch the prompt template called `example`.
+PromptLayer를 사용하면 프롬프트 템플릿을 시각적으로 생성하고, 버전을 관리하며, 추적할 수 있습니다. [Prompt Registry](https://docs.promptlayer.com/features/prompt-registry)를 사용하여 `example`이라는 프롬프트 템플릿을 프로그래밍 방식으로 가져올 수 있습니다.
 
-We also define a `pl_id_callback` function which takes in the `promptlayer_request_id` and logs a score, metadata and links the prompt template used. Read more about tracking on [our docs](https://docs.promptlayer.com/features/prompt-history/request-id).
+또한 `promptlayer_request_id`를 받아 점수를 기록하고, 메타데이터를 추가하며, 사용된 프롬프트 템플릿을 연결하는 `pl_id_callback` 함수를 정의합니다. 추적에 대한 자세한 내용은 [문서](https://docs.promptlayer.com/features/prompt-history/request-id)를 참조하세요.
 
 ```python
 from langchain_openai import OpenAI
@@ -107,5 +107,5 @@ example_prompt = promptlayer.prompts.get("example", version=1, langchain=True)
 openai_llm.invoke(example_prompt.format(product="toasters"))
 ```
 
-That is all it takes! After setup all your requests will show up on the PromptLayer dashboard.
-This callback also works with any LLM implemented on LangChain.
+이것이 전부입니다! 설정이 완료되면 모든 요청이 PromptLayer 대시보드에 표시됩니다.
+이 콜백은 LangChain에 구현된 모든 LLM과 함께 작동합니다.

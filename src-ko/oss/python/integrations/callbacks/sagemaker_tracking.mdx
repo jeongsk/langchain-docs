@@ -2,19 +2,19 @@
 title: SageMaker Tracking
 ---
 
->[Amazon SageMaker](https://aws.amazon.com/sagemaker/) is a fully managed service that is used to quickly and easily build, train and deploy machine learning (ML) models.
+>[Amazon SageMaker](https://aws.amazon.com/sagemaker/)는 머신 러닝(ML) 모델을 신속하고 쉽게 구축, 훈련 및 배포하는 데 사용되는 완전 관리형 서비스입니다.
 
->[Amazon SageMaker Experiments](https://docs.aws.amazon.com/sagemaker/latest/dg/experiments.html) is a capability of `Amazon SageMaker` that lets you organize, track, compare and evaluate ML experiments and model versions.
+>[Amazon SageMaker Experiments](https://docs.aws.amazon.com/sagemaker/latest/dg/experiments.html)는 `Amazon SageMaker`의 기능으로, ML 실험과 모델 버전을 구성, 추적, 비교 및 평가할 수 있게 해줍니다.
 
-This notebook shows how LangChain Callback can be used to log and track prompts and other LLM hyperparameters into `SageMaker Experiments`. Here, we use different scenarios to showcase the capability:
+이 노트북은 LangChain Callback을 사용하여 프롬프트 및 기타 LLM 하이퍼파라미터를 `SageMaker Experiments`에 로깅하고 추적하는 방법을 보여줍니다. 여기서는 다양한 시나리오를 통해 기능을 소개합니다:
 
-* **Scenario 1**: *Single LLM* - A case where a single LLM model is used to generate output based on a given prompt.
-* **Scenario 2**: *Sequential Chain* - A case where a sequential chain of two LLM models is used.
-* **Scenario 3**: *Agent with Tools (Chain of Thought)* - A case where multiple tools (search and math) are used in addition to an LLM.
+* **시나리오 1**: *단일 LLM* - 단일 LLM 모델이 주어진 프롬프트를 기반으로 출력을 생성하는 경우.
+* **시나리오 2**: *순차 체인* - 두 개의 LLM 모델이 순차적으로 연결된 체인을 사용하는 경우.
+* **시나리오 3**: *도구를 사용하는 에이전트(사고 과정 체인)* - LLM 외에 여러 도구(검색 및 수학)가 사용되는 경우.
 
-In this notebook, we will create a single experiment to log the prompts from each scenario.
+이 노트북에서는 각 시나리오의 프롬프트를 로깅하기 위해 단일 실험을 생성합니다.
 
-## Installation and Setup
+## 설치 및 설정
 
 ```python
 %pip install -qU  sagemaker
@@ -22,10 +22,10 @@ In this notebook, we will create a single experiment to log the prompts from eac
 %pip install -qU  google-search-results
 ```
 
-First, setup the required API keys
+먼저 필요한 API 키를 설정하세요
 
-* OpenAI: [platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys) (For OpenAI LLM model)
-* Google SERP API: [serpapi.com/manage-api-key](https://serpapi.com/manage-api-key) (For Google Search Tool)
+* OpenAI: [platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys) (OpenAI LLM 모델용)
+* Google SERP API: [serpapi.com/manage-api-key](https://serpapi.com/manage-api-key) (Google Search 도구용)
 
 ```python
 import os
@@ -49,7 +49,7 @@ from sagemaker.experiments.run import Run
 from sagemaker.session import Session
 ```
 
-## LLM Prompt Tracking
+## LLM 프롬프트 추적
 
 ```python
 # LLM Hyperparameters
@@ -68,7 +68,7 @@ EXPERIMENT_NAME = "langchain-sagemaker-tracker"
 session = Session(default_bucket=BUCKET_NAME)
 ```
 
-### Scenario 1 - LLM
+### 시나리오 1 - LLM
 
 ```python
 RUN_NAME = "run-scenario-1"
@@ -99,7 +99,7 @@ with Run(
     sagemaker_callback.flush_tracker()
 ```
 
-### Scenario 2 - Sequential Chain
+### 시나리오 2 - 순차 체인
 
 ```python
 RUN_NAME = "run-scenario-2"
@@ -148,7 +148,7 @@ with Run(
     sagemaker_callback.flush_tracker()
 ```
 
-### Scenario 3 - Agent with Tools
+### 시나리오 3 - 도구를 사용하는 에이전트
 
 ```python
 RUN_NAME = "run-scenario-3"
@@ -180,9 +180,9 @@ with Run(
     sagemaker_callback.flush_tracker()
 ```
 
-## Load Log Data
+## 로그 데이터 로드
 
-Once the prompts are logged, we can easily load and convert them to Pandas DataFrame as follows.
+프롬프트가 로깅되면 다음과 같이 쉽게 로드하여 Pandas DataFrame으로 변환할 수 있습니다.
 
 ```python
 # Load
@@ -195,7 +195,7 @@ print(df.shape)
 df.head()
 ```
 
-As can be seen above, there are three runs (rows) in the experiment corresponding to each scenario. Each run logs the prompts and related LLM settings/hyperparameters as json and are saved in s3 bucket. Feel free to load and explore the log data from each json path.
+위에서 볼 수 있듯이, 각 시나리오에 해당하는 세 개의 실행(행)이 실험에 있습니다. 각 실행은 프롬프트와 관련 LLM 설정/하이퍼파라미터를 json으로 로깅하며 s3 버킷에 저장됩니다. 각 json 경로에서 로그 데이터를 자유롭게 로드하고 탐색해 보세요.
 
 ```python
 

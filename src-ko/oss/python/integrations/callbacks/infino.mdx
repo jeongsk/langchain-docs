@@ -2,17 +2,17 @@
 title: Infino
 ---
 
->[Infino](https://github.com/infinohq/infino) is a scalable telemetry store designed for logs, metrics, and traces. Infino can function as a standalone observability solution or as the storage layer in your observability stack.
+>[Infino](https://github.com/infinohq/infino)는 로그, 메트릭, 트레이스를 위해 설계된 확장 가능한 텔레메트리 저장소입니다. Infino는 독립형 옵저버빌리티 솔루션으로 작동하거나 옵저버빌리티 스택의 저장 계층으로 기능할 수 있습니다.
 
-This example shows how one can track the following while calling OpenAI and ChatOpenAI models via `LangChain` and [Infino](https://github.com/infinohq/infino):
+이 예제는 `LangChain`과 [Infino](https://github.com/infinohq/infino)를 통해 OpenAI 및 ChatOpenAI 모델을 호출하는 동안 다음 항목을 추적하는 방법을 보여줍니다:
 
-* prompt input
-* response from `ChatGPT` or any other `LangChain` model
-* latency
-* errors
-* number of tokens consumed
+* 프롬프트 입력
+* `ChatGPT` 또는 기타 `LangChain` 모델의 응답
+* 지연 시간
+* 오류
+* 소비된 토큰 수
 
-## Initializing
+## 초기화
 
 ```python
 # Install necessary dependencies.
@@ -38,7 +38,7 @@ from infinopy import InfinoClient
 from langchain_openai import OpenAI
 ```
 
-## Start Infino server, initialize the Infino client
+## Infino 서버 시작, Infino 클라이언트 초기화
 
 ```python
 # Start server using the Infino docker image.
@@ -52,7 +52,7 @@ client = InfinoClient()
 a1159e99c6bdb3101139157acee6aba7ae9319375e77ab6fbc79beff75abeca3
 ```
 
-## Read the questions dataset
+## 질문 데이터셋 읽기
 
 ```python
 # These are a subset of questions from Stanford's QA dataset -
@@ -81,7 +81,7 @@ What name comes from the English words Normans/Normanz?"""
 questions = data.split("\n")
 ```
 
-## Example 1: LangChain OpenAI Q&A; Publish metrics and logs to Infino
+## 예제 1: LangChain OpenAI Q&A; Infino에 메트릭 및 로그 퍼블리시
 
 ```python
 # Set your key here.
@@ -130,9 +130,9 @@ Who was the duke in the battle of Hastings?
 generations=[[Generation(text='\n\nThe Duke of Normandy, William the Conqueror, was the leader of the Norman forces at the Battle of Hastings in 1066.', generation_info={'finish_reason': 'stop', 'logprobs': None})]] llm_output={'token_usage': {'total_tokens': 39, 'prompt_tokens': 11, 'completion_tokens': 28}, 'model_name': 'text-davinci-003'} run=[RunInfo(run_id=UUID('b8f84619-ea5f-4c18-b411-b62194f36fe0'))]
 ```
 
-## Create Metric Charts
+## 메트릭 차트 생성
 
-We now use matplotlib to create graphs of latency, errors and tokens consumed.
+이제 matplotlib을 사용하여 지연 시간, 오류, 소비된 토큰의 그래프를 생성합니다.
 
 ```python
 # Helper function to create a graph using matplotlib.
@@ -179,7 +179,7 @@ response = client.search_ts("__name__", "total_tokens", 0, int(time.time()))
 plot(response.text, "Total Tokens")
 ```
 
-## Full text query on prompt or prompt outputs
+## 프롬프트 또는 프롬프트 출력에 대한 전문 텍스트 쿼리
 
 ```python
 # Search for a particular prompt text.
@@ -200,7 +200,7 @@ Results for normandy : [{"time":1696947743,"fields":{"prompt_response":"\n\nThe 
 Results for king charles III : [{"time":1696947745,"fields":{"prompt_response":"\n\nKing Charles III swore fealty to King Philip II of Spain."},"text":"\n\nKing Charles III swore fealty to King Philip II of Spain."},{"time":1696947744,"fields":{"prompt":"Who did King Charles III swear fealty to?"},"text":"Who did King Charles III swear fealty to?"}]
 ```
 
-# Example 2: Summarize a piece of text using ChatOpenAI
+# 예제 2: ChatOpenAI를 사용하여 텍스트 요약하기
 
 ```python
 # Set your key here.
@@ -231,7 +231,7 @@ for url in urls:
     chain.run(docs)
 ```
 
-## Create Metric Charts
+## 메트릭 차트 생성
 
 ```python
 response = client.search_ts("__name__", "latency", 0, int(time.time()))

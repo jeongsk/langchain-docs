@@ -2,18 +2,16 @@
 title: Argilla
 ---
 
->[Argilla](https://argilla.io/) is an open-source data curation platform for LLMs.
-> Using Argilla, everyone can build robust language models through faster data curation
-> using both human and machine feedback. We provide support for each step in the MLOps cycle,
-> from data labeling to model monitoring.
+>[Argilla](https://argilla.io/)는 LLM을 위한 오픈소스 데이터 큐레이션 플랫폼입니다.
+> Argilla를 사용하면 사람과 기계의 피드백을 모두 활용하여 더 빠른 데이터 큐레이션을 통해 강력한 언어 모델을 구축할 수 있습니다. 데이터 라벨링부터 모델 모니터링까지 MLOps 사이클의 각 단계를 지원합니다.
 
 <a target="_blank" href="https://colab.research.google.com/github/langchain-ai/langchain/blob/master/docs/docs/integrations/callbacks/argilla.ipynb">
     <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a>
 
-In this guide we will demonstrate how to track the inputs and responses of your LLM to generate a dataset in Argilla, using the `ArgillaCallbackHandler`.
+이 가이드에서는 `ArgillaCallbackHandler`를 사용하여 LLM의 입력과 응답을 추적하고 Argilla에서 데이터셋을 생성하는 방법을 설명합니다.
 
-It's useful to keep track of the inputs and outputs of your LLMs to generate datasets for future fine-tuning. This is especially useful when you're using a LLM to generate data for a specific task, such as question answering, summarization, or translation.
+향후 파인튜닝을 위한 데이터셋을 생성하기 위해 LLM의 입력과 출력을 추적하는 것이 유용합니다. 이는 특히 질문 답변, 요약, 번역과 같은 특정 작업을 위한 데이터를 생성할 때 LLM을 사용하는 경우에 유용합니다.
 
 ## Installation and Setup
 
@@ -23,15 +21,15 @@ It's useful to keep track of the inputs and outputs of your LLMs to generate dat
 
 ### Getting API Credentials
 
-To get the Argilla API credentials, follow the next steps:
+Argilla API 자격 증명을 얻으려면 다음 단계를 따르세요:
 
-1. Go to your Argilla UI.
-2. Click on your profile picture and go to "My settings".
-3. Then copy the API Key.
+1. Argilla UI로 이동합니다.
+2. 프로필 사진을 클릭하고 "My settings"로 이동합니다.
+3. API Key를 복사합니다.
 
-In Argilla the API URL will be the same as the URL of your Argilla UI.
+Argilla에서 API URL은 Argilla UI의 URL과 동일합니다.
 
-To get the OpenAI API credentials, please visit [platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
+OpenAI API 자격 증명을 얻으려면 [platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)를 방문하세요.
 
 ```python
 import os
@@ -44,7 +42,7 @@ os.environ["OPENAI_API_KEY"] = "..."
 
 ### Setup Argilla
 
-To use the `ArgillaCallbackHandler` we will need to create a new `FeedbackDataset` in Argilla to keep track of your LLM experiments. To do so, please use the following code:
+`ArgillaCallbackHandler`를 사용하려면 LLM 실험을 추적하기 위한 새로운 `FeedbackDataset`을 Argilla에 생성해야 합니다. 이를 위해 다음 코드를 사용하세요:
 
 ```python
 import argilla as rg
@@ -90,11 +88,11 @@ rg.init(
 dataset.push_to_argilla("langchain-dataset")
 ```
 
-> 📌 NOTE: at the moment, just the prompt-response pairs are supported as `FeedbackDataset.fields`, so the `ArgillaCallbackHandler` will just track the prompt i.e. the LLM input, and the response i.e. the LLM output.
+> 📌 참고: 현재 `FeedbackDataset.fields`로는 프롬프트-응답 쌍만 지원되므로, `ArgillaCallbackHandler`는 프롬프트(즉, LLM 입력)와 응답(즉, LLM 출력)만 추적합니다.
 
 ## Tracking
 
-To use the `ArgillaCallbackHandler` you can either use the following code, or just reproduce one of the examples presented in the following sections.
+`ArgillaCallbackHandler`를 사용하려면 다음 코드를 사용하거나 다음 섹션에 제시된 예제 중 하나를 재현할 수 있습니다.
 
 ```python
 from langchain_community.callbacks.argilla_callback import ArgillaCallbackHandler
@@ -108,7 +106,7 @@ argilla_callback = ArgillaCallbackHandler(
 
 ### Scenario 1: Tracking an LLM
 
-First, let's just run a single LLM a few times and capture the resulting prompt-response pairs in Argilla.
+먼저 단일 LLM을 몇 번 실행하고 결과 프롬프트-응답 쌍을 Argilla에 캡처해 보겠습니다.
 
 ```python
 from langchain_core.callbacks.stdout import StdOutCallbackHandler
@@ -133,7 +131,7 @@ LLMResult(generations=[[Generation(text='\n\nQ: What did the fish say when he hi
 
 ### Scenario 2: Tracking an LLM in a chain
 
-Then we can create a chain using a prompt template, and then track the initial prompt and the final response in Argilla.
+그런 다음 프롬프트 템플릿을 사용하여 체인을 생성하고 초기 프롬프트와 최종 응답을 Argilla에서 추적할 수 있습니다.
 
 ```python
 from langchain.chains import LLMChain
@@ -177,9 +175,9 @@ Playwright: This is a synopsis for the above play:
 
 ### Scenario 3: Using an Agent with Tools
 
-Finally, as a more advanced workflow, you can create an agent that uses some tools. So that `ArgillaCallbackHandler` will keep track of the input and the output, but not about the intermediate steps/thoughts, so that given a prompt we log the original prompt and the final response to that given prompt.
+마지막으로 보다 고급 워크플로로서 일부 도구를 사용하는 에이전트를 생성할 수 있습니다. `ArgillaCallbackHandler`는 중간 단계/사고는 추적하지 않고 입력과 출력만 추적하므로, 주어진 프롬프트에 대해 원래 프롬프트와 최종 응답을 로깅합니다.
 
-> Note that for this scenario we'll be using Google Search API (Serp API) so you will need to both install `google-search-results` as `pip install google-search-results`, and to set the Serp API Key as `os.environ["SERPAPI_API_KEY"] = "..."` (you can find it at [serpapi.com/dashboard](https://serpapi.com/dashboard)), otherwise the example below won't work.
+> 참고: 이 시나리오에서는 Google Search API(Serp API)를 사용하므로 `google-search-results`를 `pip install google-search-results`로 설치하고 Serp API Key를 `os.environ["SERPAPI_API_KEY"] = "..."`로 설정해야 합니다([serpapi.com/dashboard](https://serpapi.com/dashboard)에서 찾을 수 있음). 그렇지 않으면 아래 예제가 작동하지 않습니다.
 
 ```python
 from langchain.agents import AgentType, initialize_agent, load_tools
