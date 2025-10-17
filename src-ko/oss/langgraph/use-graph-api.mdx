@@ -1,6 +1,6 @@
 ---
-title: Use the graph API
-sidebarTitle: Use the graph API
+title: Graph API 사용하기
+sidebarTitle: Graph API 사용하기
 ---
 
 import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
@@ -9,12 +9,12 @@ import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
 import ChatModelTabs from '/snippets/chat-model-tabs.mdx';
 
-This guide demonstrates the basics of LangGraph's Graph API. It walks through [state](#define-and-update-state), as well as composing common graph structures such as [sequences](#create-a-sequence-of-steps), [branches](#create-branches), and [loops](#create-and-control-loops). It also covers LangGraph's control features, including the [Send API](#map-reduce-and-the-send-api) for map-reduce workflows and the [Command API](#combine-control-flow-and-state-updates-with-command) for combining state updates with "hops" across nodes.
+이 가이드는 LangGraph의 Graph API 기초를 설명합니다. [상태(state)](#define-and-update-state)와 함께 [순차 구조(sequences)](#create-a-sequence-of-steps), [분기(branches)](#create-branches), [루프(loops)](#create-and-control-loops)와 같은 일반적인 그래프 구조를 구성하는 방법을 다룹니다. 또한 map-reduce 워크플로우를 위한 [Send API](#map-reduce-and-the-send-api)와 노드 간 "이동"과 상태 업데이트를 결합하는 [Command API](#combine-control-flow-and-state-updates-with-command)를 포함한 LangGraph의 제어 기능도 다룹니다.
 
-## Setup
+## 설정
 
 :::python
-Install `langgraph`:
+`langgraph` 설치:
 
 <CodeGroup>
 ```bash pip
@@ -28,7 +28,7 @@ uv add langgraph
 :::
 
 :::js
-Install `langgraph`:
+`langgraph` 설치:
 
 ```bash
 npm install @langchain/langgraph
@@ -36,30 +36,30 @@ npm install @langchain/langgraph
 :::
 
 <Tip>
-**Set up LangSmith for better debugging**
-Sign up for [LangSmith](https://smith.langchain.com) to quickly spot issues and improve the performance of your LangGraph projects. LangSmith lets you use trace data to debug, test, and monitor your LLM apps built with LangGraph — read more about how to get started in the [docs](https://docs.smith.langchain.com).
+**더 나은 디버깅을 위한 LangSmith 설정**
+[LangSmith](https://smith.langchain.com)에 가입하여 LangGraph 프로젝트의 문제를 빠르게 발견하고 성능을 개선하세요. LangSmith를 사용하면 추적 데이터를 활용하여 LangGraph로 구축한 LLM 앱을 디버그, 테스트, 모니터링할 수 있습니다. 시작 방법에 대한 자세한 내용은 [문서](https://docs.smith.langchain.com)를 참조하세요.
 </Tip>
 
-## Define and update state
+## 상태 정의 및 업데이트
 
-Here we show how to define and update [state](/oss/langgraph/graph-api#state) in LangGraph. We will demonstrate:
+여기서는 LangGraph에서 [상태(state)](/oss/langgraph/graph-api#state)를 정의하고 업데이트하는 방법을 보여드립니다. 다음 내용을 다룹니다:
 
-1. How to use state to define a graph's [schema](/oss/langgraph/graph-api#schema)
-2. How to use [reducers](/oss/langgraph/graph-api#reducers) to control how state updates are processed.
+1. 상태를 사용하여 그래프의 [스키마(schema)](/oss/langgraph/graph-api#schema)를 정의하는 방법
+2. [리듀서(reducers)](/oss/langgraph/graph-api#reducers)를 사용하여 상태 업데이트 처리 방식을 제어하는 방법
 
-### Define state
+### 상태 정의
 
 :::python
-[State](/oss/langgraph/graph-api#state) in LangGraph can be a `TypedDict`, `Pydantic` model, or dataclass. Below we will use `TypedDict`. See [this section](#use-pydantic-models-for-graph-state) for detail on using Pydantic.
+LangGraph의 [상태(State)](/oss/langgraph/graph-api#state)는 `TypedDict`, `Pydantic` 모델 또는 dataclass가 될 수 있습니다. 아래에서는 `TypedDict`를 사용합니다. Pydantic 사용에 대한 자세한 내용은 [이 섹션](#use-pydantic-models-for-graph-state)을 참조하세요.
 :::
 
 :::js
-[State](/oss/langgraph/graph-api#state) in LangGraph can be defined using Zod schemas. Below we will use Zod. See [this section](#alternative-state-definitions) for detail on using alternative approaches.
+LangGraph의 [상태(State)](/oss/langgraph/graph-api#state)는 Zod 스키마를 사용하여 정의할 수 있습니다. 아래에서는 Zod를 사용합니다. 대체 접근 방식에 대한 자세한 내용은 [이 섹션](#alternative-state-definitions)을 참조하세요.
 :::
 
-By default, graphs will have the same input and output schema, and the state determines that schema. See [this section](#define-input-and-output-schemas) for how to define distinct input and output schemas.
+기본적으로 그래프는 동일한 입력 및 출력 스키마를 가지며, 상태가 해당 스키마를 결정합니다. 별도의 입력 및 출력 스키마를 정의하는 방법은 [이 섹션](#define-input-and-output-schemas)을 참조하세요.
 
-Let's consider a simple example using [messages](/oss/langgraph/graph-api#messagesstate). This represents a versatile formulation of state for many LLM applications. See our [concepts page](/oss/langgraph/graph-api#working-with-messages-in-graph-state) for more detail.
+[메시지(messages)](/oss/langgraph/graph-api#messagesstate)를 사용하는 간단한 예제를 살펴보겠습니다. 이는 많은 LLM 애플리케이션에서 다용도로 활용되는 상태 형식입니다. 자세한 내용은 [개념 페이지](/oss/langgraph/graph-api#working-with-messages-in-graph-state)를 참조하세요.
 
 :::python
 ```python
@@ -71,7 +71,7 @@ class State(TypedDict):
     extra_field: int
 ```
 
-This state tracks a list of [message](https://python.langchain.com/docs/concepts/messages/) objects, as well as an extra integer field.
+이 상태는 [메시지(message)](https://python.langchain.com/docs/concepts/messages/) 객체 목록과 추가 정수 필드를 추적합니다.
 :::
 
 :::js
@@ -87,13 +87,13 @@ const State = z.object({
 });
 ```
 
-This state tracks a list of [message](https://js.langchain.com/docs/concepts/messages/) objects, as well as an extra integer field.
+이 상태는 [메시지(message)](https://js.langchain.com/docs/concepts/messages/) 객체 목록과 추가 정수 필드를 추적합니다.
 :::
 
-### Update state
+### 상태 업데이트
 
 :::python
-Let's build an example graph with a single node. Our [node](/oss/langgraph/graph-api#nodes) is just a Python function that reads our graph's state and makes updates to it. The first argument to this function will always be the state:
+단일 노드를 가진 예제 그래프를 구축해보겠습니다. [노드(node)](/oss/langgraph/graph-api#nodes)는 그래프의 상태를 읽고 업데이트하는 Python 함수입니다. 이 함수의 첫 번째 인수는 항상 상태입니다:
 
 ```python
 from langchain.messages import AIMessage
@@ -104,11 +104,11 @@ def node(state: State):
     return {"messages": messages + [new_message], "extra_field": 10}
 ```
 
-This node simply appends a message to our message list, and populates an extra field.
+이 노드는 단순히 메시지 목록에 메시지를 추가하고 추가 필드를 채웁니다.
 :::
 
 :::js
-Let's build an example graph with a single node. Our [node](/oss/langgraph/graph-api#nodes) is just a TypeScript function that reads our graph's state and makes updates to it. The first argument to this function will always be the state:
+단일 노드를 가진 예제 그래프를 구축해보겠습니다. [노드(node)](/oss/langgraph/graph-api#nodes)는 그래프의 상태를 읽고 업데이트하는 TypeScript 함수입니다. 이 함수의 첫 번째 인수는 항상 상태입니다:
 
 ```typescript
 import { AIMessage } from "@langchain/core/messages";
@@ -120,15 +120,15 @@ const node = (state: z.infer<typeof State>) => {
 };
 ```
 
-This node simply appends a message to our message list, and populates an extra field.
+이 노드는 단순히 메시지 목록에 메시지를 추가하고 추가 필드를 채웁니다.
 :::
 
 <Warning>
-Nodes should return updates to the state directly, instead of mutating the state.
+노드는 상태를 변경하는 대신 상태 업데이트를 직접 반환해야 합니다.
 </Warning>
 
 :::python
-Let's next define a simple graph containing this node. We use [StateGraph](/oss/langgraph/graph-api#stategraph) to define a graph that operates on this state. We then use [add_node](/oss/langgraph/graph-api#nodes) populate our graph.
+이제 이 노드를 포함하는 간단한 그래프를 정의해보겠습니다. 이 상태에서 작동하는 그래프를 정의하기 위해 [StateGraph](/oss/langgraph/graph-api#stategraph)를 사용합니다. 그런 다음 [add_node](/oss/langgraph/graph-api#nodes)를 사용하여 그래프를 채웁니다.
 
 ```python
 from langgraph.graph import StateGraph
@@ -141,7 +141,7 @@ graph = builder.compile()
 :::
 
 :::js
-Let's next define a simple graph containing this node. We use [StateGraph](/oss/langgraph/graph-api#stategraph) to define a graph that operates on this state. We then use [addNode](/oss/langgraph/graph-api#nodes) populate our graph.
+이제 이 노드를 포함하는 간단한 그래프를 정의해보겠습니다. 이 상태에서 작동하는 그래프를 정의하기 위해 [StateGraph](/oss/langgraph/graph-api#stategraph)를 사용합니다. 그런 다음 [addNode](/oss/langgraph/graph-api#nodes)를 사용하여 그래프를 채웁니다.
 
 ```typescript
 import { StateGraph } from "@langchain/langgraph";
@@ -153,7 +153,7 @@ const graph = new StateGraph(State)
 ```
 :::
 
-LangGraph provides built-in utilities for visualizing your graph. Let's inspect our graph. See [this section](#visualize-your-graph) for detail on visualization.
+LangGraph는 그래프를 시각화하기 위한 내장 유틸리티를 제공합니다. 그래프를 검사해보겠습니다. 시각화에 대한 자세한 내용은 [이 섹션](#visualize-your-graph)을 참조하세요.
 
 :::python
 ```python
@@ -177,7 +177,7 @@ await fs.writeFile("graph.png", imageBuffer);
 ```
 :::
 
-In this case, our graph just executes a single node. Let's proceed with a simple invocation:
+이 경우 그래프는 단일 노드만 실행합니다. 간단한 호출을 진행해보겠습니다:
 
 :::python
 ```python
@@ -205,13 +205,13 @@ console.log(result);
 ```
 :::
 
-Note that:
+다음 사항에 유의하세요:
 
-* We kicked off invocation by updating a single key of the state.
-* We receive the entire state in the invocation result.
+* 상태의 단일 키를 업데이트하여 호출을 시작했습니다.
+* 호출 결과에서 전체 상태를 받습니다.
 
 :::python
-For convenience, we frequently inspect the content of [message objects](https://python.langchain.com/docs/concepts/messages/) via pretty-print:
+편의를 위해 pretty-print를 통해 [메시지 객체](https://python.langchain.com/docs/concepts/messages/)의 내용을 자주 검사합니다:
 
 ```python
 for message in result["messages"]:
@@ -229,7 +229,7 @@ Hello!
 :::
 
 :::js
-For convenience, we frequently inspect the content of [message objects](https://js.langchain.com/docs/concepts/messages/) via logging:
+편의를 위해 로깅을 통해 [메시지 객체](https://js.langchain.com/docs/concepts/messages/)의 내용을 자주 검사합니다:
 
 ```typescript
 for (const message of result.messages) {
@@ -243,14 +243,14 @@ ai: Hello!
 ```
 :::
 
-### Process state updates with reducers
+### 리듀서로 상태 업데이트 처리하기
 
-Each key in the state can have its own independent [reducer](/oss/langgraph/graph-api#reducers) function, which controls how updates from nodes are applied. If no reducer function is explicitly specified then it is assumed that all updates to the key should override it.
+상태의 각 키는 자체적인 독립적인 [리듀서(reducer)](/oss/langgraph/graph-api#reducers) 함수를 가질 수 있으며, 이는 노드로부터의 업데이트가 적용되는 방식을 제어합니다. 리듀서 함수가 명시적으로 지정되지 않으면 해당 키에 대한 모든 업데이트가 기존 값을 덮어쓴다고 가정합니다.
 
 :::python
-For `TypedDict` state schemas, we can define reducers by annotating the corresponding field of the state with a reducer function.
+`TypedDict` 상태 스키마의 경우, 상태의 해당 필드에 리듀서 함수를 어노테이션하여 리듀서를 정의할 수 있습니다.
 
-In the earlier example, our node updated the `"messages"` key in the state by appending a message to it. Below, we add a reducer to this key, such that updates are automatically appended:
+이전 예제에서 노드는 상태의 `"messages"` 키에 메시지를 추가하여 업데이트했습니다. 아래에서는 이 키에 리듀서를 추가하여 업데이트가 자동으로 추가되도록 합니다:
 
 ```python
 from typing_extensions import Annotated
@@ -264,7 +264,7 @@ class State(TypedDict):
     extra_field: int
 ```
 
-Now our node can be simplified:
+이제 노드를 단순화할 수 있습니다:
 
 ```python
 def node(state: State):
@@ -274,9 +274,9 @@ def node(state: State):
 :::
 
 :::js
-For Zod state schemas, we can define reducers by using the special `.langgraph.reducer()` method on the schema field.
+Zod 상태 스키마의 경우, 스키마 필드에 특수한 `.langgraph.reducer()` 메서드를 사용하여 리듀서를 정의할 수 있습니다.
 
-In the earlier example, our node updated the `"messages"` key in the state by appending a message to it. Below, we add a reducer to this key, such that updates are automatically appended:
+이전 예제에서 노드는 상태의 `"messages"` 키에 메시지를 추가하여 업데이트했습니다. 아래에서는 이 키에 리듀서를 추가하여 업데이트가 자동으로 추가되도록 합니다:
 
 ```typescript
 import "@langchain/langgraph/zod";
@@ -287,7 +287,7 @@ const State = z.object({
 });
 ```
 
-Now our node can be simplified:
+이제 노드를 단순화할 수 있습니다:
 
 ```typescript
 const node = (state: z.infer<typeof State>) => {
@@ -343,13 +343,13 @@ ai: Hello!
 
 #### MessagesState
 
-In practice, there are additional considerations for updating lists of messages:
+실제로 메시지 목록을 업데이트할 때 추가로 고려해야 할 사항이 있습니다:
 
-* We may wish to update an existing message in the state.
-* We may want to accept short-hands for [message formats](/oss/langgraph/graph-api#using-messages-in-your-graph), such as [OpenAI format](https://python.langchain.com/docs/concepts/messages/#openai-format).
+* 상태의 기존 메시지를 업데이트하고 싶을 수 있습니다.
+* [OpenAI 형식](https://python.langchain.com/docs/concepts/messages/#openai-format)과 같은 [메시지 형식](/oss/langgraph/graph-api#using-messages-in-your-graph)의 단축 표기를 허용하고 싶을 수 있습니다.
 
 :::python
-LangGraph includes a built-in reducer `add_messages` that handles these considerations:
+LangGraph는 이러한 고려 사항을 처리하는 내장 리듀서 `add_messages`를 포함합니다:
 
 ```python
 from langgraph.graph.message import add_messages
@@ -383,7 +383,7 @@ Hi
 Hello!
 ```
 
-This is a versatile representation of state for applications involving [chat models](https://python.langchain.com/docs/concepts/chat_models/). LangGraph includes a pre-built `MessagesState` for convenience, so that we can have:
+이는 [채팅 모델](https://python.langchain.com/docs/concepts/chat_models/)을 사용하는 애플리케이션에서 다용도로 활용되는 상태 표현입니다. LangGraph는 편의를 위해 사전 구축된 `MessagesState`를 포함하므로 다음과 같이 사용할 수 있습니다:
 
 ```python
 from langgraph.graph import MessagesState
@@ -394,7 +394,7 @@ class State(MessagesState):
 :::
 
 :::js
-LangGraph includes a built-in `MessagesZodMeta` that handles these considerations:
+LangGraph는 이러한 고려 사항을 처리하는 내장 `MessagesZodMeta`를 포함합니다:
 
 ```typescript
 import { MessagesZodMeta } from "@langchain/langgraph";
@@ -432,7 +432,7 @@ human: Hi
 ai: Hello!
 ```
 
-This is a versatile representation of state for applications involving [chat models](https://js.langchain.com/docs/concepts/chat_models/). LangGraph includes this pre-built `MessagesZodMeta` for convenience, so that we can have:
+이는 [채팅 모델](https://js.langchain.com/docs/concepts/chat_models/)을 사용하는 애플리케이션에서 다용도로 활용되는 상태 표현입니다. LangGraph는 편의를 위해 사전 구축된 `MessagesZodMeta`를 포함하므로 다음과 같이 사용할 수 있습니다:
 
 ```typescript
 import { MessagesZodMeta } from "@langchain/langgraph";
@@ -448,13 +448,13 @@ const State = z.object({
 ```
 :::
 
-### Define input and output schemas
+### 입력 및 출력 스키마 정의
 
-By default, `StateGraph` operates with a single schema, and all nodes are expected to communicate using that schema. However, it's also possible to define distinct input and output schemas for a graph.
+기본적으로 `StateGraph`는 단일 스키마로 작동하며, 모든 노드는 해당 스키마를 사용하여 통신할 것으로 예상됩니다. 그러나 그래프에 대해 별도의 입력 및 출력 스키마를 정의하는 것도 가능합니다.
 
-When distinct schemas are specified, an internal schema will still be used for communication between nodes. The input schema ensures that the provided input matches the expected structure, while the output schema filters the internal data to return only the relevant information according to the defined output schema.
+별도의 스키마가 지정되면 노드 간 통신을 위해 내부 스키마가 여전히 사용됩니다. 입력 스키마는 제공된 입력이 예상되는 구조와 일치하는지 확인하고, 출력 스키마는 정의된 출력 스키마에 따라 관련 정보만 반환하도록 내부 데이터를 필터링합니다.
 
-Below, we'll see how to define distinct input and output schema.
+아래에서는 별도의 입력 및 출력 스키마를 정의하는 방법을 살펴보겠습니다.
 
 :::python
 ```python
@@ -535,13 +535,13 @@ console.log(await graph.invoke({ question: "hi" }));
 ```
 :::
 
-Notice that the output of invoke only includes the output schema.
+invoke의 출력에는 출력 스키마만 포함된다는 점에 유의하세요.
 
-### Pass private state between nodes
+### 노드 간 비공개 상태 전달
 
-In some cases, you may want nodes to exchange information that is crucial for intermediate logic but doesn't need to be part of the main schema of the graph. This private data is not relevant to the overall input/output of the graph and should only be shared between certain nodes.
+경우에 따라 노드가 중간 로직에 중요하지만 그래프의 주요 스키마에 포함될 필요가 없는 정보를 교환하기를 원할 수 있습니다. 이러한 비공개 데이터는 그래프의 전체 입력/출력과 관련이 없으며 특정 노드 간에만 공유되어야 합니다.
 
-Below, we'll create an example sequential graph consisting of three nodes (node_1, node_2 and node_3), where private data is passed between the first two steps (node_1 and node_2), while the third step (node_3) only has access to the public overall state.
+아래에서는 세 개의 노드(node_1, node_2, node_3)로 구성된 순차 그래프 예제를 생성합니다. 여기서 비공개 데이터는 첫 두 단계(node_1과 node_2) 사이에 전달되고, 세 번째 단계(node_3)는 공개 전체 상태에만 접근할 수 있습니다.
 
 :::python
 ```python
@@ -689,20 +689,20 @@ Output of graph invocation: {"a":"set by node3"}
 :::
 
 :::python
-### Use Pydantic models for graph state
+### 그래프 상태에 Pydantic 모델 사용
 
-A [StateGraph](https://langchain-ai.github.io/langgraph/reference/graphs.md#langgraph.graph.StateGraph) accepts a `state_schema` argument on initialization that specifies the "shape" of the state that the nodes in the graph can access and update.
+[StateGraph](https://langchain-ai.github.io/langgraph/reference/graphs.md#langgraph.graph.StateGraph)는 초기화 시 그래프의 노드가 액세스하고 업데이트할 수 있는 상태의 "형태"를 지정하는 `state_schema` 인수를 받습니다.
 
-In our examples, we typically use a python-native `TypedDict` or [`dataclass`](https://docs.python.org/3/library/dataclasses.html) for `state_schema`, but `state_schema` can be any [type](https://docs.python.org/3/library/stdtypes.html#type-objects).
+예제에서는 일반적으로 `state_schema`에 Python 네이티브 `TypedDict` 또는 [`dataclass`](https://docs.python.org/3/library/dataclasses.html)를 사용하지만, `state_schema`는 모든 [타입](https://docs.python.org/3/library/stdtypes.html#type-objects)이 될 수 있습니다.
 
-Here, we'll see how a [Pydantic BaseModel](https://docs.pydantic.dev/latest/api/base_model/) can be used for `state_schema` to add run-time validation on **inputs**.
+여기서는 [Pydantic BaseModel](https://docs.pydantic.dev/latest/api/base_model/)을 `state_schema`에 사용하여 **입력**에 대한 런타임 검증을 추가하는 방법을 살펴보겠습니다.
 
 <Note>
-**Known Limitations**
-* Currently, the output of the graph will **NOT** be an instance of a pydantic model.
-* Run-time validation only occurs on inputs into nodes, not on the outputs.
-* The validation error trace from pydantic does not show which node the error arises in.
-* Pydantic's recursive validation can be slow. For performance-sensitive applications, you may want to consider using a `dataclass` instead.
+**알려진 제한사항**
+* 현재 그래프의 출력은 Pydantic 모델의 인스턴스가 **아닙니다**.
+* 런타임 검증은 노드로의 입력에만 발생하며 출력에는 발생하지 않습니다.
+* Pydantic의 검증 오류 추적은 오류가 발생한 노드를 표시하지 않습니다.
+* Pydantic의 재귀적 검증은 느릴 수 있습니다. 성능에 민감한 애플리케이션의 경우 `dataclass` 사용을 고려할 수 있습니다.
 </Note>
 
 ```python
@@ -728,7 +728,7 @@ graph = builder.compile()
 graph.invoke({"a": "hello"})
 ```
 
-Invoke the graph with an **invalid** input
+**유효하지 않은** 입력으로 그래프 호출
 
 ```python
 try:
@@ -746,16 +746,16 @@ a
     For further information visit https://errors.pydantic.dev/2.9/v/string_type
 ```
 
-See below for additional features of Pydantic model state:
+Pydantic 모델 상태의 추가 기능은 아래를 참조하세요:
 
-<Accordion title="Serialization Behavior">
-  When using Pydantic models as state schemas, it's important to understand how serialization works, especially when:
+<Accordion title="직렬화 동작">
+  Pydantic 모델을 상태 스키마로 사용할 때는 직렬화가 작동하는 방식을 이해하는 것이 중요합니다. 특히 다음의 경우에 그렇습니다:
 
-  * Passing Pydantic objects as inputs
-  * Receiving outputs from the graph
-  * Working with nested Pydantic models
+  * Pydantic 객체를 입력으로 전달할 때
+  * 그래프에서 출력을 받을 때
+  * 중첩된 Pydantic 모델을 작업할 때
 
-  Let's see these behaviors in action.
+  이러한 동작을 실제로 살펴보겠습니다.
 
   ```python
   from langgraph.graph import StateGraph, START, END
@@ -899,17 +899,17 @@ const workflowWithChannels = new StateGraph<WorkflowChannelsState>({
 ```
 :::
 
-## Add runtime configuration
+## 런타임 구성 추가
 
-Sometimes you want to be able to configure your graph when calling it. For example, you might want to be able to specify what LLM or system prompt to use at runtime, _without polluting the graph state with these parameters_.
+때때로 그래프를 호출할 때 그래프를 구성하고 싶을 수 있습니다. 예를 들어, _이러한 매개변수로 그래프 상태를 오염시키지 않고_ 런타임에 사용할 LLM이나 시스템 프롬프트를 지정하고 싶을 수 있습니다.
 
-To add runtime configuration:
+런타임 구성을 추가하려면:
 
-1. Specify a schema for your configuration
-2. Add the configuration to the function signature for nodes or conditional edges
-3. Pass the configuration into the graph.
+1. 구성에 대한 스키마를 지정합니다
+2. 노드 또는 조건부 엣지의 함수 시그니처에 구성을 추가합니다
+3. 그래프에 구성을 전달합니다.
 
-See below for a simple example:
+간단한 예제는 아래를 참조하세요:
 
 :::python
 ```python
@@ -991,9 +991,9 @@ console.log(await graph.invoke({}, { context: { myRuntimeValue: "b" } }));  // [
 ```
 :::
 
-<Accordion title="Extended example: specifying LLM at runtime">
+<Accordion title="확장 예제: 런타임에 LLM 지정하기">
   :::python
-  Below we demonstrate a practical example in which we configure what LLM to use at runtime. We will use both OpenAI and Anthropic models.
+  아래에서는 런타임에 사용할 LLM을 구성하는 실용적인 예제를 보여줍니다. OpenAI와 Anthropic 모델을 모두 사용합니다.
 
   ```python
   from dataclasses import dataclass
@@ -1224,12 +1224,12 @@ console.log(await graph.invoke({}, { context: { myRuntimeValue: "b" } }));  // [
   :::
 </Accordion>
 
-## Add retry policies
+## 재시도 정책 추가
 
-There are many use cases where you may wish for your node to have a custom retry policy, for example if you are calling an API, querying a database, or calling an LLM, etc. LangGraph lets you add retry policies to nodes.
+API 호출, 데이터베이스 쿼리, LLM 호출 등 노드에 커스텀 재시도 정책을 적용하고 싶은 많은 사용 사례가 있습니다. LangGraph를 사용하면 노드에 재시도 정책을 추가할 수 있습니다.
 
 :::python
-To configure a retry policy, pass the `retry_policy` parameter to the [add_node](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.StateGraph.add_node). The `retry_policy` parameter takes in a `RetryPolicy` named tuple object. Below we instantiate a `RetryPolicy` object with the default parameters and associate it with a node:
+재시도 정책을 구성하려면 [add_node](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.StateGraph.add_node)에 `retry_policy` 매개변수를 전달합니다. `retry_policy` 매개변수는 `RetryPolicy` 네임드 튜플 객체를 받습니다. 아래에서는 기본 매개변수로 `RetryPolicy` 객체를 인스턴스화하고 노드와 연결합니다:
 
 ```python
 from langgraph.types import RetryPolicy
@@ -1375,11 +1375,11 @@ By default, the retry policy retries on any exception except for the following:
 </Accordion>
 
 :::python
-## Add node caching
+## 노드 캐싱 추가
 
-Node caching is useful in cases where you want to avoid repeating operations, like when doing something expensive (either in terms of time or cost). LangGraph lets you add individualized caching policies to nodes in a graph.
+노드 캐싱은 시간이나 비용 측면에서 비용이 많이 드는 작업을 수행할 때와 같이 반복 작업을 피하고 싶을 때 유용합니다. LangGraph를 사용하면 그래프의 노드에 개별화된 캐싱 정책을 추가할 수 있습니다.
 
-To configure a cache policy, pass the `cache_policy` parameter to the [add_node](https://langchain-ai.github.io/langgraph/reference/graphs.md#langgraph.graph.state.StateGraph.add_node) function. In the following example, a [`CachePolicy`](https://langchain-ai.github.io/langgraph/reference/types/?h=cachepolicy#langgraph.types.CachePolicy) object is instantiated with a time to live of 120 seconds and the default `key_func` generator. Then it is associated with a node:
+캐시 정책을 구성하려면 [add_node](https://langchain-ai.github.io/langgraph/reference/graphs.md#langgraph.graph.state.StateGraph.add_node) 함수에 `cache_policy` 매개변수를 전달합니다. 다음 예제에서는 [`CachePolicy`](https://langchain-ai.github.io/langgraph/reference/types/?h=cachepolicy#langgraph.types.CachePolicy) 객체가 120초의 유효 시간(TTL)과 기본 `key_func` 생성기로 인스턴스화됩니다. 그런 다음 노드와 연결됩니다:
 
 ```python
 from langgraph.types import CachePolicy
@@ -1391,7 +1391,7 @@ builder.add_node(
 )
 ```
 
-Then, to enable node-level caching for a graph, set the `cache` argument when compiling the graph. The example below uses `InMemoryCache` to set up a graph with in-memory cache, but `SqliteCache` is also available.
+그런 다음 그래프에 대한 노드 수준 캐싱을 활성화하려면 그래프를 컴파일할 때 `cache` 인수를 설정합니다. 아래 예제는 `InMemoryCache`를 사용하여 인메모리 캐시로 그래프를 설정하지만, `SqliteCache`도 사용할 수 있습니다.
 
 ```python
 from langgraph.cache.memory import InMemoryCache
@@ -1400,20 +1400,20 @@ graph = builder.compile(cache=InMemoryCache())
 ```
 :::
 
-## Create a sequence of steps
+## 단계 시퀀스 생성
 
 <Info>
-**Prerequisites**
-This guide assumes familiarity with the above section on [state](#define-and-update-state).
+**전제 조건**
+이 가이드는 위의 [상태](#define-and-update-state) 섹션에 익숙하다고 가정합니다.
 </Info>
 
-Here we demonstrate how to construct a simple sequence of steps. We will show:
+여기서는 간단한 단계 시퀀스를 구성하는 방법을 보여줍니다. 다음 내용을 다룹니다:
 
-1. How to build a sequential graph
-2. Built-in short-hand for constructing similar graphs.
+1. 순차 그래프를 구축하는 방법
+2. 유사한 그래프를 구성하기 위한 내장 단축 표기법
 
 :::python
-To add a sequence of nodes, we use the `.add_node` and `.add_edge` methods of our [graph](/oss/langgraph/graph-api#stategraph):
+노드 시퀀스를 추가하려면 [그래프](/oss/langgraph/graph-api#stategraph)의 `.add_node` 및 `.add_edge` 메서드를 사용합니다:
 
 ```python
 from langgraph.graph import START, StateGraph
@@ -1431,7 +1431,7 @@ builder.add_edge("step_1", "step_2")
 builder.add_edge("step_2", "step_3")
 ```
 
-We can also use the built-in shorthand `.add_sequence`:
+내장 단축 표기법 `.add_sequence`를 사용할 수도 있습니다:
 
 ```python
 builder = StateGraph(State).add_sequence([step_1, step_2, step_3])
@@ -1440,7 +1440,7 @@ builder.add_edge(START, "step_1")
 :::
 
 :::js
-To add a sequence of nodes, we use the `.addNode` and `.addEdge` methods of our [graph](/oss/langgraph/graph-api#stategraph):
+노드 시퀀스를 추가하려면 [그래프](/oss/langgraph/graph-api#stategraph)의 `.addNode` 및 `.addEdge` 메서드를 사용합니다:
 
 ```typescript
 import { START, StateGraph } from "@langchain/langgraph";
@@ -1695,13 +1695,13 @@ graph.invoke({"value_1": "c"})
 
 </Accordion>
 
-## Create branches
+## 분기 생성
 
-Parallel execution of nodes is essential to speed up overall graph operation. LangGraph offers native support for parallel execution of nodes, which can significantly enhance the performance of graph-based workflows. This parallelization is achieved through fan-out and fan-in mechanisms, utilizing both standard edges and [conditional_edges](https://langchain-ai.github.io/langgraph/reference/graphs.md#langgraph.graph.MessageGraph.add_conditional_edges). Below are some examples showing how to add create branching dataflows that work for you.
+노드의 병렬 실행은 전체 그래프 작업 속도를 높이는 데 필수적입니다. LangGraph는 노드의 병렬 실행을 기본적으로 지원하며, 이는 그래프 기반 워크플로우의 성능을 크게 향상시킬 수 있습니다. 이러한 병렬화는 표준 엣지와 [conditional_edges](https://langchain-ai.github.io/langgraph/reference/graphs.md#langgraph.graph.MessageGraph.add_conditional_edges)를 모두 활용하여 팬아웃(fan-out) 및 팬인(fan-in) 메커니즘을 통해 달성됩니다. 아래는 사용자에게 적합한 분기 데이터 흐름을 생성하는 방법을 보여주는 몇 가지 예제입니다.
 
-### Run graph nodes in parallel
+### 그래프 노드를 병렬로 실행
 
-In this example, we fan out from `Node A` to `B and C` and then fan in to `D`. With our state, [we specify the reducer add operation](/oss/langgraph/graph-api#reducers). This will combine or accumulate values for the specific key in the State, rather than simply overwriting the existing value. For lists, this means concatenating the new list with the existing list. See the above section on [state reducers](#process-state-updates-with-reducers) for more detail on updating state with reducers.
+이 예제에서는 `Node A`에서 `B와 C`로 팬아웃한 다음 `D`로 팬인합니다. 상태에서 [리듀서 추가 연산을 지정합니다](/oss/langgraph/graph-api#reducers). 이는 기존 값을 단순히 덮어쓰는 대신 State의 특정 키에 대한 값을 결합하거나 누적합니다. 리스트의 경우 새 리스트를 기존 리스트에 연결하는 것을 의미합니다. 리듀서로 상태를 업데이트하는 방법에 대한 자세한 내용은 위의 [상태 리듀서](#process-state-updates-with-reducers) 섹션을 참조하세요.
 
 :::python
 ```python
@@ -2136,9 +2136,9 @@ return ["b", "c"];
 :::
 </Tip>
 
-## Map-Reduce and the Send API
+## Map-Reduce와 Send API
 
-LangGraph supports map-reduce and other advanced branching patterns using the Send API. Here is an example of how to use it:
+LangGraph는 Send API를 사용하여 map-reduce 및 기타 고급 분기 패턴을 지원합니다. 다음은 사용 방법의 예제입니다:
 
 :::python
 ```python
@@ -2279,19 +2279,19 @@ for await (const step of await graph.stream({ topic: "animals" })) {
 ```
 :::
 
-## Create and control loops
+## 루프 생성 및 제어
 
-When creating a graph with a loop, we require a mechanism for terminating execution. This is most commonly done by adding a [conditional edge](/oss/langgraph/graph-api#conditional-edges) that routes to the [END](/oss/langgraph/graph-api#end-node) node once we reach some termination condition.
+루프가 있는 그래프를 생성할 때는 실행을 종료하는 메커니즘이 필요합니다. 가장 일반적으로는 종료 조건에 도달하면 [END](/oss/langgraph/graph-api#end-node) 노드로 라우팅하는 [조건부 엣지](/oss/langgraph/graph-api#conditional-edges)를 추가하여 수행됩니다.
 
-You can also set the graph recursion limit when invoking or streaming the graph. The recursion limit sets the number of [supersteps](/oss/langgraph/graph-api#graphs) that the graph is allowed to execute before it raises an error. Read more about the concept of recursion limits [here](/oss/langgraph/graph-api#recursion-limit).
+그래프를 호출하거나 스트리밍할 때 그래프 재귀 제한을 설정할 수도 있습니다. 재귀 제한은 오류를 발생시키기 전에 그래프가 실행할 수 있는 [수퍼스텝](/oss/langgraph/graph-api#graphs) 수를 설정합니다. 재귀 제한 개념에 대한 자세한 내용은 [여기](/oss/langgraph/graph-api#recursion-limit)를 참조하세요.
 
-Let's consider a simple graph with a loop to better understand how these mechanisms work.
+이러한 메커니즘이 작동하는 방식을 더 잘 이해하기 위해 루프가 있는 간단한 그래프를 살펴보겠습니다.
 
 <Tip>
-To return the last value of your state instead of receiving a recursion limit error, see the [next section](#impose-a-recursion-limit).
+재귀 제한 오류를 받는 대신 상태의 마지막 값을 반환하려면 [다음 섹션](#impose-a-recursion-limit)을 참조하세요.
 </Tip>
 
-When creating a loop, you can include a conditional edge that specifies a termination condition:
+루프를 생성할 때 종료 조건을 지정하는 조건부 엣지를 포함할 수 있습니다:
 
 :::python
 ```python
@@ -2332,7 +2332,7 @@ const route = (state: z.infer<typeof State>): "b" | typeof END => {
 ```
 :::
 
-To control the recursion limit, specify `"recursionLimit"` in the config. This will raise a `GraphRecursionError`, which you can catch and handle:
+재귀 제한을 제어하려면 config에서 `"recursionLimit"`을 지정합니다. 이는 `GraphRecursionError`를 발생시키며, 이를 캐치하고 처리할 수 있습니다:
 
 :::python
 ```python
@@ -2715,19 +2715,19 @@ Recursion Error
 :::
 
 :::python
-## Async
+## 비동기(Async)
 
-Using the async programming paradigm can produce significant performance improvements when running [IO-bound](https://en.wikipedia.org/wiki/I/O_bound) code concurrently (e.g., making concurrent API requests to a chat model provider).
+비동기 프로그래밍 패러다임을 사용하면 [IO-bound](https://en.wikipedia.org/wiki/I/O_bound) 코드를 동시에 실행할 때(예: 채팅 모델 제공자에 동시 API 요청) 상당한 성능 향상을 얻을 수 있습니다.
 
-To convert a `sync` implementation of the graph to an `async` implementation, you will need to:
+그래프의 `sync` 구현을 `async` 구현으로 변환하려면 다음이 필요합니다:
 
-1. Update `nodes` use `async def` instead of `def`.
-2. Update the code inside to use `await` appropriately.
-3. Invoke the graph with `.ainvoke` or `.astream` as desired.
+1. `nodes`를 `def` 대신 `async def`를 사용하도록 업데이트합니다.
+2. 내부 코드를 적절하게 `await`를 사용하도록 업데이트합니다.
+3. 원하는 대로 `.ainvoke` 또는 `.astream`으로 그래프를 호출합니다.
 
-Because many LangChain objects implement the [Runnable Protocol](https://python.langchain.com/docs/expression_language/interface/) which has `async` variants of all the `sync` methods it's typically fairly quick to upgrade a `sync` graph to an `async` graph.
+많은 LangChain 객체가 모든 `sync` 메서드의 `async` 변형을 가진 [Runnable Protocol](https://python.langchain.com/docs/expression_language/interface/)을 구현하기 때문에 일반적으로 `sync` 그래프를 `async` 그래프로 업그레이드하는 것은 상당히 빠릅니다.
 
-See example below. To demonstrate async invocations of underlying LLMs, we will include a chat model:
+아래 예제를 참조하세요. 기본 LLM의 비동기 호출을 보여주기 위해 채팅 모델을 포함합니다:
 
 <ChatModelTabs />
 
@@ -2747,14 +2747,14 @@ result = await graph.ainvoke({"messages": [input_message]})  # [!code highlight]
 ```
 
 <Tip>
-**Async streaming**
-See the [streaming guide](/oss/langgraph/streaming) for examples of streaming with async.
+**비동기 스트리밍**
+비동기를 사용한 스트리밍 예제는 [스트리밍 가이드](/oss/langgraph/streaming)를 참조하세요.
 </Tip>
 :::
 
-## Combine control flow and state updates with `Command`
+## `Command`로 제어 흐름과 상태 업데이트 결합
 
-It can be useful to combine control flow (edges) and state updates (nodes). For example, you might want to BOTH perform state updates AND decide which node to go to next in the SAME node. LangGraph provides a way to do so by returning a [Command](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.Command) object from node functions:
+제어 흐름(엣지)과 상태 업데이트(노드)를 결합하는 것이 유용할 수 있습니다. 예를 들어, 동일한 노드에서 상태 업데이트를 수행하고 다음에 이동할 노드를 결정하고 싶을 수 있습니다. LangGraph는 노드 함수에서 [Command](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.Command) 객체를 반환하여 이를 수행할 수 있는 방법을 제공합니다:
 
 :::python
 ```python
@@ -3159,14 +3159,14 @@ You MUST include `messages` (or any state key used for the message history) in `
 
 If you are using tools that update state via `Command`, we recommend using prebuilt [`ToolNode`](https://langchain-ai.github.io/langgraph/reference/agents/#langgraph.prebuilt.tool_node.ToolNode) which automatically handles tools returning `Command` objects and propagates them to the graph state. If you're writing a custom node that calls tools, you would need to manually propagate `Command` objects returned by the tools as the update from the node.
 
-## Visualize your graph
+## 그래프 시각화
 
-Here we demonstrate how to visualize the graphs you create.
+여기서는 생성한 그래프를 시각화하는 방법을 보여줍니다.
 
-You can visualize any arbitrary [Graph](https://langchain-ai.github.io/langgraph/reference/graphs/), including [StateGraph](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.StateGraph).
+[StateGraph](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.StateGraph)를 포함한 임의의 [Graph](https://langchain-ai.github.io/langgraph/reference/graphs/)를 시각화할 수 있습니다.
 
 :::python
-Let's have some fun by drawing fractals :).
+프랙탈을 그려서 재미있게 해봅시다 :).
 
 ```python
 import random
