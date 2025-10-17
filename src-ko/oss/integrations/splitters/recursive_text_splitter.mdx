@@ -1,13 +1,13 @@
 ---
-title: Splitting recursively
+title: 재귀적 분할
 ---
 
-This [text splitter](/oss/integrations/splitters/) is the recommended one for generic text. It is parameterized by a list of characters. It tries to split on them in order until the chunks are small enough. The default list is `["\n\n", "\n", " ", ""]`. This has the effect of trying to keep all paragraphs (and then sentences, and then words) together as long as possible, as those would generically seem to be the strongest semantically related pieces of text.
+이 [텍스트 분할기](/oss/integrations/splitters/)는 일반적인 텍스트에 권장되는 방식입니다. 문자 목록을 매개변수로 받아 청크가 충분히 작아질 때까지 순서대로 분할을 시도합니다. 기본 목록은 `["\n\n", "\n", " ", ""]`입니다. 이는 문단(그 다음에는 문장, 그 다음에는 단어)을 가능한 한 함께 유지하려고 시도하는 효과를 가지며, 이러한 단위들이 일반적으로 의미상 가장 강하게 연관된 텍스트 조각으로 보이기 때문입니다.
 
-1. How the text is split: by list of characters.
-2. How the chunk size is measured: by number of characters.
+1. 텍스트 분할 방식: 문자 목록 기준
+2. 청크 크기 측정 방식: 문자 수 기준
 
-Below we show example usage.
+아래는 사용 예시입니다.
 
 :::python
 ```shell
@@ -35,9 +35,9 @@ bun add @langchain/textsplitters
 :::
 
 :::python
-To obtain the string content directly, use `.split_text`.
+문자열 콘텐츠를 직접 가져오려면 `.split_text`를 사용하세요.
 
-To create LangChain @[Document] objects (e.g., for use in downstream tasks), use `.create_documents`.
+LangChain @[Document] 객체를 생성하려면(예: 다운스트림 작업에 사용) `.create_documents`를 사용하세요.
 
 ```python
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -73,9 +73,9 @@ print(text_splitter.split_text(state_of_the_union)[:2])
 :::
 
 :::js
-To obtain the string content directly, use `.splitText`.
+문자열 콘텐츠를 직접 가져오려면 `.splitText`를 사용하세요.
 
-To create LangChain @[Document] objects (e.g., for use in downstream tasks), use `.createDocuments`.
+LangChain @[Document] 객체를 생성하려면(예: 다운스트림 작업에 사용) `.createDocuments`를 사용하세요.
 
 ```ts
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
@@ -90,27 +90,27 @@ const texts = splitter.createDocuments([{ pageContent: "..." }])
 ```
 :::
 
-Let's go through the parameters set above for `RecursiveCharacterTextSplitter`:
+`RecursiveCharacterTextSplitter`에 설정된 매개변수들을 살펴보겠습니다:
 
 :::python
-- `chunk_size`: The maximum size of a chunk, where size is determined by the `length_function`.
-- `chunk_overlap`: Target overlap between chunks. Overlapping chunks helps to mitigate loss of information when context is divided between chunks.
-- `length_function`: Function determining the chunk size.
-- `is_separator_regex`: Whether the separator list (defaulting to `["\n\n", "\n", " ", ""]`) should be interpreted as regex.
+- `chunk_size`: 청크의 최대 크기이며, 크기는 `length_function`으로 결정됩니다.
+- `chunk_overlap`: 청크 간 목표 중첩 범위입니다. 청크를 중첩시키면 컨텍스트가 청크 간에 분할될 때 정보 손실을 완화하는 데 도움이 됩니다.
+- `length_function`: 청크 크기를 결정하는 함수입니다.
+- `is_separator_regex`: 구분자 목록(기본값: `["\n\n", "\n", " ", ""]`)을 정규식으로 해석할지 여부입니다.
 :::
 
 :::js
-- `chunkSize`: The maximum size of a chunk, where size is determined by the `lengthFunction`.
-- `chunkOverlap`: Target overlap between chunks. Overlapping chunks helps to mitigate loss of information when context is divided between chunks.
+- `chunkSize`: 청크의 최대 크기이며, 크기는 `lengthFunction`으로 결정됩니다.
+- `chunkOverlap`: 청크 간 목표 중첩 범위입니다. 청크를 중첩시키면 컨텍스트가 청크 간에 분할될 때 정보 손실을 완화하는 데 도움이 됩니다.
 :::
 
-## Splitting text from languages without word boundaries
+## 단어 경계가 없는 언어의 텍스트 분할
 
-Some writing systems do not have [word boundaries](https://en.wikipedia.org/wiki/Category:Writing_systems_without_word_boundaries), for example Chinese, Japanese, and Thai. Splitting text with the default separator list of `["\n\n", "\n", " ", ""]` can cause words to be split between chunks. To keep words together, you can override the list of separators to include additional punctuation:
+일부 문자 체계는 중국어, 일본어, 태국어처럼 [단어 경계](https://en.wikipedia.org/wiki/Category:Writing_systems_without_word_boundaries)가 없습니다. 기본 구분자 목록 `["\n\n", "\n", " ", ""]`로 텍스트를 분할하면 단어가 청크 사이에서 분할될 수 있습니다. 단어를 함께 유지하려면 구분자 목록을 재정의하여 추가 구두점을 포함할 수 있습니다:
 
-* Add ASCII full-stop "`.`", [Unicode fullwidth](https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)) full stop "`．`" (used in Chinese text), and [ideographic full stop](https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation) "`。`" (used in Japanese and Chinese)
-* Add [Zero-width space](https://en.wikipedia.org/wiki/Zero-width_space) used in Thai, Myanmar, Kmer, and Japanese.
-* Add ASCII comma "`,`", Unicode fullwidth comma "`，`", and Unicode ideographic comma "`、`"
+* ASCII 마침표 "`.`", [유니코드 전각](https://en.wikipedia.org/wiki/Halfwidth_and_Fullwidth_Forms_(Unicode_block)) 마침표 "`．`"(중국어 텍스트에 사용), [표意 마침표](https://en.wikipedia.org/wiki/CJK_Symbols_and_Punctuation) "`。`"(일본어 및 중국어에 사용) 추가
+* 태국어, 미얀마어, 크메르어, 일본어에 사용되는 [너비 없는 공백](https://en.wikipedia.org/wiki/Zero-width_space) 추가
+* ASCII 쉼표 "`,`", 유니코드 전각 쉼표 "`，`", 유니코드 표의 쉼표 "`、`" 추가
 
 :::python
 ```python
