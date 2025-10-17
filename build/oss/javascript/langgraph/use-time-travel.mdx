@@ -1,45 +1,42 @@
 ---
-title: Use time-travel
-sidebarTitle: Time travel
+title: 타임 트래블 사용하기
+sidebarTitle: 타임 트래블
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
+<AlphaCallout />
 
-<AlphaCalloutJS />
+모델 기반 의사결정을 수행하는 비결정적 시스템(예: LLM으로 구동되는 에이전트)으로 작업할 때, 의사결정 프로세스를 상세히 검토하는 것이 유용할 수 있습니다:
 
+1. <Icon icon="lightbulb" size={16} /> **추론 이해**: 성공적인 결과로 이어진 단계를 분석합니다.
+2. <Icon icon="bug" size={16} /> **실수 디버깅**: 오류가 어디서, 왜 발생했는지 식별합니다.
+3. <Icon icon="magnifying-glass" size={16} /> **대안 탐색**: 다양한 경로를 테스트하여 더 나은 솔루션을 발견합니다.
 
-When working with non-deterministic systems that make model-based decisions (e.g., agents powered by LLMs), it can be useful to examine their decision-making process in detail:
+LangGraph는 이러한 사용 사례를 지원하기 위해 [타임 트래블](/oss/javascript/langgraph/use-time-travel) 기능을 제공합니다. 구체적으로, 이전 체크포인트에서 실행을 재개할 수 있습니다. 동일한 상태를 재실행하거나 수정하여 대안을 탐색할 수 있습니다. 모든 경우에 과거 실행을 재개하면 히스토리에 새로운 분기가 생성됩니다.
 
-1. <Icon icon="lightbulb" size={16} /> **Understand reasoning**: Analyze the steps that led to a successful result.
-2. <Icon icon="bug" size={16} /> **Debug mistakes**: Identify where and why errors occurred.
-3. <Icon icon="magnifying-glass" size={16} /> **Explore alternatives**: Test different paths to uncover better solutions.
-
-LangGraph provides [time travel](/oss/javascript/langgraph/use-time-travel) functionality to support these use cases. Specifically, you can resume execution from a prior checkpoint — either replaying the same state or modifying it to explore alternatives. In all cases, resuming past execution produces a new fork in the history.
-
-To use [time-travel](/oss/javascript/langgraph/use-time-travel) in LangGraph:
+LangGraph에서 [타임 트래블](/oss/javascript/langgraph/use-time-travel)을 사용하려면:
 
 
 
-1. [Run the graph](#1-run-the-graph) with initial inputs using [`invoke`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.CompiledStateGraph.html#invoke) or [`stream`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.CompiledStateGraph.html#stream) methods.
-2. [Identify a checkpoint in an existing thread](#2-identify-a-checkpoint): Use the [`getStateHistory()`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.CompiledStateGraph.html#getStateHistory) method to retrieve the execution history for a specific `thread_id` and locate the desired `checkpoint_id`.
-  Alternatively, set a [breakpoint](/oss/javascript/langgraph/interrupts) before the node(s) where you want execution to pause. You can then find the most recent checkpoint recorded up to that breakpoint.
-3. [Update the graph state (optional)](#3-update-the-state-optional): Use the [`updateState`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.CompiledStateGraph.html#updateState) method to modify the graph's state at the checkpoint and resume execution from alternative state.
-4. [Resume execution from the checkpoint](#4-resume-execution-from-the-checkpoint): Use the `invoke` or `stream` methods with an input of `null` and a configuration containing the appropriate `thread_id` and `checkpoint_id`.
+1. [`invoke`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.CompiledStateGraph.html#invoke) 또는 [`stream`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.CompiledStateGraph.html#stream) 메서드를 사용하여 초기 입력으로 [그래프를 실행](#1-run-the-graph)합니다.
+2. [기존 스레드에서 체크포인트를 식별](#2-identify-a-checkpoint): [`getStateHistory()`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.CompiledStateGraph.html#getStateHistory) 메서드를 사용하여 특정 `thread_id`에 대한 실행 히스토리를 검색하고 원하는 `checkpoint_id`를 찾습니다.
+  또는 실행을 일시 중지하려는 노드 앞에 [브레이크포인트](/oss/javascript/langgraph/interrupts)를 설정합니다. 그런 다음 해당 브레이크포인트까지 기록된 가장 최근 체크포인트를 찾을 수 있습니다.
+3. [그래프 상태 업데이트(선택 사항)](#3-update-the-state-optional): [`updateState`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.CompiledStateGraph.html#updateState) 메서드를 사용하여 체크포인트에서 그래프의 상태를 수정하고 대체 상태에서 실행을 재개합니다.
+4. [체크포인트에서 실행 재개](#4-resume-execution-from-the-checkpoint): 입력을 `null`로, 적절한 `thread_id`와 `checkpoint_id`를 포함하는 구성으로 `invoke` 또는 `stream` 메서드를 사용합니다.
 
 
 <Tip>
-For a conceptual overview of time-travel, see [Time travel](/oss/javascript/langgraph/use-time-travel).
+타임 트래블의 개념적 개요는 [타임 트래블](/oss/javascript/langgraph/use-time-travel)을 참조하세요.
 </Tip>
 
-## In a workflow
+## 워크플로우에서 사용하기
 
-This example builds a simple LangGraph workflow that generates a joke topic and writes a joke using an LLM. It demonstrates how to run the graph, retrieve past execution checkpoints, optionally modify the state, and resume execution from a chosen checkpoint to explore alternate outcomes.
+이 예제는 LLM을 사용하여 농담 주제를 생성하고 농담을 작성하는 간단한 LangGraph 워크플로우를 구축합니다. 그래프를 실행하고, 과거 실행 체크포인트를 검색하고, 선택적으로 상태를 수정하고, 선택한 체크포인트에서 실행을 재개하여 대안적인 결과를 탐색하는 방법을 보여줍니다.
 
-### Setup
+### 설정
 
-First we need to install the packages required
+먼저 필요한 패키지를 설치해야 합니다
 
 
 
@@ -48,7 +45,7 @@ npm install @langchain/langgraph @langchain/anthropic
 ```
 
 
-Next, we need to set API keys for Anthropic (the LLM we will use)
+다음으로, Anthropic(사용할 LLM)에 대한 API 키를 설정해야 합니다
 
 
 
@@ -58,7 +55,7 @@ process.env.ANTHROPIC_API_KEY = "YOUR_API_KEY";
 
 
 <Tip>
-Sign up for [LangSmith](https://smith.langchain.com) to quickly spot issues and improve the performance of your LangGraph projects. LangSmith lets you use trace data to debug, test, and monitor your LLM apps built with LangGraph.
+LangGraph로 구축된 LLM 앱을 디버깅, 테스트 및 모니터링하기 위해 트레이스 데이터를 사용할 수 있는 [LangSmith](https://smith.langchain.com)에 가입하여 LangGraph 프로젝트의 문제를 신속하게 파악하고 성능을 개선하세요.
 </Tip>
 
 
@@ -76,7 +73,7 @@ const State = z.object({
 });
 
 const llm = new ChatAnthropic({
-  model: "claude-sonnet-4-5-20250929",
+  model: "claude-3-5-sonnet-latest",
   temperature: 0,
 });
 
@@ -104,7 +101,7 @@ const graph = workflow.compile({ checkpointer });
 ```
 
 
-### 1. Run the graph
+### 1. 그래프 실행
 
 
 
@@ -123,7 +120,7 @@ console.log(state.joke);
 ```
 
 
-**Output:**
+**출력:**
 
 ```
 How about "The Secret Life of Socks in the Dryer"? You know, exploring the mysterious phenomenon of how socks go into the laundry as pairs but come out as singles. Where do they go? Are they starting new lives elsewhere? Is there a sock paradise we don't know about? There's a lot of comedic potential in the everyday mystery that unites us all!
@@ -135,7 +132,7 @@ I finally discovered where all my missing socks go after the dryer. Turns out th
 My blue argyle is now living in Bermuda with a red polka dot, posting vacation photos on Sockstagram and sending me lint as alimony.
 ```
 
-### 2. Identify a checkpoint
+### 2. 체크포인트 식별
 
 
 
@@ -153,7 +150,7 @@ for (const state of states) {
 }
 ```
 
-**Output:**
+**출력:**
 
 ```
 []
@@ -179,7 +176,7 @@ console.log(selectedState.next);
 console.log(selectedState.values);
 ```
 
-**Output:**
+**출력:**
 
 ```
 ['writeJoke']
@@ -188,11 +185,11 @@ console.log(selectedState.values);
 
 
 <a id="optional"></a>
-### 3. Update the state
+### 3. 상태 업데이트
 
 
 
-`updateState` will create a new checkpoint. The new checkpoint will be associated with the same thread, but a new checkpoint ID.
+`updateState`는 새 체크포인트를 생성합니다. 새 체크포인트는 동일한 스레드와 연결되지만, 새로운 체크포인트 ID를 갖습니다.
 
 ```typescript
 const newConfig = await graph.updateState(selectedState.config, {
@@ -201,14 +198,14 @@ const newConfig = await graph.updateState(selectedState.config, {
 console.log(newConfig);
 ```
 
-**Output:**
+**출력:**
 
 ```
 {'configurable': {'thread_id': 'c62e2e03-c27b-4cb6-8cea-ea9bfedae006', 'checkpoint_ns': '', 'checkpoint_id': '1f02ac4a-ecee-600b-8002-a1d21df32e4c'}}
 ```
 
 
-### 4. Resume execution from the checkpoint
+### 4. 체크포인트에서 실행 재개
 
 
 
@@ -216,7 +213,7 @@ console.log(newConfig);
 await graph.invoke(null, newConfig);
 ```
 
-**Output:**
+**출력:**
 
 ```typescript
 {

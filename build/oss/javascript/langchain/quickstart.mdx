@@ -2,12 +2,9 @@
 title: Quickstart
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
-
-<AlphaCalloutJS />
-
+<AlphaCallout />
 
 This quickstart takes you from a simple setup to a fully functional AI agent in just a few minutes.
 
@@ -242,7 +239,8 @@ Let's walk through each step:
 
 
 ```ts
-import { createAgent, tool, initChatModel } from "langchain";
+import { createAgent, tool } from "langchain";
+import { initChatModel } from "langchain/chat_models";
 import { MemorySaver, type Runtime } from "@langchain/langgraph";
 import * as z from "zod";
 

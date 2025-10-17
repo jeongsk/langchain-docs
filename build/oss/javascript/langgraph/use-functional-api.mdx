@@ -1,24 +1,21 @@
 ---
-title: Use the functional API
-sidebarTitle: Use the Functional API
+title: 함수형 API 사용하기
+sidebarTitle: 함수형 API 사용하기
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
+<AlphaCallout />
 
-<AlphaCalloutJS />
-
-
-The [**Functional API**](/oss/javascript/langgraph/functional-api) allows you to add LangGraph's key features — [persistence](/oss/javascript/langgraph/persistence), [memory](/oss/javascript/langgraph/add-memory), [human-in-the-loop](/oss/javascript/langgraph/interrupts), and [streaming](/oss/javascript/langgraph/streaming) — to your applications with minimal changes to your existing code.
+[**함수형 API**](/oss/javascript/langgraph/functional-api)를 사용하면 기존 코드를 최소한으로 수정하면서도 LangGraph의 핵심 기능인 [영속성](/oss/javascript/langgraph/persistence), [메모리](/oss/javascript/langgraph/add-memory), [human-in-the-loop](/oss/javascript/langgraph/interrupts), [스트리밍](/oss/javascript/langgraph/streaming)을 애플리케이션에 추가할 수 있습니다.
 
 <Tip>
-For conceptual information on the functional API, see [Functional API](/oss/javascript/langgraph/functional-api).
+함수형 API에 대한 개념적인 정보는 [함수형 API](/oss/javascript/langgraph/functional-api)를 참조하세요.
 </Tip>
 
-## Creating a simple workflow
+## 간단한 워크플로우 만들기
 
-When defining an `entrypoint`, input is restricted to the first argument of the function. To pass multiple inputs, you can use a dictionary.
+`entrypoint`를 정의할 때 입력은 함수의 첫 번째 인자로 제한됩니다. 여러 입력을 전달하려면 딕셔너리를 사용할 수 있습니다.
 
 
 
@@ -38,36 +35,36 @@ await myWorkflow.invoke({ value: 1, anotherValue: 2 });
 ```
 
 
-<Accordion title="Extended example: simple workflow">
+<Accordion title="확장 예제: 간단한 워크플로우">
 
 
   ```typescript
   import { v4 as uuidv4 } from "uuid";
   import { entrypoint, task, MemorySaver } from "@langchain/langgraph";
 
-  // Task that checks if a number is even
+  // 숫자가 짝수인지 확인하는 작업
   const isEven = task("isEven", async (number: number) => {
     return number % 2 === 0;
   });
 
-  // Task that formats a message
+  // 메시지 형식을 지정하는 작업
   const formatMessage = task("formatMessage", async (isEven: boolean) => {
     return isEven ? "The number is even." : "The number is odd.";
   });
 
-  // Create a checkpointer for persistence
+  // 영속성을 위한 체크포인터 생성
   const checkpointer = new MemorySaver();
 
   const workflow = entrypoint(
     { checkpointer, name: "workflow" },
     async (inputs: { number: number }) => {
-      // Simple workflow to classify a number
+      // 숫자를 분류하는 간단한 워크플로우
       const even = await isEven(inputs.number);
       return await formatMessage(even);
     }
   );
 
-  // Run the workflow with a unique thread ID
+  // 고유한 스레드 ID로 워크플로우 실행
   const config = { configurable: { thread_id: uuidv4() } };
   const result = await workflow.invoke({ number: 7 }, config);
   console.log(result);
@@ -75,10 +72,9 @@ await myWorkflow.invoke({ value: 1, anotherValue: 2 });
 
 </Accordion>
 
-<Accordion title="Extended example: Compose an essay with an LLM">
-  This example demonstrates how to use the `@task` and `@entrypoint` decorators
-  syntactically. Given that a checkpointer is provided, the workflow results will
-  be persisted in the checkpointer.
+<Accordion title="확장 예제: LLM으로 에세이 작성하기">
+  이 예제는 `@task`와 `@entrypoint` 데코레이터를 구문적으로 사용하는 방법을 보여줍니다.
+  체크포인터가 제공되면 워크플로우 결과가 체크포인터에 저장됩니다.
 
 
 
@@ -89,9 +85,9 @@ await myWorkflow.invoke({ value: 1, anotherValue: 2 });
 
   const llm = new ChatOpenAI({ model: "gpt-3.5-turbo" });
 
-  // Task: generate essay using an LLM
+  // 작업: LLM을 사용하여 에세이 생성
   const composeEssay = task("composeEssay", async (topic: string) => {
-    // Generate an essay about the given topic
+    // 주어진 주제에 대한 에세이 생성
     const response = await llm.invoke([
       { role: "system", content: "You are a helpful assistant that writes essays." },
       { role: "user", content: `Write an essay about ${topic}.` }
@@ -99,18 +95,18 @@ await myWorkflow.invoke({ value: 1, anotherValue: 2 });
     return response.content as string;
   });
 
-  // Create a checkpointer for persistence
+  // 영속성을 위한 체크포인터 생성
   const checkpointer = new MemorySaver();
 
   const workflow = entrypoint(
     { checkpointer, name: "workflow" },
     async (topic: string) => {
-      // Simple workflow that generates an essay with an LLM
+      // LLM으로 에세이를 생성하는 간단한 워크플로우
       return await composeEssay(topic);
     }
   );
 
-  // Execute the workflow
+  // 워크플로우 실행
   const config = { configurable: { thread_id: uuidv4() } };
   const result = await workflow.invoke("the history of flight", config);
   console.log(result);
@@ -118,9 +114,9 @@ await myWorkflow.invoke({ value: 1, anotherValue: 2 });
 
 </Accordion>
 
-## Parallel execution
+## 병렬 실행
 
-Tasks can be executed in parallel by invoking them concurrently and waiting for the results. This is useful for improving performance in IO bound tasks (e.g., calling APIs for LLMs).
+작업을 동시에 호출하고 결과를 기다림으로써 병렬로 실행할 수 있습니다. 이는 IO 바운드 작업(예: LLM을 위한 API 호출)의 성능을 향상시키는 데 유용합니다.
 
 
 
@@ -138,8 +134,8 @@ const graph = entrypoint(
 ```
 
 
-<Accordion title="Extended example: parallel LLM calls">
-  This example demonstrates how to run multiple LLM calls in parallel using `@task`. Each call generates a paragraph on a different topic, and results are joined into a single text output.
+<Accordion title="확장 예제: 병렬 LLM 호출">
+  이 예제는 `@task`를 사용하여 여러 LLM 호출을 병렬로 실행하는 방법을 보여줍니다. 각 호출은 서로 다른 주제에 대한 단락을 생성하고, 결과는 하나의 텍스트 출력으로 결합됩니다.
 
 
 
@@ -148,10 +144,10 @@ const graph = entrypoint(
   import { ChatOpenAI } from "@langchain/openai";
   import { entrypoint, task, MemorySaver } from "@langchain/langgraph";
 
-  // Initialize the LLM model
+  // LLM 모델 초기화
   const llm = new ChatOpenAI({ model: "gpt-3.5-turbo" });
 
-  // Task that generates a paragraph about a given topic
+  // 주어진 주제에 대한 단락을 생성하는 작업
   const generateParagraph = task("generateParagraph", async (topic: string) => {
     const response = await llm.invoke([
       { role: "system", content: "You are a helpful assistant that writes educational paragraphs." },
@@ -160,31 +156,31 @@ const graph = entrypoint(
     return response.content as string;
   });
 
-  // Create a checkpointer for persistence
+  // 영속성을 위한 체크포인터 생성
   const checkpointer = new MemorySaver();
 
   const workflow = entrypoint(
     { checkpointer, name: "workflow" },
     async (topics: string[]) => {
-      // Generates multiple paragraphs in parallel and combines them
+      // 여러 단락을 병렬로 생성하고 결합
       const paragraphs = await Promise.all(topics.map(generateParagraph));
       return paragraphs.join("\n\n");
     }
   );
 
-  // Run the workflow
+  // 워크플로우 실행
   const config = { configurable: { thread_id: uuidv4() } };
   const result = await workflow.invoke(["quantum computing", "climate change", "history of aviation"], config);
   console.log(result);
   ```
 
 
-  This example uses LangGraph's concurrency model to improve execution time, especially when tasks involve I/O like LLM completions.
+  이 예제는 LangGraph의 동시성 모델을 사용하여 실행 시간을 개선합니다. 특히 작업이 LLM 완성과 같은 I/O를 포함할 때 효과적입니다.
 </Accordion>
 
-## Calling graphs
+## 그래프 호출하기
 
-The **Functional API** and the [**Graph API**](/oss/javascript/langgraph/graph-api) can be used together in the same application as they share the same underlying runtime.
+**함수형 API**와 [**그래프 API**](/oss/javascript/langgraph/graph-api)는 동일한 기본 런타임을 공유하므로 같은 애플리케이션에서 함께 사용할 수 있습니다.
 
 
 
@@ -199,9 +195,9 @@ const someGraph = builder.compile();
 const someWorkflow = entrypoint(
   { name: "someWorkflow" },
   async (someInput: Record<string, any>) => {
-    // Call a graph defined using the graph API
+    // 그래프 API로 정의된 그래프 호출
     const result1 = await someGraph.invoke(/* ... */);
-    // Call another graph defined using the graph API
+    // 그래프 API로 정의된 다른 그래프 호출
     const result2 = await anotherGraph.invoke(/* ... */);
     return {
       result1,
@@ -212,7 +208,7 @@ const someWorkflow = entrypoint(
 ```
 
 
-<Accordion title="Extended example: calling a simple graph from the functional API">
+<Accordion title="확장 예제: 함수형 API에서 간단한 그래프 호출하기">
 
 
   ```typescript
@@ -221,12 +217,12 @@ const someWorkflow = entrypoint(
   import { StateGraph } from "@langchain/langgraph";
   import * as z from "zod";
 
-  // Define the shared state type
+  // 공유 상태 타입 정의
   const State = z.object({
     foo: z.number(),
   });
 
-  // Build the graph using the Graph API
+  // 그래프 API를 사용하여 그래프 구축
   const builder = new StateGraph(State)
     .addNode("double", (state) => {
       return { foo: state.foo * 2 };
@@ -234,7 +230,7 @@ const someWorkflow = entrypoint(
     .addEdge("__start__", "double");
   const graph = builder.compile();
 
-  // Define the functional API workflow
+  // 함수형 API 워크플로우 정의
   const checkpointer = new MemorySaver();
 
   const workflow = entrypoint(
@@ -245,21 +241,21 @@ const someWorkflow = entrypoint(
     }
   );
 
-  // Execute the workflow
+  // 워크플로우 실행
   const config = { configurable: { thread_id: uuidv4() } };
-  console.log(await workflow.invoke(5, config)); // Output: { bar: 10 }
+  console.log(await workflow.invoke(5, config)); // 출력: { bar: 10 }
   ```
 
 </Accordion>
 
-## Call other entrypoints
+## 다른 엔트리포인트 호출하기
 
-You can call other **entrypoints** from within an **entrypoint** or a **task**.
+**entrypoint** 또는 **task** 내에서 다른 **entrypoint**를 호출할 수 있습니다.
 
 
 
 ```typescript
-// Will automatically use the checkpointer from the parent entrypoint
+// 부모 엔트리포인트의 체크포인터를 자동으로 사용
 const someOtherWorkflow = entrypoint(
   { name: "someOtherWorkflow" },
   async (inputs: { value: number }) => {
@@ -277,17 +273,17 @@ const myWorkflow = entrypoint(
 ```
 
 
-<Accordion title="Extended example: calling another entrypoint">
+<Accordion title="확장 예제: 다른 엔트리포인트 호출하기">
 
 
   ```typescript
   import { v4 as uuidv4 } from "uuid";
   import { entrypoint, MemorySaver } from "@langchain/langgraph";
 
-  // Initialize a checkpointer
+  // 체크포인터 초기화
   const checkpointer = new MemorySaver();
 
-  // A reusable sub-workflow that multiplies a number
+  // 숫자를 곱하는 재사용 가능한 서브 워크플로우
   const multiply = entrypoint(
     { name: "multiply" },
     async (inputs: { a: number; b: number }) => {
@@ -295,7 +291,7 @@ const myWorkflow = entrypoint(
     }
   );
 
-  // Main workflow that invokes the sub-workflow
+  // 서브 워크플로우를 호출하는 메인 워크플로우
   const main = entrypoint(
     { checkpointer, name: "main" },
     async (inputs: { x: number; y: number }) => {
@@ -304,19 +300,19 @@ const myWorkflow = entrypoint(
     }
   );
 
-  // Execute the main workflow
+  // 메인 워크플로우 실행
   const config = { configurable: { thread_id: uuidv4() } };
-  console.log(await main.invoke({ x: 6, y: 7 }, config)); // Output: { product: 42 }
+  console.log(await main.invoke({ x: 6, y: 7 }, config)); // 출력: { product: 42 }
   ```
 
 </Accordion>
 
-## Streaming
+## 스트리밍
 
-The **Functional API** uses the same streaming mechanism as the **Graph API**. Please
-read the [**streaming guide**](/oss/javascript/langgraph/streaming) section for more details.
+**함수형 API**는 **그래프 API**와 동일한 스트리밍 메커니즘을 사용합니다.
+자세한 내용은 [**스트리밍 가이드**](/oss/javascript/langgraph/streaming) 섹션을 참조하세요.
 
-Example of using the streaming API to stream both updates and custom data.
+업데이트와 사용자 정의 데이터를 모두 스트리밍하는 스트리밍 API 사용 예제입니다.
 
 
 
@@ -335,28 +331,28 @@ const main = entrypoint(
     inputs: { x: number },
     config: LangGraphRunnableConfig
   ): Promise<number> => {
-    config.writer?.("Started processing");   // [!code highlight]
+    config.writer?.("Started processing"); // (1)!
     const result = inputs.x * 2;
-    config.writer?.(`Result is ${result}`);   // [!code highlight]
+    config.writer?.(`Result is ${result}`); // (2)!
     return result;
   }
 );
 
 const config = { configurable: { thread_id: "abc" } };
 
-  // [!code highlight]
+// (3)!
 for await (const [mode, chunk] of await main.stream(
   { x: 5 },
-  { streamMode: ["custom", "updates"], ...config }   // [!code highlight]
+  { streamMode: ["custom", "updates"], ...config } // (4)!
 )) {
   console.log(`${mode}: ${JSON.stringify(chunk)}`);
 }
 ```
 
-1. Emit custom data before computation begins.
-2. Emit another custom message after computing the result.
-3. Use `.stream()` to process streamed output.
-4. Specify which streaming modes to use.
+1. 계산이 시작되기 전에 사용자 정의 데이터를 출력합니다.
+2. 결과를 계산한 후 다른 사용자 정의 메시지를 출력합니다.
+3. `.stream()`을 사용하여 스트리밍된 출력을 처리합니다.
+4. 사용할 스트리밍 모드를 지정합니다.
 
 ```
 updates: {"addOne": 2}
@@ -367,7 +363,7 @@ updates: {"main": 5}
 ```
 
 
-## Retry policy
+## 재시도 정책
 
 
 
@@ -379,12 +375,12 @@ import {
   RetryPolicy,
 } from "@langchain/langgraph";
 
-// This variable is just used for demonstration purposes to simulate a network failure.
-// It's not something you will have in your actual code.
+// 이 변수는 네트워크 장애를 시뮬레이션하기 위한 데모용입니다.
+// 실제 코드에서는 사용하지 않습니다.
 let attempts = 0;
 
-// Let's configure the RetryPolicy to retry on ValueError.
-// The default RetryPolicy is optimized for retrying specific network errors.
+// RetryPolicy를 ValueError에 대해 재시도하도록 구성합니다.
+// 기본 RetryPolicy는 특정 네트워크 오류를 재시도하도록 최적화되어 있습니다.
 const retryPolicy: RetryPolicy = { retryOn: (error) => error instanceof Error };
 
 const getInfo = task(
@@ -425,7 +421,7 @@ await main.invoke({ any_input: "foobar" }, config);
 ```
 
 
-## Caching Tasks
+## 작업 캐싱
 
 
 
@@ -440,7 +436,7 @@ import {
 const slowAdd = task(
   {
     name: "slowAdd",
-    cache: { ttl: 120 },   // [!code highlight]
+    cache: { ttl: 120 }, // (1)!
   },
   async (x: number) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -469,39 +465,39 @@ for await (const chunk of await main.stream(
 //> { main: { result1: 10, result2: 10 } }
 ```
 
-1. `ttl` is specified in seconds. The cache will be invalidated after this time.
+1. `ttl`은 초 단위로 지정됩니다. 이 시간이 지나면 캐시가 무효화됩니다.
 
 
-## Resuming after an error
+## 오류 후 재개하기
 
 
 
 ```typescript
 import { entrypoint, task, MemorySaver } from "@langchain/langgraph";
 
-// This variable is just used for demonstration purposes to simulate a network failure.
-// It's not something you will have in your actual code.
+// 이 변수는 네트워크 장애를 시뮬레이션하기 위한 데모용입니다.
+// 실제 코드에서는 사용하지 않습니다.
 let attempts = 0;
 
 const getInfo = task("getInfo", async () => {
   /**
-   * Simulates a task that fails once before succeeding.
-   * Throws an exception on the first attempt, then returns "OK" on subsequent tries.
+   * 성공하기 전에 한 번 실패하는 작업을 시뮬레이션합니다.
+   * 첫 번째 시도에서는 예외를 발생시키고, 이후 시도에서는 "OK"를 반환합니다.
    */
   attempts += 1;
 
   if (attempts < 2) {
-    throw new Error("Failure"); // Simulate a failure on the first attempt
+    throw new Error("Failure"); // 첫 번째 시도에서 실패 시뮬레이션
   }
   return "OK";
 });
 
-// Initialize an in-memory checkpointer for persistence
+// 영속성을 위한 인메모리 체크포인터 초기화
 const checkpointer = new MemorySaver();
 
 const slowTask = task("slowTask", async () => {
   /**
-   * Simulates a slow-running task by introducing a 1-second delay.
+   * 1초 지연을 도입하여 느리게 실행되는 작업을 시뮬레이션합니다.
    */
   await new Promise((resolve) => setTimeout(resolve, 1000));
   return "Ran slow task.";
@@ -511,37 +507,37 @@ const main = entrypoint(
   { checkpointer, name: "main" },
   async (inputs: Record<string, any>) => {
     /**
-     * Main workflow function that runs the slowTask and getInfo tasks sequentially.
+     * slowTask와 getInfo 작업을 순차적으로 실행하는 메인 워크플로우 함수입니다.
      *
-     * Parameters:
-     * - inputs: Record<string, any> containing workflow input values.
+     * 매개변수:
+     * - inputs: 워크플로우 입력 값을 포함하는 Record<string, any>입니다.
      *
-     * The workflow first executes `slowTask` and then attempts to execute `getInfo`,
-     * which will fail on the first invocation.
+     * 워크플로우는 먼저 `slowTask`를 실행한 다음 `getInfo`를 실행하려고 시도하는데,
+     * 첫 번째 호출에서는 실패합니다.
      */
-    const slowTaskResult = await slowTask(); // Blocking call to slowTask
-    await getInfo(); // Exception will be raised here on the first attempt
+    const slowTaskResult = await slowTask(); // slowTask에 대한 블로킹 호출
+    await getInfo(); // 첫 번째 시도에서 여기서 예외가 발생합니다
     return slowTaskResult;
   }
 );
 
-// Workflow execution configuration with a unique thread identifier
+// 고유한 스레드 식별자를 사용한 워크플로우 실행 구성
 const config = {
   configurable: {
-    thread_id: "1", // Unique identifier to track workflow execution
+    thread_id: "1", // 워크플로우 실행을 추적하기 위한 고유 식별자
   },
 };
 
-// This invocation will take ~1 second due to the slowTask execution
+// 이 호출은 slowTask 실행으로 인해 약 1초가 소요됩니다
 try {
-  // First invocation will raise an exception due to the `getInfo` task failing
+  // getInfo 작업이 실패하여 첫 번째 호출에서 예외가 발생합니다
   await main.invoke({ any_input: "foobar" }, config);
 } catch (err) {
-  // Handle the failure gracefully
+  // 실패를 우아하게 처리
 }
 ```
 
-When we resume execution, we won't need to re-run the `slowTask` as its result is already saved in the checkpoint.
+실행을 재개할 때 `slowTask`의 결과가 이미 체크포인트에 저장되어 있으므로 다시 실행할 필요가 없습니다.
 
 ```typescript
 await main.invoke(null, config);
@@ -554,15 +550,15 @@ await main.invoke(null, config);
 
 ## Human-in-the-loop
 
-The functional API supports [human-in-the-loop](/oss/javascript/langgraph/interrupts) workflows using the `interrupt` function and the `Command` primitive.
+함수형 API는 `interrupt` 함수와 `Command` 프리미티브를 사용하여 [human-in-the-loop](/oss/javascript/langgraph/interrupts) 워크플로우를 지원합니다.
 
-### Basic human-in-the-loop workflow
+### 기본 human-in-the-loop 워크플로우
 
-We will create three [tasks](/oss/javascript/langgraph/functional-api#task):
+세 개의 [작업](/oss/javascript/langgraph/functional-api#task)을 생성하겠습니다:
 
-1. Append `"bar"`.
-2. Pause for human input. When resuming, append human input.
-3. Append `"qux"`.
+1. `"bar"` 추가하기.
+2. 사용자 입력을 위해 일시 정지. 재개할 때 사용자 입력 추가하기.
+3. `"qux"` 추가하기.
 
 
 
@@ -570,24 +566,24 @@ We will create three [tasks](/oss/javascript/langgraph/functional-api#task):
 import { entrypoint, task, interrupt, Command } from "@langchain/langgraph";
 
 const step1 = task("step1", async (inputQuery: string) => {
-  // Append bar
+  // bar 추가
   return `${inputQuery} bar`;
 });
 
 const humanFeedback = task("humanFeedback", async (inputQuery: string) => {
-  // Append user input
+  // 사용자 입력 추가
   const feedback = interrupt(`Please provide feedback: ${inputQuery}`);
   return `${inputQuery} ${feedback}`;
 });
 
 const step3 = task("step3", async (inputQuery: string) => {
-  // Append qux
+  // qux 추가
   return `${inputQuery} qux`;
 });
 ```
 
 
-We can now compose these tasks in an [entrypoint](/oss/javascript/langgraph/functional-api#entrypoint):
+이제 이러한 작업을 [entrypoint](/oss/javascript/langgraph/functional-api#entrypoint)에서 구성할 수 있습니다:
 
 
 
@@ -609,9 +605,9 @@ const graph = entrypoint(
 ```
 
 
-[interrupt()](/oss/javascript/langgraph/interrupts#pause-using-interrupt) is called inside a task, enabling a human to review and edit the output of the previous task. The results of prior tasks-- in this case `step_1`-- are persisted, so that they are not run again following the `interrupt`.
+[interrupt()](/oss/javascript/langgraph/interrupts#pause-using-interrupt)는 작업 내에서 호출되어 사람이 이전 작업의 출력을 검토하고 편집할 수 있게 합니다. 이 경우 `step_1`과 같은 이전 작업의 결과는 유지되므로 `interrupt` 이후 다시 실행되지 않습니다.
 
-Let's send in a query string:
+쿼리 문자열을 보내 보겠습니다:
 
 
 
@@ -625,12 +621,12 @@ for await (const event of await graph.stream("foo", config)) {
 ```
 
 
-Note that we've paused with an `interrupt` after `step_1`. The interrupt provides instructions to resume the run. To resume, we issue a [Command](/oss/javascript/langgraph/interrupts#resuming-interrupts) containing the data expected by the `human_feedback` task.
+`step_1` 이후 `interrupt`로 일시 정지했습니다. interrupt는 실행을 재개하기 위한 지침을 제공합니다. 재개하려면 `human_feedback` 작업에서 예상하는 데이터를 포함하는 [Command](/oss/javascript/langgraph/interrupts#resuming-interrupts)를 발행합니다.
 
 
 
 ```typescript
-// Continue execution
+// 실행 계속
 for await (const event of await graph.stream(
   new Command({ resume: "baz" }),
   config
@@ -641,17 +637,17 @@ for await (const event of await graph.stream(
 ```
 
 
-After resuming, the run proceeds through the remaining step and terminates as expected.
+재개한 후 실행은 나머지 단계를 거쳐 예상대로 종료됩니다.
 
-### Review tool calls
+### 도구 호출 검토하기
 
-To review tool calls before execution, we add a `review_tool_call` function that calls [`interrupt`](/oss/javascript/langgraph/interrupts#pause-using-interrupt). When this function is called, execution will be paused until we issue a command to resume it.
+실행 전에 도구 호출을 검토하려면 [`interrupt`](/oss/javascript/langgraph/interrupts#pause-using-interrupt)를 호출하는 `review_tool_call` 함수를 추가합니다. 이 함수가 호출되면 재개 명령을 발행할 때까지 실행이 일시 정지됩니다.
 
-Given a tool call, our function will `interrupt` for human review. At that point we can either:
+도구 호출이 주어지면 함수는 사람의 검토를 위해 `interrupt`합니다. 이 시점에서 다음 중 하나를 수행할 수 있습니다:
 
-* Accept the tool call
-* Revise the tool call and continue
-* Generate a custom tool message (e.g., instructing the model to re-format its tool call)
+* 도구 호출 수락
+* 도구 호출 수정 및 계속
+* 사용자 정의 도구 메시지 생성(예: 도구 호출을 다시 포맷하도록 모델에 지시)
 
 
 
@@ -660,7 +656,7 @@ import { ToolCall } from "@langchain/core/messages/tool";
 import { ToolMessage } from "@langchain/core/messages";
 
 function reviewToolCall(toolCall: ToolCall): ToolCall | ToolMessage {
-  // Review a tool call, returning a validated version
+  // 도구 호출을 검토하고 검증된 버전 반환
   const humanReview = interrupt({
     question: "Is this correct?",
     tool_call: toolCall,
@@ -687,7 +683,7 @@ function reviewToolCall(toolCall: ToolCall): ToolCall | ToolMessage {
 ```
 
 
-We can now update our [entrypoint](/oss/javascript/langgraph/functional-api#entrypoint) to review the generated tool calls. If a tool call is accepted or revised, we execute in the same way as before. Otherwise, we just append the @[`ToolMessage`] supplied by the human. The results of prior tasks — in this case the initial model call — are persisted, so that they are not run again following the `interrupt`.
+이제 [entrypoint](/oss/javascript/langgraph/functional-api#entrypoint)를 업데이트하여 생성된 도구 호출을 검토할 수 있습니다. 도구 호출이 수락되거나 수정되면 이전과 같은 방식으로 실행합니다. 그렇지 않으면 사람이 제공한 `ToolMessage`를 추가하기만 하면 됩니다. 이전 작업의 결과(이 경우 초기 모델 호출)는 유지되므로 `interrupt` 이후 다시 실행되지 않습니다.
 
 
 
@@ -719,7 +715,7 @@ const agent = entrypoint(
         break;
       }
 
-      // Review tool calls
+      // 도구 호출 검토
       const toolResults: ToolMessage[] = [];
       const toolCalls: ToolCall[] = [];
 
@@ -728,31 +724,31 @@ const agent = entrypoint(
         if (review instanceof ToolMessage) {
           toolResults.push(review);
         } else {
-          // is a validated tool call
+          // 검증된 도구 호출인 경우
           toolCalls.push(review);
           if (review !== llmResponse.tool_calls[i]) {
-            llmResponse.tool_calls[i] = review; // update message
+            llmResponse.tool_calls[i] = review; // 메시지 업데이트
           }
         }
       }
 
-      // Execute remaining tool calls
+      // 나머지 도구 호출 실행
       const remainingToolResults = await Promise.all(
         toolCalls.map((toolCall) => callTool(toolCall))
       );
 
-      // Append to message list
+      // 메시지 목록에 추가
       messages = addMessages(messages, [
         llmResponse,
         ...toolResults,
         ...remainingToolResults,
       ]);
 
-      // Call model again
+      // 모델 다시 호출
       llmResponse = await callModel(messages);
     }
 
-    // Generate final response
+    // 최종 응답 생성
     messages = addMessages(messages, llmResponse);
     return entrypoint.final({ value: llmResponse, save: messages });
   }
@@ -760,29 +756,29 @@ const agent = entrypoint(
 ```
 
 
-## Short-term memory
+## 단기 메모리
 
-Short-term memory allows storing information across different **invocations** of the same **thread id**. See [short-term memory](/oss/javascript/langgraph/functional-api#short-term-memory) for more details.
+단기 메모리를 사용하면 동일한 **스레드 ID**의 서로 다른 **호출** 간에 정보를 저장할 수 있습니다. 자세한 내용은 [단기 메모리](/oss/javascript/langgraph/functional-api#short-term-memory)를 참조하세요.
 
-### Manage checkpoints
+### 체크포인트 관리
 
-You can view and delete the information stored by the checkpointer.
+체크포인터에 저장된 정보를 보고 삭제할 수 있습니다.
 
 <a id="checkpoint"></a>
-#### View thread state
+#### 스레드 상태 보기
 
 
 
-```typescript
+```typescript {highlight={3,6,9}}
 const config = {
   configurable: {
-    thread_id: "1",  // [!code highlight]
-    // optionally provide an ID for a specific checkpoint,
-    // otherwise the latest checkpoint is shown
-    // checkpoint_id: "1f029ca3-1f5b-6704-8004-820c16b69a5a" [!code highlight]
+    thread_id: "1",
+    // 선택적으로 특정 체크포인트의 ID를 제공할 수 있습니다.
+    // 그렇지 않으면 최신 체크포인트가 표시됩니다.
+    // checkpoint_id: "1f029ca3-1f5b-6704-8004-820c16b69a5a"
   },
 };
-await graph.getState(config);  // [!code highlight]
+await graph.getState(config);
 ```
 
 ```
@@ -813,17 +809,17 @@ StateSnapshot {
 
 
 <a id="checkpoints"></a>
-#### View the history of the thread
+#### 스레드 히스토리 보기
 
 
 
-```typescript
+```typescript {highlight={3,6}}
 const config = {
   configurable: {
-    thread_id: "1",  // [!code highlight]
+    thread_id: "1",
   },
 };
-const history = [];  // [!code highlight]
+const history = [];
 for await (const state of graph.getStateHistory(config)) {
   history.push(state);
 }
@@ -848,17 +844,17 @@ for await (const state of graph.getStateHistory(config)) {
     tasks: [],
     interrupts: []
   },
-  // ... more state snapshots
+  // ... 더 많은 상태 스냅샷
 ]
 ```
 
 
-### Decouple return value from saved value
+### 반환 값과 저장 값 분리하기
 
-Use `entrypoint.final` to decouple what is returned to the caller from what is persisted in the checkpoint. This is useful when:
+`entrypoint.final`을 사용하면 호출자에게 반환되는 값과 체크포인트에 저장되는 값을 분리할 수 있습니다. 다음과 같은 경우에 유용합니다:
 
-* You want to return a computed result (e.g., a summary or status), but save a different internal value for use on the next invocation.
-* You need to control what gets passed to the previous parameter on the next run.
+* 계산된 결과(예: 요약 또는 상태)를 반환하지만 다음 호출에 사용할 다른 내부 값을 저장하려는 경우.
+* 다음 실행에서 previous 매개변수로 전달될 값을 제어해야 하는 경우.
 
 
 
@@ -872,7 +868,7 @@ const accumulate = entrypoint(
   async (n: number, previous?: number) => {
     const prev = previous || 0;
     const total = prev + n;
-    // Return the *previous* value to the caller but save the *new* total to the checkpoint.
+    // 호출자에게는 *이전* 값을 반환하지만 체크포인트에는 *새* 합계를 저장
     return entrypoint.final({ value: prev, save: total });
   }
 );
@@ -885,10 +881,10 @@ console.log(await accumulate.invoke(3, config)); // 3
 ```
 
 
-### Chatbot example
+### 챗봇 예제
 
-An example of a simple chatbot using the functional API and the `InMemorySaver` checkpointer.
-The bot is able to remember the previous conversation and continue from where it left off.
+함수형 API와 `InMemorySaver` 체크포인터를 사용하는 간단한 챗봇 예제입니다.
+봇은 이전 대화를 기억하고 중단한 부분부터 계속할 수 있습니다.
 
 
 
@@ -902,7 +898,7 @@ import {
 } from "@langchain/langgraph";
 import { ChatAnthropic } from "@langchain/anthropic";
 
-const model = new ChatAnthropic({ model: "claude-sonnet-4-5-20250929" });
+const model = new ChatAnthropic({ model: "claude-3-5-sonnet-latest" });
 
 const callModel = task(
   "callModel",
@@ -953,17 +949,17 @@ for await (const chunk of await workflow.stream([inputMessage2], {
 ```
 
 
-## Long-term memory
+## 장기 메모리
 
-[long-term memory](/oss/javascript/concepts/memory#long-term-memory) allows storing information across different **thread ids**. This could be useful for learning information about a given user in one conversation and using it in another.
+[장기 메모리](/oss/javascript/concepts/memory#long-term-memory)를 사용하면 서로 다른 **스레드 ID** 간에 정보를 저장할 수 있습니다. 이는 한 대화에서 특정 사용자에 대한 정보를 학습하고 다른 대화에서 사용하는 데 유용할 수 있습니다.
 
-## Workflows
+## 워크플로우
 
-* [Workflows and agent](/oss/javascript/langgraph/workflows-agents) guide for more examples of how to build workflows using the Functional API.
+* 함수형 API를 사용하여 워크플로우를 구축하는 방법에 대한 더 많은 예제는 [워크플로우와 에이전트](/oss/javascript/langgraph/workflows-agents) 가이드를 참조하세요.
 
-## Integrate with other libraries
+## 다른 라이브러리와 통합하기
 
-* [Add LangGraph's features to other frameworks using the functional API](/langsmith/autogen-integration): Add LangGraph features like persistence, memory and streaming to other agent frameworks that do not provide them out of the box.
+* [함수형 API를 사용하여 다른 프레임워크에 LangGraph 기능 추가하기](/langsmith/autogen-integration): 기본적으로 제공하지 않는 다른 에이전트 프레임워크에 영속성, 메모리, 스트리밍과 같은 LangGraph 기능을 추가하세요.
 
 ---
 

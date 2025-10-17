@@ -2,21 +2,19 @@
 title: MISSING_CHECKPOINTER
 ---
 
-import AlphaCallout from "/snippets/alpha-lg-callout.mdx";
+import AlphaCallout from "/ko/snippets/alpha-lg-callout.mdx";
 
+<AlphaCallout />
 
-<AlphaCalloutJS />
+checkpointer를 제공하지 않고 LangGraph의 내장 지속성 기능을 사용하려고 시도하고 있습니다.
 
+이는 [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html)의 `compile()` 메서드 또는 [`entrypoint`](https://langchain-ai.github.io/langgraphjs/reference/functions/langgraph.entrypoint.html)에 `checkpointer`가 누락된 경우 발생합니다.
 
-You are attempting to use built-in LangGraph persistence without providing a checkpointer.
+## 문제 해결
 
-This happens when a `checkpointer` is missing in the `compile()` method of [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html) or [`entrypoint`](https://langchain-ai.github.io/langgraphjs/reference/functions/langgraph.entrypoint.html).
+다음 사항이 이 오류를 해결하는 데 도움이 될 수 있습니다:
 
-## Troubleshooting
-
-The following may help resolve this error:
-
--   Initialize and pass a checkpointer to the `compile()` method of [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html) or [`entrypoint`](https://langchain-ai.github.io/langgraphjs/reference/functions/langgraph.entrypoint.html).
+-   checkpointer를 초기화하고 [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html)의 `compile()` 메서드 또는 [`entrypoint`](https://langchain-ai.github.io/langgraphjs/reference/functions/langgraph.entrypoint.html)에 전달하세요.
 
 
 
@@ -40,11 +38,11 @@ const workflow = entrypoint(
 
 
 
--   Use the LangGraph API so you don't need to implement or configure checkpointers manually. The API handles all persistence infrastructure for you.
+-   LangGraph API를 사용하면 checkpointer를 수동으로 구현하거나 구성할 필요가 없습니다. API가 모든 지속성 인프라를 자동으로 처리합니다.
 
-## Related
+## 관련 항목
 
-- Read more about [persistence](/oss/javascript/langgraph/persistence).
+- [지속성](/oss/javascript/langgraph/persistence)에 대해 자세히 알아보세요.
 
 ---
 

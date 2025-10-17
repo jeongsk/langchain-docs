@@ -2,12 +2,9 @@
 title: Human-in-the-loop
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
-
-<AlphaCalloutJS />
-
+<AlphaCallout />
 
 The Human-in-the-Loop (HITL) middleware lets you add human oversight to agent tool calls.
 When a model proposes an action that might require review — for example, writing to a file or executing SQL — the middleware can pause execution and wait for a decision.
@@ -44,8 +41,9 @@ You configure it with a mapping of tool actions to the decision types that are a
 
 
 ```ts
-import { createAgent, humanInTheLoopMiddleware } from "langchain"; // [!code highlight]
+import { createAgent } from "langchain";
 import { MemorySaver } from "@langchain/langgraph"; // [!code highlight]
+import { humanInTheLoopMiddleware } from "langchain/middleware"; // [!code highlight]
 
 const agent = createAgent({
     model: "openai:gpt-4o",
@@ -78,7 +76,7 @@ const agent = createAgent({
 
 <Info>
     You must configure a checkpointer to persist the graph state across interrupts.
-    In production, use a persistent checkpointer like @[`AsyncPostgresSaver`]. For testing or prototyping, use @[`InMemorySaver`].
+    In production, use a persistent checkpointer like @[AsyncPostgresSaver]. For testing or prototyping, use @[InMemorySaver].
 
     When invoking the agent, pass a `config` that includes the **thread ID** to associate execution with a conversation thread.
     See the [LangGraph interrupts documentation](/oss/javascript/langgraph/interrupts) for details.

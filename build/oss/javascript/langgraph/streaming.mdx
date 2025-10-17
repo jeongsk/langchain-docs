@@ -1,44 +1,41 @@
 ---
-title: Streaming
+title: 스트리밍
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
+<AlphaCallout />
 
-<AlphaCalloutJS />
+LangGraph는 실시간 업데이트를 제공하기 위한 스트리밍 시스템을 구현합니다. 스트리밍은 LLM 기반 애플리케이션의 응답성을 향상시키는 데 매우 중요합니다. 완전한 응답이 준비되기 전에도 출력을 점진적으로 표시함으로써, 스트리밍은 특히 LLM의 지연 시간을 처리할 때 사용자 경험(UX)을 크게 개선합니다.
 
+LangGraph 스트리밍으로 가능한 것들:
 
-LangGraph implements a streaming system to surface real-time updates. Streaming is crucial for enhancing the responsiveness of applications built on LLMs. By displaying output progressively, even before a complete response is ready, streaming significantly improves user experience (UX), particularly when dealing with the latency of LLMs.
+* <Icon icon="share-nodes" size={16} /> [**그래프 상태 스트리밍**](#stream-graph-state) — `updates` 및 `values` 모드로 상태 업데이트/값을 가져옵니다.
+* <Icon icon="square-poll-horizontal" size={16} /> [**서브그래프 출력 스트리밍**](#stream-subgraph-outputs) — 부모 그래프와 중첩된 서브그래프 모두의 출력을 포함합니다.
+* <Icon icon="square-binary" size={16} /> [**LLM 토큰 스트리밍**](#messages) — 노드, 서브그래프 또는 도구 내 어디서든 토큰 스트림을 캡처합니다.
+* <Icon icon="table" size={16} /> [**커스텀 데이터 스트리밍**](#stream-custom-data) — 도구 함수에서 직접 커스텀 업데이트 또는 진행 상황 신호를 전송합니다.
+* <Icon icon="layer-plus" size={16} /> [**여러 스트리밍 모드 사용**](#stream-multiple-modes) — `values` (전체 상태), `updates` (상태 변경사항), `messages` (LLM 토큰 + 메타데이터), `custom` (임의의 사용자 데이터) 또는 `debug` (상세한 추적) 중에서 선택합니다.
 
-What's possible with LangGraph streaming:
-
-* <Icon icon="share-nodes" size={16} /> [**Stream graph state**](#stream-graph-state) — get state updates / values with `updates` and `values` modes.
-* <Icon icon="square-poll-horizontal" size={16} /> [**Stream subgraph outputs**](#stream-subgraph-outputs) — include outputs from both the parent graph and any nested subgraphs.
-* <Icon icon="square-binary" size={16} /> [**Stream LLM tokens**](#messages) — capture token streams from anywhere: inside nodes, subgraphs, or tools.
-* <Icon icon="table" size={16} /> [**Stream custom data**](#stream-custom-data) — send custom updates or progress signals directly from tool functions.
-* <Icon icon="layer-plus" size={16} /> [**Use multiple streaming modes**](#stream-multiple-modes) — choose from `values` (full state), `updates` (state deltas), `messages` (LLM tokens + metadata), `custom` (arbitrary user data), or `debug` (detailed traces).
-
-## Supported stream modes
+## 지원되는 스트림 모드
 
 
 
-Pass one or more of the following stream modes as a list to the [`stream()`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.CompiledStateGraph.html#stream) method:
+다음 스트림 모드 중 하나 이상을 리스트로 [`stream()`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.CompiledStateGraph.html#stream) 메서드에 전달합니다:
 
 
-| Mode       | Description                                                                                                                                                                         |
+| 모드       | 설명                                                                                                                                                                         |
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `values`   | Streams the full value of the state after each step of the graph.                                                                                                                   |
-| `updates`  | Streams the updates to the state after each step of the graph. If multiple updates are made in the same step (e.g., multiple nodes are run), those updates are streamed separately. |
-| `custom`   | Streams custom data from inside your graph nodes.                                                                                                                                   |
-| `messages` | Streams 2-tuples (LLM token, metadata) from any graph nodes where an LLM is invoked.                                                                                                |
-| `debug`    | Streams as much information as possible throughout the execution of the graph.                                                                                                      |
+| `values`   | 그래프의 각 단계 후 상태의 전체 값을 스트리밍합니다.                                                                                                                   |
+| `updates`  | 그래프의 각 단계 후 상태에 대한 업데이트를 스트리밍합니다. 동일한 단계에서 여러 업데이트가 발생하면 (예: 여러 노드가 실행됨), 해당 업데이트는 개별적으로 스트리밍됩니다. |
+| `custom`   | 그래프 노드 내부에서 커스텀 데이터를 스트리밍합니다.                                                                                                                   |
+| `messages` | LLM이 호출되는 모든 그래프 노드에서 2-튜플 (LLM 토큰, 메타데이터)을 스트리밍합니다.                                                                                                                |
+| `debug`    | 그래프 실행 전반에 걸쳐 가능한 한 많은 정보를 스트리밍합니다.                                                                                                      |
 
-## Basic usage example
+## 기본 사용 예제
 
 
 
-LangGraph graphs expose the [`.stream()`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.Pregel.html#stream) method to yield streamed outputs as iterators.
+LangGraph 그래프는 스트리밍 출력을 이터레이터로 생성하기 위해 [`.stream()`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.Pregel.html#stream) 메서드를 제공합니다.
 
 ```typescript
 for await (const chunk of await graph.stream(inputs, {
@@ -49,7 +46,7 @@ for await (const chunk of await graph.stream(inputs, {
 ```
 
 
-<Accordion title="Extended example: streaming updates">
+<Accordion title="확장 예제: 업데이트 스트리밍">
 
 
   ```typescript
@@ -75,8 +72,8 @@ for await (const chunk of await graph.stream(inputs, {
 
   for await (const chunk of await graph.stream(
     { topic: "ice cream" },
-    // Set streamMode: "updates" to stream only the updates to the graph state after each node
-    // Other stream modes are also available. See supported stream modes for details
+    // 각 노드 후 그래프 상태에 대한 업데이트만 스트리밍하려면 streamMode: "updates"로 설정합니다
+    // 다른 스트림 모드도 사용할 수 있습니다. 지원되는 스트림 모드를 참조하세요
     { streamMode: "updates" }
   )) {
     console.log(chunk);
@@ -90,13 +87,13 @@ for await (const chunk of await graph.stream(inputs, {
   ```
 </Accordion>
 
-## Stream multiple modes
+## 여러 모드 스트리밍
 
 
 
-You can pass an array as the `streamMode` parameter to stream multiple modes at once.
+`streamMode` 매개변수에 배열을 전달하여 여러 모드를 동시에 스트리밍할 수 있습니다.
 
-The streamed outputs will be tuples of `[mode, chunk]` where `mode` is the name of the stream mode and `chunk` is the data streamed by that mode.
+스트리밍되는 출력은 `[mode, chunk]` 튜플이 되며, 여기서 `mode`는 스트림 모드의 이름이고 `chunk`는 해당 모드에서 스트리밍된 데이터입니다.
 
 ```typescript
 for await (const [mode, chunk] of await graph.stream(inputs, {
@@ -107,12 +104,12 @@ for await (const [mode, chunk] of await graph.stream(inputs, {
 ```
 
 
-## Stream graph state
+## 그래프 상태 스트리밍
 
-Use the stream modes `updates` and `values` to stream the state of the graph as it executes.
+`updates` 및 `values` 스트림 모드를 사용하여 그래프 실행 시 상태를 스트리밍합니다.
 
-* `updates` streams the **updates** to the state after each step of the graph.
-* `values` streams the **full value** of the state after each step of the graph.
+* `updates`는 그래프의 각 단계 후 상태에 대한 **업데이트**를 스트리밍합니다.
+* `values`는 그래프의 각 단계 후 상태의 **전체 값**을 스트리밍합니다.
 
 
 
@@ -141,7 +138,7 @@ const graph = new StateGraph(State)
 
 <Tabs>
     <Tab title="updates">
-    Use this to stream only the **state updates** returned by the nodes after each step. The streamed outputs include the name of the node as well as the update.
+    각 단계 후 노드가 반환한 **상태 업데이트**만 스트리밍하려면 이 모드를 사용합니다. 스트리밍되는 출력에는 노드의 이름과 업데이트가 포함됩니다.
 
 
 
@@ -156,7 +153,7 @@ const graph = new StateGraph(State)
 
     </Tab>
     <Tab title="values">
-    Use this to stream the **full state** of the graph after each step.
+    각 단계 후 그래프의 **전체 상태**를 스트리밍하려면 이 모드를 사용합니다.
 
 
 
@@ -172,19 +169,19 @@ const graph = new StateGraph(State)
     </Tab>
 </Tabs>
 
-## Stream subgraph outputs
+## 서브그래프 출력 스트리밍
 
 
 
-To include outputs from [subgraphs](/oss/javascript/langgraph/use-subgraphs) in the streamed outputs, you can set `subgraphs: true` in the `.stream()` method of the parent graph. This will stream outputs from both the parent graph and any subgraphs.
+스트리밍되는 출력에 [서브그래프](/oss/javascript/langgraph/use-subgraphs)의 출력을 포함하려면, 부모 그래프의 `.stream()` 메서드에서 `subgraphs: true`로 설정할 수 있습니다. 이렇게 하면 부모 그래프와 모든 서브그래프의 출력이 스트리밍됩니다.
 
-The outputs will be streamed as tuples `[namespace, data]`, where `namespace` is a tuple with the path to the node where a subgraph is invoked, e.g. `["parent_node:<task_id>", "child_node:<task_id>"]`.
+출력은 `[namespace, data]` 튜플로 스트리밍되며, 여기서 `namespace`는 서브그래프가 호출되는 노드의 경로를 가진 튜플입니다. 예: `["parent_node:<task_id>", "child_node:<task_id>"]`
 
 ```typescript
 for await (const chunk of await graph.stream(
   { foo: "foo" },
   {
-    // Set subgraphs: true to stream outputs from subgraphs
+    // 서브그래프의 출력을 스트리밍하려면 subgraphs: true로 설정합니다
     subgraphs: true,
     streamMode: "updates",
   }
@@ -194,16 +191,16 @@ for await (const chunk of await graph.stream(
 ```
 
 
-<Accordion title="Extended example: streaming from subgraphs">
+<Accordion title="확장 예제: 서브그래프에서 스트리밍">
 
 
   ```typescript
   import { StateGraph, START } from "@langchain/langgraph";
   import * as z from "zod";
 
-  // Define subgraph
+  // 서브그래프 정의
   const SubgraphState = z.object({
-    foo: z.string(), // note that this key is shared with the parent graph state
+    foo: z.string(), // 이 키는 부모 그래프 상태와 공유됩니다
     bar: z.string(),
   });
 
@@ -218,7 +215,7 @@ for await (const chunk of await graph.stream(
     .addEdge("subgraphNode1", "subgraphNode2");
   const subgraph = subgraphBuilder.compile();
 
-  // Define parent graph
+  // 부모 그래프 정의
   const ParentState = z.object({
     foo: z.string(),
   });
@@ -236,7 +233,7 @@ for await (const chunk of await graph.stream(
     { foo: "foo" },
     {
       streamMode: "updates",
-      // Set subgraphs: true to stream outputs from subgraphs
+      // 서브그래프의 출력을 스트리밍하려면 subgraphs: true로 설정합니다
       subgraphs: true,
     }
   )) {
@@ -255,13 +252,13 @@ for await (const chunk of await graph.stream(
   ```
 
 
-  **Note** that we are receiving not just the node updates, but we also the namespaces which tell us what graph (or subgraph) we are streaming from.
+  **참고** 노드 업데이트뿐만 아니라 어떤 그래프(또는 서브그래프)에서 스트리밍하고 있는지 알려주는 네임스페이스도 받고 있습니다.
 </Accordion>
 
 <a id="debug"></a>
-### Debugging
+### 디버깅
 
-Use the `debug` streaming mode to stream as much information as possible throughout the execution of the graph. The streamed outputs include the name of the node as well as the full state.
+`debug` 스트리밍 모드를 사용하여 그래프 실행 전반에 걸쳐 가능한 한 많은 정보를 스트리밍합니다. 스트리밍되는 출력에는 노드의 이름과 전체 상태가 포함됩니다.
 
 
 
@@ -276,18 +273,18 @@ for await (const chunk of await graph.stream(
 
 
 <a id="messages"></a>
-## LLM tokens
+## LLM 토큰
 
-Use the `messages` streaming mode to stream Large Language Model (LLM) outputs **token by token** from any part of your graph, including nodes, tools, subgraphs, or tasks.
+`messages` 스트리밍 모드를 사용하여 노드, 도구, 서브그래프 또는 태스크를 포함한 그래프의 모든 부분에서 대규모 언어 모델(LLM) 출력을 **토큰 단위로** 스트리밍합니다.
 
 
 
-The streamed output from [`messages` mode](#supported-stream-modes) is a tuple `[message_chunk, metadata]` where:
+[`messages` 모드](#supported-stream-modes)에서 스트리밍되는 출력은 `[message_chunk, metadata]` 튜플입니다:
 
-* `message_chunk`: the token or message segment from the LLM.
-* `metadata`: a dictionary containing details about the graph node and LLM invocation.
+* `message_chunk`: LLM에서 나온 토큰 또는 메시지 세그먼트입니다.
+* `metadata`: 그래프 노드 및 LLM 호출에 대한 세부 정보가 포함된 딕셔너리입니다.
 
-> If your LLM is not available as a LangChain integration, you can stream its outputs using `custom` mode instead. See [use with any LLM](#use-with-any-llm) for details.
+> LLM이 LangChain 통합으로 제공되지 않는 경우, `custom` 모드를 사용하여 출력을 스트리밍할 수 있습니다. 자세한 내용은 [모든 LLM과 함께 사용](#use-with-any-llm)을 참조하세요.
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
@@ -302,8 +299,8 @@ const MyState = z.object({
 const llm = new ChatOpenAI({ model: "gpt-4o-mini" });
 
 const callModel = async (state: z.infer<typeof MyState>) => {
-  // Call the LLM to generate a joke about a topic
-  // Note that message events are emitted even when the LLM is run using .invoke rather than .stream
+  // 주제에 대한 농담을 생성하기 위해 LLM을 호출합니다
+  // LLM이 .stream이 아닌 .invoke를 사용하여 실행되더라도 메시지 이벤트가 발생합니다
   const llmResponse = await llm.invoke([
     { role: "user", content: `Generate a joke about ${state.topic}` },
   ]);
@@ -315,9 +312,9 @@ const graph = new StateGraph(MyState)
   .addEdge(START, "callModel")
   .compile();
 
-// The "messages" stream mode returns an iterator of tuples [messageChunk, metadata]
-// where messageChunk is the token streamed by the LLM and metadata is a dictionary
-// with information about the graph node where the LLM was called and other information
+// "messages" 스트림 모드는 [messageChunk, metadata] 튜플의 이터레이터를 반환합니다
+// 여기서 messageChunk는 LLM이 스트리밍한 토큰이고 metadata는 딕셔너리입니다
+// LLM이 호출된 그래프 노드에 대한 정보 및 기타 정보가 포함됩니다
 for await (const [messageChunk, metadata] of await graph.stream(
   { topic: "ice cream" },
   { streamMode: "messages" }
@@ -329,36 +326,36 @@ for await (const [messageChunk, metadata] of await graph.stream(
 ```
 
 
-#### Filter by LLM invocation
+#### LLM 호출별 필터링
 
-You can associate `tags` with LLM invocations to filter the streamed tokens by LLM invocation.
+LLM 호출에 `tags`를 연결하여 LLM 호출별로 스트리밍된 토큰을 필터링할 수 있습니다.
 
 
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
 
-// llm1 is tagged with "joke"
+// llm1은 "joke" 태그가 지정됩니다
 const llm1 = new ChatOpenAI({
   model: "gpt-4o-mini",
   tags: ['joke']
 });
-// llm2 is tagged with "poem"
+// llm2는 "poem" 태그가 지정됩니다
 const llm2 = new ChatOpenAI({
   model: "gpt-4o-mini",
   tags: ['poem']
 });
 
-const graph = // ... define a graph that uses these LLMs
+const graph = // ... 이러한 LLM을 사용하는 그래프를 정의합니다
 
-// The streamMode is set to "messages" to stream LLM tokens
-// The metadata contains information about the LLM invocation, including the tags
+// streamMode를 "messages"로 설정하여 LLM 토큰을 스트리밍합니다
+// metadata에는 태그를 포함한 LLM 호출에 대한 정보가 포함됩니다
 for await (const [msg, metadata] of await graph.stream(
   { topic: "cats" },
   { streamMode: "messages" }
 )) {
-  // Filter the streamed tokens by the tags field in the metadata to only include
-  // the tokens from the LLM invocation with the "joke" tag
+  // metadata의 tags 필드로 스트리밍된 토큰을 필터링하여
+  // "joke" 태그가 있는 LLM 호출의 토큰만 포함합니다
   if (metadata.tags?.includes("joke")) {
     console.log(msg.content + "|");
   }
@@ -366,7 +363,7 @@ for await (const [msg, metadata] of await graph.stream(
 ```
 
 
-<Accordion title="Extended example: filtering by tags">
+<Accordion title="확장 예제: 태그로 필터링">
 
 
   ```typescript
@@ -374,12 +371,12 @@ for await (const [msg, metadata] of await graph.stream(
   import { StateGraph, START } from "@langchain/langgraph";
   import * as z from "zod";
 
-  // The jokeModel is tagged with "joke"
+  // jokeModel은 "joke" 태그가 지정됩니다
   const jokeModel = new ChatOpenAI({
     model: "gpt-4o-mini",
     tags: ["joke"]
   });
-  // The poemModel is tagged with "poem"
+  // poemModel은 "poem" 태그가 지정됩니다
   const poemModel = new ChatOpenAI({
     model: "gpt-4o-mini",
     tags: ["poem"]
@@ -413,14 +410,14 @@ for await (const [msg, metadata] of await graph.stream(
     .addEdge(START, "callModel")
     .compile();
 
-  // The streamMode is set to "messages" to stream LLM tokens
-  // The metadata contains information about the LLM invocation, including the tags
+  // streamMode를 "messages"로 설정하여 LLM 토큰을 스트리밍합니다
+  // metadata에는 태그를 포함한 LLM 호출에 대한 정보가 포함됩니다
   for await (const [msg, metadata] of await graph.stream(
     { topic: "cats" },
     { streamMode: "messages" }
   )) {
-    // Filter the streamed tokens by the tags field in the metadata to only include
-    // the tokens from the LLM invocation with the "joke" tag
+    // metadata의 tags 필드로 스트리밍된 토큰을 필터링하여
+    // "joke" 태그가 있는 LLM 호출의 토큰만 포함합니다
     if (metadata.tags?.includes("joke")) {
       console.log(msg.content + "|");
     }
@@ -429,22 +426,22 @@ for await (const [msg, metadata] of await graph.stream(
 
 </Accordion>
 
-#### Filter by node
+#### 노드별 필터링
 
-To stream tokens only from specific nodes, use `stream_mode="messages"` and filter the outputs by the `langgraph_node` field in the streamed metadata:
+특정 노드에서만 토큰을 스트리밍하려면, `stream_mode="messages"`를 사용하고 스트리밍된 메타데이터의 `langgraph_node` 필드로 출력을 필터링합니다:
 
 
 
 ```typescript
-// The "messages" stream mode returns a tuple of [messageChunk, metadata]
-// where messageChunk is the token streamed by the LLM and metadata is a dictionary
-// with information about the graph node where the LLM was called and other information
+// "messages" 스트림 모드는 [messageChunk, metadata] 튜플을 반환합니다
+// 여기서 messageChunk는 LLM이 스트리밍한 토큰이고 metadata는 딕셔너리입니다
+// LLM이 호출된 그래프 노드에 대한 정보 및 기타 정보가 포함됩니다
 for await (const [msg, metadata] of await graph.stream(
   inputs,
   { streamMode: "messages" }
 )) {
-  // Filter the streamed tokens by the langgraph_node field in the metadata
-  // to only include the tokens from the specified node
+  // metadata의 langgraph_node 필드로 스트리밍된 토큰을 필터링하여
+  // 지정된 노드의 토큰만 포함합니다
   if (msg.content && metadata.langgraph_node === "some_node_name") {
     // ...
   }
@@ -452,7 +449,7 @@ for await (const [msg, metadata] of await graph.stream(
 ```
 
 
-<Accordion title="Extended example: streaming LLM tokens from specific nodes">
+<Accordion title="확장 예제: 특정 노드에서 LLM 토큰 스트리밍">
 
 
   ```typescript
@@ -483,20 +480,20 @@ for await (const [msg, metadata] of await graph.stream(
       ]);
       return { poem: poemResponse.content };
     })
-    // write both the joke and the poem concurrently
+    // 농담과 시를 동시에 작성합니다
     .addEdge(START, "writeJoke")
     .addEdge(START, "writePoem")
     .compile();
 
-  // The "messages" stream mode returns a tuple of [messageChunk, metadata]
-  // where messageChunk is the token streamed by the LLM and metadata is a dictionary
-  // with information about the graph node where the LLM was called and other information
+  // "messages" 스트림 모드는 [messageChunk, metadata] 튜플을 반환합니다
+  // 여기서 messageChunk는 LLM이 스트리밍한 토큰이고 metadata는 딕셔너리입니다
+  // LLM이 호출된 그래프 노드에 대한 정보 및 기타 정보가 포함됩니다
   for await (const [msg, metadata] of await graph.stream(
     { topic: "cats" },
     { streamMode: "messages" }
   )) {
-    // Filter the streamed tokens by the langgraph_node field in the metadata
-    // to only include the tokens from the writePoem node
+    // metadata의 langgraph_node 필드로 스트리밍된 토큰을 필터링하여
+    // writePoem 노드의 토큰만 포함합니다
     if (msg.content && metadata.langgraph_node === "writePoem") {
       console.log(msg.content + "|");
     }
@@ -505,14 +502,14 @@ for await (const [msg, metadata] of await graph.stream(
 
 </Accordion>
 
-## Stream custom data
+## 커스텀 데이터 스트리밍
 
 
 
-To send **custom user-defined data** from inside a LangGraph node or tool, follow these steps:
+LangGraph 노드 또는 도구 내부에서 **커스텀 사용자 정의 데이터**를 전송하려면 다음 단계를 따르세요:
 
-1. Use the `writer` parameter from the `LangGraphRunnableConfig` to emit custom data.
-2. Set `streamMode: "custom"` when calling `.stream()` to get the custom data in the stream. You can combine multiple modes (e.g., `["updates", "custom"]`), but at least one must be `"custom"`.
+1. `LangGraphRunnableConfig`의 `writer` 매개변수를 사용하여 커스텀 데이터를 발생시킵니다.
+2. `.stream()`을 호출할 때 `streamMode: "custom"`으로 설정하여 스트림에서 커스텀 데이터를 가져옵니다. 여러 모드를 결합할 수 있지만 (예: `["updates", "custom"]`), 적어도 하나는 `"custom"`이어야 합니다.
 
 <Tabs>
     <Tab title="node">
@@ -527,7 +524,7 @@ To send **custom user-defined data** from inside a LangGraph node or tool, follo
 
     const graph = new StateGraph(State)
       .addNode("node", async (state, config) => {
-        // Use the writer to emit a custom key-value pair (e.g., progress update)
+        // 커스텀 키-값 쌍을 발생시키기 위해 writer를 사용합니다 (예: 진행 상황 업데이트)
         config.writer({ custom_key: "Generating custom data inside node" });
         return { answer: "some data" };
       })
@@ -536,7 +533,7 @@ To send **custom user-defined data** from inside a LangGraph node or tool, follo
 
     const inputs = { query: "example" };
 
-    // Set streamMode: "custom" to receive the custom data in the stream
+    // 스트림에서 커스텀 데이터를 받으려면 streamMode: "custom"으로 설정합니다
     for await (const chunk of await graph.stream(inputs, { streamMode: "custom" })) {
       console.log(chunk);
     }
@@ -550,10 +547,10 @@ To send **custom user-defined data** from inside a LangGraph node or tool, follo
 
     const queryDatabase = tool(
       async (input, config: LangGraphRunnableConfig) => {
-        // Use the writer to emit a custom key-value pair (e.g., progress update)
+        // 커스텀 키-값 쌍을 발생시키기 위해 writer를 사용합니다 (예: 진행 상황 업데이트)
         config.writer({ data: "Retrieved 0/100 records", type: "progress" });
-        // perform query
-        // Emit another custom key-value pair
+        // 쿼리 수행
+        // 또 다른 커스텀 키-값 쌍을 발생시킵니다
         config.writer({ data: "Retrieved 100/100 records", type: "progress" });
         return "some-answer";
       },
@@ -566,9 +563,9 @@ To send **custom user-defined data** from inside a LangGraph node or tool, follo
       }
     );
 
-    const graph = // ... define a graph that uses this tool
+    const graph = // ... 이 도구를 사용하는 그래프를 정의합니다
 
-    // Set streamMode: "custom" to receive the custom data in the stream
+    // 스트림에서 커스텀 데이터를 받으려면 streamMode: "custom"으로 설정합니다
     for await (const chunk of await graph.stream(inputs, { streamMode: "custom" })) {
       console.log(chunk);
     }
@@ -577,13 +574,13 @@ To send **custom user-defined data** from inside a LangGraph node or tool, follo
 </Tabs>
 
 
-## Use with any LLM
+## 모든 LLM과 함께 사용
 
 
 
-You can use `streamMode: "custom"` to stream data from **any LLM API** — even if that API does **not** implement the LangChain chat model interface.
+`streamMode: "custom"`을 사용하여 **모든 LLM API**에서 데이터를 스트리밍할 수 있습니다 — 해당 API가 LangChain 채팅 모델 인터페이스를 구현하지 **않더라도** 말입니다.
 
-This lets you integrate raw LLM clients or external services that provide their own streaming interfaces, making LangGraph highly flexible for custom setups.
+이를 통해 자체 스트리밍 인터페이스를 제공하는 원시 LLM 클라이언트 또는 외부 서비스를 통합할 수 있어, LangGraph를 커스텀 설정에 매우 유연하게 사용할 수 있습니다.
 
 ```typescript
 import { LangGraphRunnableConfig } from "@langchain/langgraph";
@@ -592,11 +589,11 @@ const callArbitraryModel = async (
   state: any,
   config: LangGraphRunnableConfig
 ) => {
-  // Example node that calls an arbitrary model and streams the output
-  // Assume you have a streaming client that yields chunks
-  // Generate LLM tokens using your custom streaming client
+  // 임의의 모델을 호출하고 출력을 스트리밍하는 예제 노드
+  // 청크를 생성하는 스트리밍 클라이언트가 있다고 가정합니다
+  // 커스텀 스트리밍 클라이언트를 사용하여 LLM 토큰을 생성합니다
   for await (const chunk of yourCustomStreamingClient(state.topic)) {
-    // Use the writer to send custom data to the stream
+    // writer를 사용하여 스트림에 커스텀 데이터를 전송합니다
     config.writer({ custom_llm_chunk: chunk });
   }
   return { result: "completed" };
@@ -604,21 +601,21 @@ const callArbitraryModel = async (
 
 const graph = new StateGraph(State)
   .addNode("callArbitraryModel", callArbitraryModel)
-  // Add other nodes and edges as needed
+  // 필요에 따라 다른 노드와 엣지를 추가합니다
   .compile();
 
-// Set streamMode: "custom" to receive the custom data in the stream
+// 스트림에서 커스텀 데이터를 받으려면 streamMode: "custom"으로 설정합니다
 for await (const chunk of await graph.stream(
   { topic: "cats" },
   { streamMode: "custom" }
 )) {
-  // The chunk will contain the custom data streamed from the llm
+  // 청크에는 LLM에서 스트리밍된 커스텀 데이터가 포함됩니다
   console.log(chunk);
 }
 ```
 
 
-<Accordion title="Extended example: streaming arbitrary chat model">
+<Accordion title="확장 예제: 임의의 채팅 모델 스트리밍">
 
 
   ```typescript
@@ -652,7 +649,7 @@ for await (const chunk of await graph.stream(
     }
   }
 
-  // this is our tool
+  // 이것은 우리의 도구입니다
   const getItems = tool(
     async (input, config: LangGraphRunnableConfig) => {
       let response = "";
@@ -686,7 +683,7 @@ for await (const chunk of await graph.stream(
   });
 
   const graph = new StateGraph(State)
-    // this is the tool-calling graph node
+    // 이것은 도구 호출 그래프 노드입니다
     .addNode("callTool", async (state) => {
       const aiMessage = state.messages.at(-1);
       const toolCall = aiMessage.tool_calls?.at(-1);
@@ -712,7 +709,7 @@ for await (const chunk of await graph.stream(
     .compile();
   ```
 
-  Let's invoke the graph with an [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html) that includes a tool call:
+  도구 호출을 포함하는 AI 메시지로 그래프를 호출해 봅시다:
 
   ```typescript
   const inputs = {
@@ -744,21 +741,20 @@ for await (const chunk of await graph.stream(
 
 </Accordion>
 
-## Disable streaming for specific chat models
+## 특정 채팅 모델에 대한 스트리밍 비활성화
 
-If your application mixes models that support streaming with those that do not, you may need to explicitly disable streaming for
-models that do not support it.
-
+애플리케이션에서 스트리밍을 지원하는 모델과 지원하지 않는 모델을 혼합하여 사용하는 경우, 스트리밍을 지원하지 않는 모델에 대해 명시적으로 스트리밍을 비활성화해야 할 수 있습니다.
 
 
-Set `streaming: false` when initializing the model.
+
+모델을 초기화할 때 `streaming: false`로 설정합니다.
 
 ```typescript
 import { ChatOpenAI } from "@langchain/openai";
 
 const model = new ChatOpenAI({
   model: "o1-preview",
-  // Set streaming: false to disable streaming for the chat model
+  // 채팅 모델에 대한 스트리밍을 비활성화하려면 streaming: false로 설정합니다
   streaming: false,
 });
 ```

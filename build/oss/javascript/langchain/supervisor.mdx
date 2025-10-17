@@ -724,17 +724,18 @@ By default, sub-agents receive only the request string from the supervisor. You 
 ### Pass additional conversational context to sub-agents
 
 ```python
-from langchain.tools import tool, ToolRuntime
+from typing import Annotated
+from langchain.tools import InjectedState
 
 @tool
 def schedule_event(
     request: str,
-    runtime: ToolRuntime
+    state: Annotated[dict, InjectedState]
 ) -> str:
     """Schedule calendar events using natural language."""
     # Customize context received by sub-agent
     original_user_message = next(
-        message for message in runtime.state["messages"]
+        message for message in state["messages"]
         if message.type == "human"
     )
     prompt = (
@@ -791,12 +792,12 @@ The supervisor pattern creates layers of abstraction where each layer has a clea
 
 Use the supervisor pattern when you have multiple distinct domains (calendar, email, CRM, database), each domain has multiple tools or complex logic, you want centralized workflow control, and sub-agents don't need to converse directly with users.
 
-For simpler cases with just a few tools, use a single agent. When agents need to have conversations with users, use [handoffs](/oss/javascript/langchain/multi-agent#handoffs) instead. For peer-to-peer collaboration between agents, consider other multi-agent patterns.
+For simpler cases with just a few tools, use a single agent. When agents need to have conversations with users, use [handoffs](/oss/javascript/python/langchain/multi-agent#handoffs) instead. For peer-to-peer collaboration between agents, consider other multi-agent patterns.
 </Tip>
 
 ## Next steps
 
-Learn about [handoffs](/oss/javascript/langchain/multi-agent#handoffs) for agent-to-agent conversations, explore [context engineering](/oss/javascript/langchain/context-engineering) to fine-tune information flow, read the [multi-agent overview](/oss/javascript/langchain/multi-agent) to compare different patterns, and use [LangSmith](https://smith.langchain.com) to debug and monitor your multi-agent system.
+Learn about [handoffs](/oss/javascript/python/langchain/multi-agent#handoffs) for agent-to-agent conversations, explore [context engineering](/oss/javascript/python/langchain/context-engineering) to fine-tune information flow, read the [multi-agent overview](/oss/javascript/python/langchain/multi-agent) to compare different patterns, and use [LangSmith](https://smith.langchain.com) to debug and monitor your multi-agent system.
 
 ---
 

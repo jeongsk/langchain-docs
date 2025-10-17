@@ -1,77 +1,74 @@
 ---
-title: Add and manage memory
+title: 메모리 추가 및 관리
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
-<AlphaCalloutPy />
+<AlphaCallout />
 
+AI 애플리케이션은 여러 상호작용에서 컨텍스트를 공유하기 위해 [메모리](/oss/python/concepts/memory)가 필요합니다. LangGraph에서는 두 가지 유형의 메모리를 추가할 수 있습니다:
 
+* [단기 메모리 추가](#add-short-term-memory): 에이전트의 [상태](/oss/python/langgraph/graph-api#state)의 일부로 단기 메모리를 추가하여 다중 턴 대화를 가능하게 합니다.
+* [장기 메모리 추가](#add-long-term-memory): 세션 간에 사용자별 또는 애플리케이션 수준 데이터를 저장합니다.
 
-AI applications need [memory](/oss/python/concepts/memory) to share context across multiple interactions. In LangGraph, you can add two types of memory:
+## 단기 메모리 추가
 
-* [Add short-term memory](#add-short-term-memory) as a part of your agent's [state](/oss/python/langgraph/graph-api#state) to enable multi-turn conversations.
-* [Add long-term memory](#add-long-term-memory) to store user-specific or application-level data across sessions.
+**단기** 메모리(스레드 수준 [지속성](/oss/python/langgraph/persistence))를 사용하면 에이전트가 다중 턴 대화를 추적할 수 있습니다. 단기 메모리를 추가하는 방법은 다음과 같습니다:
 
-## Add short-term memory
-
-**Short-term** memory (thread-level [persistence](/oss/python/langgraph/persistence)) enables agents to track multi-turn conversations. To add short-term memory:
-
-```python
-from langgraph.checkpoint.memory import InMemorySaver  # [!code highlight]
+```python {highlight={1,4,7,11}}
+from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import StateGraph
 
-checkpointer = InMemorySaver()  # [!code highlight]
+checkpointer = InMemorySaver()
 
 builder = StateGraph(...)
-graph = builder.compile(checkpointer=checkpointer)  # [!code highlight]
+graph = builder.compile(checkpointer=checkpointer)
 
 graph.invoke(
     {"messages": [{"role": "user", "content": "hi! i am Bob"}]},
-    {"configurable": {"thread_id": "1"}},  # [!code highlight]
+    {"configurable": {"thread_id": "1"}},
 )
 ```
 
 
 
 
-### Use in production
+### 프로덕션 환경에서 사용하기
 
-In production, use a checkpointer backed by a database:
+프로덕션 환경에서는 데이터베이스를 기반으로 하는 체크포인터를 사용하세요:
 
-```python
+```python {highlight={4,6}}
 from langgraph.checkpoint.postgres import PostgresSaver
 
 DB_URI = "postgresql://postgres:postgres@localhost:5442/postgres?sslmode=disable"
-with PostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight]
+with PostgresSaver.from_conn_string(DB_URI) as checkpointer:
     builder = StateGraph(...)
-    graph = builder.compile(checkpointer=checkpointer)  # [!code highlight]
+    graph = builder.compile(checkpointer=checkpointer)
 ```
 
 
 
 
-<Accordion title="Example: using Postgres checkpointer">
+<Accordion title="예제: Postgres 체크포인터 사용하기">
   ```
   pip install -U "psycopg[binary,pool]" langgraph langgraph-checkpoint-postgres
   ```
 
     <Tip>
-    You need to call `checkpointer.setup()` the first time you're using Postgres checkpointer
+    Postgres 체크포인터를 처음 사용할 때는 `checkpointer.setup()`을 호출해야 합니다
     </Tip>
 
     <Tabs>
         <Tab title="Sync">
-      ```python
+      ```python {highlight={3,8,19,23,29,36}}
       from langchain.chat_models import init_chat_model
       from langgraph.graph import StateGraph, MessagesState, START
-      from langgraph.checkpoint.postgres import PostgresSaver  # [!code highlight]
+      from langgraph.checkpoint.postgres import PostgresSaver
 
       model = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
 
       DB_URI = "postgresql://postgres:postgres@localhost:5442/postgres?sslmode=disable"
-      with PostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight]
+      with PostgresSaver.from_conn_string(DB_URI) as checkpointer:
           # checkpointer.setup()
 
           def call_model(state: MessagesState):
@@ -82,39 +79,39 @@ with PostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight
           builder.add_node(call_model)
           builder.add_edge(START, "call_model")
 
-          graph = builder.compile(checkpointer=checkpointer)  # [!code highlight]
+          graph = builder.compile(checkpointer=checkpointer)
 
           config = {
               "configurable": {
-                  "thread_id": "1"  # [!code highlight]
+                  "thread_id": "1"
               }
           }
 
           for chunk in graph.stream(
               {"messages": [{"role": "user", "content": "hi! I'm bob"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
 
           for chunk in graph.stream(
               {"messages": [{"role": "user", "content": "what's my name?"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
 ```
         </Tab>
         <Tab title="Async">
-      ```python
+      ```python {highlight={3,8,19,23,29,36}}
       from langchain.chat_models import init_chat_model
       from langgraph.graph import StateGraph, MessagesState, START
-      from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver  # [!code highlight]
+      from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
       model = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
 
       DB_URI = "postgresql://postgres:postgres@localhost:5442/postgres?sslmode=disable"
-      async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight]
+      async with AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer:
           # await checkpointer.setup()
 
           async def call_model(state: MessagesState):
@@ -125,24 +122,24 @@ with PostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight
           builder.add_node(call_model)
           builder.add_edge(START, "call_model")
 
-          graph = builder.compile(checkpointer=checkpointer)  # [!code highlight]
+          graph = builder.compile(checkpointer=checkpointer)
 
           config = {
               "configurable": {
-                  "thread_id": "1"  # [!code highlight]
+                  "thread_id": "1"
               }
           }
 
           async for chunk in graph.astream(
               {"messages": [{"role": "user", "content": "hi! I'm bob"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
 
           async for chunk in graph.astream(
               {"messages": [{"role": "user", "content": "what's my name?"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
@@ -154,27 +151,27 @@ with PostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight
 
 </Accordion>
 
-<Accordion title="Example: using [MongoDB](https://pypi.org/project/langgraph-checkpoint-mongodb/) checkpointer">
+<Accordion title="예제: [MongoDB](https://pypi.org/project/langgraph-checkpoint-mongodb/) 체크포인터 사용하기">
   ```
   pip install -U pymongo langgraph langgraph-checkpoint-mongodb
   ```
 
     <Note>
-    **Setup**
-    To use the MongoDB checkpointer, you will need a MongoDB cluster. Follow [this guide](https://www.mongodb.com/docs/guides/atlas/cluster/) to create a cluster if you don't already have one.
+    **설정**
+    MongoDB 체크포인터를 사용하려면 MongoDB 클러스터가 필요합니다. 아직 클러스터가 없다면 [이 가이드](https://www.mongodb.com/docs/guides/atlas/cluster/)를 따라 클러스터를 생성하세요.
     </Note>
 
     <Tabs>
         <Tab title="Sync">
-      ```python
+      ```python {highlight={3,8,18,22,28,35}}
       from langchain.chat_models import init_chat_model
       from langgraph.graph import StateGraph, MessagesState, START
-      from langgraph.checkpoint.mongodb import MongoDBSaver  # [!code highlight]
+      from langgraph.checkpoint.mongodb import MongoDBSaver
 
       model = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
 
       DB_URI = "localhost:27017"
-      with MongoDBSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight]
+      with MongoDBSaver.from_conn_string(DB_URI) as checkpointer:
 
           def call_model(state: MessagesState):
               response = model.invoke(state["messages"])
@@ -184,39 +181,39 @@ with PostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight
           builder.add_node(call_model)
           builder.add_edge(START, "call_model")
 
-          graph = builder.compile(checkpointer=checkpointer)  # [!code highlight]
+          graph = builder.compile(checkpointer=checkpointer)
 
           config = {
               "configurable": {
-                  "thread_id": "1"  # [!code highlight]
+                  "thread_id": "1"
               }
           }
 
           for chunk in graph.stream(
               {"messages": [{"role": "user", "content": "hi! I'm bob"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
 
           for chunk in graph.stream(
               {"messages": [{"role": "user", "content": "what's my name?"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
 ```
         </Tab>
         <Tab title="Async">
-      ```python
+      ```python {highlight={3,8,18,22,28,35}}
       from langchain.chat_models import init_chat_model
       from langgraph.graph import StateGraph, MessagesState, START
-      from langgraph.checkpoint.mongodb.aio import AsyncMongoDBSaver  # [!code highlight]
+      from langgraph.checkpoint.mongodb.aio import AsyncMongoDBSaver
 
       model = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
 
       DB_URI = "localhost:27017"
-      async with AsyncMongoDBSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight]
+      async with AsyncMongoDBSaver.from_conn_string(DB_URI) as checkpointer:
 
           async def call_model(state: MessagesState):
               response = await model.ainvoke(state["messages"])
@@ -226,24 +223,24 @@ with PostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight
           builder.add_node(call_model)
           builder.add_edge(START, "call_model")
 
-          graph = builder.compile(checkpointer=checkpointer)  # [!code highlight]
+          graph = builder.compile(checkpointer=checkpointer)
 
           config = {
               "configurable": {
-                  "thread_id": "1"  # [!code highlight]
+                  "thread_id": "1"
               }
           }
 
           async for chunk in graph.astream(
               {"messages": [{"role": "user", "content": "hi! I'm bob"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
 
           async for chunk in graph.astream(
               {"messages": [{"role": "user", "content": "what's my name?"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
@@ -252,26 +249,26 @@ with PostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight
     </Tabs>
 </Accordion>
 
-<Accordion title="Example: using [Redis](https://pypi.org/project/langgraph-checkpoint-redis/) checkpointer">
+<Accordion title="예제: [Redis](https://pypi.org/project/langgraph-checkpoint-redis/) 체크포인터 사용하기">
   ```
   pip install -U langgraph langgraph-checkpoint-redis
   ```
 
     <Tip>
-    You need to call `checkpointer.setup()` the first time you're using Redis checkpointer
+    Redis 체크포인터를 처음 사용할 때는 `checkpointer.setup()`을 호출해야 합니다
     </Tip>
 
     <Tabs>
         <Tab title="Sync">
-      ```python
+      ```python {highlight={3,8,19,23,29,36}}
       from langchain.chat_models import init_chat_model
       from langgraph.graph import StateGraph, MessagesState, START
-      from langgraph.checkpoint.redis import RedisSaver  # [!code highlight]
+      from langgraph.checkpoint.redis import RedisSaver
 
       model = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
 
       DB_URI = "redis://localhost:6379"
-      with RedisSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight]
+      with RedisSaver.from_conn_string(DB_URI) as checkpointer:
           # checkpointer.setup()
 
           def call_model(state: MessagesState):
@@ -282,39 +279,39 @@ with PostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight
           builder.add_node(call_model)
           builder.add_edge(START, "call_model")
 
-          graph = builder.compile(checkpointer=checkpointer)  # [!code highlight]
+          graph = builder.compile(checkpointer=checkpointer)
 
           config = {
               "configurable": {
-                  "thread_id": "1"  # [!code highlight]
+                  "thread_id": "1"
               }
           }
 
           for chunk in graph.stream(
               {"messages": [{"role": "user", "content": "hi! I'm bob"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
 
           for chunk in graph.stream(
               {"messages": [{"role": "user", "content": "what's my name?"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
 ```
         </Tab>
         <Tab title="Async">
-      ```python
+      ```python {highlight={3,8,19,23,29,36}}
       from langchain.chat_models import init_chat_model
       from langgraph.graph import StateGraph, MessagesState, START
-      from langgraph.checkpoint.redis.aio import AsyncRedisSaver  # [!code highlight]
+      from langgraph.checkpoint.redis.aio import AsyncRedisSaver
 
       model = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
 
       DB_URI = "redis://localhost:6379"
-      async with AsyncRedisSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight]
+      async with AsyncRedisSaver.from_conn_string(DB_URI) as checkpointer:
           # await checkpointer.asetup()
 
           async def call_model(state: MessagesState):
@@ -325,24 +322,24 @@ with PostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight
           builder.add_node(call_model)
           builder.add_edge(START, "call_model")
 
-          graph = builder.compile(checkpointer=checkpointer)  # [!code highlight]
+          graph = builder.compile(checkpointer=checkpointer)
 
           config = {
               "configurable": {
-                  "thread_id": "1"  # [!code highlight]
+                  "thread_id": "1"
               }
           }
 
           async for chunk in graph.astream(
               {"messages": [{"role": "user", "content": "hi! I'm bob"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
 
           async for chunk in graph.astream(
               {"messages": [{"role": "user", "content": "what's my name?"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values"
           ):
               chunk["messages"][-1].pretty_print()
@@ -352,11 +349,11 @@ with PostgresSaver.from_conn_string(DB_URI) as checkpointer:  # [!code highlight
 </Accordion>
 
 
-### Use in subgraphs
+### 서브그래프에서 사용하기
 
-If your graph contains [subgraphs](/oss/python/langgraph/use-subgraphs), you only need to provide the checkpointer when compiling the parent graph. LangGraph will automatically propagate the checkpointer to the child subgraphs.
+그래프에 [서브그래프](/oss/python/langgraph/use-subgraphs)가 포함되어 있는 경우, 부모 그래프를 컴파일할 때만 체크포인터를 제공하면 됩니다. LangGraph가 자동으로 체크포인터를 자식 서브그래프에 전파합니다.
 
-```python
+```python {highlight={16,21,25}}
 from langgraph.graph import START, StateGraph
 from langgraph.checkpoint.memory import InMemorySaver
 from typing import TypedDict
@@ -364,7 +361,7 @@ from typing import TypedDict
 class State(TypedDict):
     foo: str
 
-# Subgraph
+# 서브그래프
 
 def subgraph_node_1(state: State):
     return {"foo": state["foo"] + "bar"}
@@ -372,81 +369,81 @@ def subgraph_node_1(state: State):
 subgraph_builder = StateGraph(State)
 subgraph_builder.add_node(subgraph_node_1)
 subgraph_builder.add_edge(START, "subgraph_node_1")
-subgraph = subgraph_builder.compile()  # [!code highlight]
+subgraph = subgraph_builder.compile()
 
-# Parent graph
+# 부모 그래프
 
 builder = StateGraph(State)
-builder.add_node("node_1", subgraph)  # [!code highlight]
+builder.add_node("node_1", subgraph)
 builder.add_edge(START, "node_1")
 
 checkpointer = InMemorySaver()
-graph = builder.compile(checkpointer=checkpointer)  # [!code highlight]
+graph = builder.compile(checkpointer=checkpointer)
 ```
 
 
 
 
-If you want the subgraph to have its own memory, you can compile it with the appropriate checkpointer option. This is useful in [multi-agent](/oss/python/langchain/multi-agent) systems, if you want agents to keep track of their internal message histories.
+서브그래프가 자체 메모리를 가지도록 하려면 적절한 체크포인터 옵션으로 컴파일할 수 있습니다. 이는 [멀티 에이전트](/oss/python/langchain/multi-agent) 시스템에서 에이전트가 자신의 내부 메시지 히스토리를 추적하도록 하려는 경우에 유용합니다.
 
-```python
+```python {highlight={2}}
 subgraph_builder = StateGraph(...)
-subgraph = subgraph_builder.compile(checkpointer=True)  # [!code highlight]
+subgraph = subgraph_builder.compile(checkpointer=True)
 ```
 
 
 
 
-## Add long-term memory
+## 장기 메모리 추가
 
-Use long-term memory to store user-specific or application-specific data across conversations.
+장기 메모리를 사용하여 대화 간에 사용자별 또는 애플리케이션별 데이터를 저장하세요.
 
-```python
-from langgraph.store.memory import InMemoryStore  # [!code highlight]
+```python {highlight={1,4,7}}
+from langgraph.store.memory import InMemoryStore
 from langgraph.graph import StateGraph
 
-store = InMemoryStore()  # [!code highlight]
+store = InMemoryStore()
 
 builder = StateGraph(...)
-graph = builder.compile(store=store)  # [!code highlight]
+graph = builder.compile(store=store)
 ```
 
 
 
 
-### Use in production
+### 프로덕션 환경에서 사용하기
 
-In production, use a store backed by a database:
+프로덕션 환경에서는 데이터베이스를 기반으로 하는 스토어를 사용하세요:
 
-```python
+```python {highlight={4,6}}
 from langgraph.store.postgres import PostgresStore
 
 DB_URI = "postgresql://postgres:postgres@localhost:5442/postgres?sslmode=disable"
-with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
+with PostgresStore.from_conn_string(DB_URI) as store:
     builder = StateGraph(...)
-    graph = builder.compile(store=store)  # [!code highlight]
+    graph = builder.compile(store=store)
 ```
 
 
 
 
-<Accordion title="Example: using Postgres store">
+<Accordion title="예제: Postgres 스토어 사용하기">
   ```
   pip install -U "psycopg[binary,pool]" langgraph langgraph-checkpoint-postgres
   ```
 
     <Tip>
-    You need to call `store.setup()` the first time you're using Postgres store
+    Postgres 스토어를 처음 사용할 때는 `store.setup()`을 호출해야 합니다
     </Tip>
 
     <Tabs>
         <Tab title="Sync">
-      ```python
+      ```python {highlight={5,13,23,27,35,48,53,54,59,66,73}}
       from langchain_core.runnables import RunnableConfig
       from langchain.chat_models import init_chat_model
       from langgraph.graph import StateGraph, MessagesState, START
       from langgraph.checkpoint.postgres import PostgresSaver
-      from langgraph.store.postgres import PostgresStore  # [!code highlight]
+      from langgraph.store.postgres import PostgresStore
       from langgraph.store.base import BaseStore
 
       model = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
@@ -454,7 +451,7 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
       DB_URI = "postgresql://postgres:postgres@localhost:5442/postgres?sslmode=disable"
 
       with (
-          PostgresStore.from_conn_string(DB_URI) as store,  # [!code highlight]
+          PostgresStore.from_conn_string(DB_URI) as store,
           PostgresSaver.from_conn_string(DB_URI) as checkpointer,
       ):
           # store.setup()
@@ -464,19 +461,19 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
               state: MessagesState,
               config: RunnableConfig,
               *,
-              store: BaseStore,  # [!code highlight]
+              store: BaseStore,
           ):
               user_id = config["configurable"]["user_id"]
               namespace = ("memories", user_id)
-              memories = store.search(namespace, query=str(state["messages"][-1].content))  # [!code highlight]
+              memories = store.search(namespace, query=str(state["messages"][-1].content))
               info = "\n".join([d.value["data"] for d in memories])
               system_msg = f"You are a helpful assistant talking to the user. User info: {info}"
 
-              # Store new memories if the user asks the model to remember
+              # 사용자가 모델에 기억하도록 요청하면 새로운 메모리를 저장합니다
               last_message = state["messages"][-1]
               if "remember" in last_message.content.lower():
                   memory = "User name is Bob"
-                  store.put(namespace, str(uuid.uuid4()), {"data": memory})  # [!code highlight]
+                  store.put(namespace, str(uuid.uuid4()), {"data": memory})
 
               response = model.invoke(
                   [{"role": "system", "content": system_msg}] + state["messages"]
@@ -489,44 +486,44 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
 
           graph = builder.compile(
               checkpointer=checkpointer,
-              store=store,  # [!code highlight]
+              store=store,
           )
 
           config = {
               "configurable": {
-                  "thread_id": "1",  # [!code highlight]
-                  "user_id": "1",  # [!code highlight]
+                  "thread_id": "1",
+                  "user_id": "1",
               }
           }
           for chunk in graph.stream(
               {"messages": [{"role": "user", "content": "Hi! Remember: my name is Bob"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values",
           ):
               chunk["messages"][-1].pretty_print()
 
           config = {
               "configurable": {
-                  "thread_id": "2",  # [!code highlight]
+                  "thread_id": "2",
                   "user_id": "1",
               }
           }
 
           for chunk in graph.stream(
               {"messages": [{"role": "user", "content": "what is my name?"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values",
           ):
               chunk["messages"][-1].pretty_print()
 ```
         </Tab>
         <Tab title="Async">
-      ```python
+      ```python {highlight={5,13,23,27,35,48,53,54,59,66,73}}
       from langchain_core.runnables import RunnableConfig
       from langchain.chat_models import init_chat_model
       from langgraph.graph import StateGraph, MessagesState, START
       from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-      from langgraph.store.postgres.aio import AsyncPostgresStore  # [!code highlight]
+      from langgraph.store.postgres.aio import AsyncPostgresStore
       from langgraph.store.base import BaseStore
 
       model = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
@@ -534,7 +531,7 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
       DB_URI = "postgresql://postgres:postgres@localhost:5442/postgres?sslmode=disable"
 
       async with (
-          AsyncPostgresStore.from_conn_string(DB_URI) as store,  # [!code highlight]
+          AsyncPostgresStore.from_conn_string(DB_URI) as store,
           AsyncPostgresSaver.from_conn_string(DB_URI) as checkpointer,
       ):
           # await store.setup()
@@ -544,19 +541,19 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
               state: MessagesState,
               config: RunnableConfig,
               *,
-              store: BaseStore,  # [!code highlight]
+              store: BaseStore,
           ):
               user_id = config["configurable"]["user_id"]
               namespace = ("memories", user_id)
-              memories = await store.asearch(namespace, query=str(state["messages"][-1].content))  # [!code highlight]
+              memories = await store.asearch(namespace, query=str(state["messages"][-1].content))
               info = "\n".join([d.value["data"] for d in memories])
               system_msg = f"You are a helpful assistant talking to the user. User info: {info}"
 
-              # Store new memories if the user asks the model to remember
+              # 사용자가 모델에 기억하도록 요청하면 새로운 메모리를 저장합니다
               last_message = state["messages"][-1]
               if "remember" in last_message.content.lower():
                   memory = "User name is Bob"
-                  await store.aput(namespace, str(uuid.uuid4()), {"data": memory})  # [!code highlight]
+                  await store.aput(namespace, str(uuid.uuid4()), {"data": memory})
 
               response = await model.ainvoke(
                   [{"role": "system", "content": system_msg}] + state["messages"]
@@ -569,32 +566,32 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
 
           graph = builder.compile(
               checkpointer=checkpointer,
-              store=store,  # [!code highlight]
+              store=store,
           )
 
           config = {
               "configurable": {
-                  "thread_id": "1",  # [!code highlight]
-                  "user_id": "1",  # [!code highlight]
+                  "thread_id": "1",
+                  "user_id": "1",
               }
           }
           async for chunk in graph.astream(
               {"messages": [{"role": "user", "content": "Hi! Remember: my name is Bob"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values",
           ):
               chunk["messages"][-1].pretty_print()
 
           config = {
               "configurable": {
-                  "thread_id": "2",  # [!code highlight]
+                  "thread_id": "2",
                   "user_id": "1",
               }
           }
 
           async for chunk in graph.astream(
               {"messages": [{"role": "user", "content": "what is my name?"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values",
           ):
               chunk["messages"][-1].pretty_print()
@@ -606,23 +603,23 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
 
 </Accordion>
 
-<Accordion title="Example: using [Redis](https://pypi.org/project/langgraph-checkpoint-redis/) store">
+<Accordion title="예제: [Redis](https://pypi.org/project/langgraph-checkpoint-redis/) 스토어 사용하기">
   ```
   pip install -U langgraph langgraph-checkpoint-redis
   ```
 
     <Tip>
-    You need to call `store.setup()` the first time you're using Redis store
+    Redis 스토어를 처음 사용할 때는 `store.setup()`을 호출해야 합니다
     </Tip>
 
     <Tabs>
         <Tab title="Sync">
-      ```python
+      ```python {highlight={5,13,23,27,35,48,53,54,59,66,73}}
       from langchain_core.runnables import RunnableConfig
       from langchain.chat_models import init_chat_model
       from langgraph.graph import StateGraph, MessagesState, START
       from langgraph.checkpoint.redis import RedisSaver
-      from langgraph.store.redis import RedisStore  # [!code highlight]
+      from langgraph.store.redis import RedisStore
       from langgraph.store.base import BaseStore
 
       model = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
@@ -630,7 +627,7 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
       DB_URI = "redis://localhost:6379"
 
       with (
-          RedisStore.from_conn_string(DB_URI) as store,  # [!code highlight]
+          RedisStore.from_conn_string(DB_URI) as store,
           RedisSaver.from_conn_string(DB_URI) as checkpointer,
       ):
           store.setup()
@@ -640,19 +637,19 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
               state: MessagesState,
               config: RunnableConfig,
               *,
-              store: BaseStore,  # [!code highlight]
+              store: BaseStore,
           ):
               user_id = config["configurable"]["user_id"]
               namespace = ("memories", user_id)
-              memories = store.search(namespace, query=str(state["messages"][-1].content))  # [!code highlight]
+              memories = store.search(namespace, query=str(state["messages"][-1].content))
               info = "\n".join([d.value["data"] for d in memories])
               system_msg = f"You are a helpful assistant talking to the user. User info: {info}"
 
-              # Store new memories if the user asks the model to remember
+              # 사용자가 모델에 기억하도록 요청하면 새로운 메모리를 저장합니다
               last_message = state["messages"][-1]
               if "remember" in last_message.content.lower():
                   memory = "User name is Bob"
-                  store.put(namespace, str(uuid.uuid4()), {"data": memory})  # [!code highlight]
+                  store.put(namespace, str(uuid.uuid4()), {"data": memory})
 
               response = model.invoke(
                   [{"role": "system", "content": system_msg}] + state["messages"]
@@ -665,44 +662,44 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
 
           graph = builder.compile(
               checkpointer=checkpointer,
-              store=store,  # [!code highlight]
+              store=store,
           )
 
           config = {
               "configurable": {
-                  "thread_id": "1",  # [!code highlight]
-                  "user_id": "1",  # [!code highlight]
+                  "thread_id": "1",
+                  "user_id": "1",
               }
           }
           for chunk in graph.stream(
               {"messages": [{"role": "user", "content": "Hi! Remember: my name is Bob"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values",
           ):
               chunk["messages"][-1].pretty_print()
 
           config = {
               "configurable": {
-                  "thread_id": "2",  # [!code highlight]
+                  "thread_id": "2",
                   "user_id": "1",
               }
           }
 
           for chunk in graph.stream(
               {"messages": [{"role": "user", "content": "what is my name?"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values",
           ):
               chunk["messages"][-1].pretty_print()
 ```
         </Tab>
         <Tab title="Async">
-      ```python
+      ```python {highlight={5,13,23,27,35,48,53,54,59,66,73}}
       from langchain_core.runnables import RunnableConfig
       from langchain.chat_models import init_chat_model
       from langgraph.graph import StateGraph, MessagesState, START
       from langgraph.checkpoint.redis.aio import AsyncRedisSaver
-      from langgraph.store.redis.aio import AsyncRedisStore  # [!code highlight]
+      from langgraph.store.redis.aio import AsyncRedisStore
       from langgraph.store.base import BaseStore
 
       model = init_chat_model(model="anthropic:claude-3-5-haiku-latest")
@@ -710,7 +707,7 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
       DB_URI = "redis://localhost:6379"
 
       async with (
-          AsyncRedisStore.from_conn_string(DB_URI) as store,  # [!code highlight]
+          AsyncRedisStore.from_conn_string(DB_URI) as store,
           AsyncRedisSaver.from_conn_string(DB_URI) as checkpointer,
       ):
           # await store.setup()
@@ -720,19 +717,19 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
               state: MessagesState,
               config: RunnableConfig,
               *,
-              store: BaseStore,  # [!code highlight]
+              store: BaseStore,
           ):
               user_id = config["configurable"]["user_id"]
               namespace = ("memories", user_id)
-              memories = await store.asearch(namespace, query=str(state["messages"][-1].content))  # [!code highlight]
+              memories = await store.asearch(namespace, query=str(state["messages"][-1].content))
               info = "\n".join([d.value["data"] for d in memories])
               system_msg = f"You are a helpful assistant talking to the user. User info: {info}"
 
-              # Store new memories if the user asks the model to remember
+              # 사용자가 모델에 기억하도록 요청하면 새로운 메모리를 저장합니다
               last_message = state["messages"][-1]
               if "remember" in last_message.content.lower():
                   memory = "User name is Bob"
-                  await store.aput(namespace, str(uuid.uuid4()), {"data": memory})  # [!code highlight]
+                  await store.aput(namespace, str(uuid.uuid4()), {"data": memory})
 
               response = await model.ainvoke(
                   [{"role": "system", "content": system_msg}] + state["messages"]
@@ -745,32 +742,32 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
 
           graph = builder.compile(
               checkpointer=checkpointer,
-              store=store,  # [!code highlight]
+              store=store,
           )
 
           config = {
               "configurable": {
-                  "thread_id": "1",  # [!code highlight]
-                  "user_id": "1",  # [!code highlight]
+                  "thread_id": "1",
+                  "user_id": "1",
               }
           }
           async for chunk in graph.astream(
               {"messages": [{"role": "user", "content": "Hi! Remember: my name is Bob"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values",
           ):
               chunk["messages"][-1].pretty_print()
 
           config = {
               "configurable": {
-                  "thread_id": "2",  # [!code highlight]
+                  "thread_id": "2",
                   "user_id": "1",
               }
           }
 
           async for chunk in graph.astream(
               {"messages": [{"role": "user", "content": "what is my name?"}]},
-              config,  # [!code highlight]
+              config,
               stream_mode="values",
           ):
               chunk["messages"][-1].pretty_print()
@@ -780,15 +777,15 @@ with PostgresStore.from_conn_string(DB_URI) as store:  # [!code highlight]
 </Accordion>
 
 
-### Use semantic search
+### 시맨틱 검색 사용하기
 
-Enable semantic search in your graph's memory store to let graph agents search for items in the store by semantic similarity.
+그래프의 메모리 스토어에서 시맨틱 검색을 활성화하여 그래프 에이전트가 스토어의 항목을 의미적 유사성으로 검색할 수 있도록 하세요.
 
 ```python
 from langchain.embeddings import init_embeddings
 from langgraph.store.memory import InMemoryStore
 
-# Create store with semantic search enabled
+# 시맨틱 검색이 활성화된 스토어 생성
 embeddings = init_embeddings("openai:text-embedding-3-small")
 store = InMemoryStore(
     index={
@@ -808,7 +805,7 @@ items = store.search(
 
 
 
-<Accordion title="Long-term memory with semantic search">
+<Accordion title="시맨틱 검색을 사용한 장기 메모리">
   ```python
 
   from langchain.embeddings import init_embeddings
@@ -819,7 +816,7 @@ items = store.search(
 
   llm = init_chat_model("openai:gpt-4o-mini")
 
-  # Create store with semantic search enabled
+  # 시맨틱 검색이 활성화된 스토어 생성
   embeddings = init_embeddings("openai:text-embedding-3-small")
   store = InMemoryStore(
       index={
@@ -832,7 +829,7 @@ items = store.search(
   store.put(("user_123", "memories"), "2", {"text": "I am a plumber"})
 
   def chat(state, *, store: BaseStore):
-      # Search based on user's last message
+      # 사용자의 마지막 메시지를 기반으로 검색
       items = store.search(
           ("user_123", "memories"), query=state["messages"][-1].content, limit=2
       )
@@ -863,34 +860,32 @@ items = store.search(
 
 </Accordion>
 
-## Manage short-term memory
+## 단기 메모리 관리
 
-With [short-term memory](#add-short-term-memory) enabled, long conversations can exceed the LLM's context window. Common solutions are:
+[단기 메모리](#add-short-term-memory)가 활성화되면 긴 대화가 LLM의 컨텍스트 윈도우를 초과할 수 있습니다. 일반적인 해결 방법은 다음과 같습니다:
 
-* [Trim messages](#trim-messages): Remove first or last N messages (before calling LLM)
-* [Delete messages](#delete-messages) from LangGraph state permanently
-* [Summarize messages](#summarize-messages): Summarize earlier messages in the history and replace them with a summary
-* [Manage checkpoints](#manage-checkpoints) to store and retrieve message history
-* Custom strategies (e.g., message filtering, etc.)
+* [메시지 잘라내기](#trim-messages): 처음 또는 마지막 N개의 메시지 제거하기 (LLM 호출 전)
+* [메시지 삭제하기](#delete-messages): LangGraph 상태에서 메시지 영구 삭제하기
+* [메시지 요약하기](#summarize-messages): 히스토리의 초기 메시지들을 요약하여 요약본으로 대체하기
+* [체크포인트 관리하기](#manage-checkpoints): 메시지 히스토리 저장 및 검색하기
+* 사용자 정의 전략 (예: 메시지 필터링 등)
 
-This allows the agent to keep track of the conversation without exceeding the LLM's context window.
+이를 통해 에이전트는 LLM의 컨텍스트 윈도우를 초과하지 않으면서 대화를 추적할 수 있습니다.
 
-### Trim messages
+### 메시지 잘라내기
 
-Most LLMs have a maximum supported context window (denominated in tokens). One way to decide when to truncate messages is to count the tokens in the message history and truncate whenever it approaches that limit. If you're using LangChain, you can use the trim messages utility and specify the number of tokens to keep from the list, as well as the `strategy` (e.g., keep the last `max_tokens`) to use for handling the boundary.
+대부분의 LLM에는 지원되는 최대 컨텍스트 윈도우(토큰 단위)가 있습니다. 메시지를 자를 시점을 결정하는 한 가지 방법은 메시지 히스토리의 토큰 수를 세어 해당 제한에 근접할 때마다 잘라내는 것입니다. LangChain을 사용하는 경우, trim messages 유틸리티를 사용하여 목록에서 유지할 토큰 수와 경계를 처리하기 위한 `strategy`(예: 마지막 `maxTokens` 유지)를 지정할 수 있습니다.
 
+메시지 히스토리를 자르려면 [`trim_messages`](https://python.langchain.com/api_reference/core/messages/langchain_core.messages.utils.trim_messages.html) 함수를 사용하세요:
 
-
-To trim message history, use the [`trim_messages`](https://python.langchain.com/api_reference/core/messages/langchain_core.messages.utils.trim_messages.html) function:
-
-```python
-from langchain_core.messages.utils import (  # [!code highlight]
-    trim_messages,  # [!code highlight]
-    count_tokens_approximately  # [!code highlight]
-)  # [!code highlight]
+```python {highlight={1,2,3,4,7}}
+from langchain_core.messages.utils import (
+    trim_messages,
+    count_tokens_approximately
+)
 
 def call_model(state: MessagesState):
-    messages = trim_messages(  # [!code highlight]
+    messages = trim_messages(
         state["messages"],
         strategy="last",
         token_counter=count_tokens_approximately,
@@ -909,20 +904,20 @@ builder.add_node(call_model)
 
 
 
-<Accordion title="Full example: trim messages">
-  ```python
+<Accordion title="전체 예제: 메시지 잘라내기">
+  ```python {highlight={1,2,3,4,12}}
   from langchain_core.messages.utils import (
-      trim_messages,  # [!code highlight]
-      count_tokens_approximately  # [!code highlight]
+      trim_messages,
+      count_tokens_approximately
   )
   from langchain.chat_models import init_chat_model
   from langgraph.graph import StateGraph, START, MessagesState
 
-  model = init_chat_model("anthropic:claude-sonnet-4-5-20250929")
+  model = init_chat_model("anthropic:claude-3-7-sonnet-latest")
   summarization_model = model.bind(max_tokens=128)
 
   def call_model(state: MessagesState):
-      messages = trim_messages(  # [!code highlight]
+      messages = trim_messages(
           state["messages"],
           strategy="last",
           token_counter=count_tokens_approximately,
@@ -958,52 +953,52 @@ builder.add_node(call_model)
 
 </Accordion>
 
-### Delete messages
+### 메시지 삭제하기
 
-You can delete messages from the graph state to manage the message history. This is useful when you want to remove specific messages or clear the entire message history.
+그래프 상태에서 메시지를 삭제하여 메시지 히스토리를 관리할 수 있습니다. 특정 메시지를 제거하거나 전체 메시지 히스토리를 지우고 싶을 때 유용합니다.
 
-To delete messages from the graph state, you can use the `RemoveMessage`. For `RemoveMessage` to work, you need to use a state key with [`add_messages`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.message.add_messages) [reducer](/oss/python/langgraph/graph-api#reducers), like [`MessagesState`](/oss/python/langgraph/graph-api#messagesstate).
+그래프 상태에서 메시지를 삭제하려면 `RemoveMessage`를 사용할 수 있습니다. `RemoveMessage`가 작동하려면 [`MessagesState`](/oss/python/langgraph/graph-api#messagesstate)와 같이 [`add_messages`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.message.add_messages) [리듀서](/oss/python/langgraph/graph-api#reducers)가 있는 상태 키를 사용해야 합니다.
 
-To remove specific messages:
+특정 메시지를 제거하려면:
 
-```python
-from langchain.messages import RemoveMessage  # [!code highlight]
+```python {highlight={1,7}}
+from langchain.messages import RemoveMessage
 
 def delete_messages(state):
     messages = state["messages"]
     if len(messages) > 2:
-        # remove the earliest two messages
-        return {"messages": [RemoveMessage(id=m.id) for m in messages[:2]]}  # [!code highlight]
+        # 가장 초기의 두 메시지 제거
+        return {"messages": [RemoveMessage(id=m.id) for m in messages[:2]]}
 ```
 
-To remove **all** messages:
+**모든** 메시지를 제거하려면:
 
-```python
-from langgraph.graph.message import REMOVE_ALL_MESSAGES  # [!code highlight]
+```python {highlight={1,4}}
+from langgraph.graph.message import REMOVE_ALL_MESSAGES
 
 def delete_messages(state):
-    return {"messages": [RemoveMessage(id=REMOVE_ALL_MESSAGES)]}  # [!code highlight]
+    return {"messages": [RemoveMessage(id=REMOVE_ALL_MESSAGES)]}
 ```
 
 
 
 
 <Warning>
-When deleting messages, **make sure** that the resulting message history is valid. Check the limitations of the LLM provider you're using. For example:
+메시지를 삭제할 때는 결과로 나오는 메시지 히스토리가 유효한지 **반드시 확인**하세요. 사용 중인 LLM 제공자의 제한 사항을 확인하세요. 예를 들어:
 
-* some providers expect message history to start with a `user` message
-* most providers require `assistant` messages with tool calls to be followed by corresponding `tool` result messages.
+* 일부 제공자는 메시지 히스토리가 `user` 메시지로 시작할 것을 기대합니다
+* 대부분의 제공자는 도구 호출이 있는 `assistant` 메시지 다음에 해당하는 `tool` 결과 메시지가 와야 합니다.
 </Warning>
 
-<Accordion title="Full example: delete messages">
-  ```python
-  from langchain.messages import RemoveMessage  # [!code highlight]
+<Accordion title="전체 예제: 메시지 삭제하기">
+  ```python {highlight={1,7}}
+  from langchain.messages import RemoveMessage
 
   def delete_messages(state):
       messages = state["messages"]
       if len(messages) > 2:
-          # remove the earliest two messages
-          return {"messages": [RemoveMessage(id=m.id) for m in messages[:2]]}  # [!code highlight]
+          # 가장 초기의 두 메시지 제거
+          return {"messages": [RemoveMessage(id=m.id) for m in messages[:2]]}
 
   def call_model(state: MessagesState):
       response = model.invoke(state["messages"])
@@ -1043,14 +1038,14 @@ When deleting messages, **make sure** that the resulting message history is vali
 
 </Accordion>
 
-### Summarize messages
+### 메시지 요약하기
 
-The problem with trimming or removing messages, as shown above, is that you may lose information from culling of the message queue. Because of this, some applications benefit from a more sophisticated approach of summarizing the message history using a chat model.
+위에 표시된 것처럼 메시지를 자르거나 제거하는 것의 문제점은 메시지 큐를 정리함으로써 정보를 잃을 수 있다는 것입니다. 이 때문에 일부 애플리케이션은 채팅 모델을 사용하여 메시지 히스토리를 요약하는 보다 정교한 접근 방식의 이점을 얻습니다.
 
 ![](/oss/images/summary.png)
 
 
-Prompting and orchestration logic can be used to summarize the message history. For example, in LangGraph you can extend the [`MessagesState`](/oss/python/langgraph/graph-api#working-with-messages-in-graph-state) to include a `summary` key:
+프롬프팅 및 오케스트레이션 로직을 사용하여 메시지 히스토리를 요약할 수 있습니다. 예를 들어, LangGraph에서는 [`MessagesState`](/oss/python/langgraph/graph-api#working-with-messages-in-graph-state)를 확장하여 `summary` 키를 포함할 수 있습니다:
 
 ```python
 from langgraph.graph import MessagesState
@@ -1058,18 +1053,18 @@ class State(MessagesState):
     summary: str
 ```
 
-Then, you can generate a summary of the chat history, using any existing summary as context for the next summary. This `summarize_conversation` node can be called after some number of messages have accumulated in the `messages` state key.
+그런 다음, 기존 요약을 다음 요약의 컨텍스트로 사용하여 채팅 히스토리의 요약을 생성할 수 있습니다. 이 `summarize_conversation` 노드는 `messages` 상태 키에 일정 수의 메시지가 누적된 후에 호출될 수 있습니다.
 
 ```python
 def summarize_conversation(state: State):
 
-    # First, we get any existing summary
+    # 먼저, 기존 요약을 가져옵니다
     summary = state.get("summary", "")
 
-    # Create our summarization prompt
+    # 요약 프롬프트를 생성합니다
     if summary:
 
-        # A summary already exists
+        # 요약이 이미 존재합니다
         summary_message = (
             f"This is a summary of the conversation to date: {summary}\n\n"
             "Extend the summary by taking into account the new messages above:"
@@ -1078,11 +1073,11 @@ def summarize_conversation(state: State):
     else:
         summary_message = "Create a summary of the conversation above:"
 
-    # Add prompt to our history
+    # 히스토리에 프롬프트를 추가합니다
     messages = state["messages"] + [HumanMessage(content=summary_message)]
     response = model.invoke(messages)
 
-    # Delete all but the 2 most recent messages
+    # 가장 최근 2개를 제외한 모든 메시지를 삭제합니다
     delete_messages = [RemoveMessage(id=m.id) for m in state["messages"][:-2]]
     return {"summary": response.content, "messages": delete_messages}
 ```
@@ -1090,8 +1085,8 @@ def summarize_conversation(state: State):
 
 
 
-<Accordion title="Full example: summarize messages">
-  ```python
+<Accordion title="전체 예제: 메시지 요약하기">
+  ```python {highlight={8,14,20,28,35}}
   from typing import Any, TypedDict
 
   from langchain.chat_models import init_chat_model
@@ -1099,19 +1094,19 @@ def summarize_conversation(state: State):
   from langchain_core.messages.utils import count_tokens_approximately
   from langgraph.graph import StateGraph, START, MessagesState
   from langgraph.checkpoint.memory import InMemorySaver
-  from langmem.short_term import SummarizationNode, RunningSummary  # [!code highlight]
+  from langmem.short_term import SummarizationNode, RunningSummary
 
-  model = init_chat_model("anthropic:claude-sonnet-4-5-20250929")
+  model = init_chat_model("anthropic:claude-3-7-sonnet-latest")
   summarization_model = model.bind(max_tokens=128)
 
   class State(MessagesState):
-      context: dict[str, RunningSummary]  # [!code highlight]
+      context: dict[str, RunningSummary]  # (1)!
 
-  class LLMInputState(TypedDict):  # [!code highlight]
+  class LLMInputState(TypedDict):  # (2)!
       summarized_messages: list[AnyMessage]
       context: dict[str, RunningSummary]
 
-  summarization_node = SummarizationNode(  # [!code highlight]
+  summarization_node = SummarizationNode(
       token_counter=count_tokens_approximately,
       model=summarization_model,
       max_tokens=256,
@@ -1119,19 +1114,19 @@ def summarize_conversation(state: State):
       max_summary_tokens=128,
   )
 
-  def call_model(state: LLMInputState):  # [!code highlight]
+  def call_model(state: LLMInputState):  # (3)!
       response = model.invoke(state["summarized_messages"])
       return {"messages": [response]}
 
   checkpointer = InMemorySaver()
   builder = StateGraph(State)
   builder.add_node(call_model)
-  builder.add_node("summarize", summarization_node)  # [!code highlight]
+  builder.add_node("summarize", summarization_node)
   builder.add_edge(START, "summarize")
   builder.add_edge("summarize", "call_model")
   graph = builder.compile(checkpointer=checkpointer)
 
-  # Invoke the graph
+  # 그래프 호출
   config = {"configurable": {"thread_id": "1"}}
   graph.invoke({"messages": "hi, my name is bob"}, config)
   graph.invoke({"messages": "write a short poem about cats"}, config)
@@ -1142,15 +1137,13 @@ def summarize_conversation(state: State):
   print("\nSummary:", final_response["context"]["running_summary"].summary)
 ```
 
-  1. We will keep track of our running summary in the `context` field
+  1. 실행 중인 요약을 `context` 필드에 추적합니다
 
-  (expected by the `SummarizationNode`).
+  (`SummarizationNode`에서 예상됨).
 
-  1. Define private state that will be used only for filtering
+  1. `call_model` 노드에 대한 입력을 필터링하는 데만 사용될 비공개 상태를 정의합니다
 
-  the inputs to `call_model` node.
-
-  1. We're passing a private input state here to isolate the messages returned by the summarization node
+  1. 여기서 비공개 입력 상태를 전달하여 요약 노드에서 반환된 메시지를 분리합니다
 
   ```
   ================================== Ai Message ==================================
@@ -1164,26 +1157,26 @@ def summarize_conversation(state: State):
 
 </Accordion>
 
-### Manage checkpoints
+### 체크포인트 관리하기
 
-You can view and delete the information stored by the checkpointer.
+체크포인터가 저장한 정보를 보고 삭제할 수 있습니다.
 
 <a id="checkpoint"></a>
-#### View thread state
+#### 스레드 상태 보기
 
 <Tabs>
     <Tab title="Graph/Functional API">
-    ```python
+    ```python {highlight={3,6,10}}
     config = {
         "configurable": {
-            "thread_id": "1",  # [!code highlight]
-            # optionally provide an ID for a specific checkpoint,
-            # otherwise the latest checkpoint is shown
-            # "checkpoint_id": "1f029ca3-1f5b-6704-8004-820c16b69a5a"  # [!code highlight]
+            "thread_id": "1",
+            # 선택적으로 특정 체크포인트의 ID를 제공합니다,
+            # 그렇지 않으면 최신 체크포인트가 표시됩니다
+            # "checkpoint_id": "1f029ca3-1f5b-6704-8004-820c16b69a5a"
 
         }
     }
-    graph.get_state(config)  # [!code highlight]
+    graph.get_state(config)
 ```
 
     ```
@@ -1205,17 +1198,17 @@ You can view and delete the information stored by the checkpointer.
     ```
     </Tab>
     <Tab title="Checkpointer API">
-    ```python
+    ```python {highlight={3,6,10}}
     config = {
         "configurable": {
-            "thread_id": "1",  # [!code highlight]
-            # optionally provide an ID for a specific checkpoint,
-            # otherwise the latest checkpoint is shown
-            # "checkpoint_id": "1f029ca3-1f5b-6704-8004-820c16b69a5a"  # [!code highlight]
+            "thread_id": "1",
+            # 선택적으로 특정 체크포인트의 ID를 제공합니다,
+            # 그렇지 않으면 최신 체크포인트가 표시됩니다
+            # "checkpoint_id": "1f029ca3-1f5b-6704-8004-820c16b69a5a"
 
         }
     }
-    checkpointer.get_tuple(config)  # [!code highlight]
+    checkpointer.get_tuple(config)
 ```
 
     ```
@@ -1246,17 +1239,17 @@ You can view and delete the information stored by the checkpointer.
 
 
 <a id="checkpoints"></a>
-#### View the history of the thread
+#### 스레드의 히스토리 보기
 
 <Tabs>
     <Tab title="Graph/Functional API">
-    ```python
+    ```python {highlight={3,6}}
     config = {
         "configurable": {
-            "thread_id": "1"  # [!code highlight]
+            "thread_id": "1"
         }
     }
-    list(graph.get_state_history(config))  # [!code highlight]
+    list(graph.get_state_history(config))
 ```
 
     ```
@@ -1325,13 +1318,13 @@ You can view and delete the information stored by the checkpointer.
     ```
     </Tab>
     <Tab title="Checkpointer API">
-    ```python
+    ```python {highlight={3,6}}
     config = {
         "configurable": {
-            "thread_id": "1"  # [!code highlight]
+            "thread_id": "1"
         }
     }
-    list(checkpointer.list(config))  # [!code highlight]
+    list(checkpointer.list(config))
 ```
 
     ```
@@ -1428,7 +1421,7 @@ You can view and delete the information stored by the checkpointer.
 
 
 
-#### Delete all checkpoints for a thread
+#### 스레드의 모든 체크포인트 삭제하기
 
 ```python
 thread_id = "1"
@@ -1438,9 +1431,9 @@ checkpointer.delete_thread(thread_id)
 
 
 
-## Prebuilt memory tools
+## 사전 구축된 메모리 도구
 
-**LangMem** is a LangChain-maintained library that offers tools for managing long-term memories in your agent. See the [LangMem documentation](https://langchain-ai.github.io/langmem/) for usage examples.
+**LangMem**은 에이전트에서 장기 메모리를 관리하기 위한 도구를 제공하는 LangChain 유지 관리 라이브러리입니다. 사용 예제는 [LangMem 문서](https://langchain-ai.github.io/langmem/)를 참조하세요.
 
 ---
 

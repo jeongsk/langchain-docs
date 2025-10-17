@@ -4,25 +4,17 @@ title: Tools
 
 import AlphaCallout from "/snippets/alpha-lc-callout.mdx";
 
-<AlphaCalloutPy />
-
-
+<AlphaCallout />
 
 Many AI applications interact with users via natural language. However, some use cases require models to interface directly with external systems—such as APIs, databases, or file systems—using structured input.
 
 Tools are components that [agents](/oss/python/langchain/agents) call to perform actions. They extend model capabilities by letting them interact with the world through well-defined inputs and outputs. Tools encapsulate a callable function and its input schema. These can be passed to compatible [chat models](/oss/python/langchain/models), allowing the model to decide whether to invoke a tool and with what arguments. In these scenarios, tool calling enables models to generate requests that conform to a specified input schema.
 
-<Note>
-**Server-side tool use**
-
-Some chat models (e.g., [OpenAI](/oss/python/integrations/chat/openai), [Anthropic](/oss/python/integrations/chat/anthropic), and [Gemini](/oss/python/integrations/chat/google_generative_ai)) feature [built-in tools](/oss/python/langchain/models#server-side-tool-use) that are executed server-side, such as web search and code interpreters. Refer to the [provider overview](/oss/python/integrations/providers/overview) to learn how to access these tools with your specific chat model.
-</Note>
-
 ## Create tools
 
 ### Basic tool definition
 
-The simplest way to create a tool is with the [`@tool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool) decorator. By default, the function's docstring becomes the tool's description that helps the model understand when to use it:
+The simplest way to create a tool is with the `@tool` decorator. By default, the function's docstring becomes the tool's description that helps the model understand when to use it:
 
 ```python wrap
 from langchain.tools import tool
@@ -129,37 +121,34 @@ Define complex inputs with Pydantic models or JSON schemas:
 **Why this matters:** Tools are most powerful when they can access agent state, runtime context, and long-term memory. This enables tools to make context-aware decisions, personalize responses, and maintain information across conversations.
 </Info>
 
-Tools can access runtime information through the `ToolRuntime` parameter, which provides:
+Tools can access different types of data:
 
 - **State** - Mutable data that flows through execution (messages, counters, custom fields)
-- **Context** - Immutable configuration like user IDs, session details, or application-specific configuration
-- **Store** - Persistent long-term memory across conversations
-- **Stream Writer** - Stream custom updates as tools execute
-- **Config** - RunnableConfig for the execution
-- **Tool Call ID** - ID of the current tool call
+- **Runtime** - Access to context, memory (store), and streaming capabilities via `get_runtime()`
 
-### ToolRuntime
+### State
 
-Use `ToolRuntime` to access all runtime information in a single parameter. Simply add `runtime: ToolRuntime` to your tool signature, and it will be automatically injected without being exposed to the LLM.
+Use `InjectedState` to access and modify the agent's state during execution. State includes messages, custom fields, and any data your tools need to track.
 
 <Info>
-**`ToolRuntime`**: A unified parameter that provides tools access to state, context, store, streaming, config, and tool call ID. This replaces the older pattern of using separate `InjectedState`, `InjectedStore`, `get_runtime()`, and `InjectedToolCallId` annotations.
+**`InjectedState`**: An annotation that allows tools to access the current graph state without exposing it to the LLM. This lets tools read information like message history or custom state fields while keeping the tool's schema simple.
 </Info>
 
 **Accessing state:**
 
-Tools can access the current graph state using `ToolRuntime`:
+Tools can access the current graph state using the `InjectedState` annotation:
 
 ```python wrap
-from langchain.tools import tool, ToolRuntime
+from typing_extensions import Annotated
+from langchain.tools import InjectedState
 
 # Access the current conversation state
 @tool
 def summarize_conversation(
-    runtime: ToolRuntime
+    state: Annotated[dict, InjectedState]
 ) -> str:
     """Summarize the conversation so far."""
-    messages = runtime.state["messages"]
+    messages = state["messages"]
 
     human_msgs = sum(1 for m in messages if m.__class__.__name__ == "HumanMessage")
     ai_msgs = sum(1 for m in messages if m.__class__.__name__ == "AIMessage")
@@ -171,15 +160,14 @@ def summarize_conversation(
 @tool
 def get_user_preference(
     pref_name: str,
-    runtime: ToolRuntime  # ToolRuntime parameter is not visible to the model
+    preferences: Annotated[dict, InjectedState("user_preferences")]  # InjectedState parameters are not visible to the model
 ) -> str:
     """Get a user preference value."""
-    preferences = runtime.state.get("user_preferences", {})
     return preferences.get(pref_name, "Not set")
 ```
 
 <Warning>
-The `tool_runtime` parameter is hidden from the model. For the example above, the model only sees `pref_name` in the tool schema - `tool_runtime` is *not* included in the request.
+State-injected arguments are hidden from the model. For the example above, the model only sees `pref_name` in the tool schema - `preferences` is *not* included in the request.
 </Warning>
 
 **Updating state:**
@@ -190,7 +178,8 @@ Use `Command` to update the agent's state or control the graph's execution flow:
 from langgraph.types import Command
 from langchain.messages import RemoveMessage
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
-from langchain.tools import tool, ToolRuntime
+from langchain.tools import tool, InjectedToolCallId
+from typing_extensions import Annotated
 
 # Update the conversation history by removing all messages
 @tool
@@ -207,24 +196,29 @@ def clear_conversation() -> Command:
 @tool
 def update_user_name(
     new_name: str,
-    runtime: ToolRuntime
+    tool_call_id: Annotated[dict, InjectedToolCallId]
 ) -> Command:
     """Update the user's name."""
     return Command(update={"user_name": new_name})
 ```
 
 
+### Runtime
+
+Use `get_runtime()` to access immutable configuration, context, memory (store), and streaming capabilities. The runtime provides access to data that persists across the agent's execution.
+
 #### Context
 
-Access immutable configuration and contextual data like user IDs, session details, or application-specific configuration through `runtime.context`.
+Access immutable configuration and contextual data like user IDs, session details, or application-specific configuration.
 
-Tools can access runtime context through `ToolRuntime`:
+Tools can access runtime context through `get_runtime()`:
 
 ```python wrap
 from dataclasses import dataclass
 from langchain_openai import ChatOpenAI
 from langchain.agents import create_agent
-from langchain.tools import tool, ToolRuntime
+from langchain.tools import tool
+from langgraph.runtime import get_runtime
 
 USER_DATABASE = {
     "user123": {
@@ -246,8 +240,9 @@ class UserContext:
     user_id: str
 
 @tool
-def get_account_info(runtime: ToolRuntime[UserContext]) -> str:
+def get_account_info() -> str:
     """Get the current user's account information."""
+    runtime = get_runtime(UserContext)
     user_id = runtime.context.user_id
 
     if user_id in USER_DATABASE:
@@ -274,29 +269,30 @@ result = agent.invoke(
 
 #### Memory (Store)
 
-Access persistent data across conversations using the store. The store is accessed via `runtime.store` and allows you to save and retrieve user-specific or application-specific data.
+Access persistent data across conversations using the store. The store is accessed via `get_runtime().store` and allows you to save and retrieve user-specific or application-specific data.
 
-Tools can access and update the store through `ToolRuntime`:
+Tools can access and update the store through `get_runtime().store`:
 
 ```python wrap expandable
 from typing import Any
+from langgraph.runtime import get_runtime
 from langgraph.store.memory import InMemoryStore
 from langchain.agents import create_agent
-from langchain.tools import tool, ToolRuntime
+from langchain.tools import tool
 
 # Access memory
 @tool
-def get_user_info(user_id: str, runtime: ToolRuntime) -> str:
+def get_user_info(user_id: str) -> str:
     """Look up user info."""
-    store = runtime.store
+    store = get_runtime().store
     user_info = store.get(("users",), user_id)
     return str(user_info.value) if user_info else "Unknown user"
 
 # Update memory
 @tool
-def save_user_info(user_id: str, user_info: dict[str, Any], runtime: ToolRuntime) -> str:
+def save_user_info(user_id: str, user_info: dict[str, Any]) -> str:
     """Save user info."""
-    store = runtime.store
+    store = get_runtime().store
     store.put(("users",), user_id, user_info)
     return "Successfully saved user info."
 
@@ -327,15 +323,16 @@ agent.invoke({
 
 #### Stream Writer
 
-Stream custom updates from tools as they execute using `runtime.stream_writer`. This is useful for providing real-time feedback to users about what a tool is doing.
+Stream custom updates from tools as they execute using `get_runtime().stream_writer`. This is useful for providing real-time feedback to users about what a tool is doing.
 
 ```python wrap
-from langchain.tools import tool, ToolRuntime
+from langchain.tools import tool
+from langgraph.runtime import get_runtime
 
 @tool
-def get_weather(city: str, runtime: ToolRuntime) -> str:
+def get_weather(city: str) -> str:
     """Get weather for a given city."""
-    writer = runtime.stream_writer
+    writer = get_runtime().stream_writer
 
     # Stream custom updates as the tool executes
     writer(f"Looking up data for city: {city}")
@@ -345,7 +342,7 @@ def get_weather(city: str, runtime: ToolRuntime) -> str:
 ```
 
 <Note>
-If you use `runtime.stream_writer` inside your tool, the tool must be invoked within a LangGraph execution context. See [Streaming](/oss/python/langchain/streaming) for more details.
+If you use `get_runtime().stream_writer` inside your tool, the tool must be invoked within a LangGraph execution context. See [Streaming](/oss/python/langchain/streaming) for more details.
 </Note>
 
 ---

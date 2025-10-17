@@ -1,46 +1,42 @@
 ---
-title: Observability
+title: 관찰성
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 import observability from '/snippets/oss/observability.mdx';
 
-<AlphaCalloutPy />
+<AlphaCallout />
 
+트레이스는 애플리케이션이 입력에서 출력으로 이동하기 위해 수행하는 일련의 단계입니다. 이러한 개별 단계는 각각 실행(run)으로 표현됩니다. [LangSmith](https://smith.langchain.com/)를 사용하여 이러한 실행 단계를 시각화할 수 있습니다. 사용하려면 [애플리케이션에 대한 트레이싱을 활성화](/langsmith/trace-with-langgraph)하세요. 이를 통해 다음을 수행할 수 있습니다:
 
+* [로컬에서 실행 중인 애플리케이션 디버그](/langsmith/observability-studio#debug-langsmith-traces).
+* [애플리케이션 성능 평가](/oss/python/langchain/evals).
+* [애플리케이션 모니터링](/langsmith/dashboards).
 
-Traces are a series of steps that your application takes to go from input to output. Each of these individual steps is represented by a run. You can use [LangSmith](https://smith.langchain.com/) to visualize these execution steps. To use it, [enable tracing for your application](/langsmith/trace-with-langgraph). This enables you to do the following:
+## 사전 요구 사항
 
-* [Debug a locally running application](/langsmith/observability-studio#debug-langsmith-traces).
-* [Evaluate the application performance](/oss/python/langchain/evals).
-* [Monitor the application](/langsmith/dashboards).
+시작하기 전에 다음이 필요합니다:
 
-## Prerequisites
+* [LangSmith 계정](https://smith.langchain.com/) (무료 가입 가능)
 
-Before you begin, ensure you have the following:
+## 트레이싱 활성화
 
-* A [LangSmith account](https://smith.langchain.com/) (free to sign up)
-
-## Enable tracing
-
-To enable tracing for your application, set the following environment variables:
+애플리케이션에 대한 트레이싱을 활성화하려면 다음 환경 변수를 설정하세요:
 
 ```python
 export LANGSMITH_TRACING=true
 export LANGSMITH_API_KEY=<your-api-key>
 ```
 
-By default, the trace will be logged to the project with the name `default`. To configure a custom project name, see [Log to a project](#log-to-a-project).
+기본적으로 트레이스는 `default`라는 이름의 프로젝트에 로깅됩니다. 사용자 정의 프로젝트 이름을 구성하려면 [프로젝트에 로깅](#log-to-a-project)을 참조하세요.
 
-For more information, see [Trace with LangGraph](/langsmith/trace-with-langgraph).
+자세한 내용은 [LangGraph로 트레이싱하기](/langsmith/trace-with-langgraph)를 참조하세요.
 
 <observability />
 
-## Use anonymizers to prevent logging of sensitive data in traces
+## 익명화를 사용하여 트레이스에서 민감한 데이터의 로깅 방지
 
-You may want to mask sensitive data to prevent it from being logged to LangSmith. You can create [anonymizers](/langsmith/mask-inputs-outputs#rule-based-masking-of-inputs-and-outputs) and apply them to
-your graph using configuration. This example will redact anything matching the Social Security Number format XXX-XX-XXXX from traces sent to LangSmith.
+민감한 데이터를 마스킹하여 LangSmith에 로깅되지 않도록 할 수 있습니다. [익명화](/langsmith/mask-inputs-outputs#rule-based-masking-of-inputs-and-outputs)를 생성하고 구성을 사용하여 그래프에 적용할 수 있습니다. 이 예제는 XXX-XX-XXXX 형식의 주민등록번호와 일치하는 모든 내용을 LangSmith로 전송되는 트레이스에서 삭제합니다.
 
 ```python Python
 from langchain_core.tracers.langchain import LangChainTracer
@@ -49,13 +45,13 @@ from langsmith import Client
 from langsmith.anonymizer import create_anonymizer
 
 anonymizer = create_anonymizer([
-    # Matches SSNs
+    # SSN과 일치
     { "pattern": r"\b\d{3}-?\d{2}-?\d{4}\b", "replace": "<ssn>" }
 ])
 
 tracer_client = Client(anonymizer=anonymizer)
 tracer = LangChainTracer(client=tracer_client)
-# Define the graph
+# 그래프 정의
 graph = (
     StateGraph(MessagesState)
     ...

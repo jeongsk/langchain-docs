@@ -1,38 +1,38 @@
-This guide will walk you through how to use **Studio** to visualize, interact, and debug your agent locally.
+이 가이드에서는 **LangGraph Studio**를 사용하여 에이전트를 로컬에서 시각화하고, 상호작용하며, 디버깅하는 방법을 안내합니다.
 
-Studio is our free-to-use, powerful agent IDE that integrates with [LangSmith](/langsmith/home) to enable tracing, evaluation, and prompt engineering. See exactly how your agent thinks, trace every decision, and ship smarter, more reliable agents.
+LangGraph Studio는 무료로 사용할 수 있는 강력한 에이전트 IDE로, [LangSmith](/langsmith/home)와 통합되어 추적, 평가 및 프롬프트 엔지니어링을 지원합니다. 에이전트가 어떻게 사고하는지 정확히 확인하고, 모든 결정을 추적하며, 더 스마트하고 신뢰할 수 있는 에이전트를 출시하세요.
 
 <Frame>
 <iframe
   className="w-full aspect-video rounded-xl"
   src="https://www.youtube.com/embed/Mi1gSlHwZLM?si=zA47TNuTC5aH0ahd"
-  title="Studio"
+  title="LangGraph Studio"
   frameBorder="0"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowFullScreen
 ></iframe>
 </Frame>
 
-## Prerequisites
+## 사전 준비사항
 
-Before you begin, ensure you have the following:
-* An API key for [LangSmith](https://smith.langchain.com/settings) (free to sign up)
+시작하기 전에 다음 사항을 준비하세요:
+* [LangSmith](https://smith.langchain.com/settings) API 키 (무료 가입 가능)
 
-## Setup local LangGraph server
+## 로컬 LangGraph 서버 설정
 
-### 1. Install the LangGraph CLI
+### 1. LangGraph CLI 설치
 
 ```shell
-# Python >= 3.11 is required.
+# Python >= 3.11 버전이 필요합니다.
 pip install --upgrade "langgraph-cli[inmem]"
 ```
 
 
 
 
-### 2. Prepare your agent
+### 2. 에이전트 준비
 
-We'll use the following simple agent as an example:
+다음 간단한 에이전트를 예제로 사용하겠습니다:
 
 ```python title="agent.py"
 from langchain.agents import create_agent
@@ -40,13 +40,13 @@ from langchain.agents import create_agent
 model = ChatOpenAI(model="gpt-4o")
 
 def send_email(to: str, subject: str, body: str):
-    """Send an email"""
+    """이메일 전송"""
     email = {
         "to": to,
         "subject": subject,
         "body": body
     }
-    # ... email sending logic
+    # ... 이메일 전송 로직
 
     return f"Email sent to {to}"
 
@@ -57,21 +57,21 @@ agent = create_agent(
 )
 ```
 
-### 3. Environment variables
+### 3. 환경 변수 설정
 
-Create a `.env` file in the root of your project and fill in the necessary API keys. We'll need to set the `LANGSMITH_API_KEY` environment variable to the API key you get from [LangSmith](https://smith.langchain.com/settings).
+프로젝트 루트에 `.env` 파일을 생성하고 필요한 API 키를 입력하세요. [LangSmith](https://smith.langchain.com/settings)에서 받은 API 키로 `LANGSMITH_API_KEY` 환경 변수를 설정해야 합니다.
 
 <Warning>
-    Be sure not to commit your `.env` to version control systems such as Git!
+    `.env` 파일을 Git과 같은 버전 관리 시스템에 커밋하지 않도록 주의하세요!
 </Warning>
 
 ```bash .env
 LANGSMITH_API_KEY=lsv2...
 ```
 
-### 4. Create a LangGraph config file
+### 4. LangGraph 설정 파일 생성
 
-Inside your app's directory, create a configuration file `langgraph.json`:
+앱 디렉토리 내에 `langgraph.json` 설정 파일을 생성하세요:
 
 ```json title="langgraph.json"
 {
@@ -83,13 +83,13 @@ Inside your app's directory, create a configuration file `langgraph.json`:
 }
 ```
 
-[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent) automatically returns a compiled LangGraph graph that we can pass to the `graphs` key in our configuration file.
+`create_agent()`는 자동으로 컴파일된 LangGraph 그래프를 반환하므로, 설정 파일의 `graphs` 키에 전달할 수 있습니다.
 
 <Info>
-See the [LangGraph configuration file reference](/langsmith/cli#configuration-file) for detailed explanations of each key in the JSON object of the configuration file.
+설정 파일의 JSON 객체에 포함된 각 키에 대한 자세한 설명은 [LangGraph 설정 파일 참조](/langgraph-platform/cli#configuration-file)를 참조하세요.
 </Info>
 
-So far, our project structure looks like this:
+지금까지의 프로젝트 구조는 다음과 같습니다:
 
 ```bash
 my-app/
@@ -99,9 +99,9 @@ my-app/
 └── langgraph.json
 ```
 
-### 5. Install dependencies
+### 5. 의존성 설치
 
-In the root of your new LangGraph app, install the dependencies:
+새로운 LangGraph 앱의 루트에서 의존성을 설치하세요:
 
 <CodeGroup>
 ```shell pip
@@ -115,9 +115,9 @@ uv sync
 
 
 
-### 6. View your agent in Studio
+### 6. Studio에서 에이전트 확인
 
-Start your LangGraph server:
+LangGraph 서버를 시작하세요:
 
 ```shell
 langgraph dev
@@ -127,21 +127,21 @@ langgraph dev
 
 
 <Warning>
-Safari blocks `localhost` connections to Studio. To work around this, run the above command with `--tunnel` to access Studio via a secure tunnel.
+Safari는 Studio로의 `localhost` 연결을 차단합니다. 이를 해결하려면 위 명령에 `--tunnel` 옵션을 추가하여 보안 터널을 통해 Studio에 접근하세요.
 </Warning>
 
-Your agent will be accessible via API (`http://127.0.0.1:2024`) and the Studio UI `https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024`:
+에이전트는 API(`http://127.0.0.1:2024`)와 Studio UI `https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024`를 통해 접근할 수 있습니다:
 
 <Frame>
-![Agent view in the Studio UI](/oss/images/studio_create-agent.png)
+![Agent view in LangGraph studio UI](/oss/images/studio_create-agent.png)
 </Frame>
 
-Studio makes each step of your agent easily observable. Replay any input and inspect the exact prompt, tool arguments, return values, and token/latency metrics. If a tool throws an exception, Studio records it with surrounding state so you can spend less time debugging.
+Studio는 에이전트의 각 단계를 쉽게 관찰할 수 있게 만듭니다. 모든 입력을 다시 실행하고 정확한 프롬프트, 도구 인자, 반환 값, 토큰/지연 시간 메트릭을 검사할 수 있습니다. 도구가 예외를 발생시키면 Studio는 주변 상태와 함께 기록하므로 디버깅 시간을 줄일 수 있습니다.
 
-Keep your dev server running, edit prompts or tool signatures, and watch Studio hot-reload. Re-run the conversation thread from any step to verify behavior changes. See [Manage threads](/langsmith/use-studio#edit-thread-history) for more details.
+개발 서버를 계속 실행한 상태에서 프롬프트나 도구 시그니처를 편집하면 Studio가 핫 리로드됩니다. 대화 스레드를 어느 단계에서든 다시 실행하여 동작 변경을 확인할 수 있습니다. 자세한 내용은 [스레드 관리](/langgraph-platform/use-studio#manage-threads#edit-thread-history)를 참조하세요.
 
-As your agent grows, the same view scales from a single-tool demo to multi-node graphs, keeping decisions legible and reproducible.
+에이전트가 성장함에 따라 동일한 뷰가 단일 도구 데모에서 다중 노드 그래프까지 확장되며, 결정을 명확하고 재현 가능하게 유지합니다.
 
 <Tip>
-For an in-depth look at Studio, check out the [overview page](/langsmith/studio).
+LangGraph Studio에 대한 심층적인 내용은 포괄적인 [LangGraph Studio 개요](/langgraph-platform/langgraph-studio)를 확인하세요.
 </Tip>

@@ -3,12 +3,9 @@ title: Context overview
 sidebarTitle: Context
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
-
-<AlphaCalloutJS />
-
+<AlphaCallout />
 
 **Context engineering** is the practice of building dynamic systems that provide the right information and tools, in the right format, so that an AI application can accomplish a task. Context can be characterized along two key dimensions:
 
@@ -87,7 +84,7 @@ await graph.invoke(
     });
 
     const agent = createAgent({  // [!code highlight]
-      model: "anthropic:claude-sonnet-4-5-20250929",
+      model: "anthropic:claude-3-7-sonnet-latest",
       tools: [/* your tools here */],
       middleware: [personalizedPrompt] as const, // [!code highlight]
     });

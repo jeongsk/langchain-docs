@@ -1,24 +1,21 @@
 ---
-title: Use the functional API
-sidebarTitle: Use the Functional API
+title: 함수형 API 사용하기
+sidebarTitle: 함수형 API 사용하기
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
-<AlphaCalloutPy />
+<AlphaCallout />
 
-
-
-The [**Functional API**](/oss/python/langgraph/functional-api) allows you to add LangGraph's key features — [persistence](/oss/python/langgraph/persistence), [memory](/oss/python/langgraph/add-memory), [human-in-the-loop](/oss/python/langgraph/interrupts), and [streaming](/oss/python/langgraph/streaming) — to your applications with minimal changes to your existing code.
+[**함수형 API**](/oss/python/langgraph/functional-api)를 사용하면 기존 코드를 최소한으로 수정하면서도 LangGraph의 핵심 기능인 [영속성](/oss/python/langgraph/persistence), [메모리](/oss/python/langgraph/add-memory), [human-in-the-loop](/oss/python/langgraph/interrupts), [스트리밍](/oss/python/langgraph/streaming)을 애플리케이션에 추가할 수 있습니다.
 
 <Tip>
-For conceptual information on the functional API, see [Functional API](/oss/python/langgraph/functional-api).
+함수형 API에 대한 개념적인 정보는 [함수형 API](/oss/python/langgraph/functional-api)를 참조하세요.
 </Tip>
 
-## Creating a simple workflow
+## 간단한 워크플로우 만들기
 
-When defining an `entrypoint`, input is restricted to the first argument of the function. To pass multiple inputs, you can use a dictionary.
+`entrypoint`를 정의할 때 입력은 함수의 첫 번째 인자로 제한됩니다. 여러 입력을 전달하려면 딕셔너리를 사용할 수 있습니다.
 
 ```python
 @entrypoint(checkpointer=checkpointer)
@@ -33,32 +30,32 @@ my_workflow.invoke({"value": 1, "another_value": 2})
 
 
 
-<Accordion title="Extended example: simple workflow">
+<Accordion title="확장 예제: 간단한 워크플로우">
   ```python
   import uuid
   from langgraph.func import entrypoint, task
   from langgraph.checkpoint.memory import InMemorySaver
 
-  # Task that checks if a number is even
+  # 숫자가 짝수인지 확인하는 작업
   @task
   def is_even(number: int) -> bool:
       return number % 2 == 0
 
-  # Task that formats a message
+  # 메시지 형식을 지정하는 작업
   @task
   def format_message(is_even: bool) -> str:
       return "The number is even." if is_even else "The number is odd."
 
-  # Create a checkpointer for persistence
+  # 영속성을 위한 체크포인터 생성
   checkpointer = InMemorySaver()
 
   @entrypoint(checkpointer=checkpointer)
   def workflow(inputs: dict) -> str:
-      """Simple workflow to classify a number."""
+      """숫자를 분류하는 간단한 워크플로우입니다."""
       even = is_even(inputs["number"]).result()
       return format_message(even).result()
 
-  # Run the workflow with a unique thread ID
+  # 고유한 스레드 ID로 워크플로우 실행
   config = {"configurable": {"thread_id": str(uuid.uuid4())}}
   result = workflow.invoke({"number": 7}, config=config)
   print(result)
@@ -68,10 +65,9 @@ my_workflow.invoke({"value": 1, "another_value": 2})
 
 </Accordion>
 
-<Accordion title="Extended example: Compose an essay with an LLM">
-  This example demonstrates how to use the `@task` and `@entrypoint` decorators
-  syntactically. Given that a checkpointer is provided, the workflow results will
-  be persisted in the checkpointer.
+<Accordion title="확장 예제: LLM으로 에세이 작성하기">
+  이 예제는 `@task`와 `@entrypoint` 데코레이터를 구문적으로 사용하는 방법을 보여줍니다.
+  체크포인터가 제공되면 워크플로우 결과가 체크포인터에 저장됩니다.
 
   ```python
   import uuid
@@ -81,24 +77,24 @@ my_workflow.invoke({"value": 1, "another_value": 2})
 
   llm = init_chat_model('openai:gpt-3.5-turbo')
 
-  # Task: generate essay using an LLM
+  # 작업: LLM을 사용하여 에세이 생성
   @task
   def compose_essay(topic: str) -> str:
-      """Generate an essay about the given topic."""
+      """주어진 주제에 대한 에세이를 생성합니다."""
       return llm.invoke([
           {"role": "system", "content": "You are a helpful assistant that writes essays."},
           {"role": "user", "content": f"Write an essay about {topic}."}
       ]).content
 
-  # Create a checkpointer for persistence
+  # 영속성을 위한 체크포인터 생성
   checkpointer = InMemorySaver()
 
   @entrypoint(checkpointer=checkpointer)
   def workflow(topic: str) -> str:
-      """Simple workflow that generates an essay with an LLM."""
+      """LLM으로 에세이를 생성하는 간단한 워크플로우입니다."""
       return compose_essay(topic).result()
 
-  # Execute the workflow
+  # 워크플로우 실행
   config = {"configurable": {"thread_id": str(uuid.uuid4())}}
   result = workflow.invoke("the history of flight", config=config)
   print(result)
@@ -108,9 +104,9 @@ my_workflow.invoke({"value": 1, "another_value": 2})
 
 </Accordion>
 
-## Parallel execution
+## 병렬 실행
 
-Tasks can be executed in parallel by invoking them concurrently and waiting for the results. This is useful for improving performance in IO bound tasks (e.g., calling APIs for LLMs).
+작업을 동시에 호출하고 결과를 기다림으로써 병렬로 실행할 수 있습니다. 이는 IO 바운드 작업(예: LLM을 위한 API 호출)의 성능을 향상시키는 데 유용합니다.
 
 ```python
 @task
@@ -126,8 +122,8 @@ def graph(numbers: list[int]) -> list[str]:
 
 
 
-<Accordion title="Extended example: parallel LLM calls">
-  This example demonstrates how to run multiple LLM calls in parallel using `@task`. Each call generates a paragraph on a different topic, and results are joined into a single text output.
+<Accordion title="확장 예제: 병렬 LLM 호출">
+  이 예제는 `@task`를 사용하여 여러 LLM 호출을 병렬로 실행하는 방법을 보여줍니다. 각 호출은 서로 다른 주제에 대한 단락을 생성하고, 결과는 하나의 텍스트 출력으로 결합됩니다.
 
   ```python
   import uuid
@@ -135,10 +131,10 @@ def graph(numbers: list[int]) -> list[str]:
   from langgraph.func import entrypoint, task
   from langgraph.checkpoint.memory import InMemorySaver
 
-  # Initialize the LLM model
+  # LLM 모델 초기화
   llm = init_chat_model("openai:gpt-3.5-turbo")
 
-  # Task that generates a paragraph about a given topic
+  # 주어진 주제에 대한 단락을 생성하는 작업
   @task
   def generate_paragraph(topic: str) -> str:
       response = llm.invoke([
@@ -147,17 +143,17 @@ def graph(numbers: list[int]) -> list[str]:
       ])
       return response.content
 
-  # Create a checkpointer for persistence
+  # 영속성을 위한 체크포인터 생성
   checkpointer = InMemorySaver()
 
   @entrypoint(checkpointer=checkpointer)
   def workflow(topics: list[str]) -> str:
-      """Generates multiple paragraphs in parallel and combines them."""
+      """여러 단락을 병렬로 생성하고 결합합니다."""
       futures = [generate_paragraph(topic) for topic in topics]
       paragraphs = [f.result() for f in futures]
       return "\n\n".join(paragraphs)
 
-  # Run the workflow
+  # 워크플로우 실행
   config = {"configurable": {"thread_id": str(uuid.uuid4())}}
   result = workflow.invoke(["quantum computing", "climate change", "history of aviation"], config=config)
   print(result)
@@ -166,12 +162,12 @@ def graph(numbers: list[int]) -> list[str]:
 
 
 
-  This example uses LangGraph's concurrency model to improve execution time, especially when tasks involve I/O like LLM completions.
+  이 예제는 LangGraph의 동시성 모델을 사용하여 실행 시간을 개선합니다. 특히 작업이 LLM 완성과 같은 I/O를 포함할 때 효과적입니다.
 </Accordion>
 
-## Calling graphs
+## 그래프 호출하기
 
-The **Functional API** and the [**Graph API**](/oss/python/langgraph/graph-api) can be used together in the same application as they share the same underlying runtime.
+**함수형 API**와 [**그래프 API**](/oss/python/langgraph/graph-api)는 동일한 기본 런타임을 공유하므로 같은 애플리케이션에서 함께 사용할 수 있습니다.
 
 ```python
 from langgraph.func import entrypoint
@@ -183,9 +179,9 @@ some_graph = builder.compile()
 
 @entrypoint()
 def some_workflow(some_input: dict) -> int:
-    # Call a graph defined using the graph API
+    # 그래프 API로 정의된 그래프 호출
     result_1 = some_graph.invoke(...)
-    # Call another graph defined using the graph API
+    # 그래프 API로 정의된 다른 그래프 호출
     result_2 = another_graph.invoke(...)
     return {
         "result_1": result_1,
@@ -196,7 +192,7 @@ def some_workflow(some_input: dict) -> int:
 
 
 
-<Accordion title="Extended example: calling a simple graph from the functional API">
+<Accordion title="확장 예제: 함수형 API에서 간단한 그래프 호출하기">
   ```python
   import uuid
   from typing import TypedDict
@@ -204,21 +200,21 @@ def some_workflow(some_input: dict) -> int:
   from langgraph.checkpoint.memory import InMemorySaver
   from langgraph.graph import StateGraph
 
-  # Define the shared state type
+  # 공유 상태 타입 정의
   class State(TypedDict):
       foo: int
 
-  # Define a simple transformation node
+  # 간단한 변환 노드 정의
   def double(state: State) -> State:
       return {"foo": state["foo"] * 2}
 
-  # Build the graph using the Graph API
+  # 그래프 API를 사용하여 그래프 구축
   builder = StateGraph(State)
   builder.add_node("double", double)
   builder.set_entry_point("double")
   graph = builder.compile()
 
-  # Define the functional API workflow
+  # 함수형 API 워크플로우 정의
   checkpointer = InMemorySaver()
 
   @entrypoint(checkpointer=checkpointer)
@@ -226,21 +222,21 @@ def some_workflow(some_input: dict) -> int:
       result = graph.invoke({"foo": x})
       return {"bar": result["foo"]}
 
-  # Execute the workflow
+  # 워크플로우 실행
   config = {"configurable": {"thread_id": str(uuid.uuid4())}}
-  print(workflow.invoke(5, config=config))  # Output: {'bar': 10}
+  print(workflow.invoke(5, config=config))  # 출력: {'bar': 10}
   ```
 
 
 
 </Accordion>
 
-## Call other entrypoints
+## 다른 엔트리포인트 호출하기
 
-You can call other **entrypoints** from within an **entrypoint** or a **task**.
+**entrypoint** 또는 **task** 내에서 다른 **entrypoint**를 호출할 수 있습니다.
 
 ```python
-@entrypoint() # Will automatically use the checkpointer from the parent entrypoint
+@entrypoint() # 부모 엔트리포인트의 체크포인터를 자동으로 사용합니다
 def some_other_workflow(inputs: dict) -> int:
     return inputs["value"]
 
@@ -253,73 +249,73 @@ def my_workflow(inputs: dict) -> int:
 
 
 
-<Accordion title="Extended example: calling another entrypoint">
+<Accordion title="확장 예제: 다른 엔트리포인트 호출하기">
   ```python
   import uuid
   from langgraph.func import entrypoint
   from langgraph.checkpoint.memory import InMemorySaver
 
-  # Initialize a checkpointer
+  # 체크포인터 초기화
   checkpointer = InMemorySaver()
 
-  # A reusable sub-workflow that multiplies a number
+  # 숫자를 곱하는 재사용 가능한 서브 워크플로우
   @entrypoint()
   def multiply(inputs: dict) -> int:
       return inputs["a"] * inputs["b"]
 
-  # Main workflow that invokes the sub-workflow
+  # 서브 워크플로우를 호출하는 메인 워크플로우
   @entrypoint(checkpointer=checkpointer)
   def main(inputs: dict) -> dict:
       result = multiply.invoke({"a": inputs["x"], "b": inputs["y"]})
       return {"product": result}
 
-  # Execute the main workflow
+  # 메인 워크플로우 실행
   config = {"configurable": {"thread_id": str(uuid.uuid4())}}
-  print(main.invoke({"x": 6, "y": 7}, config=config))  # Output: {'product': 42}
+  print(main.invoke({"x": 6, "y": 7}, config=config))  # 출력: {'product': 42}
   ```
 
 
 
 </Accordion>
 
-## Streaming
+## 스트리밍
 
-The **Functional API** uses the same streaming mechanism as the **Graph API**. Please
-read the [**streaming guide**](/oss/python/langgraph/streaming) section for more details.
+**함수형 API**는 **그래프 API**와 동일한 스트리밍 메커니즘을 사용합니다.
+자세한 내용은 [**스트리밍 가이드**](/oss/python/langgraph/streaming) 섹션을 참조하세요.
 
-Example of using the streaming API to stream both updates and custom data.
+업데이트와 사용자 정의 데이터를 모두 스트리밍하는 스트리밍 API 사용 예제입니다.
 
-```python
+```python {highlight={17}}
 from langgraph.func import entrypoint
 from langgraph.checkpoint.memory import InMemorySaver
-from langgraph.config import get_stream_writer   # [!code highlight]
+from langgraph.config import get_stream_writer # (1)!
 
 checkpointer = InMemorySaver()
 
 @entrypoint(checkpointer=checkpointer)
 def main(inputs: dict) -> int:
-    writer = get_stream_writer()   # [!code highlight]
-    writer("Started processing")   # [!code highlight]
+    writer = get_stream_writer() # (2)!
+    writer("Started processing") # (3)!
     result = inputs["x"] * 2
-    writer(f"Result is {result}")   # [!code highlight]
+    writer(f"Result is {result}") # (4)!
     return result
 
 config = {"configurable": {"thread_id": "abc"}}
 
-for mode, chunk in main.stream(   # [!code highlight]
+for mode, chunk in main.stream( # (5)!
     {"x": 5},
-    stream_mode=["custom", "updates"],   # [!code highlight]
+    stream_mode=["custom", "updates"], # (6)!
     config=config
 ):
     print(f"{mode}: {chunk}")
 ```
 
-1. Import [`get_stream_writer`](https://reference.langchain.com/python/langgraph/config/#langgraph.config.get_stream_writer) from `langgraph.config`.
-2. Obtain a stream writer instance within the entrypoint.
-3. Emit custom data before computation begins.
-4. Emit another custom message after computing the result.
-5. Use `.stream()` to process streamed output.
-6. Specify which streaming modes to use.
+1. `langgraph.config`에서 `get_stream_writer`를 가져옵니다.
+2. 엔트리포인트 내에서 스트림 라이터 인스턴스를 가져옵니다.
+3. 계산이 시작되기 전에 사용자 정의 데이터를 출력합니다.
+4. 결과를 계산한 후 다른 사용자 정의 메시지를 출력합니다.
+5. `.stream()`을 사용하여 스트리밍된 출력을 처리합니다.
+6. 사용할 스트리밍 모드를 지정합니다.
 
 ```pycon
 ('updates', {'add_one': 2})
@@ -330,15 +326,14 @@ for mode, chunk in main.stream(   # [!code highlight]
 ```
 
 <Warning>
-**Async with Python < 3.11**
-If using Python < 3.11 and writing async code, using [`get_stream_writer`](https://reference.langchain.com/python/langgraph/config/#langgraph.config.get_stream_writer) will not work. Instead please
-use the `StreamWriter` class directly. See [Async with Python < 3.11](/oss/python/langgraph/streaming#async) for more details.
+**Python < 3.11에서 비동기 사용**
+Python < 3.11을 사용하고 비동기 코드를 작성하는 경우 `get_stream_writer()`를 사용하면 작동하지 않습니다. 대신 `StreamWriter` 클래스를 직접 사용하세요. 자세한 내용은 [Python < 3.11에서 비동기](/oss/python/langgraph/streaming#async)를 참조하세요.
 
-```python
+```python {highlight={4}}
 from langgraph.types import StreamWriter
 
 @entrypoint(checkpointer=checkpointer)
-async def main(inputs: dict, writer: StreamWriter) -> int:  # [!code highlight]
+async def main(inputs: dict, writer: StreamWriter) -> int:
 ...
 ```
 </Warning>
@@ -346,19 +341,19 @@ async def main(inputs: dict, writer: StreamWriter) -> int:  # [!code highlight]
 
 
 
-## Retry policy
+## 재시도 정책
 
 ```python
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.func import entrypoint, task
 from langgraph.types import RetryPolicy
 
-# This variable is just used for demonstration purposes to simulate a network failure.
-# It's not something you will have in your actual code.
+# 이 변수는 네트워크 장애를 시뮬레이션하기 위한 데모용입니다.
+# 실제 코드에서는 사용하지 않습니다.
 attempts = 0
 
-# Let's configure the RetryPolicy to retry on ValueError.
-# The default RetryPolicy is optimized for retrying specific network errors.
+# RetryPolicy를 ValueError에 대해 재시도하도록 구성합니다.
+# 기본 RetryPolicy는 특정 네트워크 오류를 재시도하도록 최적화되어 있습니다.
 retry_policy = RetryPolicy(retry_on=ValueError)
 
 @task(retry_policy=retry_policy)
@@ -392,7 +387,7 @@ main.invoke({'any_input': 'foobar'}, config=config)
 
 
 
-## Caching Tasks
+## 작업 캐싱
 
 ```python
 import time
@@ -401,7 +396,7 @@ from langgraph.func import entrypoint, task
 from langgraph.types import CachePolicy
 
 
-@task(cache_policy=CachePolicy(ttl=120))    # [!code highlight]
+@task(cache_policy=CachePolicy(ttl=120))  # (1)!
 def slow_add(x: int) -> int:
     time.sleep(1)
     return x * 2
@@ -422,12 +417,12 @@ for chunk in main.stream({"x": 5}, stream_mode="updates"):
 #> {'main': {'result1': 10, 'result2': 10}}
 ```
 
-1. `ttl` is specified in seconds. The cache will be invalidated after this time.
+1. `ttl`은 초 단위로 지정됩니다. 이 시간이 지나면 캐시가 무효화됩니다.
 
 
 
 
-## Resuming after an error
+## 오류 후 재개하기
 
 ```python
 import time
@@ -435,30 +430,30 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.func import entrypoint, task
 from langgraph.types import StreamWriter
 
-# This variable is just used for demonstration purposes to simulate a network failure.
-# It's not something you will have in your actual code.
+# 이 변수는 네트워크 장애를 시뮬레이션하기 위한 데모용입니다.
+# 실제 코드에서는 사용하지 않습니다.
 attempts = 0
 
 @task()
 def get_info():
     """
-    Simulates a task that fails once before succeeding.
-    Raises an exception on the first attempt, then returns "OK" on subsequent tries.
+    성공하기 전에 한 번 실패하는 작업을 시뮬레이션합니다.
+    첫 번째 시도에서는 예외를 발생시키고, 이후 시도에서는 "OK"를 반환합니다.
     """
     global attempts
     attempts += 1
 
     if attempts < 2:
-        raise ValueError("Failure")  # Simulate a failure on the first attempt
+        raise ValueError("Failure")  # 첫 번째 시도에서 실패 시뮬레이션
     return "OK"
 
-# Initialize an in-memory checkpointer for persistence
+# 영속성을 위한 인메모리 체크포인터 초기화
 checkpointer = InMemorySaver()
 
 @task
 def slow_task():
     """
-    Simulates a slow-running task by introducing a 1-second delay.
+    1초 지연을 도입하여 느리게 실행되는 작업을 시뮬레이션합니다.
     """
     time.sleep(1)
     return "Ran slow task."
@@ -466,35 +461,35 @@ def slow_task():
 @entrypoint(checkpointer=checkpointer)
 def main(inputs, writer: StreamWriter):
     """
-    Main workflow function that runs the slow_task and get_info tasks sequentially.
+    slow_task와 get_info 작업을 순차적으로 실행하는 메인 워크플로우 함수입니다.
 
-    Parameters:
-    - inputs: Dictionary containing workflow input values.
-    - writer: StreamWriter for streaming custom data.
+    매개변수:
+    - inputs: 워크플로우 입력 값을 포함하는 딕셔너리입니다.
+    - writer: 사용자 정의 데이터를 스트리밍하기 위한 StreamWriter입니다.
 
-    The workflow first executes `slow_task` and then attempts to execute `get_info`,
-    which will fail on the first invocation.
+    워크플로우는 먼저 `slow_task`를 실행한 다음 `get_info`를 실행하려고 시도하는데,
+    첫 번째 호출에서는 실패합니다.
     """
-    slow_task_result = slow_task().result()  # Blocking call to slow_task
-    get_info().result()  # Exception will be raised here on the first attempt
+    slow_task_result = slow_task().result()  # slow_task에 대한 블로킹 호출
+    get_info().result()  # 첫 번째 시도에서 여기서 예외가 발생합니다
     return slow_task_result
 
-# Workflow execution configuration with a unique thread identifier
+# 고유한 스레드 식별자를 사용한 워크플로우 실행 구성
 config = {
     "configurable": {
-        "thread_id": "1"  # Unique identifier to track workflow execution
+        "thread_id": "1"  # 워크플로우 실행을 추적하기 위한 고유 식별자
     }
 }
 
-# This invocation will take ~1 second due to the slow_task execution
+# 이 호출은 slow_task 실행으로 인해 약 1초가 소요됩니다
 try:
-    # First invocation will raise an exception due to the `get_info` task failing
+    # get_info 작업이 실패하여 첫 번째 호출에서 예외가 발생합니다
     main.invoke({'any_input': 'foobar'}, config=config)
 except ValueError:
-    pass  # Handle the failure gracefully
+    pass  # 실패를 우아하게 처리
 ```
 
-When we resume execution, we won't need to re-run the `slow_task` as its result is already saved in the checkpoint.
+실행을 재개할 때 `slow_task`의 결과가 이미 체크포인트에 저장되어 있으므로 다시 실행할 필요가 없습니다.
 
 ```python
 main.invoke(None, config=config)
@@ -509,15 +504,15 @@ main.invoke(None, config=config)
 
 ## Human-in-the-loop
 
-The functional API supports [human-in-the-loop](/oss/python/langgraph/interrupts) workflows using the `interrupt` function and the `Command` primitive.
+함수형 API는 `interrupt` 함수와 `Command` 프리미티브를 사용하여 [human-in-the-loop](/oss/python/langgraph/interrupts) 워크플로우를 지원합니다.
 
-### Basic human-in-the-loop workflow
+### 기본 human-in-the-loop 워크플로우
 
-We will create three [tasks](/oss/python/langgraph/functional-api#task):
+세 개의 [작업](/oss/python/langgraph/functional-api#task)을 생성하겠습니다:
 
-1. Append `"bar"`.
-2. Pause for human input. When resuming, append human input.
-3. Append `"qux"`.
+1. `"bar"` 추가하기.
+2. 사용자 입력을 위해 일시 정지. 재개할 때 사용자 입력 추가하기.
+3. `"qux"` 추가하기.
 
 ```python
 from langgraph.func import entrypoint, task
@@ -526,27 +521,26 @@ from langgraph.types import Command, interrupt
 
 @task
 def step_1(input_query):
-    """Append bar."""
+    """bar를 추가합니다."""
     return f"{input_query} bar"
 
 
 @task
 def human_feedback(input_query):
-    """Append user input."""
+    """사용자 입력을 추가합니다."""
     feedback = interrupt(f"Please provide feedback: {input_query}")
     return f"{input_query} {feedback}"
 
-
 @task
 def step_3(input_query):
-    """Append qux."""
+    """qux를 추가합니다."""
     return f"{input_query} qux"
 ```
 
 
 
 
-We can now compose these tasks in an [entrypoint](/oss/python/langgraph/functional-api#entrypoint):
+이제 이러한 작업을 [entrypoint](/oss/python/langgraph/functional-api#entrypoint)에서 구성할 수 있습니다:
 
 ```python
 from langgraph.checkpoint.memory import InMemorySaver
@@ -566,9 +560,9 @@ def graph(input_query):
 
 
 
-[interrupt()](/oss/python/langgraph/interrupts#pause-using-interrupt) is called inside a task, enabling a human to review and edit the output of the previous task. The results of prior tasks-- in this case `step_1`-- are persisted, so that they are not run again following the `interrupt`.
+[interrupt()](/oss/python/langgraph/interrupts#pause-using-interrupt)는 작업 내에서 호출되어 사람이 이전 작업의 출력을 검토하고 편집할 수 있게 합니다. 이 경우 `step_1`과 같은 이전 작업의 결과는 유지되므로 `interrupt` 이후 다시 실행되지 않습니다.
 
-Let's send in a query string:
+쿼리 문자열을 보내 보겠습니다:
 
 ```python
 config = {"configurable": {"thread_id": "1"}}
@@ -581,10 +575,10 @@ for event in graph.stream("foo", config):
 
 
 
-Note that we've paused with an `interrupt` after `step_1`. The interrupt provides instructions to resume the run. To resume, we issue a [Command](/oss/python/langgraph/interrupts#resuming-interrupts) containing the data expected by the `human_feedback` task.
+`step_1` 이후 `interrupt`로 일시 정지했습니다. interrupt는 실행을 재개하기 위한 지침을 제공합니다. 재개하려면 `human_feedback` 작업에서 예상하는 데이터를 포함하는 [Command](/oss/python/langgraph/interrupts#resuming-interrupts)를 발행합니다.
 
 ```python
-# Continue execution
+# 실행 계속
 for event in graph.stream(Command(resume="baz"), config):
     print(event)
     print("\n")
@@ -593,23 +587,23 @@ for event in graph.stream(Command(resume="baz"), config):
 
 
 
-After resuming, the run proceeds through the remaining step and terminates as expected.
+재개한 후 실행은 나머지 단계를 거쳐 예상대로 종료됩니다.
 
-### Review tool calls
+### 도구 호출 검토하기
 
-To review tool calls before execution, we add a `review_tool_call` function that calls [`interrupt`](/oss/python/langgraph/interrupts#pause-using-interrupt). When this function is called, execution will be paused until we issue a command to resume it.
+실행 전에 도구 호출을 검토하려면 [`interrupt`](/oss/python/langgraph/interrupts#pause-using-interrupt)를 호출하는 `review_tool_call` 함수를 추가합니다. 이 함수가 호출되면 재개 명령을 발행할 때까지 실행이 일시 정지됩니다.
 
-Given a tool call, our function will `interrupt` for human review. At that point we can either:
+도구 호출이 주어지면 함수는 사람의 검토를 위해 `interrupt`합니다. 이 시점에서 다음 중 하나를 수행할 수 있습니다:
 
-* Accept the tool call
-* Revise the tool call and continue
-* Generate a custom tool message (e.g., instructing the model to re-format its tool call)
+* 도구 호출 수락
+* 도구 호출 수정 및 계속
+* 사용자 정의 도구 메시지 생성(예: 도구 호출을 다시 포맷하도록 모델에 지시)
 
 ```python
 from typing import Union
 
 def review_tool_call(tool_call: ToolCall) -> Union[ToolCall, ToolMessage]:
-    """Review a tool call, returning a validated version."""
+    """도구 호출을 검토하고 검증된 버전을 반환합니다."""
     human_review = interrupt(
         {
             "question": "Is this correct?",
@@ -632,7 +626,7 @@ def review_tool_call(tool_call: ToolCall) -> Union[ToolCall, ToolMessage]:
 
 
 
-We can now update our [entrypoint](/oss/python/langgraph/functional-api#entrypoint) to review the generated tool calls. If a tool call is accepted or revised, we execute in the same way as before. Otherwise, we just append the [`ToolMessage`](https://reference.langchain.com/python/langchain/messages/#langchain.messages.ToolMessage) supplied by the human. The results of prior tasks — in this case the initial model call — are persisted, so that they are not run again following the `interrupt`.
+이제 [entrypoint](/oss/python/langgraph/functional-api#entrypoint)를 업데이트하여 생성된 도구 호출을 검토할 수 있습니다. 도구 호출이 수락되거나 수정되면 이전과 같은 방식으로 실행합니다. 그렇지 않으면 사람이 제공한 `ToolMessage`를 추가하기만 하면 됩니다. 이전 작업의 결과(이 경우 초기 모델 호출)는 유지되므로 `interrupt` 이후 다시 실행되지 않습니다.
 
 ```python
 from langgraph.checkpoint.memory import InMemorySaver
@@ -653,32 +647,32 @@ def agent(messages, previous):
         if not llm_response.tool_calls:
             break
 
-        # Review tool calls
+        # 도구 호출 검토
         tool_results = []
         tool_calls = []
         for i, tool_call in enumerate(llm_response.tool_calls):
             review = review_tool_call(tool_call)
             if isinstance(review, ToolMessage):
                 tool_results.append(review)
-            else:  # is a validated tool call
+            else:  # 검증된 도구 호출인 경우
                 tool_calls.append(review)
                 if review != tool_call:
-                    llm_response.tool_calls[i] = review  # update message
+                    llm_response.tool_calls[i] = review  # 메시지 업데이트
 
-        # Execute remaining tool calls
+        # 나머지 도구 호출 실행
         tool_result_futures = [call_tool(tool_call) for tool_call in tool_calls]
         remaining_tool_results = [fut.result() for fut in tool_result_futures]
 
-        # Append to message list
+        # 메시지 목록에 추가
         messages = add_messages(
             messages,
             [llm_response, *tool_results, *remaining_tool_results],
         )
 
-        # Call model again
+        # 모델 다시 호출
         llm_response = call_model(messages).result()
 
-    # Generate final response
+    # 최종 응답 생성
     messages = add_messages(messages, llm_response)
     return entrypoint.final(value=llm_response, save=messages)
 ```
@@ -686,28 +680,28 @@ def agent(messages, previous):
 
 
 
-## Short-term memory
+## 단기 메모리
 
-Short-term memory allows storing information across different **invocations** of the same **thread id**. See [short-term memory](/oss/python/langgraph/functional-api#short-term-memory) for more details.
+단기 메모리를 사용하면 동일한 **스레드 ID**의 서로 다른 **호출** 간에 정보를 저장할 수 있습니다. 자세한 내용은 [단기 메모리](/oss/python/langgraph/functional-api#short-term-memory)를 참조하세요.
 
-### Manage checkpoints
+### 체크포인트 관리
 
-You can view and delete the information stored by the checkpointer.
+체크포인터에 저장된 정보를 보고 삭제할 수 있습니다.
 
 <a id="checkpoint"></a>
-#### View thread state
+#### 스레드 상태 보기
 
-```python
+```python {highlight={3,6,10}}
 config = {
     "configurable": {
-        "thread_id": "1",  # [!code highlight]
-        # optionally provide an ID for a specific checkpoint,
-        # otherwise the latest checkpoint is shown
-        # "checkpoint_id": "1f029ca3-1f5b-6704-8004-820c16b69a5a"  # [!code highlight]
+        "thread_id": "1",
+        # 선택적으로 특정 체크포인트의 ID를 제공할 수 있습니다.
+        # 그렇지 않으면 최신 체크포인트가 표시됩니다.
+        # "checkpoint_id": "1f029ca3-1f5b-6704-8004-820c16b69a5a"
 
     }
 }
-graph.get_state(config)  # [!code highlight]
+graph.get_state(config)
 ```
 
 ```
@@ -732,15 +726,15 @@ StateSnapshot(
 
 
 <a id="checkpoints"></a>
-#### View the history of the thread
+#### 스레드 히스토리 보기
 
-```python
+```python {highlight={3,6}}
 config = {
     "configurable": {
-        "thread_id": "1"  # [!code highlight]
+        "thread_id": "1"
     }
 }
-list(graph.get_state_history(config))  # [!code highlight]
+list(graph.get_state_history(config))
 ```
 
 ```
@@ -811,12 +805,12 @@ list(graph.get_state_history(config))  # [!code highlight]
 
 
 
-### Decouple return value from saved value
+### 반환 값과 저장 값 분리하기
 
-Use `entrypoint.final` to decouple what is returned to the caller from what is persisted in the checkpoint. This is useful when:
+`entrypoint.final`을 사용하면 호출자에게 반환되는 값과 체크포인트에 저장되는 값을 분리할 수 있습니다. 다음과 같은 경우에 유용합니다:
 
-* You want to return a computed result (e.g., a summary or status), but save a different internal value for use on the next invocation.
-* You need to control what gets passed to the previous parameter on the next run.
+* 계산된 결과(예: 요약 또는 상태)를 반환하지만 다음 호출에 사용할 다른 내부 값을 저장하려는 경우.
+* 다음 실행에서 previous 매개변수로 전달될 값을 제어해야 하는 경우.
 
 ```python
 from langgraph.func import entrypoint
@@ -828,7 +822,7 @@ checkpointer = InMemorySaver()
 def accumulate(n: int, *, previous: int | None) -> entrypoint.final[int, int]:
     previous = previous or 0
     total = previous + n
-    # Return the *previous* value to the caller but save the *new* total to the checkpoint.
+    # 호출자에게는 *이전* 값을 반환하지만 체크포인트에는 *새* 합계를 저장합니다.
     return entrypoint.final(value=previous, save=total)
 
 config = {"configurable": {"thread_id": "my-thread"}}
@@ -841,10 +835,10 @@ print(accumulate.invoke(3, config=config))  # 3
 
 
 
-### Chatbot example
+### 챗봇 예제
 
-An example of a simple chatbot using the functional API and the `InMemorySaver` checkpointer.
-The bot is able to remember the previous conversation and continue from where it left off.
+함수형 API와 `InMemorySaver` 체크포인터를 사용하는 간단한 챗봇 예제입니다.
+봇은 이전 대화를 기억하고 중단한 부분부터 계속할 수 있습니다.
 
 ```python
 from langchain.messages import BaseMessage
@@ -853,7 +847,7 @@ from langgraph.func import entrypoint, task
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain_anthropic import ChatAnthropic
 
-model = ChatAnthropic(model="claude-sonnet-4-5-20250929")
+model = ChatAnthropic(model="claude-3-5-sonnet-latest")
 
 @task
 def call_model(messages: list[BaseMessage]):
@@ -883,17 +877,17 @@ for chunk in workflow.stream([input_message], config, stream_mode="values"):
 
 
 
-## Long-term memory
+## 장기 메모리
 
-[long-term memory](/oss/python/concepts/memory#long-term-memory) allows storing information across different **thread ids**. This could be useful for learning information about a given user in one conversation and using it in another.
+[장기 메모리](/oss/python/concepts/memory#long-term-memory)를 사용하면 서로 다른 **스레드 ID** 간에 정보를 저장할 수 있습니다. 이는 한 대화에서 특정 사용자에 대한 정보를 학습하고 다른 대화에서 사용하는 데 유용할 수 있습니다.
 
-## Workflows
+## 워크플로우
 
-* [Workflows and agent](/oss/python/langgraph/workflows-agents) guide for more examples of how to build workflows using the Functional API.
+* 함수형 API를 사용하여 워크플로우를 구축하는 방법에 대한 더 많은 예제는 [워크플로우와 에이전트](/oss/python/langgraph/workflows-agents) 가이드를 참조하세요.
 
-## Integrate with other libraries
+## 다른 라이브러리와 통합하기
 
-* [Add LangGraph's features to other frameworks using the functional API](/langsmith/autogen-integration): Add LangGraph features like persistence, memory and streaming to other agent frameworks that do not provide them out of the box.
+* [함수형 API를 사용하여 다른 프레임워크에 LangGraph 기능 추가하기](/langsmith/autogen-integration): 기본적으로 제공하지 않는 다른 에이전트 프레임워크에 영속성, 메모리, 스트리밍과 같은 LangGraph 기능을 추가하세요.
 
 ---
 

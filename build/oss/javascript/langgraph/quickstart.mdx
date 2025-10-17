@@ -1,32 +1,30 @@
 ---
-title: Quickstart
+title: 빠른 시작
 ---
 
-import AlphaCallout from "/snippets/alpha-lg-callout.mdx";
+import AlphaCallout from "/ko/snippets/alpha-lg-callout.mdx";
 
+<AlphaCallout />
 
-<AlphaCalloutJS />
+이 빠른 시작에서는 LangGraph Graph API 또는 Functional API를 사용하여 계산기 에이전트를 구축하는 방법을 보여줍니다.
 
-
-This quickstart demonstrates how to build a calculator agent using the LangGraph Graph API or the Functional API.
-
-- [Use the Graph API](#use-the-graph-api) if you prefer to define your agent as a graph of nodes and edges.
-- [Use the Functional API](#use-the-functional-api) if you prefer to define your agent as a single function.
+- 에이전트를 노드와 에지의 그래프로 정의하려면 [Graph API 사용](#use-the-graph-api)을 선택하세요.
+- 에이전트를 단일 함수로 정의하려면 [Functional API 사용](#use-the-functional-api)을 선택하세요.
 
 <Tip>
-For conceptual information, see [Graph API overview](/oss/javascript/langgraph/graph-api) and [Functional API overview](/oss/javascript/langgraph/functional-api).
+개념적인 정보는 [Graph API 개요](/oss/javascript/langgraph/graph-api)와 [Functional API 개요](/oss/javascript/langgraph/functional-api)를 참조하세요.
 </Tip>
 
 <Info>
-For this example, you will need to set up a [Claude (Anthropic)](https://www.anthropic.com/) account and get an API key. Then, set the `ANTHROPIC_API_KEY` environment variable in your terminal.
+이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 발급받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
 </Info>
 
 <Tabs>
 <Tab title="Use the Graph API">
 
-## 1. Define tools and model
+## 1. 도구와 모델 정의
 
-In this example, we'll use the Claude Sonnet 4.5 model and define tools for addition, multiplication, and division.
+이 예제에서는 Claude 3.7 Sonnet 모델을 사용하고 덧셈, 곱셈, 나눗셈을 위한 도구를 정의합니다.
 
 
 
@@ -36,7 +34,7 @@ import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 
 const llm = new ChatAnthropic({
-  model: "claude-sonnet-4-5-20250929",
+  model: "claude-3-7-sonnet-latest",
   temperature: 0,
 });
 
@@ -79,12 +77,12 @@ const llmWithTools = llm.bindTools(tools);
 ```
 
 
-## 2. Define state
+## 2. 상태 정의
 
-The graph's state is used to store the messages and the number of LLM calls.
+그래프의 상태는 메시지와 LLM 호출 횟수를 저장하는 데 사용됩니다.
 
 <Tip>
-    State in LangGraph persists throughout the agent's execution. The `Annotated` type with `operator.add` ensures that new messages are appended to the existing list rather than replacing it.
+    LangGraph의 State는 에이전트 실행 전반에 걸쳐 지속됩니다. `operator.add`와 함께 사용된 `Annotated` 타입은 새로운 메시지가 기존 목록을 대체하는 대신 추가되도록 보장합니다.
 </Tip>
 
 
@@ -105,9 +103,9 @@ const MessagesState = z.object({
 ```
 
 
-## 3. Define model node
+## 3. 모델 노드 정의
 
-The model node is used to call the LLM and decide whether to call a tool or not.
+모델 노드는 LLM을 호출하고 도구를 호출할지 여부를 결정하는 데 사용됩니다.
 
 
 
@@ -127,9 +125,9 @@ async function llmCall(state: z.infer<typeof MessagesState>) {
 ```
 
 
-## 4. Define tool node
+## 4. 도구 노드 정의
 
-The tool node is used to call the tools and return the results.
+도구 노드는 도구를 호출하고 결과를 반환하는 데 사용됩니다.
 
 
 
@@ -154,9 +152,9 @@ async function toolNode(state: z.infer<typeof MessagesState>) {
 ```
 
 
-## 5. Define end logic
+## 5. 종료 로직 정의
 
-The conditional edge function is used to route to the tool node or end based upon whether the LLM made a tool call.
+조건부 에지 함수는 LLM이 도구 호출을 했는지 여부에 따라 도구 노드로 라우팅하거나 종료하는 데 사용됩니다.
 
 
 
@@ -176,9 +174,9 @@ async function shouldContinue(state: z.infer<typeof MessagesState>) {
 ```
 
 
-## 6. Build and compile the agent
+## 6. 에이전트 빌드 및 컴파일
 
-The agent is built using the `StateGraph` class and compiled using the `compile` method.
+에이전트는 `StateGraph` 클래스를 사용하여 빌드하고 `compile` 메서드를 사용하여 컴파일합니다.
 
 
 
@@ -203,9 +201,9 @@ for (const message of result.messages) {
 ```
 
 
-Congratulations! You've built your first agent using the LangGraph Graph API.
+축하합니다! LangGraph Graph API를 사용하여 첫 번째 에이전트를 구축했습니다.
 
-<Accordion title="Full code example">
+<Accordion title="전체 코드 예제">
 
 
 ```typescript
@@ -215,7 +213,7 @@ import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 
 const llm = new ChatAnthropic({
-  model: "claude-sonnet-4-5-20250929",
+  model: "claude-3-7-sonnet-latest",
   temperature: 0,
 });
 
@@ -341,9 +339,9 @@ for (const message of result.messages) {
 
 <Tab title="Use the Functional API">
 
-## 1. Define tools and model
+## 1. 도구와 모델 정의
 
-In this example, we'll use the Claude Sonnet 4.5 model and define tools for addition, multiplication, and division.
+이 예제에서는 Claude 3.7 Sonnet 모델을 사용하고 덧셈, 곱셈, 나눗셈을 위한 도구를 정의합니다.
 
 
 
@@ -353,7 +351,7 @@ import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 
 const llm = new ChatAnthropic({
-  model: "claude-sonnet-4-5-20250929",
+  model: "claude-3-7-sonnet-latest",
   temperature: 0,
 });
 
@@ -397,12 +395,12 @@ const llmWithTools = llm.bindTools(tools);
 ```
 
 
-## 2. Define model node
+## 2. 모델 노드 정의
 
-The model node is used to call the LLM and decide whether to call a tool or not.
+모델 노드는 LLM을 호출하고 도구를 호출할지 여부를 결정하는 데 사용됩니다.
 
 <Tip>
-    The `@task` decorator marks a function as a task that can be executed as part of the agent. Tasks can be called synchronously or asynchronously within your entrypoint function.
+    `@task` 데코레이터는 함수를 에이전트의 일부로 실행할 수 있는 작업으로 표시합니다. 작업은 진입점 함수 내에서 동기적 또는 비동기적으로 호출될 수 있습니다.
 </Tip>
 
 
@@ -421,9 +419,9 @@ const callLlm = task({ name: "callLlm" }, async (messages: BaseMessage[]) => {
 ```
 
 
-## 3. Define tool node
+## 3. 도구 노드 정의
 
-The tool node is used to call the tools and return the results.
+도구 노드는 도구를 호출하고 결과를 반환하는 데 사용됩니다.
 
 
 
@@ -436,12 +434,12 @@ const callTool = task({ name: "callTool" }, async (toolCall: ToolCall) => {
 ```
 
 
-## 4. Define agent
+## 4. 에이전트 정의
 
-The agent is built using the `entrypoint` function.
+에이전트는 `entrypoint` 함수를 사용하여 빌드합니다.
 
 <Note>
-    In the Functional API, instead of defining nodes and edges explicitly, you write standard control flow logic (loops, conditionals) within a single function.
+    Functional API에서는 노드와 에지를 명시적으로 정의하는 대신, 단일 함수 내에서 표준 제어 흐름 로직(루프, 조건문)을 작성합니다.
 </Note>
 
 
@@ -478,9 +476,9 @@ for (const message of result) {
 ```
 
 
-Congratulations! You've built your first agent using the LangGraph Functional API.
+축하합니다! LangGraph Functional API를 사용하여 첫 번째 에이전트를 구축했습니다.
 
-<Accordion title="Full code example" icon="code">
+<Accordion title="전체 코드 예제" icon="code">
 
 
 ```typescript
@@ -490,7 +488,7 @@ import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 
 const llm = new ChatAnthropic({
-  model: "claude-sonnet-4-5-20250929",
+  model: "claude-3-7-sonnet-latest",
   temperature: 0,
 });
 

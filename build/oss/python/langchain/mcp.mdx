@@ -2,12 +2,9 @@
 title: Model Context Protocol (MCP)
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
-<AlphaCalloutPy />
-
-
+<AlphaCallout />
 
 [Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) is an open protocol that standardizes how applications provide tools and context to LLMs. LangChain agents can use tools defined on MCP servers using the [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchain-mcp-adapters) library.
 
@@ -64,7 +61,7 @@ client = MultiServerMCPClient(  # [!code highlight]
 
 tools = await client.get_tools()  # [!code highlight]
 agent = create_agent(
-    "anthropic:claude-sonnet-4-5-20250929",
+    "anthropic:claude-3-7-sonnet-latest",
     tools  # [!code highlight]
 )
 math_response = await agent.ainvoke(

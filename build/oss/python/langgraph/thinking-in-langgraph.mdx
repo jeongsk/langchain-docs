@@ -1,36 +1,36 @@
 ---
-title: Thinking in LangGraph
-description: Learn how to think about building agents with LangGraph by breaking down a customer support email agent into discrete steps
+title: LangGraph로 사고하기
+description: 고객 지원 이메일 에이전트를 개별 단계로 분해하여 LangGraph로 에이전트를 구축하는 사고 방식을 학습합니다
 ---
 
-LangGraph can change how you think about the agents you build. When you build an agent with LangGraph, you will first break it apart into discrete steps called **nodes**. Then, you will describe the different decisions and transitions for each of your nodes. Finally, you will connect your nodes together through a shared **state** that each node can read from and write to. In this tutorial, we'll guide you through the thought process of building a customer support email agent with LangGraph.
+LangGraph는 에이전트를 구축하는 사고 방식을 바꿀 수 있습니다. LangGraph로 에이전트를 구축할 때는 먼저 **노드**라고 불리는 개별 단계로 분해합니다. 그런 다음 각 노드의 다양한 결정과 전환을 설명합니다. 마지막으로 각 노드가 읽고 쓸 수 있는 공유 **상태**를 통해 노드들을 연결합니다. 이 튜토리얼에서는 LangGraph로 고객 지원 이메일 에이전트를 구축하는 사고 과정을 안내합니다.
 
-## Start with the process you want to automate
+## 자동화하려는 프로세스부터 시작하기
 
-Imagine that you need to build an AI agent that handles customer support emails. Your product team has given you these requirements:
+고객 지원 이메일을 처리하는 AI 에이전트를 구축해야 한다고 가정해 보겠습니다. 제품 팀에서 다음과 같은 요구사항을 제시했습니다:
 
-The agent should:
+에이전트가 수행해야 할 작업:
 
-- Read incoming customer emails
-- Classify them by urgency and topic
-- Search relevant documentation to answer questions
-- Draft appropriate responses
-- Escalate complex issues to human agents
-- Schedule follow-ups when needed
+- 수신된 고객 이메일 읽기
+- 긴급도와 주제별로 분류
+- 질문에 답변하기 위한 관련 문서 검색
+- 적절한 응답 초안 작성
+- 복잡한 문제를 담당자에게 에스컬레이션
+- 필요시 후속 조치 일정 잡기
 
-Example scenarios to handle:
+처리해야 할 예시 시나리오:
 
-1. Simple product question: "How do I reset my password?"
-2. Bug report: "The export feature crashes when I select PDF format"
-3. Urgent billing issue: "I was charged twice for my subscription!"
-4. Feature request: "Can you add dark mode to the mobile app?"
-5. Complex technical issue: "Our API integration fails intermittently with 504 errors"
+1. 간단한 제품 질문: "비밀번호를 재설정하려면 어떻게 하나요?"
+2. 버그 보고: "PDF 형식을 선택하면 내보내기 기능이 충돌합니다"
+3. 긴급 청구 문제: "구독료가 두 번 청구되었습니다!"
+4. 기능 요청: "모바일 앱에 다크 모드를 추가할 수 있나요?"
+5. 복잡한 기술적 문제: "API 통합이 504 오류로 간헐적으로 실패합니다"
 
-To implement an agent in LangGraph, you will usually follow the same five steps.
+LangGraph에서 에이전트를 구현하려면 일반적으로 동일한 5단계를 따릅니다.
 
-## Step 1: Map out your workflow as discrete steps
+## 1단계: 워크플로를 개별 단계로 매핑하기
 
-Start by identifying the distinct steps in your process. Each step will become a **node** (a function that does one specific thing). Then sketch how these steps connect to each other.
+프로세스의 개별 단계를 식별하는 것부터 시작합니다. 각 단계는 **노드**(특정 작업을 수행하는 함수)가 됩니다. 그런 다음 이러한 단계들이 서로 어떻게 연결되는지 스케치합니다.
 
 ```mermaid
 flowchart TD
@@ -52,147 +52,147 @@ flowchart TD
     I --> J[END]
 ```
 
-The arrows show possible paths, but the actual decision of which path to take happens inside each node.
+화살표는 가능한 경로를 보여주지만, 어떤 경로를 선택할지에 대한 실제 결정은 각 노드 내부에서 이루어집니다.
 
-Now that you've identified the components in your workflow, let's understand what each node needs to do:
+이제 워크플로의 구성 요소를 식별했으므로 각 노드가 수행해야 할 작업을 이해해 보겠습니다:
 
-- Read Email: Extract and parse the email content
-- Classify Intent: Use an LLM to categorize urgency and topic, then route to appropriate action
-- Doc Search: Query your knowledge base for relevant information
-- Bug Track: Create or update issue in tracking system
-- Draft Reply: Generate an appropriate response
-- Human Review: Escalate to human agent for approval or handling
-- Send Reply: Dispatch the email response
+- Read Email: 이메일 콘텐츠 추출 및 파싱
+- Classify Intent: LLM을 사용하여 긴급도와 주제를 분류한 다음 적절한 작업으로 라우팅
+- Doc Search: 관련 정보를 위해 지식 베이스 쿼리
+- Bug Track: 추적 시스템에서 이슈 생성 또는 업데이트
+- Draft Reply: 적절한 응답 생성
+- Human Review: 승인 또는 처리를 위해 담당자에게 에스컬레이션
+- Send Reply: 이메일 응답 발송
 
 <Tip>
-Notice that some nodes make decisions about where to go next (Classify Intent, Draft Reply, Human Review), while others always proceed to the same next step (Read Email always goes to Classify Intent, Doc Search always goes to Draft Reply).
+일부 노드는 다음에 어디로 갈지 결정하는 반면(Classify Intent, Draft Reply, Human Review), 다른 노드는 항상 동일한 다음 단계로 진행한다는 점에 유의하세요(Read Email은 항상 Classify Intent로, Doc Search는 항상 Draft Reply로 이동합니다).
 </Tip>
 
-## Step 2: Identify what each step needs to do
+## 2단계: 각 단계가 수행해야 할 작업 식별하기
 
-For each node in your graph, determine what type of operation it represents and what context it needs to work properly.
+그래프의 각 노드에 대해 어떤 유형의 작업을 나타내는지, 그리고 제대로 작동하려면 어떤 컨텍스트가 필요한지 결정합니다.
 
 <CardGroup cols={2}>
-  <Card title="LLM Steps" icon="brain" href="#llm-steps">
-    Use when you need to understand, analyze, generate text, or make reasoning decisions
+  <Card title="LLM 단계" icon="brain" href="#llm-steps">
+    텍스트를 이해, 분석, 생성하거나 추론 결정을 내려야 할 때 사용
   </Card>
-  <Card title="Data Steps" icon="database" href="#data-steps">
-    Use when you need to retrieve information from external sources
+  <Card title="데이터 단계" icon="database" href="#data-steps">
+    외부 소스에서 정보를 검색해야 할 때 사용
   </Card>
-  <Card title="Action Steps" icon="bolt" href="#action-steps">
-    Use when you need to perform external actions
+  <Card title="액션 단계" icon="bolt" href="#action-steps">
+    외부 작업을 수행해야 할 때 사용
   </Card>
-  <Card title="User Input Steps" icon="user" href="#user-input-steps">
-    Use when you need human intervention
+  <Card title="사용자 입력 단계" icon="user" href="#user-input-steps">
+    사람의 개입이 필요할 때 사용
   </Card>
 </CardGroup>
 
-### LLM Steps
+### LLM 단계
 
-When a step needs to understand, analyze, generate text, or make reasoning decisions:
+단계에서 텍스트를 이해, 분석, 생성하거나 추론 결정을 내려야 하는 경우:
 
 <AccordionGroup>
-  <Accordion title="Classify Intent Node">
-    - Static context (prompt): Classification categories, urgency definitions, response format
-    - Dynamic context (from state): Email content, sender information
-    - Desired outcome: Structured classification that determines routing
+  <Accordion title="Classify Intent 노드">
+    - 정적 컨텍스트 (프롬프트): 분류 카테고리, 긴급도 정의, 응답 형식
+    - 동적 컨텍스트 (상태에서): 이메일 콘텐츠, 발신자 정보
+    - 원하는 결과: 라우팅을 결정하는 구조화된 분류
   </Accordion>
 
-  <Accordion title="Draft Reply Node">
-    - Static context (prompt): Tone guidelines, company policies, response templates
-    - Dynamic context (from state): Classification results, search results, customer history
-    - Desired outcome: Professional email response ready for review
+  <Accordion title="Draft Reply 노드">
+    - 정적 컨텍스트 (프롬프트): 톤 가이드라인, 회사 정책, 응답 템플릿
+    - 동적 컨텍스트 (상태에서): 분류 결과, 검색 결과, 고객 이력
+    - 원하는 결과: 검토 준비가 완료된 전문적인 이메일 응답
   </Accordion>
 </AccordionGroup>
 
-### Data Steps
+### 데이터 단계
 
-When a step needs to retrieve information from external sources:
+단계에서 외부 소스로부터 정보를 검색해야 하는 경우:
 
 <AccordionGroup>
-  <Accordion title="Doc Search Node">
-    - Parameters: Query built from intent and topic
-    - Retry strategy: Yes, with exponential backoff for transient failures
-    - Caching: Could cache common queries to reduce API calls
+  <Accordion title="Doc Search 노드">
+    - 매개변수: 의도와 주제로부터 구축된 쿼리
+    - 재시도 전략: 예, 일시적 실패에 대한 지수 백오프 사용
+    - 캐싱: API 호출을 줄이기 위해 일반적인 쿼리 캐싱 가능
   </Accordion>
 
   <Accordion title="Customer History Lookup">
-    - Parameters: Customer email or ID from state
-    - Retry strategy: Yes, but with fallback to basic info if unavailable
-    - Caching: Yes, with time-to-live to balance freshness and performance
+    - 매개변수: 상태의 고객 이메일 또는 ID
+    - 재시도 전략: 예, 하지만 사용 불가능한 경우 기본 정보로 대체
+    - 캐싱: 예, 최신성과 성능의 균형을 위해 TTL 사용
   </Accordion>
 </AccordionGroup>
 
-### Action Steps
+### 액션 단계
 
-When a step needs to perform an external action:
+단계에서 외부 작업을 수행해야 하는 경우:
 
 <AccordionGroup>
-  <Accordion title="Send Reply Node">
-    - When to execute: After approval (human or automated)
-    - Retry strategy: Yes, with exponential backoff for network issues
-    - Should not cache: Each send is a unique action
+  <Accordion title="Send Reply 노드">
+    - 실행 시점: 승인 후 (사람 또는 자동)
+    - 재시도 전략: 예, 네트워크 문제에 대한 지수 백오프 사용
+    - 캐싱하지 않음: 각 발송은 고유한 작업
   </Accordion>
 
-  <Accordion title="Bug Track Node">
-    - When to execute: Always when intent is "bug"
-    - Retry strategy: Yes, critical to not lose bug reports
-    - Returns: Ticket ID to include in response
+  <Accordion title="Bug Track 노드">
+    - 실행 시점: 의도가 "bug"일 때 항상
+    - 재시도 전략: 예, 버그 보고서를 잃지 않는 것이 중요
+    - 반환: 응답에 포함할 티켓 ID
   </Accordion>
 </AccordionGroup>
 
-### User Input Steps
+### 사용자 입력 단계
 
-When a step needs human intervention:
+단계에서 사람의 개입이 필요한 경우:
 
 <AccordionGroup>
-  <Accordion title="Human Review Node">
-    - Context for decision: Original email, draft response, urgency, classification
-    - Expected input format: Approval boolean plus optional edited response
-    - When triggered: High urgency, complex issues, or quality concerns
+  <Accordion title="Human Review 노드">
+    - 결정을 위한 컨텍스트: 원본 이메일, 응답 초안, 긴급도, 분류
+    - 예상 입력 형식: 승인 불리언 및 선택적으로 편집된 응답
+    - 트리거 시점: 높은 긴급도, 복잡한 문제 또는 품질 우려
   </Accordion>
 </AccordionGroup>
 
-## Step 3: Design your state
+## 3단계: 상태 설계하기
 
-State is the shared [memory](/oss/python/concepts/memory) accessible to all nodes in your agent. Think of it as the notebook your agent uses to keep track of everything it learns and decides as it works through the process.
+상태는 에이전트의 모든 노드가 접근할 수 있는 공유 [메모리](/oss/python/concepts/memory)입니다. 에이전트가 프로세스를 진행하면서 학습하고 결정하는 모든 것을 추적하는 데 사용하는 노트로 생각하면 됩니다.
 
-### What belongs in state?
+### 무엇이 상태에 속하나요?
 
-Ask yourself these questions about each piece of data:
+각 데이터 조각에 대해 다음 질문을 스스로에게 물어보세요:
 
 <CardGroup cols={2}>
-  <Card title="Include in State" icon="check">
-    Does it need to persist across steps? If yes, it goes in state.
+  <Card title="상태에 포함" icon="check">
+    단계를 거쳐 지속되어야 하나요? 그렇다면 상태에 포함됩니다.
   </Card>
 
-  <Card title="Don't Store" icon="code">
-    Can you derive it from other data? If yes, compute it when needed instead of storing it in state.
+  <Card title="저장하지 않음" icon="code">
+    다른 데이터로부터 파생할 수 있나요? 그렇다면 상태에 저장하는 대신 필요할 때 계산하세요.
   </Card>
 </CardGroup>
 
-For our email agent, we need to track:
+이메일 에이전트의 경우 다음을 추적해야 합니다:
 
-- The original email and sender info (can't reconstruct these)
-- Classification results (needed by multiple downstream nodes)
-- Search results and customer data (expensive to re-fetch)
-- The draft response (needs to persist through review)
-- Execution metadata (for debugging and recovery)
+- 원본 이메일 및 발신자 정보 (재구성할 수 없음)
+- 분류 결과 (여러 다운스트림 노드에서 필요)
+- 검색 결과 및 고객 데이터 (재검색 비용이 큼)
+- 응답 초안 (검토를 거쳐 지속되어야 함)
+- 실행 메타데이터 (디버깅 및 복구용)
 
-### Keep state raw, format prompts on-demand
+### 상태를 원시 상태로 유지하고 프롬프트는 필요시 포맷하기
 
 <Tip>
-A key principle: your state should store raw data, not formatted text. Format prompts inside nodes when you need them.
+핵심 원칙: 상태는 원시 데이터를 저장해야 하며 포맷된 텍스트가 아닙니다. 필요할 때 노드 내부에서 프롬프트를 포맷하세요.
 </Tip>
 
-This separation means:
+이러한 분리는 다음을 의미합니다:
 
-- Different nodes can format the same data differently for their needs
-- You can change prompt templates without modifying your state schema
-- Debugging is clearer - you see exactly what data each node received
-- Your agent can evolve without breaking existing state
+- 서로 다른 노드가 필요에 따라 동일한 데이터를 다르게 포맷할 수 있습니다
+- 상태 스키마를 수정하지 않고 프롬프트 템플릿을 변경할 수 있습니다
+- 디버깅이 더 명확합니다 - 각 노드가 받은 정확한 데이터를 볼 수 있습니다
+- 에이전트가 기존 상태를 손상시키지 않고 진화할 수 있습니다
 
-Let's define our state:
+상태를 정의해 보겠습니다:
 
 ```python
 from typing import TypedDict, Literal
@@ -225,30 +225,30 @@ class EmailAgentState(TypedDict):
 
 
 
-Notice that the state contains only raw data - no prompt templates, no formatted strings, no instructions. The classification output is stored as a single dictionary, straight from the LLM.
+상태는 원시 데이터만 포함하며 프롬프트 템플릿, 포맷된 문자열, 지시사항은 포함하지 않습니다. 분류 출력은 LLM에서 직접 가져온 단일 딕셔너리로 저장됩니다.
 
-## Step 4: Build your nodes
+## 4단계: 노드 구축하기
 
-Now we implement each step as a function. A node in LangGraph is just a Python function that takes the current state and returns updates to it.
-
-
+이제 각 단계를 함수로 구현합니다. LangGraph의 노드는 현재 상태를 받아 업데이트를 반환하는 Python 함수일 뿐입니다.
 
 
 
-### Handle errors appropriately
 
-Different errors need different handling strategies:
 
-| Error Type | Who Fixes It | Strategy | When to Use |
+### 오류를 적절하게 처리하기
+
+서로 다른 오류는 서로 다른 처리 전략이 필요합니다:
+
+| 오류 유형 | 해결 주체 | 전략 | 사용 시점 |
 |------------|--------------|----------|-------------|
-| Transient errors (network issues, rate limits) | System (automatic) | Retry policy | Temporary failures that usually resolve on retry |
-| LLM-recoverable errors (tool failures, parsing issues) | LLM | Store error in state and loop back | LLM can see the error and adjust its approach |
-| User-fixable errors (missing information, unclear instructions) | Human | Pause with `interrupt()` | Need user input to proceed |
-| Unexpected errors | Developer | Let them bubble up | Unknown issues that need debugging |
+| 일시적 오류 (네트워크 문제, 속도 제한) | 시스템 (자동) | 재시도 정책 | 재시도 시 일반적으로 해결되는 일시적 장애 |
+| LLM 복구 가능 오류 (도구 실패, 파싱 문제) | LLM | 상태에 오류를 저장하고 루프백 | LLM이 오류를 보고 접근 방식을 조정할 수 있음 |
+| 사용자 수정 가능 오류 (정보 누락, 불명확한 지시사항) | 사람 | `interrupt()`로 일시 중지 | 진행하려면 사용자 입력이 필요 |
+| 예상치 못한 오류 | 개발자 | 버블업하도록 허용 | 디버깅이 필요한 알 수 없는 문제 |
 
 <Tabs>
-  <Tab title="Transient errors" icon="rotate">
-    Add a retry policy to automatically retry network issues and rate limits:
+  <Tab title="일시적 오류" icon="rotate">
+    네트워크 문제와 속도 제한을 자동으로 재시도하도록 재시도 정책을 추가합니다:
 
 ```python
 from langgraph.types import RetryPolicy
@@ -266,8 +266,8 @@ workflow.add_node(
 
   </Tab>
 
-  <Tab title="LLM-recoverable" icon="brain">
-    Store the error in state and loop back so the LLM can see what went wrong and try again:
+  <Tab title="LLM 복구 가능" icon="brain">
+    LLM이 무엇이 잘못되었는지 보고 다시 시도할 수 있도록 오류를 상태에 저장하고 루프백합니다:
 
 ```python
 def execute_tool(state: State) -> Command[Literal["agent", "execute_tool"]]:
@@ -288,8 +288,8 @@ def execute_tool(state: State) -> Command[Literal["agent", "execute_tool"]]:
 
   </Tab>
 
-  <Tab title="User-fixable" icon="user">
-    Pause and collect information from the user when needed (like account IDs, order numbers, or clarifications):
+  <Tab title="사용자 수정 가능" icon="user">
+    필요할 때 사용자로부터 정보를 수집하기 위해 일시 중지합니다(계정 ID, 주문 번호 또는 명확화):
 
 ```python
 def lookup_customer_history(state: State) -> Command[Literal["draft_response"]]:
@@ -313,8 +313,8 @@ def lookup_customer_history(state: State) -> Command[Literal["draft_response"]]:
 
   </Tab>
 
-  <Tab title="Unexpected" icon="triangle-exclamation">
-    Let them bubble up for debugging. Don't catch what you can't handle:
+  <Tab title="예상치 못한" icon="triangle-exclamation">
+    디버깅을 위해 버블업하도록 허용합니다. 처리할 수 없는 것은 캐치하지 마세요:
 
 ```python
 def send_reply(state: EmailAgentState):
@@ -332,12 +332,12 @@ def send_reply(state: EmailAgentState):
 </Tabs>
 
 
-### Implementing our email agent nodes
+### 이메일 에이전트 노드 구현하기
 
-We'll implement each node as a simple function. Remember: nodes take state, do work, and return updates.
+각 노드를 간단한 함수로 구현하겠습니다. 기억하세요: 노드는 상태를 받아 작업을 수행하고 업데이트를 반환합니다.
 
 <AccordionGroup>
-  <Accordion title="Read and classify nodes" icon="brain">
+  <Accordion title="읽기 및 분류 노드" icon="brain">
 
 ```python
 from typing import Literal
@@ -397,7 +397,7 @@ def classify_intent(state: EmailAgentState) -> Command[Literal["search_documenta
 
   </Accordion>
 
-  <Accordion title="Search and tracking nodes" icon="database">
+  <Accordion title="검색 및 추적 노드" icon="database">
 
 ```python
 def search_documentation(state: EmailAgentState) -> Command[Literal["draft_response"]]:
@@ -445,7 +445,7 @@ def bug_tracking(state: EmailAgentState) -> Command[Literal["draft_response"]]:
 
   </Accordion>
 
-  <Accordion title="Response nodes" icon="pen-to-square">
+  <Accordion title="응답 노드" icon="pen-to-square">
 
 ```python
 def draft_response(state: EmailAgentState) -> Command[Literal["human_review", "send_reply"]]:
@@ -536,13 +536,13 @@ def send_reply(state: EmailAgentState) -> dict:
   </Accordion>
 </AccordionGroup>
 
-## Step 5: Wire it together
+## 5단계: 함께 연결하기
 
-Now we connect our nodes into a working graph. Since our nodes handle their own routing decisions, we only need a few essential edges.
+이제 노드들을 작동하는 그래프로 연결합니다. 노드가 자체 라우팅 결정을 처리하므로 몇 가지 필수 엣지만 필요합니다.
 
-To enable [human-in-the-loop](/oss/python/langgraph/interrupts) with `interrupt()`, we need to compile with a [checkpointer](/oss/python/langgraph/persistence) to save state between runs:
+`interrupt()`를 사용한 [human-in-the-loop](/oss/python/langgraph/add-human-in-the-loop)를 활성화하려면 실행 간 상태를 저장하기 위한 [체크포인터](/oss/python/langgraph/persistence)와 함께 컴파일해야 합니다:
 
-<Accordion title="Graph compilation code" icon="diagram-project" defaultOpen={true}>
+<Accordion title="그래프 컴파일 코드" icon="diagram-project" defaultOpen={true}>
 
 ```python
 from langgraph.checkpoint.memory import MemorySaver
@@ -582,17 +582,17 @@ app = workflow.compile(checkpointer=memory)
 
 </Accordion>
 
-The graph structure is minimal because routing happens inside nodes through `Command` objects. Each node declares where it can go using type hints like `Command[Literal["node1", "node2"]]`, making the flow explicit and traceable.
+그래프 구조는 노드 내부에서 `Command` 객체를 통해 라우팅이 발생하기 때문에 최소화됩니다. 각 노드는 `Command[Literal["node1", "node2"]]`와 같은 타입 힌트를 사용하여 갈 수 있는 곳을 선언하므로 흐름이 명시적이고 추적 가능합니다.
 
 
 
 
 
-### Try out your agent
+### 에이전트 시험해보기
 
-Let's run our agent with an urgent billing issue that needs human review:
+담당자의 검토가 필요한 긴급 청구 문제로 에이전트를 실행해 보겠습니다:
 
-<Accordion title="Testing the agent" icon="flask">
+<Accordion title="에이전트 테스트" icon="flask">
 
 ```python
 # Test with an urgent billing issue
@@ -630,95 +630,95 @@ print(f"Email sent successfully!")
 
 </Accordion>
 
-The graph pauses when it hits `interrupt()`, saves everything to the checkpointer, and waits. It can resume days later, picking up exactly where it left off. The thread_id ensures all state for this conversation is preserved together.
+그래프는 `interrupt()`에 도달하면 일시 중지되고, 모든 것을 체크포인터에 저장한 후 대기합니다. 며칠 후에도 재개될 수 있으며 중단한 지점부터 정확히 이어갑니다. thread_id는 이 대화의 모든 상태가 함께 보존되도록 보장합니다.
 
-## Summary and next steps
+## 요약 및 다음 단계
 
-### Key Insights
+### 핵심 인사이트
 
-Building this email agent has shown us the LangGraph way of thinking:
+이메일 에이전트를 구축하면서 LangGraph 방식의 사고를 배웠습니다:
 
 <CardGroup cols={2}>
-  <Card title="Break into discrete steps" icon="sitemap" href="#step-1-map-out-your-workflow-as-discrete-steps">
-    Each node does one thing well. This decomposition enables streaming progress updates, durable execution that can pause and resume, and clear debugging since you can inspect state between steps.
+  <Card title="개별 단계로 분해" icon="sitemap" href="#step-1-map-out-your-workflow-as-discrete-steps">
+    각 노드는 한 가지 작업을 잘 수행합니다. 이러한 분해는 스트리밍 진행 업데이트, 일시 중지하고 재개할 수 있는 지속 가능한 실행, 그리고 단계 간 상태를 검사할 수 있어 명확한 디버깅을 가능하게 합니다.
   </Card>
 
-  <Card title="State is shared memory" icon="database" href="#step-3-design-your-state">
-    Store raw data, not formatted text. This lets different nodes use the same information in different ways.
+  <Card title="상태는 공유 메모리" icon="database" href="#step-3-design-your-state">
+    포맷된 텍스트가 아닌 원시 데이터를 저장하세요. 이를 통해 서로 다른 노드가 동일한 정보를 다양한 방식으로 사용할 수 있습니다.
   </Card>
 
-  <Card title="Nodes are functions" icon="code" href="#step-4-build-your-nodes">
-    They take state, do work, and return updates. When they need to make routing decisions, they specify both the state updates and the next destination.
+  <Card title="노드는 함수" icon="code" href="#step-4-build-your-nodes">
+    상태를 받아 작업을 수행하고 업데이트를 반환합니다. 라우팅 결정을 내려야 할 때는 상태 업데이트와 다음 목적지를 모두 지정합니다.
   </Card>
 
-  <Card title="Errors are part of the flow" icon="triangle-exclamation" href="#handle-errors-appropriately">
-    Transient failures get retries, LLM-recoverable errors loop back with context, user-fixable problems pause for input, and unexpected errors bubble up for debugging.
+  <Card title="오류는 흐름의 일부" icon="triangle-exclamation" href="#handle-errors-appropriately">
+    일시적 장애는 재시도되고, LLM 복구 가능 오류는 컨텍스트와 함께 루프백되며, 사용자 수정 가능 문제는 입력을 위해 일시 중지되고, 예상치 못한 오류는 디버깅을 위해 버블업됩니다.
   </Card>
 
-  <Card title="Human input is first-class" icon="user" href="/oss/python/langgraph/interrupts">
-    The `interrupt()` function pauses execution indefinitely, saves all state, and resumes exactly where it left off when you provide input. When combined with other operations in a node, it must come first.
+  <Card title="사용자 입력은 일급 시민" icon="user" href="/oss/python/langgraph/add-human-in-the-loop">
+    `interrupt()` 함수는 실행을 무기한 일시 중지하고, 모든 상태를 저장하며, 입력을 제공하면 중단한 지점부터 정확히 재개합니다. 노드의 다른 작업과 결합될 때는 먼저 와야 합니다.
   </Card>
 
-  <Card title="Graph structure emerges naturally" icon="diagram-project" href="#step-5-wire-it-together">
-    You define the essential connections, and your nodes handle their own routing logic. This keeps control flow explicit and traceable - you can always understand what your agent will do next by looking at the current node.
+  <Card title="그래프 구조는 자연스럽게 나타남" icon="diagram-project" href="#step-5-wire-it-together">
+    필수 연결을 정의하면 노드가 자체 라우팅 로직을 처리합니다. 이를 통해 제어 흐름이 명시적이고 추적 가능하게 유지됩니다 - 현재 노드를 보면 에이전트가 다음에 무엇을 할지 항상 이해할 수 있습니다.
   </Card>
 </CardGroup>
 
-### Advanced considerations
+### 고급 고려사항
 
-<Accordion title="Node granularity trade-offs" icon="sliders">
+<Accordion title="노드 세분성 트레이드오프" icon="sliders">
 <Info>
-This section explores the trade-offs in node granularity design. Most applications can skip this and use the patterns shown above.
+이 섹션에서는 노드 세분성 설계의 트레이드오프를 탐구합니다. 대부분의 애플리케이션은 이를 건너뛰고 위에 표시된 패턴을 사용할 수 있습니다.
 </Info>
 
-You might wonder: why not combine Read Email and Classify Intent into one node? Or why separate Doc Search from Draft Reply? The answer involves trade-offs between resilience and observability.
+왜 Read Email과 Classify Intent를 하나의 노드로 결합하지 않을까요? 또는 왜 Doc Search를 Draft Reply에서 분리할까요? 답은 복원력과 관찰 가능성 간의 트레이드오프와 관련이 있습니다.
 
-The resilience consideration: LangGraph's [durable execution](/oss/python/langgraph/durable-execution) creates checkpoints at node boundaries. When a workflow resumes after an interruption or failure, it starts from the beginning of the node where execution stopped. Smaller nodes mean more frequent checkpoints, which means less work to repeat if something goes wrong. If you combine multiple operations into one large node, a failure near the end means re-executing everything from the start of that node.
+복원력 고려사항: LangGraph의 [지속 가능한 실행](/oss/python/langgraph/durable-execution)은 노드 경계에서 체크포인트를 생성합니다. 중단이나 실패 후 워크플로가 재개될 때 실행이 중단된 노드의 시작부터 시작됩니다. 작은 노드는 더 빈번한 체크포인트를 의미하며, 문제가 발생했을 때 반복해야 할 작업이 줄어듭니다. 여러 작업을 하나의 큰 노드로 결합하면 끝 부분에서 실패가 발생할 경우 해당 노드의 시작부터 모든 것을 다시 실행해야 합니다.
 
-Why we chose this breakdown for the email agent:
+이메일 에이전트에 대해 이러한 분해를 선택한 이유:
 
-- Isolation of external services: Doc Search and Bug Track are separate nodes because they call external APIs. If the search service is slow or fails, we want to isolate that from the LLM calls. We can add retry policies to these specific nodes without affecting others.
+- 외부 서비스의 격리: Doc Search와 Bug Track은 외부 API를 호출하기 때문에 별도의 노드입니다. 검색 서비스가 느리거나 실패하면 LLM 호출로부터 격리하고자 합니다. 다른 노드에 영향을 주지 않고 이러한 특정 노드에 재시도 정책을 추가할 수 있습니다.
 
-- Intermediate visibility: Having Classify Intent as its own node lets us inspect what the LLM decided before taking action. This is valuable for debugging and monitoring—you can see exactly when and why the agent routes to human review.
+- 중간 가시성: Classify Intent를 자체 노드로 갖는 것은 조치를 취하기 전에 LLM이 결정한 내용을 검사할 수 있게 합니다. 이는 디버깅과 모니터링에 유용합니다 - 에이전트가 언제 그리고 왜 담당자 검토로 라우팅되는지 정확히 볼 수 있습니다.
 
-- Different failure modes: LLM calls, database lookups, and email sending have different retry strategies. Separate nodes let you configure these independently.
+- 다른 실패 모드: LLM 호출, 데이터베이스 조회, 이메일 발송은 서로 다른 재시도 전략을 갖습니다. 별도의 노드를 사용하면 이를 독립적으로 구성할 수 있습니다.
 
-- Reusability and testing: Smaller nodes are easier to test in isolation and reuse in other workflows.
+- 재사용성과 테스팅: 작은 노드는 독립적으로 테스트하고 다른 워크플로에서 재사용하기가 더 쉽습니다.
 
-A different valid approach: You could combine Read Email and Classify Intent into a single node. You'd lose the ability to inspect the raw email before classification and would repeat both operations on any failure in that node. For most applications, the observability and debugging benefits of separate nodes are worth the trade-off.
+다른 유효한 접근 방식: Read Email과 Classify Intent를 단일 노드로 결합할 수 있습니다. 분류 전에 원시 이메일을 검사하는 기능을 잃게 되고 해당 노드의 실패 시 두 작업을 모두 반복해야 합니다. 대부분의 애플리케이션의 경우 별도 노드의 관찰 가능성과 디버깅 이점이 트레이드오프 가치가 있습니다.
 
-Application-level concerns: The caching discussion in Step 2 (whether to cache search results) is an application-level decision, not a LangGraph framework feature. You implement caching within your node functions based on your specific requirements—LangGraph doesn't prescribe this.
+애플리케이션 수준 고려사항: 2단계의 캐싱 논의(검색 결과를 캐싱할지 여부)는 애플리케이션 수준 결정이지 LangGraph 프레임워크 기능이 아닙니다. 특정 요구사항에 따라 노드 함수 내에서 캐싱을 구현합니다 - LangGraph는 이를 규정하지 않습니다.
 
-Controlling checkpoint behavior: You can adjust when checkpoints are written using [durability modes](/oss/python/langgraph/durable-execution#durability-modes). The default `"async"` mode writes checkpoints in the background for good performance while maintaining durability. Use `"exit"` mode to checkpoint only at completion (faster for long-running graphs where mid-execution recovery isn't needed), or `"sync"` mode to guarantee checkpoints are written before proceeding to the next step (useful when you need to ensure state is persisted before continuing execution).
+체크포인트 동작 제어: [지속성 모드](/oss/python/langgraph/durable-execution#durability-modes)를 사용하여 체크포인트가 작성되는 시점을 조정할 수 있습니다. 기본 `"async"` 모드는 지속성을 유지하면서 좋은 성능을 위해 백그라운드에서 체크포인트를 작성합니다. 완료 시에만 체크포인트하려면 `"exit"` 모드를 사용하고(중간 실행 복구가 필요하지 않은 장기 실행 그래프의 경우 더 빠름), 다음 단계로 진행하기 전에 체크포인트가 작성되도록 보장하려면 `"sync"` 모드를 사용합니다(실행을 계속하기 전에 상태가 지속되도록 보장해야 할 때 유용).
 </Accordion>
 
-### Where to go from here
+### 다음 단계
 
-This was an introduction to thinking about building agents with LangGraph. You can extend this foundation with:
+이것은 LangGraph로 에이전트를 구축하는 사고에 대한 소개였습니다. 이 기반을 다음과 같이 확장할 수 있습니다:
 
 <CardGroup cols={2}>
-  <Card title="Human-in-the-loop patterns" icon="user-check" href="/oss/python/langgraph/interrupts">
-    Learn how to add tool approval before execution, batch approval, and other patterns
+  <Card title="Human-in-the-loop 패턴" icon="user-check" href="/oss/python/langgraph/add-human-in-the-loop">
+    실행 전 도구 승인, 일괄 승인 및 기타 패턴을 추가하는 방법을 학습합니다
   </Card>
 
-  <Card title="Subgraphs" icon="diagram-nested" href="/oss/python/langgraph/use-subgraphs">
-    Create subgraphs for complex multi-step operations
+  <Card title="서브그래프" icon="diagram-nested" href="/oss/python/langgraph/use-subgraphs">
+    복잡한 다단계 작업을 위한 서브그래프를 생성합니다
   </Card>
 
-  <Card title="Streaming" icon="tower-broadcast" href="/oss/python/langgraph/streaming">
-    Add streaming to show real-time progress to users
+  <Card title="스트리밍" icon="tower-broadcast" href="/oss/python/langgraph/streaming">
+    사용자에게 실시간 진행 상황을 표시하기 위해 스트리밍을 추가합니다
   </Card>
 
-  <Card title="Observability" icon="chart-line" href="/oss/python/langgraph/observability">
-    Add observability with LangSmith for debugging and monitoring
+  <Card title="관찰 가능성" icon="chart-line" href="/oss/python/langgraph/observability">
+    디버깅과 모니터링을 위해 LangSmith로 관찰 가능성을 추가합니다
   </Card>
 
-  <Card title="Tool Integration" icon="wrench" href="/oss/python/langchain/tools">
-    Integrate more tools for web search, database queries, and API calls
+  <Card title="도구 통합" icon="wrench" href="/oss/python/langchain/tools">
+    웹 검색, 데이터베이스 쿼리, API 호출을 위한 더 많은 도구를 통합합니다
   </Card>
 
-  <Card title="Retry Logic" icon="rotate" href="/oss/python/langgraph/use-graph-api#add-retry-policies">
-    Implement retry logic with exponential backoff for failed operations
+  <Card title="재시도 로직" icon="rotate" href="/oss/python/langgraph/use-graph-api#add-retry-policies">
+    실패한 작업을 위해 지수 백오프를 사용한 재시도 로직을 구현합니다
   </Card>
 </CardGroup>
 

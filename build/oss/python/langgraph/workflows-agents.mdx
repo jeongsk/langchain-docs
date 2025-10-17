@@ -1,27 +1,27 @@
 ---
-title: Workflows and agents
-sidebarTitle: Workflows + agents
+title: 워크플로우와 에이전트
+sidebarTitle: 워크플로우 + 에이전트
 ---
 
-This guide reviews common workflow and agent patterns.
+이 가이드에서는 일반적인 워크플로우와 에이전트 패턴을 검토합니다.
 
-- Workflows have predetermined code paths and are designed to operate in a certain order.
-- Agents are dynamic and define their own processes and tool usage.
+- 워크플로우는 사전 결정된 코드 경로를 가지며 특정 순서로 작동하도록 설계되었습니다.
+- 에이전트는 동적이며 자체 프로세스와 도구 사용을 정의합니다.
 
 ![Agent Workflow](/oss/images/agent_workflow.png)
 
-LangGraph offers several benefits when building agents and workflows, including [persistence](/oss/python/langgraph/persistence), [streaming](/oss/python/langgraph/streaming), and support for debugging as well as [deployment](/oss/python/langgraph/deploy).
+LangGraph는 에이전트와 워크플로우를 구축할 때 [지속성](/oss/python/langgraph/persistence), [스트리밍](/oss/python/langgraph/streaming), 디버깅 및 [배포](/oss/python/langgraph/deploy) 지원을 포함한 여러 이점을 제공합니다.
 
-## Setup
+## 설정
 
-To build a workflow or agent, you can use [any chat model](/oss/python/integrations/chat) that supports structured outputs and tool calling. The following example uses Anthropic:
+워크플로우 또는 에이전트를 구축하려면 구조화된 출력과 도구 호출을 지원하는 [모든 채팅 모델](/oss/python/integrations/chat)을 사용할 수 있습니다. 다음 예제에서는 Anthropic을 사용합니다:
 
-1. Install dependencies:
+1. 종속성 설치:
 ```bash
 pip install langchain_core langchain-anthropic langgraph
 ```
 
-2. Initialize the LLM:
+2. LLM 초기화:
 
 ```python
 import os
@@ -36,15 +36,15 @@ def _set_env(var: str):
 
 _set_env("ANTHROPIC_API_KEY")
 
-llm = ChatAnthropic(model="claude-sonnet-4-5-20250929")
+llm = ChatAnthropic(model="claude-3-5-sonnet-latest")
 ```
 
 
 
 
-## LLMs and augmentations
+## LLM과 증강
 
-Workflows and agentic systems are based on LLMs and the various augmentations you add to them. [Tool calling](/oss/python/langchain/tools), [structured outputs](/oss/python/langchain/structured-output), and [short term memory](/oss/python/langchain/short-term-memory) are a few options for tailoring LLMs to your needs.
+워크플로우와 에이전트 시스템은 LLM과 이에 추가하는 다양한 증강을 기반으로 합니다. [도구 호출](/oss/python/langchain/tools), [구조화된 출력](/oss/python/langchain/structured-output), [단기 메모리](/oss/python/langchain/short-term-memory)는 LLM을 요구 사항에 맞게 조정하는 몇 가지 옵션입니다.
 
 ![LLM augmentations](/oss/images/augmented_llm.png)
 
@@ -82,12 +82,12 @@ msg.tool_calls
 
 
 
-## Prompt chaining
+## 프롬프트 체이닝
 
-Prompt chaining is when each LLM call processes the output of the previous call. It's often used for performing well-defined tasks that can be broken down into smaller, verifiable steps. Some examples include:
+프롬프트 체이닝은 각 LLM 호출이 이전 호출의 출력을 처리하는 방식입니다. 작은 단위로 검증 가능한 단계로 나눌 수 있는 잘 정의된 작업을 수행하는 데 자주 사용됩니다. 몇 가지 예는 다음과 같습니다:
 
-- Translating documents into different languages
-- Verifying generated content for consistency
+- 문서를 다른 언어로 번역
+- 생성된 콘텐츠의 일관성 검증
 
 ![Prompt chaining](/oss/images/prompt_chain.png)
 
@@ -227,17 +227,17 @@ for step in prompt_chaining_workflow.stream("cats", stream_mode="updates"):
 
 
 
-## Parallelization
+## 병렬화
 
-With parallelization, LLMs work simultaneously on a task. This is either done by running multiple independent subtasks at the same time, or running the same task multiple times to check for different outputs. Parallelization is commonly used to:
+병렬화를 사용하면 LLM이 작업을 동시에 처리합니다. 여러 독립적인 하위 작업을 동시에 실행하거나 동일한 작업을 여러 번 실행하여 다른 출력을 확인합니다. 병렬화는 일반적으로 다음 용도로 사용됩니다:
 
-- Split up subtasks and run them in parallel, which increases speed
-- Run tasks multiple times to check for different outputs, which increases confidence
+- 하위 작업을 분할하여 병렬로 실행하여 속도 향상
+- 작업을 여러 번 실행하여 다른 출력을 확인하여 신뢰도 향상
 
-Some examples include:
+몇 가지 예는 다음과 같습니다:
 
-- Running one subtask that processes a document for keywords, and a second subtask to check for formatting errors
-- Running a task multiple times that scores a document for accuracy based on different criteria, like the number of citations, the number of sources used, and the quality of the sources
+- 문서에서 키워드를 처리하는 하나의 하위 작업과 서식 오류를 확인하는 두 번째 하위 작업을 병렬로 실행
+- 인용 수, 사용된 출처 수, 출처의 품질과 같은 다양한 기준에 따라 문서의 정확성을 평가하는 작업을 여러 번 실행
 
 ![parallelization.png](/oss/images/parallelization.png)
 
@@ -363,9 +363,9 @@ for step in parallel_workflow.stream("cats", stream_mode="updates"):
 
 
 
-## Routing
+## 라우팅
 
-Routing workflows process inputs and then directs them to context-specific tasks. This allows you to define specialized flows for complex tasks. For example, a workflow built to answer product related questions might process the type of question first, and then route the request to specific processes for pricing, refunds, returns, etc.
+라우팅 워크플로우는 입력을 처리한 다음 컨텍스트별 작업으로 전달합니다. 이를 통해 복잡한 작업에 대한 전문화된 흐름을 정의할 수 있습니다. 예를 들어 제품 관련 질문에 답변하도록 구축된 워크플로우는 먼저 질문 유형을 처리한 다음 가격, 환불, 반품 등에 대한 특정 프로세스로 요청을 라우팅할 수 있습니다.
 
 ![routing.png](/oss/images/routing.png)
 
@@ -550,17 +550,17 @@ for step in router_workflow.stream("Write me a joke about cats", stream_mode="up
 
 
 
-## Orchestrator-worker
+## 오케스트레이터-워커
 
-In an orchestrator-worker configuration, the orchestrator:
+오케스트레이터-워커 구성에서 오케스트레이터는:
 
-- Breaks down tasks into subtasks
-- Delegates subtasks to workers
-- Synthesizes worker outputs into a final result
+- 작업을 하위 작업으로 분할
+- 하위 작업을 워커에게 위임
+- 워커 출력을 최종 결과로 합성
 
 ![worker.png](/oss/images/worker.png)
 
-Orchestrator-worker workflows provide more flexibility and are often used when subtasks cannot be predefined the way they can with [parallelization](#parallelization). This is common with workflows that write code or need to update content across multiple files. For example, a workflow that needs to update installation instructions for multiple Python libraries across an unknown number of documents might use this pattern.
+오케스트레이터-워커 워크플로우는 더 많은 유연성을 제공하며 [병렬화](#parallelization)처럼 하위 작업을 미리 정의할 수 없는 경우에 자주 사용됩니다. 이는 코드를 작성하거나 여러 파일에서 콘텐츠를 업데이트해야 하는 워크플로우에서 일반적입니다. 예를 들어 알 수 없는 수의 문서에서 여러 Python 라이브러리에 대한 설치 지침을 업데이트해야 하는 워크플로우는 이 패턴을 사용할 수 있습니다.
 
 <CodeGroup>
 ```python Graph API
@@ -669,9 +669,9 @@ Markdown(report)
 
 
 
-### Creating workers in LangGraph
+### LangGraph에서 워커 생성
 
-Orchestrator-worker workflows are common and LangGraph has built-in support for them. The `Send` API lets you dynamically create worker nodes and send them specific inputs. Each worker has its own state, and all worker outputs are written to a shared state key that is accessible to the orchestrator graph. This gives the orchestrator access to all worker output and allows it to synthesize them into a final output. The example below iterates over a list of sections and uses the `Send` API to send a section to each worker.
+오케스트레이터-워커 워크플로우는 일반적이며 LangGraph에는 이를 위한 기본 지원이 있습니다. `Send` API를 사용하면 워커 노드를 동적으로 생성하고 특정 입력을 보낼 수 있습니다. 각 워커는 자체 상태를 가지며 모든 워커 출력은 오케스트레이터 그래프에서 액세스할 수 있는 공유 상태 키에 기록됩니다. 이를 통해 오케스트레이터가 모든 워커 출력에 액세스하여 최종 출력으로 합성할 수 있습니다. 아래 예제는 섹션 목록을 반복하고 `Send` API를 사용하여 각 워커에 섹션을 보냅니다.
 
 
 ```python
@@ -779,11 +779,11 @@ Markdown(state["final_report"])
 
 
 
-## Evaluator-optimizer
+## 평가자-최적화
 
-In evaluator-optimizer workflows, one LLM call creates a response and the other evaluates that response. If the evaluator or a [human-in-the-loop](/oss/python/langgraph/interrupts) determines the response needs refinement, feedback is provided and the response is recreated. This loop continues until an acceptable response is generated.
+평가자-최적화 워크플로우에서는 하나의 LLM 호출이 응답을 생성하고 다른 하나가 해당 응답을 평가합니다. 평가자 또는 [휴먼-인-더-루프](/oss/python/langgraph/interrupts)가 응답을 개선해야 한다고 판단하면 피드백이 제공되고 응답이 다시 생성됩니다. 이 루프는 허용 가능한 응답이 생성될 때까지 계속됩니다.
 
-Evaluator-optimizer workflows are commonly used when there's particular success criteria for a task, but iteration is required to meet that criteria. For example, there's not always a perfect match when translating text between two languages. It might take a few iterations to generate a translation with the same meaning across the two languages.
+평가자-최적화 워크플로우는 작업에 대한 특정 성공 기준이 있지만 해당 기준을 충족하려면 반복이 필요한 경우에 일반적으로 사용됩니다. 예를 들어 두 언어 간에 텍스트를 번역할 때 항상 완벽한 일치가 있는 것은 아닙니다. 두 언어에서 동일한 의미를 가진 번역을 생성하려면 몇 번의 반복이 필요할 수 있습니다.
 
 ![evaluator_optimizer.png](/oss/images/evaluator_optimizer.png)
 
@@ -926,14 +926,14 @@ for step in optimizer_workflow.stream("Cats", stream_mode="updates"):
 
 
 
-## Agents
+## 에이전트
 
-Agents are typically implemented as an LLM performing actions using [tools](/oss/python/langchain/tools). They operate in continuous feedback loops, and are used in situations where problems and solutions are unpredictable. Agents have more autonomy than workflows, and can make decisions about the tools they use and how to solve problems. You can still define the available toolset and guidelines for how agents behave.
+에이전트는 일반적으로 [도구](/oss/python/langchain/tools)를 사용하여 작업을 수행하는 LLM으로 구현됩니다. 지속적인 피드백 루프에서 작동하며 문제와 솔루션이 예측 불가능한 상황에서 사용됩니다. 에이전트는 워크플로우보다 더 많은 자율성을 가지며 사용하는 도구와 문제 해결 방법에 대한 결정을 내릴 수 있습니다. 사용 가능한 도구 세트와 에이전트 동작에 대한 가이드라인은 여전히 정의할 수 있습니다.
 
 ![agent.png](/oss/images/agent.png)
 
 <Note>
-To get started with agents, see the [quickstart](/oss/python/langchain/quickstart) or read more about [how they work](/oss/python/langchain/agents) in LangChain.
+에이전트를 시작하려면 [빠른 시작](/oss/python/langchain/quickstart)을 참조하거나 LangChain에서 [에이전트가 작동하는 방식](/oss/python/langchain/agents)에 대해 자세히 읽어보세요.
 </Note>
 
 ```python Using tools

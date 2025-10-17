@@ -2,33 +2,27 @@
 title: Agent Chat UI
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
-import chat_uiPy from '/snippets/oss/ui-py.mdx';
-import chat_uiJS from '/snippets/oss/ui-js.mdx';
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
+import chat_ui from '/snippets/oss/ui.mdx';
 
+<AlphaCallout />
 
-<AlphaCalloutJS />
+<chat_ui />
 
+### 에이전트에 연결하기
 
+Agent Chat UI는 [로컬](/oss/javascript/langgraph/studio#setup-local-langgraph-server) 및 [배포된 에이전트](/oss/javascript/langgraph/deploy) 모두에 연결할 수 있습니다.
 
-<chat_uiJS />
+Agent Chat UI를 시작한 후 에이전트에 연결하도록 구성해야 합니다:
 
+1. **Graph ID**: 그래프 이름을 입력합니다 (`langgraph.json` 파일의 `graphs` 아래에서 확인할 수 있습니다)
+2. **Deployment URL**: LangGraph 서버의 엔드포인트를 입력합니다 (로컬 개발의 경우 `http://localhost:2024`, 또는 배포된 에이전트의 URL)
+3. **LangSmith API key (선택사항)**: LangSmith API 키를 추가합니다 (로컬 LangGraph 서버를 사용하는 경우 필수 아님)
 
-### Connect to your agent
-
-Agent Chat UI can connect to both [local](/oss/javascript/langgraph/studio#setup-local-langgraph-server) and [deployed agents](/oss/javascript/langgraph/deploy).
-
-After starting Agent Chat UI, you'll need to configure it to connect to your agent:
-
-1. **Graph ID**: Enter your graph name (find this under `graphs` in your `langgraph.json` file)
-2. **Deployment URL**: Your LangGraph server's endpoint (e.g., `http://localhost:2024` for local development, or your deployed agent's URL)
-3. **LangSmith API key (optional)**: Add your LangSmith API key (not required if you're using a local LangGraph server)
-
-Once configured, Agent Chat UI will automatically fetch and display any interrupted threads from your agent.
+구성이 완료되면 Agent Chat UI가 에이전트에서 중단된 스레드를 자동으로 가져와 표시합니다.
 
 <Tip>
-  Agent Chat UI has out-of-the-box support for rendering tool calls and tool result messages. To customize what messages are shown, see [Hiding Messages in the Chat](https://github.com/langchain-ai/agent-chat-ui?tab=readme-ov-file#hiding-messages-in-the-chat).
+  Agent Chat UI는 도구 호출 및 도구 결과 메시지 렌더링을 기본적으로 지원합니다. 표시되는 메시지를 사용자 정의하려면 [채팅에서 메시지 숨기기](https://github.com/langchain-ai/agent-chat-ui?tab=readme-ov-file#hiding-messages-in-the-chat)를 참조하세요.
 </Tip>
 
 ---

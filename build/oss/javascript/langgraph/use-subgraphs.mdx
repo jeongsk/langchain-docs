@@ -1,28 +1,25 @@
 ---
-title: Subgraphs
-sidebarTitle: Subgraphs
+title: 서브그래프
+sidebarTitle: 서브그래프
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
+<AlphaCallout />
 
-<AlphaCalloutJS />
+이 가이드에서는 서브그래프를 사용하는 메커니즘을 설명합니다. 서브그래프는 다른 그래프에서 [노드](/oss/javascript/langgraph/graph-api#nodes)로 사용되는 [그래프](/oss/javascript/langgraph/graph-api#graphs)입니다.
 
+서브그래프는 다음과 같은 경우에 유용합니다:
+- [멀티 에이전트 시스템](/oss/javascript/langchain/multi-agent) 구축
+- 여러 그래프에서 노드 집합 재사용
+- 분산 개발: 서로 다른 팀이 그래프의 각 부분을 독립적으로 작업하고자 할 때, 각 부분을 서브그래프로 정의할 수 있으며, 서브그래프 인터페이스(입력 및 출력 스키마)만 준수한다면 부모 그래프는 서브그래프의 세부 사항을 알 필요 없이 구축할 수 있습니다
 
-This guide explains the mechanics of using subgraphs. A subgraph is a [graph](/oss/javascript/langgraph/graph-api#graphs) that is used as a [node](/oss/javascript/langgraph/graph-api#nodes) in another graph.
+서브그래프를 추가할 때는 부모 그래프와 서브그래프가 통신하는 방법을 정의해야 합니다:
 
-Subgraphs are useful for:
-- Building [multi-agent systems](/oss/javascript/langchain/multi-agent)
-- Re-using a set of nodes in multiple graphs
-- Distributing development: when you want different teams to work on different parts of the graph independently, you can define each part as a subgraph, and as long as the subgraph interface (the input and output schemas) is respected, the parent graph can be built without knowing any details of the subgraph
+* [노드에서 그래프 호출하기](#invoke-a-graph-from-a-node) — 부모 그래프의 노드 내부에서 서브그래프를 호출합니다
+* [그래프를 노드로 추가하기](#add-a-graph-as-a-node) — 서브그래프를 부모의 노드로 직접 추가하며 부모와 **[상태 키](/oss/javascript/langgraph/graph-api#state)를 공유**합니다
 
-When adding subgraphs, you need to define how the parent graph and the subgraph communicate:
-
-* [Invoke a graph from a node](#invoke-a-graph-from-a-node) — subgraphs are called from inside a node in the parent graph
-* [Add a graph as a node](#add-a-graph-as-a-node) — a subgraph is added directly as a node in the parent and **shares [state keys](/oss/javascript/langgraph/graph-api#state)** with the parent
-
-## Setup
+## 설정
 
 
 
@@ -32,16 +29,16 @@ npm install @langchain/langgraph
 
 
 <Tip>
-**Set up LangSmith for LangGraph development**
-Sign up for [LangSmith](https://smith.langchain.com) to quickly spot issues and improve the performance of your LangGraph projects. LangSmith lets you use trace data to debug, test, and monitor your LLM apps built with LangGraph — read more about how to get started [here](https://docs.smith.langchain.com).
+**LangGraph 개발을 위한 LangSmith 설정**
+[LangSmith](https://smith.langchain.com)에 가입하여 LangGraph 프로젝트의 문제를 신속하게 파악하고 성능을 개선하세요. LangSmith를 사용하면 트레이스 데이터를 활용하여 LangGraph로 구축한 LLM 앱을 디버깅, 테스트 및 모니터링할 수 있습니다 — 시작하는 방법에 대한 자세한 내용은 [여기](https://docs.smith.langchain.com)에서 확인하세요.
 </Tip>
 
 
-## Invoke a graph from a node
+## 노드에서 그래프 호출하기
 
-A simple way to implement a subgraph is to invoke a graph from inside the node of another graph. In this case subgraphs can have **completely different schemas** from the parent graph (no shared keys). For example, you might want to keep a private message history for each of the agents in a [multi-agent](/oss/javascript/langchain/multi-agent) system.
+서브그래프를 구현하는 간단한 방법은 다른 그래프의 노드 내부에서 그래프를 호출하는 것입니다. 이 경우 서브그래프는 부모 그래프와 **완전히 다른 스키마**를 가질 수 있습니다(공유 키 없음). 예를 들어, [멀티 에이전트](/oss/javascript/langchain/multi-agent) 시스템의 각 에이전트에 대해 비공개 메시지 히스토리를 유지하고 싶을 수 있습니다.
 
-If that's the case for your application, you need to define a node **function that invokes the subgraph**. This function needs to transform the input (parent) state to the subgraph state before invoking the subgraph, and transform the results back to the parent state before returning the state update from the node.
+애플리케이션에서 이러한 경우에 해당한다면, **서브그래프를 호출하는** 노드 함수를 정의해야 합니다. 이 함수는 서브그래프를 호출하기 전에 입력(부모) 상태를 서브그래프 상태로 변환하고, 결과를 다시 부모 상태로 변환한 후 노드에서 상태 업데이트를 반환해야 합니다.
 
 
 
@@ -79,7 +76,7 @@ const graph = builder.compile();
 ```
 
 
-<Accordion title="Full example: different state schemas">
+<Accordion title="전체 예제: 다른 상태 스키마">
 
 
   ```typescript
@@ -115,8 +112,8 @@ const graph = builder.compile();
       return { foo: "hi! " + state.foo };
     })
     .addNode("node2", async (state) => {
-      const response = await subgraph.invoke({ bar: state.foo });   // [!code highlight]
-      return { foo: response.bar };   // [!code highlight]
+      const response = await subgraph.invoke({ bar: state.foo }); // (1)!
+      return { foo: response.bar }; // (2)!
     })
     .addEdge(START, "node1")
     .addEdge("node1", "node2");
@@ -131,8 +128,8 @@ const graph = builder.compile();
   }
   ```
 
-  1. Transform the state to the subgraph state
-  2. Transform response back to the parent state
+  1. 상태를 서브그래프 상태로 변환합니다
+  2. 응답을 다시 부모 상태로 변환합니다
 
   ```
   [[], { node1: { foo: 'hi! foo' } }]
@@ -143,8 +140,8 @@ const graph = builder.compile();
 
 </Accordion>
 
-<Accordion title="Full example: different state schemas (two levels of subgraphs)">
-  This is an example with two levels of subgraphs: parent -> child -> grandchild.
+<Accordion title="전체 예제: 다른 상태 스키마 (두 단계의 서브그래프)">
+  다음은 두 단계의 서브그래프를 사용하는 예제입니다: parent -> child -> grandchild.
 
 
 
@@ -175,10 +172,10 @@ const graph = builder.compile();
   const child = new StateGraph(ChildState)
     .addNode("child1", async (state) => {
       // NOTE: parent or grandchild keys won't be accessible here
-      const grandchildGraphInput = { myGrandchildKey: state.myChildKey };   // [!code highlight]
+      const grandchildGraphInput = { myGrandchildKey: state.myChildKey }; // (1)!
       const grandchildGraphOutput = await grandchildGraph.invoke(grandchildGraphInput);
-      return { myChildKey: grandchildGraphOutput.myGrandchildKey + " today?" };   // [!code highlight]
-    })   // [!code highlight]
+      return { myChildKey: grandchildGraphOutput.myGrandchildKey + " today?" }; // (2)!
+    }) // (3)!
     .addEdge(START, "child1")
     .addEdge("child1", END);
 
@@ -195,10 +192,10 @@ const graph = builder.compile();
       return { myKey: "hi " + state.myKey };
     })
     .addNode("child", async (state) => {
-      const childGraphInput = { myChildKey: state.myKey };   // [!code highlight]
+      const childGraphInput = { myChildKey: state.myKey }; // (4)!
       const childGraphOutput = await childGraph.invoke(childGraphInput);
-      return { myKey: childGraphOutput.myChildKey };   // [!code highlight]
-    })   // [!code highlight]
+      return { myKey: childGraphOutput.myChildKey }; // (5)!
+    }) // (6)!
     .addNode("parent2", (state) => {
       return { myKey: state.myKey + " bye!" };
     })
@@ -217,12 +214,12 @@ const graph = builder.compile();
   }
   ```
 
-  1. We're transforming the state from the child state channels (`myChildKey`) to the grandchild state channels (`myGrandchildKey`)
-  2. We're transforming the state from the grandchild state channels (`myGrandchildKey`) back to the child state channels (`myChildKey`)
-  3. We're passing a function here instead of just compiled graph (`grandchildGraph`)
-  4. We're transforming the state from the parent state channels (`myKey`) to the child state channels (`myChildKey`)
-  5. We're transforming the state from the child state channels (`myChildKey`) back to the parent state channels (`myKey`)
-  6. We're passing a function here instead of just a compiled graph (`childGraph`)
+  1. 상태를 자식 상태 채널(`myChildKey`)에서 손자 상태 채널(`myGrandchildKey`)로 변환합니다
+  2. 상태를 손자 상태 채널(`myGrandchildKey`)에서 다시 자식 상태 채널(`myChildKey`)로 변환합니다
+  3. 여기서는 컴파일된 그래프(`grandchildGraph`)만 전달하는 대신 함수를 전달합니다
+  4. 상태를 부모 상태 채널(`myKey`)에서 자식 상태 채널(`myChildKey`)로 변환합니다
+  5. 상태를 자식 상태 채널(`myChildKey`)에서 다시 부모 상태 채널(`myKey`)로 변환합니다
+  6. 여기서는 컴파일된 그래프(`childGraph`)만 전달하는 대신 함수를 전달합니다
 
   ```
   [[], { parent1: { myKey: 'hi Bob' } }]
@@ -234,9 +231,9 @@ const graph = builder.compile();
 
 </Accordion>
 
-## Add a graph as a node
+## 그래프를 노드로 추가하기
 
-When the parent graph and subgraph can communicate over a shared state key (channel) in the [schema](/oss/javascript/langgraph/graph-api#state), you can add a graph as a [node](/oss/javascript/langgraph/graph-api#nodes) in another graph. For example, in [multi-agent](/oss/javascript/langchain/multi-agent) systems, the agents often communicate over a shared [messages](/oss/javascript/langgraph/graph-api#why-use-messages) key.
+부모 그래프와 서브그래프가 [스키마](/oss/javascript/langgraph/graph-api#state)의 공유 상태 키(채널)를 통해 통신할 수 있는 경우, 그래프를 다른 그래프의 [노드](/oss/javascript/langgraph/graph-api#nodes)로 추가할 수 있습니다. 예를 들어, [멀티 에이전트](/oss/javascript/langchain/multi-agent) 시스템에서는 에이전트들이 종종 공유된 [메시지](/oss/javascript/langgraph/graph-api#why-use-messages) 키를 통해 통신합니다.
 
 <img
   src="/oss/images/subgraph.png"
@@ -244,12 +241,12 @@ When the parent graph and subgraph can communicate over a shared state key (chan
   style={{ height: "450px" }}
 />
 
-If your subgraph shares state keys with the parent graph, you can follow these steps to add it to your graph:
+서브그래프가 부모 그래프와 상태 키를 공유하는 경우, 다음 단계에 따라 그래프에 추가할 수 있습니다:
 
 
 
-1. Define the subgraph workflow (`subgraphBuilder` in the example below) and compile it
-2. Pass compiled subgraph to the `.addNode` method when defining the parent graph workflow
+1. 서브그래프 워크플로우(아래 예제의 `subgraphBuilder`)를 정의하고 컴파일합니다
+2. 부모 그래프 워크플로우를 정의할 때 `.addNode` 메서드에 컴파일된 서브그래프를 전달합니다
 
 ```typescript
 import { StateGraph, START } from "@langchain/langgraph";
@@ -277,7 +274,7 @@ const graph = builder.compile();
 ```
 
 
-<Accordion title="Full example: shared state schemas">
+<Accordion title="전체 예제: 공유 상태 스키마">
 
 
   ```typescript
@@ -286,8 +283,8 @@ const graph = builder.compile();
 
   // Define subgraph
   const SubgraphState = z.object({
-    foo: z.string(),    // [!code highlight]
-    bar: z.string(),    // [!code highlight]
+    foo: z.string(),  // (1)!
+    bar: z.string(),  // (2)!
   });
 
   const subgraphBuilder = new StateGraph(SubgraphState)
@@ -324,8 +321,8 @@ const graph = builder.compile();
   }
   ```
 
-  1. This key is shared with the parent graph state
-  2. This key is private to the `SubgraphState` and is not visible to the parent graph
+  1. 이 키는 부모 그래프 상태와 공유됩니다
+  2. 이 키는 `SubgraphState`에만 있으며 부모 그래프에는 보이지 않습니다
 
   ```
   { node1: { foo: 'hi! foo' } }
@@ -334,9 +331,9 @@ const graph = builder.compile();
 
 </Accordion>
 
-## Add persistence
+## 영속성 추가
 
-You only need to **provide the checkpointer when compiling the parent graph**. LangGraph will automatically propagate the checkpointer to the child subgraphs.
+**부모 그래프를 컴파일할 때만 체크포인터를 제공**하면 됩니다. LangGraph는 자동으로 체크포인터를 자식 서브그래프로 전파합니다.
 
 
 
@@ -367,7 +364,7 @@ const graph = builder.compile({ checkpointer });
 ```
 
 
-If you want the subgraph to **have its own memory**, you can compile it with the appropriate checkpointer option. This is useful in [multi-agent](/oss/javascript/langchain/multi-agent) systems, if you want agents to keep track of their internal message histories:
+서브그래프가 **자체 메모리를 가지도록** 하려면, 적절한 체크포인터 옵션으로 컴파일할 수 있습니다. 이는 [멀티 에이전트](/oss/javascript/langchain/multi-agent) 시스템에서 에이전트들이 내부 메시지 히스토리를 추적하고 싶을 때 유용합니다:
 
 
 
@@ -377,21 +374,21 @@ const subgraph = subgraphBuilder.compile({ checkpointer: true });
 ```
 
 
-## View subgraph state
+## 서브그래프 상태 보기
 
-When you enable [persistence](/oss/javascript/langgraph/persistence), you can [inspect the graph state](/oss/javascript/langgraph/persistence#checkpoints) (checkpoint) via the appropriate method. To view the subgraph state, you can use the subgraphs option.
+[영속성](/oss/javascript/langgraph/persistence)을 활성화하면, 적절한 메서드를 통해 [그래프 상태를 검사](/oss/javascript/langgraph/persistence#checkpoints)(체크포인트)할 수 있습니다. 서브그래프 상태를 보려면 subgraphs 옵션을 사용할 수 있습니다.
 
 
 
-You can inspect the graph state via `graph.getState(config)`. To view the subgraph state, you can use `graph.getState(config, { subgraphs: true })`.
+`graph.getState(config)`를 통해 그래프 상태를 검사할 수 있습니다. 서브그래프 상태를 보려면 `graph.getState(config, { subgraphs: true })`를 사용할 수 있습니다.
 
 
 <Warning>
-**Available **only** when interrupted**
-Subgraph state can only be viewed **when the subgraph is interrupted**. Once you resume the graph, you won't be able to access the subgraph state.
+**중단되었을 때만 사용 가능**
+서브그래프 상태는 **서브그래프가 중단되었을 때만** 볼 수 있습니다. 그래프를 재개하면 서브그래프 상태에 액세스할 수 없습니다.
 </Warning>
 
-<Accordion title="View interrupted subgraph state">
+<Accordion title="중단된 서브그래프 상태 보기">
 
 
   ```typescript
@@ -424,7 +421,7 @@ Subgraph state can only be viewed **when the subgraph is interrupted**. Once you
 
   await graph.invoke({ foo: "" }, config);
   const parentState = await graph.getState(config);
-  const subgraphState = (await graph.getState(config, { subgraphs: true })).tasks[0].state;   // [!code highlight]
+  const subgraphState = (await graph.getState(config, { subgraphs: true })).tasks[0].state; // (1)!
 
   // resume the subgraph
   await graph.invoke(new Command({ resume: "bar" }), config);
@@ -432,9 +429,9 @@ Subgraph state can only be viewed **when the subgraph is interrupted**. Once you
 
 </Accordion>
 
-## Stream subgraph outputs
+## 서브그래프 출력 스트리밍
 
-To include outputs from subgraphs in the streamed outputs, you can set the subgraphs option in the stream method of the parent graph. This will stream outputs from both the parent graph and any subgraphs.
+스트리밍 출력에 서브그래프의 출력을 포함하려면, 부모 그래프의 stream 메서드에서 subgraphs 옵션을 설정할 수 있습니다. 이렇게 하면 부모 그래프와 모든 서브그래프의 출력이 스트리밍됩니다.
 
 
 
@@ -442,7 +439,7 @@ To include outputs from subgraphs in the streamed outputs, you can set the subgr
 for await (const chunk of await graph.stream(
   { foo: "foo" },
   {
-    subgraphs: true,   // [!code highlight]
+    subgraphs: true, // (1)!
     streamMode: "updates",
   }
 )) {
@@ -450,10 +447,10 @@ for await (const chunk of await graph.stream(
 }
 ```
 
-1. Set `subgraphs: true` to stream outputs from subgraphs.
+1. 서브그래프의 출력을 스트리밍하려면 `subgraphs: true`를 설정하세요.
 
 
-<Accordion title="Stream from subgraphs">
+<Accordion title="서브그래프에서 스트리밍">
 
 
   ```typescript
@@ -499,14 +496,14 @@ for await (const chunk of await graph.stream(
     { foo: "foo" },
     {
       streamMode: "updates",
-      subgraphs: true,   // [!code highlight]
+      subgraphs: true, // (1)!
     }
   )) {
     console.log(chunk);
   }
   ```
 
-  1. Set `subgraphs: true` to stream outputs from subgraphs.
+  1. 서브그래프의 출력을 스트리밍하려면 `subgraphs: true`를 설정하세요.
 
   ```
   [[], { node1: { foo: 'hi! foo' } }]

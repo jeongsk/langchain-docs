@@ -2,12 +2,9 @@
 title: Quickstart
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
+import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
-<AlphaCalloutPy />
-
-
+<AlphaCallout />
 
 This quickstart takes you from a simple setup to a fully functional AI agent in just a few minutes.
 
@@ -80,9 +77,8 @@ Let's walk through each step:
 
         ```python
         from dataclasses import dataclass
-        from langchain.tools import tool, ToolRuntime
+        from langgraph.runtime import get_runtime
 
-        @tool
         def get_weather_for_location(city: str) -> str:
             """Get weather for a given city."""
             return f"It's always sunny in {city}!"
@@ -92,16 +88,16 @@ Let's walk through each step:
             """Custom runtime context schema."""
             user_id: str
 
-        @tool
-        def get_user_location(runtime: ToolRuntime[Context]) -> str:
+        def get_user_location() -> str:
             """Retrieve user information based on user ID."""
+            runtime = get_runtime(Context)
             user_id = runtime.context.user_id
             return "Florida" if user_id == "1" else "SF"
         ```
 
         <Tip>
             Tools should be well-documented: their name, description, and argument names become part of the model's prompt.
-            LangChain's [`@tool` decorator](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool) adds metadata and enables runtime injection via the `ToolRuntime` parameter.
+            We've defined them here as plain Python functions, but LangChain's [@tool decorator](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool) decorator is often used to add extra metadata.
         </Tip>
 
 
@@ -215,8 +211,8 @@ from dataclasses import dataclass
 
 from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
-from langchain.tools import tool, ToolRuntime
 from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.runtime import get_runtime
 
 # Define system prompt
 system_prompt = """You are an expert weather forecaster, who speaks in puns.
@@ -235,14 +231,13 @@ class Context:
     user_id: str
 
 # Define tools
-@tool
 def get_weather_for_location(city: str) -> str:
     """Get weather for a given city."""
     return f"It's always sunny in {city}!"
 
-@tool
-def get_user_location(runtime: ToolRuntime[Context]) -> str:
+def get_user_location() -> str:
     """Retrieve user information based on user ID."""
+    runtime = get_runtime(Context)
     user_id = runtime.context.user_id
     return "Florida" if user_id == "1" else "SF"
 
