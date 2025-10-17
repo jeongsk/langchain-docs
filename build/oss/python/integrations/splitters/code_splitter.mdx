@@ -1,10 +1,10 @@
 ---
-title: Splitting code
+title: 코드 분할
 ---
 
-@[RecursiveCharacterTextSplitter] includes pre-built lists of separators that are useful for [splitting text](/oss/python/integrations/splitters/) in a specific programming language.
+@[RecursiveCharacterTextSplitter]는 특정 프로그래밍 언어로 작성된 [텍스트를 분할](/oss/python/integrations/splitters/)하는 데 유용한 사전 구성된 구분자 목록을 포함하고 있습니다.
 
-Supported languages are stored in the `langchain_text_splitters.Language` enum. They include:
+지원되는 언어는 `langchain_text_splitters.Language` 열거형에 저장되어 있습니다. 포함된 언어는 다음과 같습니다:
 
 ```
 "cpp",
@@ -33,12 +33,12 @@ Supported languages are stored in the `langchain_text_splitters.Language` enum. 
 "haskell"
 ```
 
-To view the list of separators for a given language, pass a value from this enum into
+특정 언어의 구분자 목록을 확인하려면 이 열거형의 값을 다음 메서드에 전달하세요:
 ```python
 RecursiveCharacterTextSplitter.get_separators_for_language
 ```
 
-To instantiate a splitter that is tailored for a specific language, pass a value from the enum into
+특정 언어에 맞춤화된 분할기를 생성하려면 열거형의 값을 다음 메서드에 전달하세요:
 ```python
 RecursiveCharacterTextSplitter.from_language
 ```
@@ -46,7 +46,7 @@ RecursiveCharacterTextSplitter.from_language
 
 
 
-Below we demonstrate examples for the various languages.
+아래에서 다양한 언어에 대한 예제를 확인할 수 있습니다.
 
 ```python
 %pip install -qU langchain-text-splitters
@@ -61,7 +61,7 @@ from langchain_text_splitters import (
 )
 ```
 
-To view the full list of supported languages:
+지원되는 전체 언어 목록을 확인하려면:
 
 
 ```python
@@ -101,7 +101,7 @@ To view the full list of supported languages:
 ```
 
 
-You can also see the separators used for a given language:
+특정 언어에 사용되는 구분자도 확인할 수 있습니다:
 
 
 ```python
@@ -116,7 +116,7 @@ RecursiveCharacterTextSplitter.get_separators_for_language(Language.PYTHON)
 
 
 ## Python
-Here's an example using the PythonTextSplitter:
+다음은 PythonTextSplitter를 사용하는 예제입니다:
 
 ```python
 PYTHON_CODE = """
@@ -143,7 +143,7 @@ python_docs
 
 
 ## JS
-Here's an example using the JS text splitter:
+다음은 JS 텍스트 분할기를 사용하는 예제입니다:
 
 ```python
 JS_CODE = """
@@ -170,7 +170,7 @@ js_docs
 
 
 ## TS
-Here's an example using the typescript text splitter:
+다음은 TypeScript 텍스트 분할기를 사용하는 예제입니다:
 
 ```python
 TS_CODE = """
@@ -198,7 +198,7 @@ ts_docs
 
 
 ## Markdown
-Here's an example using the Markdown text splitter:
+다음은 Markdown 텍스트 분할기를 사용하는 예제입니다:
 
 ```python
 markdown_text = """
@@ -236,7 +236,7 @@ md_docs
 
 
 ## Latex
-Here's an example on Latex text:
+다음은 Latex 텍스트를 사용하는 예제입니다:
 
 ```python
 latex_text = """
@@ -295,7 +295,7 @@ latex_docs
 
 
 ## HTML
-Here's an example using an HTML text splitter:
+다음은 HTML 텍스트 분할기를 사용하는 예제입니다:
 
 ```python
 html_text = """
@@ -352,7 +352,7 @@ html_docs
 
 
 ## Solidity
-Here's an example using the Solidity text splitter:
+다음은 Solidity 텍스트 분할기를 사용하는 예제입니다:
 
 ```python
 SOL_CODE = """
@@ -379,7 +379,7 @@ sol_docs
 
 
 ## C#
-Here's an example using the C# text splitter:
+다음은 C# 텍스트 분할기를 사용하는 예제입니다:
 
 ```python
 C_CODE = """
@@ -424,7 +424,7 @@ c_docs
 
 
 ## Haskell
-Here's an example using the Haskell text splitter:
+다음은 Haskell 텍스트 분할기를 사용하는 예제입니다:
 
 ```python
 HASKELL_CODE = """
@@ -452,7 +452,7 @@ haskell_docs
 
 
 ## PHP
-Here's an example using the PHP text splitter:
+다음은 PHP 텍스트 분할기를 사용하는 예제입니다:
 
 ```python
 PHP_CODE = """<?php
@@ -492,7 +492,7 @@ php_docs
 
 
 ## PowerShell
-Here's an example using the PowerShell text splitter:
+다음은 PowerShell 텍스트 분할기를 사용하는 예제입니다:
 
 ```python
 POWERSHELL_CODE = """

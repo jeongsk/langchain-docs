@@ -6,7 +6,7 @@ import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
 <AlphaCallout />
 
-**지속 가능한 실행(Durable execution)**은 프로세스나 워크플로우가 주요 지점에서 진행 상황을 저장하여 일시 중지한 후 정확히 중단된 지점부터 다시 시작할 수 있도록 하는 기술입니다. 이는 사용자가 프로세스를 검사, 검증 또는 수정한 후 계속할 수 있는 [human-in-the-loop](/oss/javascript/langgraph/interrupts)가 필요한 시나리오와, 중단이나 오류가 발생할 수 있는 장시간 실행 작업(예: LLM 호출 시간 초과)에서 특히 유용합니다. 완료된 작업을 보존함으로써 지속 가능한 실행은 상당한 시간(예: 일주일 후)이 지난 후에도 이전 단계를 재처리하지 않고 프로세스를 재개할 수 있게 합니다.
+<b>지속 가능한 실행(Durable execution)</b>은 프로세스나 워크플로우가 주요 지점에서 진행 상황을 저장하여 일시 중지한 후 정확히 중단된 지점부터 다시 시작할 수 있도록 하는 기술입니다. 이는 사용자가 프로세스를 검사, 검증 또는 수정한 후 계속할 수 있는 [human-in-the-loop](/oss/javascript/langgraph/interrupts)가 필요한 시나리오와, 중단이나 오류가 발생할 수 있는 장시간 실행 작업(예: LLM 호출 시간 초과)에서 특히 유용합니다. 완료된 작업을 보존함으로써 지속 가능한 실행은 상당한 시간(예: 일주일 후)이 지난 후에도 이전 단계를 재처리하지 않고 프로세스를 재개할 수 있게 합니다.
 
 LangGraph의 내장 [지속성](/oss/javascript/langgraph/persistence) 레이어는 워크플로우에 지속 가능한 실행을 제공하여 각 실행 단계의 상태가 영구 저장소에 저장되도록 보장합니다. 이 기능은 시스템 장애나 [human-in-the-loop](/oss/javascript/langgraph/interrupts) 상호작용으로 워크플로우가 중단되더라도 마지막으로 기록된 상태에서 재개할 수 있음을 보장합니다.
 

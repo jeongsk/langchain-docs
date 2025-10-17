@@ -1,12 +1,12 @@
 ---
-title: Splitting code
+title: 코드 분할
 ---
 
-@[RecursiveCharacterTextSplitter] includes pre-built lists of separators that are useful for [splitting text](/oss/javascript/integrations/splitters/) in a specific programming language.
+@[RecursiveCharacterTextSplitter]는 특정 프로그래밍 언어로 작성된 [텍스트를 분할](/oss/javascript/integrations/splitters/)하는 데 유용한 사전 구성된 구분자 목록을 포함하고 있습니다.
 
 
 
-Supported languages are kept in the `SupportedTextSplitterLanguages` type. They include:
+지원되는 언어는 `SupportedTextSplitterLanguages` 타입에 포함되어 있습니다. 포함된 언어는 다음과 같습니다:
 
 ```
 "cpp",
@@ -27,18 +27,18 @@ Supported languages are kept in the `SupportedTextSplitterLanguages` type. They 
 "sol",
 ```
 
-To view the list of separators for a given language, pass a value from this enum into
+특정 언어의 구분자 목록을 확인하려면 이 열거형의 값을 다음 메서드에 전달하세요:
 ```ts
 RecursiveCharacterTextSplitter.getSeparatorsForLanguage()
 ```
 
-To instantiate a splitter that is tailored for a specific language, pass a value from the enum into
+특정 언어에 맞춤화된 분할기를 생성하려면 열거형의 값을 다음 메서드에 전달하세요:
 ```ts
 RecursiveCharacterTextSplitter.fromLanguage()
 ```
 
 
-Below we demonstrate examples for the various languages.
+아래에서 다양한 언어에 대한 예제를 확인할 수 있습니다.
 
 
 <CodeGroup>
@@ -64,7 +64,7 @@ bun add @langchain/textsplitters
 
 ## Python
 
-Here's an example using the python text splitter:
+다음은 Python 텍스트 분할기를 사용하는 예제입니다:
 
 ```ts
 const pythonSplitter = RecursiveCharacterTextSplitter.fromLanguage(
@@ -84,7 +84,7 @@ console.log(pythonDocs);
 
 ## JS
 
-Here's an example using the JS text splitter:
+다음은 JS 텍스트 분할기를 사용하는 예제입니다:
 
 ```ts
 const JS_CODE = `
@@ -113,7 +113,7 @@ console.log(jsDocs);
 
 ## TS
 
-Here's an example using the typescript text splitter:
+다음은 TypeScript 텍스트 분할기를 사용하는 예제입니다:
 
 ```ts
 const TS_CODE = `
@@ -143,7 +143,7 @@ console.log(tsDocs);
 
 ## Markdown
 
-Here's an example using the Markdown text splitter:
+다음은 Markdown 텍스트 분할기를 사용하는 예제입니다:
 
 ```ts
 const markdownText = `
@@ -181,7 +181,7 @@ console.log(mdDocs);
 
 ## Latex
 
-Here's an example on Latex text:
+다음은 Latex 텍스트를 사용하는 예제입니다:
 
 ```ts
 const latexText = `
@@ -240,7 +240,7 @@ console.log(latexDocs);
 
 ## HTML
 
-Here's an example using an HTML text splitter:
+다음은 HTML 텍스트 분할기를 사용하는 예제입니다:
 
 ```ts
 const htmlText = `
@@ -297,7 +297,7 @@ console.log(htmlDocs);
 
 ## Solidity
 
-Here's an example using the Solidity text splitter:
+다음은 Solidity 텍스트 분할기를 사용하는 예제입니다:
 
 ```ts
 const SOL_CODE = `
@@ -326,7 +326,7 @@ console.log(solDocs);
 
 ## C#
 
-Here's an example using the C# text splitter:
+다음은 C# 텍스트 분할기를 사용하는 예제입니다:
 
 ```ts
 const C_CODE = `
@@ -374,7 +374,7 @@ console.log(csharpDocs);
 
 ## Haskell
 
-Here's an example using the Haskell text splitter:
+다음은 Haskell 텍스트 분할기를 사용하는 예제입니다:
 
 ```ts
 const HASKELL_CODE = `
@@ -405,7 +405,7 @@ console.log(haskellDocs);
 
 ## PHP
 
-Here's an example using the PHP text splitter:
+다음은 PHP 텍스트 분할기를 사용하는 예제입니다:
 
 ```ts
 const PHP_CODE = `<?php
@@ -448,7 +448,7 @@ console.log(phpDocs);
 
 ## PowerShell
 
-Here's an example using the PowerShell text splitter:
+다음은 PowerShell 텍스트 분할기를 사용하는 예제입니다:
 
 ```ts
 const POWERSHELL_CODE = `

@@ -2,23 +2,23 @@
 title: LLMonitor
 ---
 
->[LLMonitor](https://llmonitor.com?utm_source=langchain&utm_medium=py&utm_campaign=docs) is an open-source observability platform that provides cost and usage analytics, user tracking, tracing and evaluation tools.
+>[LLMonitor](https://llmonitor.com?utm_source=langchain&utm_medium=py&utm_campaign=docs)은 비용 및 사용량 분석, 사용자 추적, 추적 및 평가 도구를 제공하는 오픈 소스 옵저버빌리티 플랫폼입니다.
 
 <video controls width='100%' >
     <source src='https://llmonitor.com/videos/demo-annotated.mp4'/>
 </video>
 
-## Setup
+## 설정
 
-Create an account on [llmonitor.com](https://llmonitor.com?utm_source=langchain&utm_medium=py&utm_campaign=docs), then copy your new app's `tracking id`.
+[llmonitor.com](https://llmonitor.com?utm_source=langchain&utm_medium=py&utm_campaign=docs)에서 계정을 생성한 다음, 새 앱의 `tracking id`를 복사합니다.
 
-Once you have it, set it as an environment variable by running:
+이를 확보하면 다음을 실행하여 환경 변수로 설정합니다:
 
 ```bash
 export LLMONITOR_APP_ID="..."
 ```
 
-If you'd prefer not to set an environment variable, you can pass the key directly when initializing the callback handler:
+환경 변수를 설정하지 않으려면 콜백 핸들러를 초기화할 때 키를 직접 전달할 수 있습니다:
 
 ```python
 from langchain_community.callbacks.llmonitor_callback import LLMonitorCallbackHandler
@@ -26,7 +26,7 @@ from langchain_community.callbacks.llmonitor_callback import LLMonitorCallbackHa
 handler = LLMonitorCallbackHandler(app_id="...")
 ```
 
-## Usage with LLM/Chat models
+## LLM/Chat 모델과 함께 사용
 
 ```python
 from langchain_openai import OpenAI
@@ -44,13 +44,13 @@ llm("Tell me a joke")
 
 ```
 
-## Usage with chains and agents
+## 체인 및 에이전트와 함께 사용
 
-Make sure to pass the callback handler to the `run` method so that all related chains and llm calls are correctly tracked.
+관련된 모든 체인과 llm 호출이 올바르게 추적되도록 `run` 메서드에 콜백 핸들러를 전달해야 합니다.
 
-It is also recommended to pass `agent_name` in the metadata to be able to distinguish between agents in the dashboard.
+또한 대시보드에서 에이전트를 구별할 수 있도록 메타데이터에 `agent_name`을 전달하는 것이 권장됩니다.
 
-Example:
+예제:
 
 ```python
 from langchain_openai import ChatOpenAI
@@ -82,7 +82,7 @@ agent_executor = AgentExecutor(
 agent_executor.run("how many letters in the word educa?", callbacks=[handler])
 ```
 
-Another example:
+또 다른 예제:
 
 ```python
 import os
@@ -109,9 +109,9 @@ input_message = {
 agent.invoke({"messages": [input_message]})
 ```
 
-## User Tracking
+## 사용자 추적
 
-User tracking allows you to identify your users, track their cost, conversations and more.
+사용자 추적을 통해 사용자를 식별하고, 비용, 대화 등을 추적할 수 있습니다.
 
 ```python
 from langchain_community.callbacks.llmonitor_callback import LLMonitorCallbackHandler, identify
@@ -123,9 +123,9 @@ with identify("user-456", user_props={"email": "user456@test.com"}):
     agent.invoke(...)
 ```
 
-## Support
+## 지원
 
-For any question or issue with integration you can reach out to the LLMonitor team on [Discord](http://discord.com/invite/8PafSG58kK) or via [email](mailto:vince@llmonitor.com).
+통합과 관련된 질문이나 문제가 있으면 [Discord](http://discord.com/invite/8PafSG58kK) 또는 [이메일](mailto:vince@llmonitor.com)을 통해 LLMonitor 팀에 문의할 수 있습니다.
 
 ---
 

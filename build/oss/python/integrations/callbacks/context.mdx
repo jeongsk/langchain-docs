@@ -2,11 +2,11 @@
 title: Context
 ---
 
->[Context](https://context.ai/) provides user analytics for LLM-powered products and features.
+>[Context](https://context.ai/)는 LLM 기반 제품 및 기능에 대한 사용자 분석을 제공합니다.
 
-With `Context`, you can start understanding your users and improving their experiences in less than 30 minutes.
+`Context`를 사용하면 30분 이내에 사용자를 이해하고 경험을 개선할 수 있습니다.
 
-In this guide we will show you how to integrate with Context.
+이 가이드에서는 Context와 통합하는 방법을 보여줍니다.
 
 ## Installation and Setup
 
@@ -16,17 +16,17 @@ In this guide we will show you how to integrate with Context.
 
 ### Getting API Credentials
 
-To get your Context API token:
+Context API 토큰을 얻으려면:
 
-1. Go to the settings page within your Context account ([with.context.ai/settings](https://with.context.ai/settings)).
-2. Generate a new API Token.
-3. Store this token somewhere secure.
+1. Context 계정 내의 설정 페이지([with.context.ai/settings](https://with.context.ai/settings))로 이동합니다.
+2. 새 API Token을 생성합니다.
+3. 이 토큰을 안전한 곳에 저장합니다.
 
 ### Setup Context
 
-To use the `ContextCallbackHandler`, import the handler from LangChain and instantiate it with your Context API token.
+`ContextCallbackHandler`를 사용하려면 LangChain에서 핸들러를 import하고 Context API 토큰으로 인스턴스화합니다.
 
-Ensure you have installed the `context-python` package before using the handler.
+핸들러를 사용하기 전에 `context-python` 패키지를 설치했는지 확인하세요.
 
 ```python
 from langchain_community.callbacks.context_callback import ContextCallbackHandler
@@ -44,7 +44,7 @@ context_callback = ContextCallbackHandler(token)
 
 ### Context callback within a chat model
 
-The Context callback handler can be used to directly record transcripts between users and AI assistants.
+Context 콜백 핸들러는 사용자와 AI 어시스턴트 간의 대화 기록을 직접 기록하는 데 사용할 수 있습니다.
 
 ```python
 import os
@@ -70,18 +70,18 @@ print(chat(messages))
 
 ### Context callback within Chains
 
-The Context callback handler can also be used to record the inputs and outputs of chains. Note that intermediate steps of the chain are not recorded - only the starting inputs and final outputs.
+Context 콜백 핸들러는 체인의 입력과 출력을 기록하는 데에도 사용할 수 있습니다. 체인의 중간 단계는 기록되지 않으며 시작 입력과 최종 출력만 기록됩니다.
 
-__Note:__ Ensure that you pass the same context object to the chat model and the chain.
+__참고:__ 동일한 context 객체를 챗 모델과 체인에 전달해야 합니다.
 
-Wrong:
+잘못된 방법:
 >
 > ```python
 > chat = ChatOpenAI(temperature=0.9, callbacks=[ContextCallbackHandler(token)])
 > chain = LLMChain(llm=chat, prompt=chat_prompt_template, callbacks=[ContextCallbackHandler(token)])
 > ```
 
-Correct:
+올바른 방법:
 >
 >```python
 >handler = ContextCallbackHandler(token)

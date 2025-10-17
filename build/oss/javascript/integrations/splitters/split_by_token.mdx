@@ -1,21 +1,21 @@
 ---
-title: Splitting by token
+title: 토큰 단위로 분할하기
 ---
 
-Language models have a token limit. You should not exceed the token limit. When you [split your text](/oss/javascript/integrations/splitters/) into chunks it is therefore a good idea to count the number of tokens. There are many tokenizers. When you count tokens in your text you should use the same tokenizer as used in the language model.
+언어 모델에는 토큰 제한이 있습니다. 토큰 제한을 초과해서는 안 됩니다. [텍스트를 청크로 분할](/oss/javascript/integrations/splitters/)할 때는 토큰 수를 계산하는 것이 좋습니다. 토크나이저는 여러 종류가 있습니다. 텍스트의 토큰을 계산할 때는 언어 모델에서 사용하는 것과 동일한 토크나이저를 사용해야 합니다.
 
 
 
 ## js-tiktoken
 
 <Note>
-**[js-tiktoken](https://github.com/dqbd/tiktoken) is a JavaScript vesrion of the `BPE` tokenizer created by `OpenAI`.**
+**[js-tiktoken](https://github.com/dqbd/tiktoken)은 `OpenAI`가 만든 `BPE` 토크나이저의 JavaScript 버전입니다.**
 </Note>
 
-We can use `tiktoken` to estimate tokens used using @[TokenTextSplitter]. It will probably be more accurate for OpenAI mdoels.
+@[TokenTextSplitter]를 사용하여 `tiktoken`으로 사용된 토큰을 추정할 수 있습니다. OpenAI 모델에서는 더 정확할 것입니다.
 
-1. How the text is split: by character passed in.
-2. How the chunk size is measured: by `tiktoken` tokenizer.
+1. 텍스트 분할 방식: 전달된 문자 기준.
+2. 청크 크기 측정 방식: `tiktoken` 토크나이저 기준.
 
 <CodeGroup>
 ```bash npm
@@ -39,16 +39,16 @@ bun add @langchain/textsplitters
 import { TokenTextSplitter } from "@langchain/textsplitters";
 import { readFileSync } from "fs";
 
-// Example: read a long document
+// 예시: 긴 문서 읽기
 const stateOfTheUnion = readFileSync("state_of_the_union.txt", "utf8");
 ```
 
-To split with a @[TokenTextSplitter] and then merge chunks with `tiktoken`, pass in an `encodingName` (e.g. cl100k_base) when initializing the @[TokenTextSplitter]. Note that splits from this method can be larger than the chunk size measured by the `tiktoken` tokenizer.
+@[TokenTextSplitter]로 분할한 다음 `tiktoken`으로 청크를 병합하려면 @[TokenTextSplitter]를 초기화할 때 `encodingName`(예: cl100k_base)을 전달하세요. 이 메서드에서 나온 분할은 `tiktoken` 토크나이저로 측정한 청크 크기보다 클 수 있습니다.
 
 ```ts
 import { TokenTextSplitter } from "@langchain/textsplitters";
 
-// Example: use cl100k_base encoding
+// 예시: cl100k_base 인코딩 사용
 const splitter = new TokenTextSplitter({ encodingName: "cl100k_base", chunkSize: 10, chunkOverlap: 0 });
 
 const texts = splitter.splitText(stateOfTheUnion);
