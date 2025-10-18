@@ -2,23 +2,23 @@
 title: ChatUpstage
 ---
 
-This notebook covers how to get started with Upstage chat models.
+이 노트북은 Upstage 채팅 모델을 시작하는 방법을 다룹니다.
 
-## Installation
+## 설치
 
-Install `langchain-upstage` package.
+`langchain-upstage` 패키지를 설치합니다.
 
 ```bash
 pip install -U langchain-upstage
 ```
 
-## Environment Setup
+## 환경 설정
 
-Make sure to set the following environment variables:
+다음 환경 변수를 설정해야 합니다:
 
-- `UPSTAGE_API_KEY`: Your Upstage API key from [Upstage console](https://console.upstage.ai/).
+- `UPSTAGE_API_KEY`: [Upstage 콘솔](https://console.upstage.ai/)에서 발급받은 Upstage API 키
 
-## Usage
+## 사용법
 
 ```python
 import os
@@ -34,20 +34,20 @@ chat = ChatUpstage()
 ```
 
 ```python
-# using chat invoke
+# chat invoke 사용
 chat.invoke("Hello, how are you?")
 ```
 
 ```python
-# using chat stream
+# chat stream 사용
 for m in chat.stream("Hello, how are you?"):
     print(m)
 ```
 
-## Chaining
+## 체이닝
 
 ```python
-# using chain
+# 체인 사용
 prompt = ChatPromptTemplate.from_messages(
     [
         ("system", "You are a helpful assistant that translates English to French."),

@@ -2,43 +2,43 @@
 title: ChatBedrock
 ---
 
-This doc will help you get started with AWS Bedrock [chat models](/oss/python/langchain/models). Amazon Bedrock is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies like AI21 Labs, Anthropic, Cohere, Meta, Stability AI, and Amazon via a single API, along with a broad set of capabilities you need to build generative AI applications with security, privacy, and responsible AI. Using Amazon Bedrock, you can easily experiment with and evaluate top FMs for your use case, privately customize them with your data using techniques such as fine-tuning and Retrieval Augmented Generation (RAG), and build agents that execute tasks using your enterprise systems and data sources. Since Amazon Bedrock is serverless, you don't have to manage any infrastructure, and you can securely integrate and deploy generative AI capabilities into your applications using the AWS services you are already familiar with.
+이 문서는 AWS Bedrock [채팅 모델](/oss/python/langchain/models) 시작하기를 도와드립니다. Amazon Bedrock은 AI21 Labs, Anthropic, Cohere, Meta, Stability AI, Amazon 등 주요 AI 기업의 고성능 기초 모델(FMs)을 단일 API를 통해 제공하는 완전 관리형 서비스입니다. 보안, 프라이버시, 책임 있는 AI를 갖춘 생성형 AI 애플리케이션을 구축하는 데 필요한 광범위한 기능을 제공합니다. Amazon Bedrock을 사용하면 사용 사례에 맞는 최고의 FM을 쉽게 실험하고 평가할 수 있으며, 미세 조정 및 Retrieval Augmented Generation(RAG)과 같은 기술을 사용하여 데이터로 비공개적으로 커스터마이징하고, 엔터프라이즈 시스템과 데이터 소스를 사용하여 작업을 수행하는 에이전트를 구축할 수 있습니다. Amazon Bedrock은 서버리스이므로 인프라를 관리할 필요가 없으며, 이미 익숙한 AWS 서비스를 사용하여 생성형 AI 기능을 애플리케이션에 안전하게 통합하고 배포할 수 있습니다.
 
-AWS Bedrock maintains a [Converse API](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html) which provides a unified conversational interface for Bedrock models. This API does not yet support custom models. You can see a list of all [models that are supported here](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html).
+AWS Bedrock은 Bedrock 모델을 위한 통합 대화 인터페이스를 제공하는 [Converse API](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html)를 유지 관리합니다. 이 API는 아직 커스텀 모델을 지원하지 않습니다. [여기에서 지원되는 모든 모델 목록](https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html)을 확인할 수 있습니다.
 
 <Info>
-**We recommend the Converse API for users who do not need to use custom models. It can be accessed using [ChatBedrockConverse](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html).**
+**커스텀 모델을 사용할 필요가 없는 사용자에게는 Converse API를 권장합니다. [ChatBedrockConverse](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html)를 사용하여 액세스할 수 있습니다.**
 
 </Info>
 
-For detailed documentation of all Bedrock features and configurations head to the [API reference](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html).
+모든 Bedrock 기능 및 구성에 대한 자세한 문서는 [API 레퍼런스](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html)를 참조하세요.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/bedrock) | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatBedrock](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock.ChatBedrock.html) | [langchain-aws](https://python.langchain.com/api_reference/aws/index.html) | ❌ | beta | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-aws?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-aws?style=flat-square&label=%20) |
 | [ChatBedrockConverse](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html) | [langchain-aws](https://python.langchain.com/api_reference/aws/index.html) | ❌ | beta | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-aws?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-aws?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
-The below apply to both `ChatBedrock` and `ChatBedrockConverse`.
+아래 내용은 `ChatBedrock` 및 `ChatBedrockConverse` 모두에 적용됩니다.
 
-| [Tool calling](/oss/python/langchain/tools) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | [Image input](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming/) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
+| [도구 호출](/oss/python/langchain/tools) | [구조화된 출력](/oss/python/langchain/structured-output) | JSON mode | [이미지 입력](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [토큰 수준 스트리밍](/oss/python/langchain/streaming/) | Native async | [토큰 사용량](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ | ❌ |
 
-## Setup
+## 설정
 
-To access Bedrock models you'll need to create an AWS account, set up the Bedrock API service, get an access key ID and secret key, and install the `langchain-aws` integration package.
+Bedrock 모델에 액세스하려면 AWS 계정을 생성하고, Bedrock API 서비스를 설정하고, 액세스 키 ID와 시크릿 키를 받고, `langchain-aws` 통합 패키지를 설치해야 합니다.
 
-### Credentials
+### 자격 증명
 
-Head to the [AWS docs](https://docs.aws.amazon.com/bedrock/latest/userguide/setting-up.html) to sign up to AWS and setup your credentials.
+AWS에 가입하고 자격 증명을 설정하려면 [AWS 문서](https://docs.aws.amazon.com/bedrock/latest/userguide/setting-up.html)를 참조하세요.
 
-Alternatively, `ChatBedrockConverse` will read from the following environment variables by default:
+또는 `ChatBedrockConverse`는 기본적으로 다음 환경 변수에서 읽습니다:
 
 ```python
 # os.environ["AWS_ACCESS_KEY_ID"] = "..."
@@ -48,26 +48,26 @@ Alternatively, `ChatBedrockConverse` will read from the following environment va
 # os.environ["AWS_SESSION_TOKEN"] = "..."
 ```
 
-You'll also need to turn on model access for your account, which you can do by following [these instructions](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html).
+계정에 대한 모델 액세스를 활성화해야 하며, [이 지침](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html)을 따라 수행할 수 있습니다.
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
 
 ```python
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 # os.environ["LANGSMITH_TRACING"] = "true"
 ```
 
-### Installation
+### 설치
 
-The LangChain Bedrock integration lives in the `langchain-aws` package:
+LangChain Bedrock 통합은 `langchain-aws` 패키지에 있습니다:
 
 ```python
 %pip install -qU langchain-aws
 ```
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
 
 ```python
 from langchain_aws import ChatBedrockConverse
@@ -84,7 +84,7 @@ llm = ChatBedrockConverse(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 messages = [
@@ -110,9 +110,9 @@ print(ai_msg.content)
 J'adore la programmation.
 ```
 
-### Streaming
+### 스트리밍
 
-Note that `ChatBedrockConverse` emits content blocks while streaming:
+`ChatBedrockConverse`는 스트리밍하는 동안 콘텐츠 블록을 방출합니다:
 
 ```python
 for chunk in llm.stream(messages):
@@ -129,7 +129,7 @@ content=[] additional_kwargs={} response_metadata={'stopReason': 'end_turn'} id=
 content=[] additional_kwargs={} response_metadata={'metrics': {'latencyMs': 600}, 'model_name': 'anthropic.claude-3-5-sonnet-20240620-v1:0'} id='run-d0e0836e-7146-4c3d-97c7-ad23dac6febd' usage_metadata={'input_tokens': 29, 'output_tokens': 11, 'total_tokens': 40, 'input_token_details': {'cache_creation': 0, 'cache_read': 0}}
 ```
 
-You can filter to text using the [.text](https://python.langchain.com/api_reference/core/messages/langchain_core.messages.ai.AIMessage.html#langchain_core.messages.ai.AIMessage.text) property on the output:
+출력에서 [.text](https://python.langchain.com/api_reference/core/messages/langchain_core.messages.ai.AIMessage.html#langchain_core.messages.ai.AIMessage.text) 속성을 사용하여 텍스트를 필터링할 수 있습니다:
 
 ```python
 for chunk in llm.stream(messages):
@@ -142,11 +142,11 @@ for chunk in llm.stream(messages):
 
 ## Extended Thinking
 
-This guide focuses on implementing Extended Thinking using AWS Bedrock with LangChain's `ChatBedrockConverse` integration.
+이 가이드는 LangChain의 `ChatBedrockConverse` 통합과 함께 AWS Bedrock을 사용하여 Extended Thinking을 구현하는 데 중점을 둡니다.
 
-### Supported Models
+### 지원되는 모델
 
-Extended Thinking is available for the following Claude models on AWS Bedrock:
+AWS Bedrock의 다음 Claude 모델에서 Extended Thinking을 사용할 수 있습니다:
 
 | Model | Model ID |
 |-------|----------|
@@ -177,9 +177,9 @@ ai_msg.content_blocks
  {'type': 'text', 'text': "J'aime la programmation."}]
 ```
 
-### How extended thinking works
+### Extended Thinking 작동 방식
 
-When extended thinking is turned on, Claude creates thinking content blocks where it outputs its internal reasoning. Claude incorporates insights from this reasoning before crafting a final response. The API response will include thinking content blocks, followed by text content blocks.
+Extended Thinking이 활성화되면 Claude는 내부 추론을 출력하는 사고 콘텐츠 블록을 생성합니다. Claude는 최종 응답을 작성하기 전에 이 추론에서 얻은 통찰력을 통합합니다. API 응답에는 사고 콘텐츠 블록과 텍스트 콘텐츠 블록이 포함됩니다.
 
 ```python
 next_messages = messages + [("ai", ai_msg.content), ("human", "I love AI")]
@@ -195,16 +195,16 @@ ai_msg.content_blocks
  {'type': 'text', 'text': "J'aime l'IA."}]
 ```
 
-## Prompt caching
+## 프롬프트 캐싱
 
-Bedrock supports [caching](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html) of elements of your prompts, including messages and tools. This allows you to re-use large documents, instructions, [few-shot documents](/langsmith/create-few-shot-evaluators), and other data to reduce latency and costs.
+Bedrock은 메시지 및 도구를 포함한 프롬프트 요소의 [캐싱](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html)을 지원합니다. 이를 통해 대용량 문서, 지침, [퓨샷 문서](/langsmith/create-few-shot-evaluators) 및 기타 데이터를 재사용하여 지연 시간과 비용을 줄일 수 있습니다.
 
 <Note>
-**Not all models support prompt caching. See supported models [here](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html#prompt-caching-models).**
+**모든 모델이 프롬프트 캐싱을 지원하는 것은 아닙니다. 지원되는 모델은 [여기](https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-caching.html#prompt-caching-models)를 참조하세요.**
 
 </Note>
 
-To enable caching on an element of a prompt, mark its associated content block using the `cachePoint` key. See example below:
+프롬프트 요소에서 캐싱을 활성화하려면 `cachePoint` 키를 사용하여 관련 콘텐츠 블록을 표시하세요. 아래 예제를 참조하세요:
 
 ```python
 import requests
@@ -255,12 +255,11 @@ Second:
 {'cache_creation': 0, 'cache_read': 1528}
 ```
 
-## Citations
+## 인용
 
-Citations can be generated if they are enabled on input documents. Documents can be
-specified in Bedrock's
-[native format](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_DocumentBlock.html)
-or LangChain's [standard types](/oss/python/langchain/messages#multimodal):
+입력 문서에서 활성화된 경우 인용을 생성할 수 있습니다. 문서는 Bedrock의
+[네이티브 형식](https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_DocumentBlock.html)
+또는 LangChain의 [표준 타입](/oss/python/langchain/messages#multimodal)으로 지정할 수 있습니다:
 
 <CodeGroup>
 ```python Bedrock format
@@ -330,11 +329,11 @@ response.content_blocks
 ```
 </CodeGroup>
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all ChatBedrock features and configurations head to the API reference: [python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock.ChatBedrock.html](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock.ChatBedrock.html)
+모든 ChatBedrock 기능 및 구성에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock.ChatBedrock.html](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock.ChatBedrock.html)
 
-For detailed documentation of all ChatBedrockConverse features and configurations head to the API reference: [python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html)
+모든 ChatBedrockConverse 기능 및 구성에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html](https://python.langchain.com/api_reference/aws/chat_models/langchain_aws.chat_models.bedrock_converse.ChatBedrockConverse.html)
 
 ---
 

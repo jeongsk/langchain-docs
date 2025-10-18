@@ -6,25 +6,25 @@ title: ChatWatsonx
 
 The aim of these examples is to show how to communicate with `watsonx.ai` models using `LangChain` LLMs API.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/ibm/) | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatWatsonx](https://python.langchain.com/api_reference/ibm/chat_models/langchain_ibm.chat_models.ChatWatsonx.html) | [langchain-ibm](https://python.langchain.com/api_reference/ibm/index.html) | ❌ | ❌ | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-ibm?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-ibm?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
 | [Tool calling](/oss/python/langchain/tools/) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | Image input | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming/) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ | ✅ |
 
-## Setup
+## 설정
 
 To access IBM watsonx.ai models you'll need to create an IBM watsonx.ai account, get an API key, and install the `langchain-ibm` integration package.
 
-### Credentials
+### 자격 증명
 
 The cell below defines the credentials required to work with watsonx Foundation Model inferencing.
 
@@ -51,7 +51,7 @@ os.environ["WATSONX_USERNAME"] = "your username for accessing the CPD cluster"
 os.environ["WATSONX_INSTANCE_ID"] = "your instance_id for accessing the CPD cluster"
 ```
 
-### Installation
+### 설치
 
 The LangChain IBM integration lives in the `langchain-ibm` package:
 
@@ -59,7 +59,7 @@ The LangChain IBM integration lives in the `langchain-ibm` package:
 !pip install -qU langchain-ibm
 ```
 
-## Instantiation
+## 인스턴스화
 
 You might need to adjust model `parameters` for different models or tasks. For details, refer to [Available TextChatParameters](https://ibm.github.io/watsonx-ai-python-sdk/fm_schema.html#ibm_watsonx_ai.foundation_models.schema.TextChatParameters).
 
@@ -131,7 +131,7 @@ chat = ChatWatsonx(
 )
 ```
 
-## Invocation
+## 호출
 
 To obtain completions, you can call the model directly using a string prompt.
 
@@ -172,7 +172,7 @@ chat.invoke([system_message, human_message])
 AIMessage(content='horses are quadrupedal mammals that are members of the family Equidae. They are typically farm animals, competing in horse racing and other forms of equine competition. With over 200 breeds, horses are diverse in their physical appearance and behavior. They are intelligent, social animals that are often used for transportation, food, and entertainment.', additional_kwargs={}, response_metadata={'token_usage': {'completion_tokens': 89, 'prompt_tokens': 29, 'total_tokens': 118}, 'model_name': 'ibm/granite-34b-code-instruct', 'system_fingerprint': '', 'finish_reason': 'stop'}, id='chat-9a6e28abb3d448aaa4f83b677a9fd653', usage_metadata={'input_tokens': 29, 'output_tokens': 89, 'total_tokens': 118})
 ```
 
-## Chaining
+## 체이닝
 
 Create `ChatPromptTemplate` objects which will be responsible for creating a random question.
 
@@ -203,7 +203,7 @@ chain.invoke(
 AIMessage(content='Ich liebe Python.', additional_kwargs={}, response_metadata={'token_usage': {'completion_tokens': 7, 'prompt_tokens': 28, 'total_tokens': 35}, 'model_name': 'ibm/granite-34b-code-instruct', 'system_fingerprint': '', 'finish_reason': 'stop'}, id='chat-fef871190b6047a7a3e68c58b3810c33', usage_metadata={'input_tokens': 28, 'output_tokens': 7, 'total_tokens': 35})
 ```
 
-## Streaming the Model output
+## 모델 출력 스트리밍
 
 You can stream the model output.
 
@@ -221,7 +221,7 @@ for chunk in chat.stream([system_message, human_message]):
 The Moon is the fifth largest moon in the solar system and the largest relative to its host planet. It is the fifth brightest object in Earth's night sky after the Sun, the stars, the Milky Way, and the Moon itself. It orbits around the Earth at an average distance of 238,855 miles (384,400 kilometers). The Moon's gravity is about one-sixthth of Earth's and thus allows for the formation of tides on Earth. The Moon is thought to have formed around 4.5 billion years ago from debris from a collision between Earth and a Mars-sized body named Theia. The Moon is effectively immutable, with its current characteristics remaining from formation. Aside from Earth, the Moon is the only other natural satellite of Earth. The most widely accepted theory is that it formed from the debris of a collision
 ```
 
-## Batch the Model output
+## 모델 출력 배칭
 
 You can batch the model output.
 
@@ -247,7 +247,7 @@ chat.batch([message_1, message_2])
  AIMessage(content='Dogs are domesticated animals that belong to the Canidae family, also known as wolves. They are one of the most popular pets worldwide, known for their loyalty and affection towards their owners. Dogs come in various breeds, each with unique characteristics, and are trained for different purposes such as hunting, herding, or guarding. They require a lot of exercise and mental stimulation to stay healthy and happy, and they need proper training and socialization to be well-behaved. Dogs are also known for their playful and energetic nature, making them great companions for people of all ages.', additional_kwargs={}, response_metadata={'token_usage': {'completion_tokens': 144, 'prompt_tokens': 28, 'total_tokens': 172}, 'model_name': 'ibm/granite-34b-code-instruct', 'system_fingerprint': '', 'finish_reason': 'stop'}, id='chat-cae7663c50cf4f3499726821cc2f0ec7', usage_metadata={'input_tokens': 28, 'output_tokens': 144, 'total_tokens': 172})]
 ```
 
-## Tool calling
+## 도구 호출
 
 ### ChatWatsonx.bind_tools()
 
@@ -305,7 +305,7 @@ ai_msg.tool_calls
   'type': 'tool_call'}]
 ```
 
-## API reference
+## API 참조
 
 For detailed documentation of all `ChatWatsonx` features and configurations head to the [API reference](https://python.langchain.com/api_reference/ibm/chat_models/langchain_ibm.chat_models.ChatWatsonx.html).
 

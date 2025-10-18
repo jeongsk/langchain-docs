@@ -2,19 +2,19 @@
 title: Cohere
 ---
 
-This notebook covers how to get started with [Cohere chat models](https://cohere.com/chat).
+이 노트북은 [Cohere 채팅 모델](https://cohere.com/chat) 시작하기를 다룹니다.
 
-Head to the [API reference](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.cohere.ChatCohere.html) for detailed documentation of all attributes and methods.
+모든 속성 및 메서드에 대한 자세한 문서는 [API 레퍼런스](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.cohere.ChatCohere.html)를 참조하세요.
 
-## Setup
+## 설정
 
-The integration lives in the `langchain-cohere` package. We can install these with:
+통합은 `langchain-cohere` 패키지에 있습니다. 다음과 같이 설치할 수 있습니다:
 
 ```bash
 pip install -U langchain-cohere
 ```
 
-We'll also need to get a [Cohere API key](https://cohere.com/) and set the `COHERE_API_KEY` environment variable:
+[Cohere API 키](https://cohere.com/)를 받아 `COHERE_API_KEY` 환경 변수를 설정해야 합니다:
 
 ```python
 import getpass
@@ -23,16 +23,16 @@ import os
 os.environ["COHERE_API_KEY"] = getpass.getpass()
 ```
 
-It's also helpful (but not needed) to set up [LangSmith](https://smith.langchain.com/) for best-in-class observability
+최고 수준의 관찰 기능을 위해 [LangSmith](https://smith.langchain.com/)를 설정하는 것도 도움이 됩니다(필수는 아님):
 
 ```python
 # os.environ["LANGSMITH_TRACING"] = "true"
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 ```
 
-## Usage
+## 사용법
 
-ChatCohere supports all [ChatModel](/oss/python/langchain/models) functionality:
+ChatCohere는 모든 [ChatModel](/oss/python/langchain/models) 기능을 지원합니다:
 
 ```python
 from langchain_cohere import ChatCohere
@@ -77,9 +77,9 @@ chat.batch([messages])
 [AIMessage(content='4 && 5', additional_kwargs={'documents': None, 'citations': None, 'search_results': None, 'search_queries': None, 'is_search_required': None, 'generation_id': '6770ca86-f6c3-4ba3-a285-c4772160612f', 'token_count': {'prompt_tokens': 68, 'response_tokens': 3, 'total_tokens': 71, 'billed_tokens': 57}}, response_metadata={'documents': None, 'citations': None, 'search_results': None, 'search_queries': None, 'is_search_required': None, 'generation_id': '6770ca86-f6c3-4ba3-a285-c4772160612f', 'token_count': {'prompt_tokens': 68, 'response_tokens': 3, 'total_tokens': 71, 'billed_tokens': 57}}, id='run-8d6fade2-1b39-4e31-ab23-4be622dd0027-0')]
 ```
 
-## Tool calling
+## 도구 호출
 
-Cohere supports tool calling functionalities!
+Cohere는 도구 호출 기능을 지원합니다!
 
 ```python
 from langchain.messages import (

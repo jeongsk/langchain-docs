@@ -2,19 +2,19 @@
 title: ChatOctoAI
 ---
 
-[OctoAI](https://docs.octoai.cloud/docs) offers easy access to efficient compute and enables users to integrate their choice of AI models into applications. The `OctoAI` compute service helps you run, tune, and scale AI applications easily.
+[OctoAI](https://docs.octoai.cloud/docs)는 효율적인 컴퓨팅에 대한 간편한 액세스를 제공하며 사용자가 선택한 AI 모델을 애플리케이션에 통합할 수 있도록 합니다. `OctoAI` 컴퓨팅 서비스는 AI 애플리케이션을 쉽게 실행, 튜닝 및 확장할 수 있도록 도와줍니다.
 
-This notebook demonstrates the use of `langchain.chat_models.ChatOctoAI` for [OctoAI endpoints](https://octoai.cloud/text).
+이 노트북은 [OctoAI 엔드포인트](https://octoai.cloud/text)에 대한 `langchain.chat_models.ChatOctoAI` 사용법을 보여줍니다.
 
-## Setup
+## 설정
 
-To run our example app, there are two simple steps to take:
+예제 앱을 실행하려면 다음 두 가지 간단한 단계를 수행하세요:
 
-1. Get an API Token from [your OctoAI account page](https://octoai.cloud/settings).
+1. [OctoAI 계정 페이지](https://octoai.cloud/settings)에서 API 토큰을 가져옵니다.
 
-2. Paste your API token in the code cell below or use the `octoai_api_token` keyword argument.
+2. 아래 코드 셀에 API 토큰을 붙여넣거나 `octoai_api_token` 키워드 인수를 사용합니다.
 
-Note: If you want to use a different model than the [available models](https://octoai.cloud/text?selectedTags=Chat), you can containerize the model and make a custom OctoAI endpoint yourself, by following [Build a Container from Python](https://octo.ai/docs/bring-your-own-model/advanced-build-a-container-from-scratch-in-python) and [Create a Custom Endpoint from a Container](https://octo.ai/docs/bring-your-own-model/create-custom-endpoints-from-a-container/create-custom-endpoints-from-a-container) and then updating your `OCTOAI_API_BASE` environment variable.
+참고: [사용 가능한 모델](https://octoai.cloud/text?selectedTags=Chat)과 다른 모델을 사용하려면 [Python에서 컨테이너 빌드](https://octo.ai/docs/bring-your-own-model/advanced-build-a-container-from-scratch-in-python) 및 [컨테이너에서 커스텀 엔드포인트 생성](https://octo.ai/docs/bring-your-own-model/create-custom-endpoints-from-a-container/create-custom-endpoints-from-a-container)을 참조하여 모델을 컨테이너화하고 직접 커스텀 OctoAI 엔드포인트를 만든 다음 `OCTOAI_API_BASE` 환경 변수를 업데이트할 수 있습니다.
 
 ```python
 import os
@@ -27,7 +27,7 @@ from langchain_community.chat_models import ChatOctoAI
 from langchain.messages import HumanMessage, SystemMessage
 ```
 
-## Example
+## 예제
 
 ```python
 chat = ChatOctoAI(max_tokens=300, model_name="mixtral-8x7b-instruct")

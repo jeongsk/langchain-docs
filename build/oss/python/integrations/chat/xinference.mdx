@@ -2,44 +2,43 @@
 title: ChatXinference
 ---
 
-[Xinference](https://github.com/xorbitsai/inference) is a powerful and versatile library designed to serve LLMs,
-speech recognition models, and multimodal models, even on your laptop. It supports a variety of models compatible with GGML, such as chatglm, baichuan, whisper, vicuna, orca, and many others.
+[Xinference](https://github.com/xorbitsai/inference)는 노트북에서도 LLM, 음성 인식 모델, 멀티모달 모델을 서빙할 수 있도록 설계된 강력하고 다재다능한 라이브러리입니다. chatglm, baichuan, whisper, vicuna, orca 등 GGML과 호환되는 다양한 모델을 지원합니다.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | [JS support] | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | ChatXinference| langchain-xinference | ✅ | ❌ | ✅ | ✅ | ✅ |
 
-### Model features
+### 모델 기능
 
 | [Tool calling](/oss/python/langchain/tools/) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | [Image input](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming/) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
 | :---: |:----------------------------------------------------:| :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ |                          ✅                           | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ |
 
-## Setup
+## 설정
 
-Install `Xinference` through PyPI:
+PyPI를 통해 `Xinference`를 설치하세요:
 
 ```python
 %pip install -qU  "xinference[all]"
 ```
 
-### Deploy Xinference Locally or in a Distributed Cluster
+### Xinference를 로컬 또는 분산 클러스터에 배포
 
-For local deployment, run `xinference`.
+로컬 배포의 경우 `xinference`를 실행하세요.
 
-To deploy Xinference in a cluster, first start an Xinference supervisor using the `xinference-supervisor`. You can also use the option -p to specify the port and -H to specify the host. The default port is 8080 and the default host is 0.0.0.0.
+클러스터에 Xinference를 배포하려면 먼저 `xinference-supervisor`를 사용하여 Xinference 슈퍼바이저를 시작하세요. -p 옵션으로 포트를 지정하고 -H 옵션으로 호스트를 지정할 수도 있습니다. 기본 포트는 8080이고 기본 호스트는 0.0.0.0입니다.
 
-Then, start the Xinference workers using `xinference-worker` on each server you want to run them on.
+그런 다음 실행하려는 각 서버에서 `xinference-worker`를 사용하여 Xinference 워커를 시작하세요.
 
-You can consult the README file from [Xinference](https://github.com/xorbitsai/inference) for more information.
+자세한 내용은 [Xinference](https://github.com/xorbitsai/inference)의 README 파일을 참조하세요.
 
-### Wrapper
+### 래퍼
 
-To use Xinference with LangChain, you need to first launch a model. You can use command line interface (CLI) to do so:
+LangChain과 함께 Xinference를 사용하려면 먼저 모델을 실행해야 합니다. 명령줄 인터페이스(CLI)를 사용하여 다음과 같이 할 수 있습니다:
 
 ```python
 %xinference launch -n vicuna-v1.3 -f ggmlv3 -q q4_0
@@ -49,21 +48,21 @@ To use Xinference with LangChain, you need to first launch a model. You can use 
 Model uid: 7167b2b0-2a04-11ee-83f0-d29396a3f064
 ```
 
-A model UID is returned for you to use. Now you can use Xinference with LangChain:
+사용할 모델 UID가 반환됩니다. 이제 LangChain과 함께 Xinference를 사용할 수 있습니다:
 
-## Installation
+## 설치
 
-The LangChain Xinference integration lives in the `langchain-xinference` package:
+LangChain Xinference 통합은 `langchain-xinference` 패키지에 있습니다:
 
 ```python
 %pip install -qU langchain-xinference
 ```
 
-Make sure you're using the latest Xinference version for structured outputs.
+구조화된 출력을 위해 최신 Xinference 버전을 사용하고 있는지 확인하세요.
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
 
 ```python
 from langchain_xinference.chat_models import ChatXinference
@@ -78,7 +77,7 @@ llm.invoke(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 from langchain.messages import HumanMessage, SystemMessage
@@ -94,9 +93,9 @@ human_message = "I love programming."
 llm.invoke([HumanMessage(content=human_message), SystemMessage(content=system_message)])
 ```
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all ChatXinference features and configurations head to the API reference: [github.com/TheSongg/langchain-xinference](https://github.com/TheSongg/langchain-xinference)
+모든 ChatXinference 기능과 구성에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [github.com/TheSongg/langchain-xinference](https://github.com/TheSongg/langchain-xinference)
 
 ---
 

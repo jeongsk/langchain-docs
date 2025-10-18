@@ -1,9 +1,9 @@
 ---
 title: ChatTongyi
 ---
-Tongyi Qwen is a large language model developed by Alibaba's Damo Academy. It is capable of understanding user intent through natural language understanding and semantic analysis, based on user input in natural language. It provides services and assistance to users in different domains and tasks. By providing clear and detailed instructions, you can obtain results that better align with your expectations.
-In this notebook, we will introduce how to use langchain with [Tongyi](https://www.aliyun.com/product/dashscope) mainly in `Chat` corresponding
- to the package `langchain/chat_models` in langchain
+Tongyi Qwen은 Alibaba의 Damo Academy에서 개발한 대규모 언어 모델입니다. 자연어 이해 및 의미 분석을 통해 자연어로 입력된 사용자 입력을 기반으로 사용자 의도를 이해할 수 있습니다. 다양한 도메인과 작업에서 사용자에게 서비스와 지원을 제공합니다. 명확하고 상세한 지침을 제공하면 기대에 더 부합하는 결과를 얻을 수 있습니다.
+이 노트북에서는 langchain에서 [Tongyi](https://www.aliyun.com/product/dashscope)를 주로 `Chat`으로 사용하는 방법을 소개하며,
+langchain의 `langchain/chat_models` 패키지에 해당합니다.
 
 ```python
 # Install the package
@@ -69,9 +69,9 @@ AIMessage(content="J'adore programmer.", response_metadata={'model_name': 'qwen-
 
 ## Tool Calling
 
-ChatTongyi supports tool calling API that lets you describe tools and their arguments, and have the model return a JSON object with a tool to invoke and the inputs to that tool.
+ChatTongyi는 도구와 해당 인수를 설명하고, 모델이 호출할 도구와 해당 도구의 입력이 포함된 JSON 객체를 반환하도록 하는 tool calling API를 지원합니다.
 
-### Use with `bind_tools`
+### `bind_tools` 사용
 
 ```python
 from langchain_community.chat_models.tongyi import ChatTongyi
@@ -97,7 +97,7 @@ print(msg)
 content='' additional_kwargs={'tool_calls': [{'function': {'name': 'multiply', 'arguments': '{"first_int": 5, "second_int": 42}'}, 'id': '', 'type': 'function'}]} response_metadata={'model_name': 'qwen-turbo', 'finish_reason': 'tool_calls', 'request_id': '4acf0e36-44af-987a-a0c0-8b5c5eaa1a8b', 'token_usage': {'input_tokens': 200, 'output_tokens': 25, 'total_tokens': 225}} id='run-0ecd0f09-1d20-4e55-a4f3-f14d1f710ae7-0' tool_calls=[{'name': 'multiply', 'args': {'first_int': 5, 'second_int': 42}, 'id': ''}]
 ```
 
-### Construct args manually
+### 인수를 수동으로 구성
 
 ```python
 from langchain_community.chat_models.tongyi import ChatTongyi
@@ -122,7 +122,7 @@ tools = [
                 "properties": {
                     "location": {
                         "type": "string",
-                        "description": "城市或县区，比如北京市、杭州市、余杭区等。",
+                        "description": "城市或县区,比如北京市、杭州市、余杭区等。",
                     }
                 },
             },
@@ -147,7 +147,7 @@ AIMessage(content='', additional_kwargs={'tool_calls': [{'function': {'name': 'g
 
 ## Partial Mode
 
-Enable the large model to continue generating content from the initial text you provide.
+제공한 초기 텍스트에서 대규모 모델이 콘텐츠를 계속 생성하도록 활성화합니다.
 
 ```python
 from langchain_community.chat_models.tongyi import ChatTongyi
@@ -172,7 +172,7 @@ AIMessage(content=' has cast off its heavy cloak of snow, donning instead a vibr
 
 ## Tongyi With Vision
 
-Qwen-VL(qwen-vl-plus/qwen-vl-max) are models that can process images.
+Qwen-VL(qwen-vl-plus/qwen-vl-max)은 이미지를 처리할 수 있는 모델입니다.
 
 ```python
 from langchain_community.chat_models import ChatTongyi

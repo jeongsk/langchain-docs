@@ -2,35 +2,35 @@
 title: ChatBaseten
 ---
 
-This guide provides a quick overview for getting started with the Baseten [chat model](/oss/python/langchain/models). For a detailed listing of all ChatBaseten features, parameters, and configurations, head to the [ChatBaseten API reference](https://python.langchain.com/api_reference/baseten/chat_models/langchain_baseten.chat_models.ChatBaseten.html).
+이 가이드는 Baseten [채팅 모델](/oss/python/langchain/models) 시작하기에 대한 간략한 개요를 제공합니다. ChatBaseten의 모든 기능, 매개변수 및 설정에 대한 자세한 목록은 [ChatBaseten API 레퍼런스](https://python.langchain.com/api_reference/baseten/chat_models/langchain_baseten.chat_models.ChatBaseten.html)를 참조하세요.
 
-Baseten provides inference designed for production applications. Built on the Baseten Inference Stack, these APIs deliver enterprise-grade performance and reliability for leading open-source or custom models: https://www.baseten.co/library/.
+Baseten은 프로덕션 애플리케이션을 위해 설계된 추론을 제공합니다. Baseten Inference Stack을 기반으로 구축된 이러한 API는 주요 오픈소스 또는 사용자 정의 모델에 대해 엔터프라이즈급 성능과 안정성을 제공합니다: https://www.baseten.co/library/.
 
-## Overview
+## 개요
 
-### Details
+### 세부 정보
 
 | Class | Package | Local | Serializable | JS support | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatBaseten](https://python.langchain.com/api_reference/baseten/chat_models/langchain_baseten.chat_models.ChatBaseten.html) | [langchain-baseten](https://python.langchain.com/api_reference/baseten/index.html) | ❌ | beta | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-baseten?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-baseten?style=flat-square&label=%20) |
 
-### Features
+### 기능
 
 | [Tool calling](/oss/python/langchain/tools) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | [Image input](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming/) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ |
 
-Model APIs only support text input, while some dedicated deployments support image and audio input depending on model. Check the Baseten model library for details: https://www.baseten.co/library/
+Model API는 텍스트 입력만 지원하지만, 일부 전용 배포는 모델에 따라 이미지 및 오디오 입력을 지원합니다. 자세한 내용은 Baseten 모델 라이브러리를 확인하세요: https://www.baseten.co/library/
 
 ---
 
-## Setup
+## 설정
 
-To access Baseten models, you'll need to create a Baseten account, get an API key, and install the `langchain-baseten` integration package.
+Baseten 모델에 액세스하려면 Baseten 계정을 생성하고, API 키를 발급받고, `langchain-baseten` 통합 패키지를 설치해야 합니다.
 
-Head to [this page](https://app.baseten.co) to create an account with Baseten and generate an API key. Once you've done this, set the BASETEN_API_KEY environment variable:
+[이 페이지](https://app.baseten.co)로 이동하여 Baseten 계정을 생성하고 API 키를 생성하세요. 완료한 후 BASETEN_API_KEY 환경 변수를 설정하세요:
 
-### Credentials
+### 자격 증명
 
 ```python Set API key icon="key"
 import getpass
@@ -40,16 +40,16 @@ if "BASETEN_API_KEY" not in os.environ:
     os.environ["BASETEN_API_KEY"] = getpass.getpass("Enter your Baseten API key: ")
 ```
 
-To enable automated <Tooltip tip="Log each step of a model's execution to debug and improve it">tracing</Tooltip> of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 <Tooltip tip="모델 실행의 각 단계를 로그하여 디버그하고 개선합니다">추적</Tooltip>을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
 
 ```python Enable tracing icon="flask"
 os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 os.environ["LANGSMITH_TRACING"] = "true"
 ```
 
-### Installation
+### 설치
 
-The LangChain Baseten integration lives in the `langchain-baseten` package:
+LangChain Baseten 통합은 `langchain-baseten` 패키지에 있습니다:
 
 <CodeGroup>
     ```python pip
@@ -62,14 +62,14 @@ The LangChain Baseten integration lives in the `langchain-baseten` package:
 
 ---
 
-## Instantiation
+## 인스턴스화
 
-Baseten offers two ways to access chat models:
+Baseten은 채팅 모델에 액세스하는 두 가지 방법을 제공합니다:
 
-1. **Model APIs**: For access to the latest, most popular opensource models.
-2. **Dedicated URLs**: Use specific model deployments with dedicated resources.
+1. **Model API**: 최신 인기 오픈소스 모델에 액세스합니다.
+2. **전용 URL**: 전용 리소스를 사용하여 특정 모델 배포를 사용합니다.
 
-Both approaches are supported with automatic endpoint normalization.
+두 접근 방식 모두 자동 엔드포인트 정규화를 통해 지원됩니다.
 
 
 ```python Initialize with model slug icon="robot"
@@ -94,7 +94,7 @@ model = ChatBaseten(
 
 ---
 
-## Invocation
+## 호출
 
 ```python Basic invocation icon="play"
 # Use the chat model
@@ -106,7 +106,7 @@ print(response.content)
 content="Hello! I'm doing well, thank you for asking! How about you?" additional_kwargs={} response_metadata={'finish_reason': 'stop'} id='run--908651ec-00d7-4992-a320-864397c14e37-0'
 ```
 
-You can also use message objects for more complex conversations:
+더 복잡한 대화를 위해 메시지 객체를 사용할 수도 있습니다:
 
 <CodeGroup>
     ```python Dictionary format icon="book"
@@ -124,14 +124,14 @@ content='Buds yawn open wide—  \na robin stitches the hush  \nwith threads of 
 
 
 <Tip>
-    Full guides are available on [chat model invocation types](/oss/python/langchain/models#invocation), [message types](/oss/python/langchain/messages#message-types), and [content blocks](/oss/python/langchain/messages#standard-content-blocks).
+    [채팅 모델 호출 타입](/oss/python/langchain/models#invocation), [메시지 타입](/oss/python/langchain/messages#message-types), [콘텐츠 블록](/oss/python/langchain/messages#standard-content-blocks)에 대한 전체 가이드가 제공됩니다.
 </Tip>
 
 ---
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all ChatBaseten features and configurations, head to the [API reference](https://python.langchain.com/api_reference/baseten/chat_models/langchain_baseten.chat_models.ChatBaseten.html).
+ChatBaseten의 모든 기능과 설정에 대한 자세한 문서는 [API 레퍼런스](https://python.langchain.com/api_reference/baseten/chat_models/langchain_baseten.chat_models.ChatBaseten.html)를 참조하세요.
 
 ---
 

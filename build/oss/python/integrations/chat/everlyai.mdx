@@ -2,12 +2,12 @@
 title: ChatEverlyAI
 ---
 
->[EverlyAI](https://everlyai.xyz) allows you to run your ML models at scale in the cloud. It also provides API access to [several LLM models](https://everlyai.xyz).
+>[EverlyAI](https://everlyai.xyz)를 사용하면 클라우드에서 ML 모델을 규모에 맞게 실행할 수 있습니다. 또한 [여러 LLM 모델](https://everlyai.xyz)에 대한 API 접근을 제공합니다.
 
-This notebook demonstrates the use of `langchain.chat_models.ChatEverlyAI` for [EverlyAI Hosted Endpoints](https://everlyai.xyz/).
+이 노트북은 [EverlyAI Hosted Endpoints](https://everlyai.xyz/)를 위한 `langchain.chat_models.ChatEverlyAI` 사용을 시연합니다.
 
-* Set `EVERLYAI_API_KEY` environment variable
-* or use the `everlyai_api_key` keyword argument
+* `EVERLYAI_API_KEY` 환경 변수 설정
+* 또는 `everlyai_api_key` 키워드 인수 사용
 
 ```python
 %pip install -qU  langchain-openai
@@ -21,7 +21,7 @@ if "EVERLYAI_API_KEY" not in os.environ:
     os.environ["EVERLYAI_API_KEY"] = getpass()
 ```
 
-# Let's try out LLAMA model offered on EverlyAI Hosted Endpoints
+# EverlyAI Hosted Endpoints에서 제공하는 LLAMA 모델을 사용해 보겠습니다
 
 ```python
 from langchain_community.chat_models import ChatEverlyAI
@@ -44,7 +44,7 @@ print(chat(messages).content)
   Hello! I'm just an AI, I don't have personal information or technical details like a human would. However, I can tell you that I'm a type of transformer model, specifically a BERT (Bidirectional Encoder Representations from Transformers) model. B
 ```
 
-# EverlyAI also supports streaming responses
+# EverlyAI는 스트리밍 응답도 지원합니다
 
 ```python
 from langchain_community.chat_models import ChatEverlyAI
@@ -78,7 +78,7 @@ Because
 AIMessageChunk(content="  Ah, a joke, you say? *adjusts glasses* Well, I've got a doozy for you! *winks*\n *pauses for dramatic effect*\nWhy did the AI go to therapy?\n*drumroll*\nBecause")
 ```
 
-# Let's try a different language model on EverlyAI
+# EverlyAI에서 다른 언어 모델을 사용해 보겠습니다
 
 ```python
 from langchain_community.chat_models import ChatEverlyAI

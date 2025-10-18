@@ -2,9 +2,9 @@
 title: Upstash Ratelimit Callback
 ---
 
-In this guide, we will go over how to add rate limiting based on number of requests or the number of tokens using `UpstashRatelimitHandler`. This handler uses [ratelimit library of Upstash](https://github.com/upstash/ratelimit-py/), which utilizes [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted).
+이 가이드에서는 `UpstashRatelimitHandler`를 사용하여 요청 수 또는 토큰 수를 기반으로 속도 제한을 추가하는 방법을 다룹니다. 이 핸들러는 [Upstash의 ratelimit 라이브러리](https://github.com/upstash/ratelimit-py/)를 사용하며, 이는 [Upstash Redis](https://upstash.com/docs/redis/overall/getstarted)를 활용합니다.
 
-Upstash Ratelimit works by sending an HTTP request to Upstash Redis everytime the `limit` method is called. Remaining tokens/requests of the user are checked and updated. Based on the remaining tokens, we can stop the execution of costly operations like invoking an LLM or querying a vector store:
+Upstash Ratelimit은 `limit` 메서드가 호출될 때마다 Upstash Redis에 HTTP 요청을 보내는 방식으로 작동합니다. 사용자의 남은 토큰/요청이 확인되고 업데이트됩니다. 남은 토큰을 기반으로 LLM 호출이나 벡터 스토어 쿼리와 같은 비용이 많이 드는 작업의 실행을 중지할 수 있습니다:
 
 ```py
 response = ratelimit.limit()
@@ -12,26 +12,26 @@ if response.allowed:
     execute_costly_operation()
 ```
 
-`UpstashRatelimitHandler` allows you to incorporate the ratelimit logic into your chain in a few minutes.
+`UpstashRatelimitHandler`를 사용하면 몇 분 안에 속도 제한 로직을 체인에 통합할 수 있습니다.
 
-First, you will need to go to [the Upstash Console](https://console.upstash.com/login) and create a redis database ([see our docs](https://upstash.com/docs/redis/overall/getstarted)). After creating a database, you will need to set the environment variables:
+먼저, [Upstash 콘솔](https://console.upstash.com/login)로 이동하여 Redis 데이터베이스를 생성해야 합니다([문서 참조](https://upstash.com/docs/redis/overall/getstarted)). 데이터베이스를 생성한 후 환경 변수를 설정해야 합니다:
 
 ```
 UPSTASH_REDIS_REST_URL="****"
 UPSTASH_REDIS_REST_TOKEN="****"
 ```
 
-Next, you will need to install Upstash Ratelimit and Redis library with:
+다음으로, Upstash Ratelimit 및 Redis 라이브러리를 설치해야 합니다:
 
 ```
 pip install upstash-ratelimit upstash-redis
 ```
 
-You are now ready to add rate limiting to your chain!
+이제 체인에 속도 제한을 추가할 준비가 되었습니다!
 
-## Ratelimiting Per Request
+## 요청당 속도 제한
 
-Let's imagine that we want to allow our users to invoke our chain 10 times per minute. Achieving this is as simple as:
+사용자가 분당 10회 체인을 호출할 수 있도록 허용하려는 경우를 가정해 봅시다. 이를 달성하는 것은 다음과 같이 간단합니다:
 
 ```python
 # set env variables
@@ -73,30 +73,30 @@ Error in UpstashRatelimitHandler.on_chain_start callback: UpstashRatelimitError(
 Handling ratelimit. <class 'langchain_community.callbacks.upstash_ratelimit_callback.UpstashRatelimitError'>
 ```
 
-Note that we pass the handler to the `invoke` method instead of passing the handler when defining the chain.
+체인을 정의할 때가 아니라 `invoke` 메서드에 핸들러를 전달한다는 점에 유의하세요.
 
-For rate limiting algorithms other than `FixedWindow`, see [upstash-ratelimit docs](https://github.com/upstash/ratelimit-py?tab=readme-ov-file#ratelimiting-algorithms).
+`FixedWindow` 외의 속도 제한 알고리즘에 대해서는 [upstash-ratelimit 문서](https://github.com/upstash/ratelimit-py?tab=readme-ov-file#ratelimiting-algorithms)를 참조하세요.
 
-Before executing any steps in our pipeline, ratelimit will check whether the user has passed the request limit. If so, `UpstashRatelimitError` is raised.
+파이프라인의 어떤 단계든 실행하기 전에, ratelimit은 사용자가 요청 제한을 초과했는지 확인합니다. 초과한 경우 `UpstashRatelimitError`가 발생합니다.
 
-## Ratelimiting Per Token
+## 토큰당 속도 제한
 
-Another option is to rate limit chain invokations based on:
+또 다른 옵션은 다음을 기반으로 체인 호출에 속도 제한을 적용하는 것입니다:
 
-1. number of tokens in prompt
-2. number of tokens in prompt and LLM completion
+1. 프롬프트의 토큰 수
+2. 프롬프트와 LLM 완성의 토큰 수
 
-This only works if you have an LLM in your chain. Another requirement is that the LLM you are using should return the token usage in it's `LLMOutput`.
+이는 체인에 LLM이 있는 경우에만 작동합니다. 또 다른 요구 사항은 사용하는 LLM이 `LLMOutput`에서 토큰 사용량을 반환해야 한다는 것입니다.
 
-### How it works
+### 작동 방식
 
-The handler will get the remaining tokens before calling the LLM. If the remaining tokens is more than 0, LLM will be called. Otherwise `UpstashRatelimitError` will be raised.
+핸들러는 LLM을 호출하기 전에 남은 토큰을 가져옵니다. 남은 토큰이 0보다 많으면 LLM이 호출됩니다. 그렇지 않으면 `UpstashRatelimitError`가 발생합니다.
 
-After LLM is called, token usage information will be used to subtracted from the remaining tokens of the user. No error is raised at this stage of the chain.
+LLM이 호출된 후, 토큰 사용 정보는 사용자의 남은 토큰에서 차감되는 데 사용됩니다. 이 체인 단계에서는 오류가 발생하지 않습니다.
 
-### Configuration
+### 구성
 
-For the first configuration, simply initialize the handler like this:
+첫 번째 구성의 경우, 다음과 같이 핸들러를 초기화하세요:
 
 ```python
 ratelimit = Ratelimit(
@@ -108,7 +108,7 @@ ratelimit = Ratelimit(
 handler = UpstashRatelimitHandler(identifier=user_id, token_ratelimit=ratelimit)
 ```
 
-For the second configuration, here is how to initialize the handler:
+두 번째 구성의 경우, 핸들러를 다음과 같이 초기화하세요:
 
 ```python
 ratelimit = Ratelimit(
@@ -124,9 +124,9 @@ handler = UpstashRatelimitHandler(
 )
 ```
 
-You can also employ ratelimiting based on requests and tokens at the same time, simply by passing both `request_ratelimit` and `token_ratelimit` parameters.
+`request_ratelimit`과 `token_ratelimit` 매개변수를 모두 전달하여 요청과 토큰을 기반으로 한 속도 제한을 동시에 적용할 수도 있습니다.
 
-Here is an example with a chain utilizing an LLM:
+다음은 LLM을 활용하는 체인의 예제입니다:
 
 ```python
 # set env variables

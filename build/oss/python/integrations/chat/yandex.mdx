@@ -2,27 +2,27 @@
 title: ChatYandexGPT
 ---
 
-This notebook goes over how to use LangChain with [YandexGPT](https://cloud.yandex.com/en/services/yandexgpt) chat model.
+이 노트북은 LangChain을 [YandexGPT](https://cloud.yandex.com/en/services/yandexgpt) 채팅 모델과 함께 사용하는 방법을 다룹니다.
 
-To use, you should have the `yandexcloud` python package installed.
+사용하려면 `yandexcloud` Python 패키지가 설치되어 있어야 합니다.
 
 ```python
 %pip install -qU  yandexcloud
 ```
 
-First, you should [create service account](https://cloud.yandex.com/en/docs/iam/operations/sa/create) with the `ai.languageModels.user` role.
+먼저 `ai.languageModels.user` 역할로 [서비스 계정을 생성](https://cloud.yandex.com/en/docs/iam/operations/sa/create)해야 합니다.
 
-Next, you have two authentication options:
+다음으로 두 가지 인증 옵션이 있습니다:
 
-- [IAM token](https://cloud.yandex.com/en/docs/iam/operations/iam-token/create-for-sa).
-    You can specify the token in a constructor parameter `iam_token` or in an environment variable `YC_IAM_TOKEN`.
+- [IAM 토큰](https://cloud.yandex.com/en/docs/iam/operations/iam-token/create-for-sa).
+    생성자 매개변수 `iam_token` 또는 환경 변수 `YC_IAM_TOKEN`에 토큰을 지정할 수 있습니다.
 
-- [API key](https://cloud.yandex.com/en/docs/iam/operations/api-key/create)
-    You can specify the key in a constructor parameter `api_key` or in an environment variable `YC_API_KEY`.
+- [API 키](https://cloud.yandex.com/en/docs/iam/operations/api-key/create)
+    생성자 매개변수 `api_key` 또는 환경 변수 `YC_API_KEY`에 키를 지정할 수 있습니다.
 
-To specify the model you can use `model_uri` parameter, see [the documentation](https://cloud.yandex.com/en/docs/yandexgpt/concepts/models#yandexgpt-generation) for more details.
+모델을 지정하려면 `model_uri` 매개변수를 사용할 수 있습니다. 자세한 내용은 [문서](https://cloud.yandex.com/en/docs/yandexgpt/concepts/models#yandexgpt-generation)를 참조하세요.
 
-By default, the latest version of `yandexgpt-lite` is used from the folder specified in the parameter `folder_id` or `YC_FOLDER_ID` environment variable.
+기본적으로 매개변수 `folder_id` 또는 `YC_FOLDER_ID` 환경 변수에 지정된 폴더의 최신 버전 `yandexgpt-lite`가 사용됩니다.
 
 ```python
 from langchain_community.chat_models import ChatYandexGPT

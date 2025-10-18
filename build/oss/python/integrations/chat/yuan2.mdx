@@ -2,44 +2,44 @@
 title: Yuan2.0
 ---
 
-This notebook shows how to use [YUAN2 API](https://github.com/IEIT-Yuan/Yuan-2.0/blob/main/docs/inference_server.md) in LangChain with the langchain.chat_models.ChatYuan2.
+이 노트북은 langchain.chat_models.ChatYuan2를 사용하여 LangChain에서 [YUAN2 API](https://github.com/IEIT-Yuan/Yuan-2.0/blob/main/docs/inference_server.md)를 사용하는 방법을 보여줍니다.
 
-[*Yuan2.0*](https://github.com/IEIT-Yuan/Yuan-2.0/blob/main/README-EN.md) is a new generation Fundamental Large Language Model developed by IEIT System. We have published all three models, Yuan 2.0-102B, Yuan 2.0-51B, and Yuan 2.0-2B. And we provide relevant scripts for pretraining, fine-tuning, and inference services for other developers. Yuan2.0 is based on Yuan1.0, utilizing a wider range of high-quality pre training data and instruction fine-tuning datasets to enhance the model's understanding of semantics, mathematics, reasoning, code, knowledge, and other aspects.
+[*Yuan2.0*](https://github.com/IEIT-Yuan/Yuan-2.0/blob/main/README-EN.md)은 IEIT System에서 개발한 차세대 기본 대규모 언어 모델입니다. Yuan 2.0-102B, Yuan 2.0-51B, Yuan 2.0-2B 세 가지 모델을 모두 공개했습니다. 다른 개발자를 위해 사전 학습, 미세 조정 및 추론 서비스에 대한 관련 스크립트를 제공합니다. Yuan2.0은 Yuan1.0을 기반으로 하며, 더 광범위한 고품질 사전 학습 데이터와 지시사항 미세 조정 데이터세트를 활용하여 의미론, 수학, 추론, 코드, 지식 및 기타 측면에 대한 모델의 이해를 향상시킵니다.
 
-## Getting started
+## 시작하기
 
-### Installation
+### 설치
 
-First, Yuan2.0 provided an OpenAI compatible API, and we integrate ChatYuan2 into langchain chat model by using OpenAI client.
-Therefore, ensure the openai package is installed in your Python environment. Run the following command:
+먼저 Yuan2.0은 OpenAI 호환 API를 제공하며, OpenAI 클라이언트를 사용하여 ChatYuan2를 langchain 채팅 모델에 통합합니다.
+따라서 Python 환경에 openai 패키지가 설치되어 있는지 확인하세요. 다음 명령을 실행하세요:
 
 ```python
 %pip install -qU openai
 ```
 
-### Importing the Required Modules
+### 필수 모듈 가져오기
 
-After installation, import the necessary modules to your Python script:
+설치 후 Python 스크립트에 필요한 모듈을 가져오세요:
 
 ```python
 from langchain_community.chat_models import ChatYuan2
 from langchain.messages import AIMessage, HumanMessage, SystemMessage
 ```
 
-### Setting Up Your API server
+### API 서버 설정
 
-Setting up your OpenAI compatible API server following [yuan2 openai api server](https://github.com/IEIT-Yuan/Yuan-2.0/blob/main/docs/Yuan2_fastchat.md).
-If you deployed api server locally, you can simply set `yuan2_api_key="EMPTY"` or anything you want.
-Just make sure, the `yuan2_api_base` is set correctly.
+[yuan2 openai api server](https://github.com/IEIT-Yuan/Yuan-2.0/blob/main/docs/Yuan2_fastchat.md)를 따라 OpenAI 호환 API 서버를 설정하세요.
+API 서버를 로컬에 배포한 경우 `yuan2_api_key="EMPTY"` 또는 원하는 값으로 간단히 설정할 수 있습니다.
+`yuan2_api_base`가 올바르게 설정되어 있는지 확인하세요.
 
 ```python
 yuan2_api_key = "your_api_key"
 yuan2_api_base = "http://127.0.0.1:8001/v1"
 ```
 
-### Initialize the ChatYuan2 Model
+### ChatYuan2 모델 초기화
 
-Here's how to initialize the chat model:
+채팅 모델을 초기화하는 방법은 다음과 같습니다:
 
 ```python
 chat = ChatYuan2(
@@ -51,14 +51,14 @@ chat = ChatYuan2(
 )
 ```
 
-### Basic Usage
+### 기본 사용법
 
-Invoke the model with system and human messages like this:
+다음과 같이 시스템 및 사람 메시지로 모델을 호출하세요:
 
 ```python
 messages = [
     SystemMessage(content="你是一个人工智能助手。"),
-    HumanMessage(content="你好，你是谁？"),
+    HumanMessage(content="你好,你是谁?"),
 ]
 ```
 
@@ -66,9 +66,9 @@ messages = [
 print(chat.invoke(messages))
 ```
 
-### Basic Usage with streaming
+### 스트리밍을 사용한 기본 사용법
 
-For continuous interaction, use the streaming feature:
+지속적인 상호작용을 위해 스트리밍 기능을 사용하세요:
 
 ```python
 from langchain_core.callbacks import StreamingStdOutCallbackHandler
@@ -91,11 +91,11 @@ messages = [
 chat.invoke(messages)
 ```
 
-## Advanced Features
+## 고급 기능
 
-### Usage with async calls
+### 비동기 호출과 함께 사용
 
-Invoke the model with non-blocking calls, like this:
+다음과 같이 논블로킹 호출로 모델을 호출하세요:
 
 ```python
 async def basic_agenerate():
@@ -122,9 +122,9 @@ import asyncio
 asyncio.run(basic_agenerate())
 ```
 
-### Usage with prompt template
+### 프롬프트 템플릿과 함께 사용
 
-Invoke the model with non-blocking calls and used chat template like this:
+다음과 같이 논블로킹 호출과 채팅 템플릿을 사용하여 모델을 호출하세요:
 
 ```python
 async def ainvoke_with_prompt_template():
@@ -140,8 +140,8 @@ async def ainvoke_with_prompt_template():
     )
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system", "你是一个诗人，擅长写诗。"),
-            ("human", "给我写首诗，主题是{theme}。"),
+            ("system", "你是一个诗人,擅长写诗。"),
+            ("human", "给我写首诗,主题是{theme}。"),
         ]
     )
     chain = prompt | chat
@@ -153,9 +153,9 @@ async def ainvoke_with_prompt_template():
 asyncio.run(ainvoke_with_prompt_template())
 ```
 
-### Usage with async calls in streaming
+### 스트리밍에서 비동기 호출과 함께 사용
 
-For non-blocking calls with streaming output, use the astream method:
+스트리밍 출력과 함께 논블로킹 호출을 위해 astream 메서드를 사용하세요:
 
 ```python
 async def basic_astream():

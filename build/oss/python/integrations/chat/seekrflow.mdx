@@ -2,53 +2,53 @@
 title: ChatSeekrFlow
 ---
 
-> [Seekr](https://www.seekr.com/) provides AI-powered solutions for structured, explainable, and transparent AI interactions.
+> [Seekr](https://www.seekr.com/)는 구조화되고 설명 가능하며 투명한 AI 상호 작용을 위한 AI 기반 솔루션을 제공합니다.
 
-This guide provides a quick overview for getting started with Seekr [chat models](/oss/python/langchain/models). For detailed documentation of all `ChatSeekrFlow` features and configurations, head to the [API reference](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.seekrflow.ChatSeekrFlow.html).
+이 가이드는 Seekr [채팅 모델](/oss/python/langchain/models) 시작을 위한 간단한 개요를 제공합니다. 모든 `ChatSeekrFlow` 기능 및 구성에 대한 자세한 문서는 [API 레퍼런스](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.seekrflow.ChatSeekrFlow.html)를 참조하세요.
 
-## Overview
+## 개요
 
-`ChatSeekrFlow` class wraps a chat model endpoint hosted on SeekrFlow, enabling seamless integration with LangChain applications.
+`ChatSeekrFlow` 클래스는 SeekrFlow에 호스팅된 채팅 모델 엔드포인트를 래핑하여 LangChain 애플리케이션과의 원활한 통합을 가능하게 합니다.
 
-### Integration Details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: |
 | [ChatSeekrFlow](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.seekrflow.ChatSeekrFlow.html) | [seekrai](https://python.langchain.com/docs/integrations/providers/seekr/) | ❌ | beta | ![PyPI - Downloads](https://img.shields.io/pypi/dm/seekrai?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/seekrai?style=flat-square&label=%20) |
 
-### Model Features
+### 모델 기능
 
-| [Tool calling](/oss/python/langchain/tools/) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | [Image input](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming/) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
+| [도구 호출](/oss/python/langchain/tools/) | [구조화된 출력](/oss/python/langchain/structured-output) | JSON 모드 | [이미지 입력](/oss/python/langchain/messages#multimodal) | 오디오 입력 | 비디오 입력 | [토큰 수준 스트리밍](/oss/python/langchain/streaming/) | 네이티브 비동기 | [토큰 사용량](/oss/python/langchain/models#token-usage) | [로그 확률](/oss/python/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ | ❌ |
 
-### Supported Methods
+### 지원되는 메서드
 
-`ChatSeekrFlow` supports all methods of `ChatModel`, **except async APIs**.
+`ChatSeekrFlow`는 **비동기 API를 제외한** `ChatModel`의 모든 메서드를 지원합니다.
 
-### Endpoint Requirements
+### 엔드포인트 요구 사항
 
-The serving endpoint `ChatSeekrFlow` wraps **must** have OpenAI-compatible chat input/output format. It can be used for:
+`ChatSeekrFlow`가 래핑하는 서빙 엔드포인트는 OpenAI 호환 채팅 입/출력 형식을 **반드시** 가져야 합니다. 다음에 사용할 수 있습니다:
 
-1. **Fine-tuned Seekr models**
-2. **Custom SeekrFlow models**
-3. **RAG-enabled models using Seekr's retrieval system**
+1. **미세 조정된 Seekr 모델**
+2. **사용자 정의 SeekrFlow 모델**
+3. **Seekr의 검색 시스템을 사용하는 RAG 지원 모델**
 
-For async usage, please refer to `AsyncChatSeekrFlow` (coming soon).
+비동기 사용에 대해서는 `AsyncChatSeekrFlow`를 참조하세요 (곧 출시 예정).
 
-# Getting Started with ChatSeekrFlow in LangChain
+# LangChain에서 ChatSeekrFlow 시작하기
 
-This notebook covers how to use SeekrFlow as a chat model in LangChain.
+이 노트북은 LangChain에서 SeekrFlow를 채팅 모델로 사용하는 방법을 다룹니다.
 
-## Setup
+## 설정
 
-Ensure you have the necessary dependencies installed:
+필요한 종속성이 설치되어 있는지 확인하세요:
 
 ```bash
 pip install seekrai langchain langchain-community
 ```
 
-You must also have an API key from Seekr to authenticate requests.
+요청을 인증하려면 Seekr의 API 키도 있어야 합니다.
 
 ```python
 # Standard library
@@ -65,13 +65,13 @@ from langchain_seekrflow import ChatSeekrFlow
 from seekrai import SeekrFlow
 ```
 
-## API Key Setup
+## API 키 설정
 
-You'll need to set your API key as an environment variable to authenticate requests.
+요청을 인증하려면 API 키를 환경 변수로 설정해야 합니다.
 
-Run the below cell.
+아래 셀을 실행하세요.
 
-Or manually assign it before running queries:
+또는 쿼리를 실행하기 전에 수동으로 할당하세요:
 
 ```python
 SEEKR_API_KEY = "your-api-key-here"
@@ -81,7 +81,7 @@ SEEKR_API_KEY = "your-api-key-here"
 os.environ["SEEKR_API_KEY"] = getpass.getpass("Enter your Seekr API key:")
 ```
 
-## Instantiation
+## 인스턴스화
 
 ```python
 os.environ["SEEKR_API_KEY"]
@@ -92,7 +92,7 @@ llm = ChatSeekrFlow(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 response = llm.invoke([HumanMessage(content="Hello, Seekr!")])
@@ -103,7 +103,7 @@ print(response.content)
 Hello there! I'm Seekr, nice to meet you! What brings you here today? Do you have a question, or are you looking for some help with something? I'm all ears (or rather, all text)!
 ```
 
-## Chaining
+## 체이닝
 
 ```python
 prompt = ChatPromptTemplate.from_template("Translate to French: {text}")
@@ -146,7 +146,7 @@ Ripples on the quiet lake
 Peaceful evening sky
 ```
 
-## Error Handling & Debugging
+## 오류 처리 및 디버깅
 
 ```python
 # Define a minimal mock SeekrFlow client
@@ -209,10 +209,10 @@ Running test: Missing Model Name
 ✅ Expected Error: A valid model name must be provided.
 ```
 
-## API reference
+## API 레퍼런스
 
-- `ChatSeekrFlow` class: [`langchain_seekrflow.ChatSeekrFlow`](https://github.com/benfaircloth/langchain-seekrflow/blob/main/langchain_seekrflow/seekrflow.py)
-- PyPI package: [`langchain-seekrflow`](https://pypi.org/project/langchain-seekrflow/)
+- `ChatSeekrFlow` 클래스: [`langchain_seekrflow.ChatSeekrFlow`](https://github.com/benfaircloth/langchain-seekrflow/blob/main/langchain_seekrflow/seekrflow.py)
+- PyPI 패키지: [`langchain-seekrflow`](https://pypi.org/project/langchain-seekrflow/)
 
 ---
 

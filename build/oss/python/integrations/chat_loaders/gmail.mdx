@@ -2,15 +2,15 @@
 title: GMail
 ---
 
-This loader goes over how to load data from GMail. There are many ways you could want to load data from GMail. This loader is currently fairly opinionated in how to do so. The way it does it is it first looks for all messages that you have sent. It then looks for messages where you are responding to a previous email. It then fetches that previous email, and creates a training example of that email, followed by your email.
+이 로더는 GMail에서 데이터를 로드하는 방법을 다룹니다. GMail에서 데이터를 로드하는 방법에는 여러 가지가 있을 수 있습니다. 이 로더는 현재 로드 방식에 대해 상당히 독단적입니다. 작동 방식은 먼저 사용자가 보낸 모든 메시지를 찾습니다. 그런 다음 이전 이메일에 회신하는 메시지를 찾습니다. 그런 다음 이전 이메일을 가져와서 해당 이메일과 사용자의 이메일로 구성된 학습 예제를 만듭니다.
 
-Note that there are clear limitations here. For example, all examples created are only looking at the previous email for context.
+여기에는 명확한 제한 사항이 있습니다. 예를 들어, 생성된 모든 예제는 컨텍스트를 위해 이전 이메일만 참조합니다.
 
-To use:
+사용하려면:
 
-- Set up a Google Developer Account: Go to the Google Developer Console, create a project, and enable the Gmail API for that project. This will give you a credentials.json file that you'll need later.
+- Google Developer Account 설정: Google Developer Console로 이동하여 프로젝트를 생성하고 해당 프로젝트에 대해 Gmail API를 활성화합니다. 이렇게 하면 나중에 필요한 credentials.json 파일이 제공됩니다.
 
-- Install the Google Client Library: Run the following command to install the Google Client Library:
+- Google Client Library 설치: 다음 명령을 실행하여 Google Client Library를 설치합니다:
 
 ```python
 %pip install -qU  google-auth google-auth-oauthlib google-auth-httplib2 google-api-python-client

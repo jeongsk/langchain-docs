@@ -2,61 +2,61 @@
 title: Llama.cpp
 ---
 
->[llama.cpp python](https://github.com/abetlen/llama-cpp-python) library is a simple Python bindings for `@ggerganov`
->[llama.cpp](https://github.com/ggerganov/llama.cpp).
+>[llama.cpp python](https://github.com/abetlen/llama-cpp-python) 라이브러리는 `@ggerganov`의
+>[llama.cpp](https://github.com/ggerganov/llama.cpp)에 대한 간단한 Python 바인딩입니다.
 >
->This package provides:
+>이 패키지는 다음을 제공합니다:
 >
-> - Low-level access to C API via ctypes interface.
-> - High-level Python API for text completion
->   - `OpenAI`-like API
->   - `LangChain` compatibility
->   - `LlamaIndex` compatibility
-> - OpenAI compatible web server
->   - Local Copilot replacement
->   - Function Calling support
->   - Vision API support
->   - Multiple Models
+> - ctypes 인터페이스를 통한 C API에 대한 저수준 액세스.
+> - 텍스트 완성을 위한 고수준 Python API
+>   - `OpenAI`와 유사한 API
+>   - `LangChain` 호환성
+>   - `LlamaIndex` 호환성
+> - OpenAI 호환 웹 서버
+>   - 로컬 Copilot 대체
+>   - Function Calling 지원
+>   - Vision API 지원
+>   - 다중 모델
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부정보
 
 | Class | Package | Local | Serializable | JS support |
 | :--- | :--- | :---: | :---: |  :---: |
 | [ChatLlamaCpp](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.llamacpp.ChatLlamaCpp.html) | [langchain-community](https://python.langchain.com/api_reference/community/index.html) | ✅ | ❌ | ❌ |
 
-### Model features
+### 모델 기능
 
 | [Tool calling](/oss/python/langchain/tools) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | Image input | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming/) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ✅ |
 
-## Setup
+## 설정
 
-To get started and use **all** the features shown below, we recommend using a model that has been fine-tuned for tool-calling.
+시작하고 아래에 표시된 **모든** 기능을 사용하려면 도구 호출을 위해 미세 조정된 모델을 사용하는 것이 좋습니다.
 
-We will use [
-Hermes-2-Pro-Llama-3-8B-GGUF](https://huggingface.co/NousResearch/Hermes-2-Pro-Llama-3-8B-GGUF) from NousResearch.
+NousResearch의 [
+Hermes-2-Pro-Llama-3-8B-GGUF](https://huggingface.co/NousResearch/Hermes-2-Pro-Llama-3-8B-GGUF)를 사용합니다.
 
-> Hermes 2 Pro is an upgraded version of Nous Hermes 2, consisting of an updated and cleaned version of the OpenHermes 2.5 Dataset, as well as a newly introduced Function Calling and JSON Mode dataset developed in-house. This new version of Hermes maintains its excellent general task and conversation capabilities - but also excels at Function Calling
+> Hermes 2 Pro는 OpenHermes 2.5 Dataset의 업데이트되고 정리된 버전과 자체 개발한 새로운 Function Calling 및 JSON Mode 데이터셋으로 구성된 Nous Hermes 2의 업그레이드 버전입니다. 이 새로운 버전의 Hermes는 뛰어난 일반 작업 및 대화 기능을 유지하면서 Function Calling도 탁월합니다.
 
-See our guides on local models to go deeper:
+로컬 모델에 대한 자세한 내용은 가이드를 참조하세요:
 
-- [Run LLMs locally](https://python.langchain.com/v0.1/docs/guides/development/local_llms/)
-- [Using local models with RAG](https://python.langchain.com/v0.1/docs/use_cases/question_answering/local_retrieval_qa/)
+- [로컬에서 LLM 실행](https://python.langchain.com/v0.1/docs/guides/development/local_llms/)
+- [RAG와 함께 로컬 모델 사용](https://python.langchain.com/v0.1/docs/use_cases/question_answering/local_retrieval_qa/)
 
-### Installation
+### 설치
 
-The LangChain LlamaCpp integration lives in the `langchain-community` and `llama-cpp-python` packages:
+LangChain LlamaCpp 통합은 `langchain-community` 및 `llama-cpp-python` 패키지에 있습니다:
 
 ```python
 %pip install -qU langchain-community llama-cpp-python
 ```
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
 
 ```python
 # Path to your model weights
@@ -82,7 +82,7 @@ llm = ChatLlamaCpp(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 messages = [
@@ -110,13 +110,13 @@ Je suis amoureux de la programmation informatique.
 (You might also say simply 'programmation', which would be understood as both meanings - depending on context).
 ```
 
-## Tool calling
+## 도구 호출
 
-Firstly, it works mostly the same as OpenAI Function Calling
+첫째, OpenAI Function Calling과 거의 동일하게 작동합니다.
 
-OpenAI has a [tool calling](https://platform.openai.com/docs/guides/function-calling) (we use "tool calling" and "function calling" interchangeably here) API that lets you describe tools and their arguments, and have the model return a JSON object with a tool to invoke and the inputs to that tool. tool-calling is extremely useful for building tool-using chains and agents, and for getting structured outputs from models more generally.
+OpenAI에는 도구와 해당 인수를 설명하고 모델이 호출할 도구와 해당 도구에 대한 입력을 포함하는 JSON 객체를 반환하도록 하는 [tool calling](https://platform.openai.com/docs/guides/function-calling) (여기서는 "tool calling"과 "function calling"을 동의어로 사용합니다) API가 있습니다. 도구 호출은 도구를 사용하는 체인 및 에이전트를 구축하고 모델에서 더 일반적으로 구조화된 출력을 얻는 데 매우 유용합니다.
 
-With `ChatLlamaCpp.bind_tools`, we can easily pass in Pydantic classes, dict schemas, LangChain tools, or even functions as tools to the model. Under the hood, these are converted to an OpenAI tool schema, which looks like:
+`ChatLlamaCpp.bind_tools`를 사용하면 Pydantic 클래스, dict 스키마, LangChain 도구 또는 심지어 함수를 모델에 도구로 쉽게 전달할 수 있습니다. 내부적으로 이들은 다음과 같은 OpenAI 도구 스키마로 변환됩니다:
 
 ```
 {
@@ -126,9 +126,9 @@ With `ChatLlamaCpp.bind_tools`, we can easily pass in Pydantic classes, dict sch
 }
 ```
 
-and passed in every model invocation.
+그리고 모든 모델 호출에 전달됩니다.
 
-However, it cannot automatically trigger a function/tool, we need to force it by specifying the 'tool choice' parameter. This parameter is typically formatted as described below.
+그러나 함수/도구를 자동으로 트리거할 수 없으므로 'tool choice' 매개변수를 지정하여 강제해야 합니다. 이 매개변수는 일반적으로 아래와 같이 형식화됩니다.
 
 `{"type": "function", "function": {"name": <<tool_name>>}}.`
 
@@ -203,7 +203,7 @@ ai_msg.tool_calls
   'id': 'call__0_get_magic_function_cmpl-cd83a994-b820-4428-957c-48076c68335a'}]
 ```
 
-# Structured output
+# 구조화된 출력
 
 ```python
 from langchain_core.utils.function_calling import convert_to_openai_tool
@@ -232,16 +232,16 @@ result
  'punchline': '\n\n- To get to its gilded cage on the other side!'}
 ```
 
-# Streaming
+# 스트리밍
 
 ```python
 for chunk in llm.stream("what is 25x5"):
         print(chunk.content, end="\n", flush=True)
 ```
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all ChatLlamaCpp features and configurations, head to the API reference: [python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.llamacpp.ChatLlamaCpp.html](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.llamacpp.ChatLlamaCpp.html)
+모든 ChatLlamaCpp 기능 및 구성에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.llamacpp.ChatLlamaCpp.html](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.llamacpp.ChatLlamaCpp.html)
 
 ---
 

@@ -2,48 +2,47 @@
 title: ChatDatabricks
 ---
 
-> [Databricks](https://www.databricks.com/) Lakehouse Platform unifies data, analytics, and AI on one platform.
+> [Databricks](https://www.databricks.com/) Lakehouse Platform은 데이터, 분석 및 AI를 하나의 플랫폼에 통합합니다.
 
-This guide provides a quick overview for getting started with Databricks [chat models](/oss/python/langchain/models). For detailed documentation of all ChatDatabricks features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.databricks.ChatDatabricks.html).
+이 가이드는 Databricks [채팅 모델](/oss/python/langchain/models) 시작하기를 위한 빠른 개요를 제공합니다. 모든 ChatDatabricks 기능 및 구성에 대한 자세한 문서는 [API 레퍼런스](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.databricks.ChatDatabricks.html)를 참조하세요.
 
-## Overview
+## 개요
 
-`ChatDatabricks` class wraps a chat model endpoint hosted on [Databricks Model Serving](https://docs.databricks.com/en/machine-learning/model-serving/index.html). This example notebook shows how to wrap your serving endpoint and use it as a chat model in your LangChain application.
+`ChatDatabricks` 클래스는 [Databricks Model Serving](https://docs.databricks.com/en/machine-learning/model-serving/index.html)에 호스팅된 채팅 모델 엔드포인트를 래핑합니다. 이 예제 노트북은 서빙 엔드포인트를 래핑하고 LangChain 애플리케이션에서 채팅 모델로 사용하는 방법을 보여줍니다.
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: |
 | [ChatDatabricks](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.databricks.ChatDatabricks.html) | [databricks-langchain](https://python.langchain.com/docs/integrations/providers/databricks/) | ❌ | beta | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-databricks?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-databricks?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
-| [Tool calling](/oss/python/langchain/tools/) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | [Image input](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming/) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
+| [도구 호출](/oss/python/langchain/tools/) | [구조화된 출력](/oss/python/langchain/structured-output) | JSON mode | [이미지 입력](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [토큰 수준 스트리밍](/oss/python/langchain/streaming/) | Native async | [토큰 사용량](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |  ✅ | ✅ | ✅ | ❌ |
 
-### Supported Methods
+### 지원되는 메서드
 
-`ChatDatabricks` supports all methods of `ChatModel` including async APIs.
+`ChatDatabricks`는 비동기 API를 포함한 `ChatModel`의 모든 메서드를 지원합니다.
 
-### Endpoint Requirement
+### 엔드포인트 요구 사항
 
-The serving endpoint `ChatDatabricks` wraps must have OpenAI-compatible chat input/output format ([reference](https://mlflow.org/docs/latest/llms/deployments/index.html#chat)). As long as the input format is compatible, `ChatDatabricks` can be used for any endpoint type hosted on [Databricks Model Serving](https://docs.databricks.com/en/machine-learning/model-serving/index.html):
+`ChatDatabricks`가 래핑하는 서빙 엔드포인트는 OpenAI 호환 채팅 입력/출력 형식([레퍼런스](https://mlflow.org/docs/latest/llms/deployments/index.html#chat))을 가져야 합니다. 입력 형식이 호환되는 한 `ChatDatabricks`는 [Databricks Model Serving](https://docs.databricks.com/en/machine-learning/model-serving/index.html)에 호스팅된 모든 엔드포인트 유형에 사용할 수 있습니다:
 
-1. Foundation Models - Curated list of state-of-the-art foundation models such as DRBX, Llama3, Mixtral-8x7B, and etc. These endpoint are ready to use in your Databricks workspace without any set up.
-2. Custom Models - You can also deploy custom models to a serving endpoint via MLflow with
-your choice of framework such as LangChain, Pytorch, Transformers, etc.
-3. External Models - Databricks endpoints can serve models that are hosted outside Databricks as a proxy, such as proprietary model service like OpenAI GPT4.
+1. Foundation Models - DRBX, Llama3, Mixtral-8x7B 등과 같은 최첨단 기초 모델의 선별된 목록입니다. 이러한 엔드포인트는 설정 없이 Databricks 작업 영역에서 사용할 준비가 되어 있습니다.
+2. Custom Models - LangChain, Pytorch, Transformers 등과 같은 선택한 프레임워크를 사용하여 MLflow를 통해 커스텀 모델을 서빙 엔드포인트에 배포할 수도 있습니다.
+3. External Models - Databricks 엔드포인트는 OpenAI GPT4와 같은 독점 모델 서비스와 같이 Databricks 외부에 호스팅된 모델을 프록시로 제공할 수 있습니다.
 
-## Setup
+## 설정
 
-To access Databricks models you'll need to create a Databricks account, set up credentials (only if you are outside Databricks workspace), and install required packages.
+Databricks 모델에 액세스하려면 Databricks 계정을 생성하고, 자격 증명을 설정하고(Databricks 작업 영역 외부에 있는 경우에만), 필요한 패키지를 설치해야 합니다.
 
-### Credentials (only if you are outside Databricks)
+### 자격 증명 (Databricks 외부에 있는 경우에만)
 
-If you are running LangChain app inside Databricks, you can skip this step.
+Databricks 내에서 LangChain 앱을 실행하는 경우 이 단계를 건너뛸 수 있습니다.
 
-Otherwise, you need manually set the Databricks workspace hostname and personal access token to `DATABRICKS_HOST` and `DATABRICKS_TOKEN` environment variables, respectively. See [Authentication Documentation](https://docs.databricks.com/en/dev-tools/auth/index.html#databricks-personal-access-tokens) for how to get an access token.
+그렇지 않으면 Databricks 작업 영역 호스트 이름과 개인 액세스 토큰을 각각 `DATABRICKS_HOST` 및 `DATABRICKS_TOKEN` 환경 변수로 수동으로 설정해야 합니다. 액세스 토큰을 얻는 방법은 [인증 문서](https://docs.databricks.com/en/dev-tools/auth/index.html#databricks-personal-access-tokens)를 참조하세요.
 
 ```python
 import getpass
@@ -60,19 +59,19 @@ if "DATABRICKS_TOKEN" not in os.environ:
 Enter your Databricks access token:  ········
 ```
 
-### Installation
+### 설치
 
-The LangChain Databricks integration lives in the `databricks-langchain` package.
+LangChain Databricks 통합은 `databricks-langchain` 패키지에 있습니다.
 
 ```python
 %pip install -qU databricks-langchain
 ```
 
-We first demonstrates how to query DBRX-instruct model hosted as Foundation Models endpoint with `ChatDatabricks`.
+먼저 `ChatDatabricks`를 사용하여 Foundation Models 엔드포인트로 호스팅된 DBRX-instruct 모델을 쿼리하는 방법을 보여줍니다.
 
-For other type of endpoints, there are some difference in how to set up the endpoint itself, however, once the endpoint is ready, there is no difference in how to query it with `ChatDatabricks`. Please refer to the bottom of this notebook for the examples with other type of endpoints.
+다른 유형의 엔드포인트의 경우 엔드포인트 자체를 설정하는 방법에는 약간의 차이가 있지만, 엔드포인트가 준비되면 `ChatDatabricks`로 쿼리하는 방법에는 차이가 없습니다. 다른 유형의 엔드포인트에 대한 예제는 이 노트북의 하단을 참조하세요.
 
-## Instantiation
+## 인스턴스화
 
 ```python
 from databricks_langchain import ChatDatabricks
@@ -85,7 +84,7 @@ chat_model = ChatDatabricks(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 chat_model.invoke("What is MLflow?")
@@ -108,9 +107,9 @@ chat_model.invoke(messages)
 AIMessage(content='Databricks Model Serving is a feature of the Databricks platform that allows data scientists and engineers to easily deploy machine learning models into production. With Model Serving, you can host, manage, and serve machine learning models as APIs, making it easy to integrate them into applications and business processes. It supports a variety of popular machine learning frameworks, including TensorFlow, PyTorch, and scikit-learn, and provides tools for monitoring and managing the performance of deployed models. Model Serving is designed to be scalable, secure, and easy to use, making it a great choice for organizations that want to quickly and efficiently deploy machine learning models into production.', response_metadata={'prompt_tokens': 35, 'completion_tokens': 130, 'total_tokens': 165}, id='run-b3feea21-223e-4105-8627-41d647d5ccab-0')
 ```
 
-## Chaining
+## 체이닝
 
-Similar to other chat models, `ChatDatabricks` can be used as a part of a complex chain.
+다른 채팅 모델과 마찬가지로 `ChatDatabricks`는 복잡한 체인의 일부로 사용될 수 있습니다.
 
 ```python
 from langchain_core.prompts import ChatPromptTemplate
@@ -138,7 +137,7 @@ chain.invoke(
 AIMessage(content="Unity Catalog is a new data catalog feature in Databricks that allows you to discover, manage, and govern all your data assets across your data landscape, including data lakes, data warehouses, and data marts. It provides a centralized repository for storing and managing metadata, data lineage, and access controls for all your data assets. Unity Catalog enables data teams to easily discover and access the data they need, while ensuring compliance with data privacy and security regulations. It is designed to work seamlessly with Databricks' Lakehouse platform, providing a unified experience for managing and analyzing all your data.", response_metadata={'prompt_tokens': 32, 'completion_tokens': 118, 'total_tokens': 150}, id='run-82d72624-f8df-4c0d-a976-919feec09a55-0')
 ```
 
-## Invocation (streaming)
+## 호출 (스트리밍)
 
 ```python
 for chunk in chat_model.stream("How are you?"):
@@ -149,7 +148,7 @@ for chunk in chat_model.stream("How are you?"):
 I|'m| an| AI| and| don|'t| have| feelings|,| but| I|'m| here| and| ready| to| assist| you|.| How| can| I| help| you| today|?||
 ```
 
-## Async Invocation
+## 비동기 호출
 
 ```python
 import asyncio
@@ -159,11 +158,11 @@ futures = [chat_model.ainvoke(f"Where is the capital of {c}?") for c in country]
 await asyncio.gather(*futures)
 ```
 
-## Tool calling
+## 도구 호출
 
-ChatDatabricks supports OpenAI-compatible tool calling API that lets you describe tools and their arguments, and have the model return a JSON object with a tool to invoke and the inputs to that tool. tool-calling is extremely useful for building tool-using chains and agents, and for getting structured outputs from models more generally.
+ChatDatabricks는 도구를 설명하고 해당 인수를 설명할 수 있게 하고 모델이 호출할 도구와 해당 도구에 대한 입력이 포함된 JSON 객체를 반환하도록 하는 OpenAI 호환 도구 호출 API를 지원합니다. 도구 호출은 도구 사용 체인 및 에이전트를 구축하고 모델에서 보다 일반적으로 구조화된 출력을 얻는 데 매우 유용합니다.
 
-With `ChatDatabricks.bind_tools`, we can easily pass in Pydantic classes, dict schemas, LangChain tools, or even functions as tools to the model. Under the hood these are converted to the OpenAI-compatible tool schemas, which looks like:
+`ChatDatabricks.bind_tools`를 사용하면 Pydantic 클래스, dict 스키마, LangChain 도구 또는 함수를 모델에 도구로 쉽게 전달할 수 있습니다. 내부적으로 이들은 다음과 같은 OpenAI 호환 도구 스키마로 변환됩니다:
 
 ```
 {
@@ -173,7 +172,7 @@ With `ChatDatabricks.bind_tools`, we can easily pass in Pydantic classes, dict s
 }
 ```
 
-and passed in every model invocation.
+그리고 모든 모델 호출에 전달됩니다.
 
 ```python
 from pydantic import BaseModel, Field
@@ -198,14 +197,14 @@ ai_msg = llm_with_tools.invoke(
 print(ai_msg.tool_calls)
 ```
 
-## Wrapping Custom Model Endpoint
+## 커스텀 모델 엔드포인트 래핑
 
-Prerequisites:
+전제 조건:
 
-* An LLM was registered and deployed to [a Databricks serving endpoint](https://docs.databricks.com/machine-learning/model-serving/index.html) via MLflow. The endpoint must have OpenAI-compatible chat input/output format ([reference](https://mlflow.org/docs/latest/llms/deployments/index.html#chat))
-* You have ["Can Query" permission](https://docs.databricks.com/security/auth-authz/access-control/serving-endpoint-acl.html) to the endpoint.
+* LLM이 등록되고 [Databricks 서빙 엔드포인트](https://docs.databricks.com/machine-learning/model-serving/index.html)에 MLflow를 통해 배포되었습니다. 엔드포인트는 OpenAI 호환 채팅 입력/출력 형식을 가져야 합니다([레퍼런스](https://mlflow.org/docs/latest/llms/deployments/index.html#chat))
+* 엔드포인트에 대한 ["Can Query" 권한](https://docs.databricks.com/security/auth-authz/access-control/serving-endpoint-acl.html)이 있습니다.
 
-Once the endpoint is ready, the usage pattern is identical to that of Foundation Models.
+엔드포인트가 준비되면 사용 패턴은 Foundation Models와 동일합니다.
 
 ```python
 chat_model_custom = ChatDatabricks(
@@ -217,13 +216,13 @@ chat_model_custom = ChatDatabricks(
 chat_model_custom.invoke("How are you?")
 ```
 
-## Wrapping External Models
+## 외부 모델 래핑
 
-Prerequisite: Create Proxy Endpoint
+전제 조건: 프록시 엔드포인트 생성
 
-First, create a new Databricks serving endpoint that proxies requests to the target external model. The endpoint creation should be fairy quick for proxying external models.
+먼저 대상 외부 모델에 대한 요청을 프록시하는 새 Databricks 서빙 엔드포인트를 생성합니다. 외부 모델을 프록시하는 엔드포인트 생성은 상당히 빨라야 합니다.
 
-This requires registering your OpenAI API Key within the Databricks secret manager as follows:
+이를 위해서는 다음과 같이 Databricks 시크릿 관리자 내에 OpenAI API 키를 등록해야 합니다:
 
 ```sh
 # Replace `<scope>` with your scope
@@ -231,7 +230,7 @@ databricks secrets create-scope <scope>
 databricks secrets put-secret <scope> openai-api-key --string-value $OPENAI_API_KEY
 ```
 
-For how to set up Databricks CLI and manage secrets, please refer to [docs.databricks.com/en/security/secrets/secrets.html](https://docs.databricks.com/en/security/secrets/secrets.html)
+Databricks CLI를 설정하고 시크릿을 관리하는 방법은 [docs.databricks.com/en/security/secrets/secrets.html](https://docs.databricks.com/en/security/secrets/secrets.html)을 참조하세요.
 
 ```python
 from mlflow.deployments import get_deploy_client
@@ -260,7 +259,7 @@ client.create_endpoint(
 )
 ```
 
-Once the endpoint status has become "Ready", you can query the endpoint in the same way as other types of endpoints.
+엔드포인트 상태가 "Ready"가 되면 다른 유형의 엔드포인트와 동일한 방식으로 엔드포인트를 쿼리할 수 있습니다.
 
 ```python
 chat_model_external = ChatDatabricks(
@@ -271,11 +270,11 @@ chat_model_external = ChatDatabricks(
 chat_model_external.invoke("How to use Databricks?")
 ```
 
-## Function calling on Databricks
+## Databricks에서의 함수 호출
 
-Databricks Function Calling is OpenAI-compatible and is only available during model serving as part of Foundation Model APIs.
+Databricks Function Calling은 OpenAI 호환이며 Foundation Model APIs의 일부로 모델 서빙 중에만 사용할 수 있습니다.
 
-See [Databricks function calling introduction](https://docs.databricks.com/en/machine-learning/model-serving/function-calling.html#supported-models) for supported models.
+지원되는 모델은 [Databricks 함수 호출 소개](https://docs.databricks.com/en/machine-learning/model-serving/function-calling.html#supported-models)를 참조하세요.
 
 ```python
 llm = ChatDatabricks(endpoint="databricks-meta-llama-3-70b-instruct")
@@ -307,11 +306,11 @@ messages = [{"role": "user", "content": "What is the current temperature of Chic
 print(model.invoke(messages))
 ```
 
-See [Databricks Unity Catalog](/oss/python/integrations/tools/databricks) about how to use UC functions in chains.
+UC 함수를 체인에서 사용하는 방법에 대해서는 [Databricks Unity Catalog](/oss/python/integrations/tools/databricks)를 참조하세요.
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all ChatDatabricks features and configurations head to the API reference: [api-docs.databricks.com/python/databricks-ai-bridge/latest/databricks_langchain.html#databricks_langchain.ChatDatabricks](https://api-docs.databricks.com/python/databricks-ai-bridge/latest/databricks_langchain.html#databricks_langchain.ChatDatabricks)
+모든 ChatDatabricks 기능 및 구성에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [api-docs.databricks.com/python/databricks-ai-bridge/latest/databricks_langchain.html#databricks_langchain.ChatDatabricks](https://api-docs.databricks.com/python/databricks-ai-bridge/latest/databricks_langchain.html#databricks_langchain.ChatDatabricks)
 
 ---
 

@@ -2,29 +2,29 @@
 title: ChatCloudflareWorkersAI
 ---
 
-This will help you get started with CloudflareWorkersAI [chat models](/oss/python/langchain/models). For detailed documentation of all ChatCloudflareWorkersAI features and configurations head to the [API reference](https://python.langchain.com/docs/integrations/chat/cloudflare_workersai/).
+이 문서는 CloudflareWorkersAI [채팅 모델](/oss/python/langchain/models) 시작하기를 도와드립니다. 모든 ChatCloudflareWorkersAI 기능 및 구성에 대한 자세한 문서는 [API 레퍼런스](https://python.langchain.com/docs/integrations/chat/cloudflare_workersai/)를 참조하세요.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/cloudflare) | Downloads | Version |
 | :--- | :--- |:-----:|:------------:|:------------------------------------------------------------------------:| :---: | :---: |
 | [ChatCloudflareWorkersAI](https://python.langchain.com/docs/integrations/chat/cloudflare_workersai/) | [langchain-cloudflare](https://pypi.org/project/langchain-cloudflare/) |   ✅   |      ❌       |                                     ❌                                     | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-cloudflare?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-cloudflare?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
-| [Tool calling](/oss/python/langchain/tools) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | [Image input](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming/) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
+| [도구 호출](/oss/python/langchain/tools) | [구조화된 출력](/oss/python/langchain/structured-output) | JSON mode | [이미지 입력](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [토큰 수준 스트리밍](/oss/python/langchain/streaming/) | Native async | [토큰 사용량](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
 |:-----------------------------------------:|:----------------------------------------------------:|:---------:|:----------------------------------------------:|:-----------:|:-----------:|:-----------------------------------------------------:|:------------:|:------------------------------------------------------:|:----------------------------------:|
 |                     ✅                     |                          ✅                           |     ✅     |                       ❌                        |      ❌      |      ❌      |                           ❌                           |      ❌       |                             ✅                            |                 ❌                  |
 
-## Setup
+## 설정
 
-To access CloudflareWorkersAI models you'll need to create a/an CloudflareWorkersAI account, get an API key, and install the `langchain-cloudflare` integration package.
+CloudflareWorkersAI 모델에 액세스하려면 CloudflareWorkersAI 계정을 생성하고, API 키를 받고, `langchain-cloudflare` 통합 패키지를 설치해야 합니다.
 
-### Credentials
+### 자격 증명
 
-Head to [www.cloudflare.com/developer-platform/products/workers-ai/](https://www.cloudflare.com/developer-platform/products/workers-ai/) to sign up to CloudflareWorkersAI and generate an API key. Once you've done this set the CF_AI_API_KEY environment variable and the CF_ACCOUNT_ID environment variable:
+[www.cloudflare.com/developer-platform/products/workers-ai/](https://www.cloudflare.com/developer-platform/products/workers-ai/)로 이동하여 CloudflareWorkersAI에 가입하고 API 키를 생성하세요. 이 작업을 완료한 후 CF_AI_API_KEY 환경 변수와 CF_ACCOUNT_ID 환경 변수를 설정하세요:
 
 ```python
 import getpass
@@ -41,26 +41,26 @@ if not os.getenv("CF_ACCOUNT_ID"):
     )
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```python
 # os.environ["LANGSMITH_TRACING"] = "true"
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 ```
 
-### Installation
+### 설치
 
-The LangChain CloudflareWorkersAI integration lives in the `langchain-cloudflare` package:
+LangChain CloudflareWorkersAI 통합은 `langchain-cloudflare` 패키지에 있습니다:
 
 ```python
 %pip install -qU langchain-cloudflare
 ```
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
 
-- Update model instantiation with relevant params.
+- 관련 매개변수로 모델 인스턴스화를 업데이트합니다.
 
 ```python
 from langchain_cloudflare.chat_models import ChatCloudflareWorkersAI
@@ -73,7 +73,7 @@ llm = ChatCloudflareWorkersAI(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 messages = [
@@ -99,7 +99,7 @@ print(ai_msg.content)
 J'adore la programmation.
 ```
 
-## Structured Outputs
+## 구조화된 출력
 
 ```python
 json_schema = {
@@ -134,7 +134,7 @@ structured_llm.invoke("Tell me a joke about cats")
  'rating': '8'}
 ```
 
-## Bind tools
+## 도구 바인딩
 
 ```python
 from typing import List
@@ -171,7 +171,7 @@ result.tool_calls
   'type': 'tool_call'}]
 ```
 
-## API reference
+## API 레퍼런스
 
 [developers.cloudflare.com/workers-ai/](https://developers.cloudflare.com/workers-ai/)
 [developers.cloudflare.com/agents/](https://developers.cloudflare.com/agents/)
