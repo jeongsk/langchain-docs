@@ -2,26 +2,25 @@
 title: Athena
 ---
 
->[Amazon Athena](https://aws.amazon.com/athena/) is a serverless, interactive analytics service built
->on open-source frameworks, supporting open-table and file formats. `Athena` provides a simplified,
->flexible way to analyze petabytes of data where it lives. Analyze data or build applications
->from an Amazon Simple Storage Service (S3) data lake and 30 data sources, including on-premises data
->sources or other cloud systems using SQL or Python. `Athena` is built on open-source `Trino`
->and `Presto` engines and `Apache Spark` frameworks, with no provisioning or configuration effort required.
+>[Amazon Athena](https://aws.amazon.com/athena/)는 오픈소스 프레임워크를 기반으로 구축된 서버리스 대화형 분석 서비스로,
+>오픈 테이블 및 파일 형식을 지원합니다. `Athena`는 데이터가 있는 곳에서 페타바이트급 데이터를 분석할 수 있는 간소화되고
+>유연한 방법을 제공합니다. Amazon Simple Storage Service(S3) 데이터 레이크와 온프레미스 데이터 소스 또는 다른 클라우드 시스템을
+>포함한 30개의 데이터 소스에서 SQL 또는 Python을 사용하여 데이터를 분석하거나 애플리케이션을 구축할 수 있습니다. `Athena`는
+>오픈소스 `Trino` 및 `Presto` 엔진과 `Apache Spark` 프레임워크를 기반으로 구축되었으며, 프로비저닝이나 구성 작업이 필요하지 않습니다.
 
-This notebook goes over how to load documents from `AWS Athena`.
+이 노트북에서는 `AWS Athena`에서 문서를 로드하는 방법을 다룹니다.
 
-## Setting up
+## 설정
 
-Follow [instructions to set up an AWS account](https://docs.aws.amazon.com/athena/latest/ug/setting-up.html).
+[AWS 계정 설정 지침](https://docs.aws.amazon.com/athena/latest/ug/setting-up.html)을 따르세요.
 
-Install a python library:
+Python 라이브러리를 설치합니다:
 
 ```python
 ! pip install boto3
 ```
 
-## Example
+## 예제
 
 ```python
 from langchain_community.document_loaders.athena import AthenaLoader
@@ -44,7 +43,7 @@ documents = loader.load()
 print(documents)
 ```
 
-Example with metadata columns
+메타데이터 컬럼을 사용하는 예제
 
 ```python
 database_name = "my_database"

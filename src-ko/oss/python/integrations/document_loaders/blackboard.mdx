@@ -2,15 +2,14 @@
 title: Blackboard
 ---
 
->[Blackboard Learn](https://en.wikipedia.org/wiki/Blackboard_Learn) (previously the Blackboard Learning Management System) is a web-based virtual learning environment and learning management system developed by Blackboard Inc. The software features course management, customizable open architecture, and scalable design that allows integration with student information systems and authentication protocols. It may be installed on local servers, hosted by `Blackboard ASP Solutions`, or provided as Software as a Service hosted on Amazon Web Services. Its main purposes are stated to include the addition of online elements to courses traditionally delivered face-to-face and development of completely online courses with few or no face-to-face meetings
+>[Blackboard Learn](https://en.wikipedia.org/wiki/Blackboard_Learn)(이전 Blackboard Learning Management System)은 Blackboard Inc.에서 개발한 웹 기반 가상 학습 환경 및 학습 관리 시스템입니다. 이 소프트웨어는 강좌 관리, 사용자 정의 가능한 개방형 아키텍처, 학생 정보 시스템 및 인증 프로토콜과의 통합을 허용하는 확장 가능한 설계를 특징으로 합니다. 로컬 서버에 설치하거나 `Blackboard ASP Solutions`에서 호스팅하거나 Amazon Web Services에서 호스팅되는 SaaS로 제공될 수 있습니다. 주요 목적은 전통적으로 대면으로 제공되는 강좌에 온라인 요소를 추가하고 대면 회의가 거의 없거나 전혀 없는 완전한 온라인 강좌를 개발하는 것입니다.
 
-This covers how to load data from a [Blackboard Learn](https://www.anthology.com/products/teaching-and-learning/learning-effectiveness/blackboard-learn) instance.
+이 문서에서는 [Blackboard Learn](https://www.anthology.com/products/teaching-and-learning/learning-effectiveness/blackboard-learn) 인스턴스에서 데이터를 로드하는 방법을 다룹니다.
 
-This loader is not compatible with all `Blackboard` courses. It is only
-    compatible with courses that use the new `Blackboard` interface.
-    To use this loader, you must have the BbRouter cookie. You can get this
-    cookie by logging into the course and then copying the value of the
-    BbRouter cookie from the browser's developer tools.
+이 로더는 모든 `Blackboard` 강좌와 호환되지 않습니다. 새로운 `Blackboard` 인터페이스를 사용하는 강좌와만 호환됩니다.
+    이 로더를 사용하려면 BbRouter 쿠키가 필요합니다. 강좌에 로그인한 다음
+    브라우저의 개발자 도구에서 BbRouter 쿠키 값을 복사하여
+    이 쿠키를 얻을 수 있습니다.
 
 ```python
 from langchain_community.document_loaders import BlackboardLoader

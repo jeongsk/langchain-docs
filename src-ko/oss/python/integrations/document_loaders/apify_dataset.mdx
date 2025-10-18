@@ -2,26 +2,26 @@
 title: Apify Dataset
 ---
 
->[Apify Dataset](https://docs.apify.com/platform/storage/dataset) is a scalable append-only storage with sequential access built for storing structured web scraping results, such as a list of products or Google SERPs, and then export them to various formats like JSON, CSV, or Excel. Datasets are mainly used to save results of [Apify Actors](https://apify.com/store)—serverless cloud programs for various web scraping, crawling, and data extraction use cases.
+>[Apify Dataset](https://docs.apify.com/platform/storage/dataset)은 제품 목록이나 Google SERP와 같은 구조화된 웹 스크래핑 결과를 저장하고 JSON, CSV, Excel과 같은 다양한 형식으로 내보내기 위해 구축된 순차 액세스 방식의 확장 가능한 추가 전용 스토리지입니다. 데이터셋은 주로 다양한 웹 스크래핑, 크롤링 및 데이터 추출 사용 사례를 위한 서버리스 클라우드 프로그램인 [Apify Actors](https://apify.com/store)의 결과를 저장하는 데 사용됩니다.
 
-This notebook shows how to load Apify datasets to LangChain.
+이 노트북은 Apify 데이터셋을 LangChain에 로드하는 방법을 보여줍니다.
 
 ## Prerequisites
 
-You need to have an existing dataset on the Apify platform. This example shows how to load a dataset produced by the [Website Content Crawler](https://apify.com/apify/website-content-crawler).
+Apify 플랫폼에 기존 데이터셋이 있어야 합니다. 이 예제는 [Website Content Crawler](https://apify.com/apify/website-content-crawler)에서 생성된 데이터셋을 로드하는 방법을 보여줍니다.
 
 ```python
 %pip install -qU langchain langchain-apify langchain-openai
 ```
 
-First, import `ApifyDatasetLoader` into your source code:
+먼저 소스 코드에 `ApifyDatasetLoader`를 import하세요:
 
 ```python
 from langchain_apify import ApifyDatasetLoader
 from langchain_core.documents import Document
 ```
 
-Find your [Apify API token](https://console.apify.com/account/integrations) and [OpenAI API key](https://platform.openai.com/account/api-keys) and initialize these into environment variable:
+[Apify API 토큰](https://console.apify.com/account/integrations)과 [OpenAI API 키](https://platform.openai.com/account/api-keys)를 찾아 환경 변수로 초기화하세요:
 
 ```python
 import os
@@ -30,9 +30,9 @@ os.environ["APIFY_API_TOKEN"] = "your-apify-api-token"
 os.environ["OPENAI_API_KEY"] = "your-openai-api-key"
 ```
 
-Then provide a function that maps Apify dataset record fields to LangChain `Document` format.
+그런 다음 Apify 데이터셋 레코드 필드를 LangChain @[`Document`] 형식으로 매핑하는 함수를 제공하세요.
 
-For example, if your dataset items are structured like this:
+예를 들어, 데이터셋 항목이 다음과 같이 구조화되어 있는 경우:
 
 ```json
 {
@@ -41,7 +41,7 @@ For example, if your dataset items are structured like this:
 }
 ```
 
-The mapping function in the code below will convert them to LangChain `Document` format, so that you can use them further with any LLM model (e.g. for question answering).
+아래 코드의 매핑 함수는 이를 LangChain @[`Document`] 형식으로 변환하여 모든 LLM 모델(예: 질문 답변)과 함께 사용할 수 있습니다.
 
 ```python
 loader = ApifyDatasetLoader(
@@ -58,7 +58,7 @@ data = loader.load()
 
 ## An example with question answering
 
-In this example, we use data from a dataset to answer a question.
+이 예제에서는 데이터셋의 데이터를 사용하여 질문에 답변합니다.
 
 ```python
 from langchain.indexes import VectorstoreIndexCreator

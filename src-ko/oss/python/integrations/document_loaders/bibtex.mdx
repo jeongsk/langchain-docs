@@ -2,36 +2,36 @@
 title: BibTeX
 ---
 
->[BibTeX](https://www.ctan.org/pkg/bibtex) is a file format and reference management system commonly used in conjunction with `LaTeX` typesetting. It serves as a way to organize and store bibliographic information for academic and research documents.
+>[BibTeX](https://www.ctan.org/pkg/bibtex)는 `LaTeX` 조판과 함께 일반적으로 사용되는 파일 형식 및 참고 문헌 관리 시스템입니다. 학술 및 연구 문서의 서지 정보를 구성하고 저장하는 방법으로 사용됩니다.
 
-`BibTeX` files have a `.bib` extension and consist of plain text entries representing references to various publications, such as books, articles, conference papers, theses, and more. Each `BibTeX` entry follows a specific structure and contains fields for different bibliographic details like author names, publication title, journal or book title, year of publication, page numbers, and more.
+`BibTeX` 파일은 `.bib` 확장자를 가지며 책, 논문, 학회 논문, 학위 논문 등 다양한 출판물에 대한 참조를 나타내는 일반 텍스트 항목으로 구성됩니다. 각 `BibTeX` 항목은 특정 구조를 따르며 저자 이름, 출판 제목, 저널 또는 도서 제목, 출판 연도, 페이지 번호 등과 같은 다양한 서지 세부 정보에 대한 필드를 포함합니다.
 
-BibTeX files can also store the path to documents, such as `.pdf` files that can be retrieved.
+BibTeX 파일은 검색할 수 있는 `.pdf` 파일과 같은 문서 경로도 저장할 수 있습니다.
 
-## Installation
+## 설치
 
-First, you need to install `bibtexparser` and `PyMuPDF`.
+먼저 `bibtexparser`와 `PyMuPDF`를 설치해야 합니다.
 
 ```python
 %pip install -qU  bibtexparser pymupdf
 ```
 
-## Examples
+## 예제
 
-`BibtexLoader` has these arguments:
+`BibtexLoader`는 다음 인수를 가집니다:
 
-- `file_path`: the path of the `.bib` bibtex file
-- optional `max_docs`: default=None, i.e. not limit. Use it to limit number of retrieved documents.
-- optional `max_content_chars`: default=4000. Use it to limit the number of characters in a single document.
-- optional `load_extra_meta`: default=False. By default only the most important fields from the bibtex entries: `Published` (publication year), `Title`, `Authors`, `Summary`, `Journal`, `Keywords`, and `URL`. If True, it will also try to load return `entry_id`, `note`, `doi`, and `links` fields.
-- optional `file_pattern`: default=`r'[^:]+\.pdf'`. Regex pattern to find files in the `file` entry. Default pattern supports `Zotero` flavour bibtex style and bare file path.
+- `file_path`: `.bib` bibtex 파일의 경로
+- 선택 사항 `max_docs`: 기본값=None, 즉 제한 없음. 검색된 문서 수를 제한하는 데 사용합니다.
+- 선택 사항 `max_content_chars`: 기본값=4000. 단일 문서의 문자 수를 제한하는 데 사용합니다.
+- 선택 사항 `load_extra_meta`: 기본값=False. 기본적으로 bibtex 항목에서 가장 중요한 필드만 로드합니다: `Published`(출판 연도), `Title`, `Authors`, `Summary`, `Journal`, `Keywords` 및 `URL`. True이면 `entry_id`, `note`, `doi` 및 `links` 필드도 로드를 시도합니다.
+- 선택 사항 `file_pattern`: 기본값=`r'[^:]+\.pdf'`. `file` 항목에서 파일을 찾기 위한 정규식 패턴입니다. 기본 패턴은 `Zotero` 스타일 bibtex 및 단순 파일 경로를 지원합니다.
 
 ```python
 from langchain_community.document_loaders import BibtexLoader
 ```
 
 ```python
-# Create a dummy bibtex file and download a pdf.
+# 더미 bibtex 파일 생성 및 pdf 다운로드
 import urllib.request
 
 urllib.request.urlretrieve(
@@ -53,7 +53,7 @@ bibtex_text = """
         file={einstein1905.pdf}
     }
     """
-# save bibtex_text to biblio.bib file
+# bibtex_text를 biblio.bib 파일로 저장
 with open("./biblio.bib", "w") as file:
     file.write(bibtex_text)
 ```
@@ -77,7 +77,7 @@ docs[0].metadata
 ```
 
 ```python
-print(docs[0].page_content[:400])  # all pages of the pdf content
+print(docs[0].page_content[:400])  # pdf 콘텐츠의 모든 페이지
 ```
 
 ```output

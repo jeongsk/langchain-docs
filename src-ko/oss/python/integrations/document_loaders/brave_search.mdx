@@ -2,22 +2,14 @@
 title: Brave Search
 ---
 
->[Brave Search](https://en.wikipedia.org/wiki/Brave_Search) is a search engine developed by Brave Software.
+>[Brave Search](https://en.wikipedia.org/wiki/Brave_Search)는 Brave Software에서 개발한 검색 엔진입니다.
 >
-> - `Brave Search` uses its own web index. As of May 2022, it covered over 10 billion pages and was used to serve 92%
-> of search results without relying on any third-parties, with the remainder being retrieved
-> server-side from the Bing API or (on an opt-in basis) client-side from Google. According
-> to Brave, the index was kept "intentionally smaller than that of Google or Bing" in order to
-> help avoid spam and other low-quality content, with the disadvantage that "Brave Search is
-> not yet as good as Google in recovering long-tail queries."
->- `Brave Search Premium`: As of April 2023 Brave Search is an ad-free website, but it will
-> eventually switch to a new model that will include ads and premium users will get an ad-free experience.
-> User data including IP addresses won't be collected from its users by default. A premium account
-> will be required for opt-in data-collection.
+> - `Brave Search`는 자체 웹 인덱스를 사용합니다. 2022년 5월 기준으로 100억 개 이상의 페이지를 포함하고 있으며 타사에 의존하지 않고 검색 결과의 92%를 제공하는 데 사용되었습니다. 나머지는 Bing API에서 서버 측으로 또는 (옵트인 기준으로) Google에서 클라이언트 측으로 검색됩니다. Brave에 따르면 인덱스는 스팸 및 기타 저품질 콘텐츠를 피하기 위해 "Google 또는 Bing의 인덱스보다 의도적으로 작게" 유지되었으며 "Brave Search는 롱테일 쿼리를 복구하는 데 Google만큼 좋지 않다"는 단점이 있습니다.
+>- `Brave Search Premium`: 2023년 4월부터 Brave Search는 광고가 없는 웹사이트이지만 결국 광고를 포함하는 새로운 모델로 전환되며 프리미엄 사용자는 광고 없는 경험을 얻게 됩니다. 기본적으로 사용자로부터 IP 주소를 포함한 사용자 데이터가 수집되지 않습니다. 옵트인 데이터 수집을 위해서는 프리미엄 계정이 필요합니다.
 
-## Installation and Setup
+## 설치 및 설정
 
-To get access to the Brave Search API, you need to [create an account and get an API key](https://api.search.brave.com/app/dashboard).
+Brave Search API에 액세스하려면 [계정을 생성하고 API 키를 받아야](https://api.search.brave.com/app/dashboard) 합니다.
 
 ```python
 api_key = "..."
@@ -27,7 +19,7 @@ api_key = "..."
 from langchain_community.document_loaders import BraveSearchLoader
 ```
 
-## Example
+## 예시
 
 ```python
 loader = BraveSearchLoader(

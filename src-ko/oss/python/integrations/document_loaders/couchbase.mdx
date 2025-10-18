@@ -2,19 +2,19 @@
 title: Couchbase
 ---
 
->[Couchbase](http://couchbase.com/) is an award-winning distributed NoSQL cloud database that delivers unmatched versatility, performance, scalability, and financial value for all of your cloud, mobile, AI, and edge computing applications.
+>[Couchbase](http://couchbase.com/)는 클라우드, 모바일, AI 및 엣지 컴퓨팅 애플리케이션을 위해 탁월한 유연성, 성능, 확장성 및 재정적 가치를 제공하는 수상 경력이 있는 분산 NoSQL 클라우드 데이터베이스입니다.
 
-## Installation
+## 설치
 
 ```python
 %pip install -qU  couchbase
 ```
 
-## Querying for Documents from Couchbase
+## Couchbase에서 문서 쿼리하기
 
-For more details on connecting to a Couchbase cluster, please check the [Python SDK documentation](https://docs.couchbase.com/python-sdk/current/howtos/managing-connections.html#connection-strings).
+Couchbase 클러스터 연결에 대한 자세한 내용은 [Python SDK 문서](https://docs.couchbase.com/python-sdk/current/howtos/managing-connections.html#connection-strings)를 확인하세요.
 
-For help with querying for documents using SQL++ (SQL for JSON), please check the [documentation](https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html).
+SQL++ (SQL for JSON)를 사용하여 문서를 쿼리하는 방법에 대한 도움말은 [문서](https://docs.couchbase.com/server/current/n1ql/n1ql-language-reference/index.html)를 확인하세요.
 
 ```python
 from langchain_community.document_loaders.couchbase import CouchbaseLoader
@@ -33,7 +33,7 @@ query = """
         """
 ```
 
-## Create the Loader
+## 로더 생성하기
 
 ```python
 loader = CouchbaseLoader(
@@ -44,7 +44,7 @@ loader = CouchbaseLoader(
 )
 ```
 
-You can fetch the documents by calling the `load` method of the loader. It will return a list with all the documents. If you want to avoid this blocking call, you can call `lazy_load` method that returns an Iterator.
+로더의 `load` 메서드를 호출하여 문서를 가져올 수 있습니다. 모든 문서가 포함된 목록을 반환합니다. 이 블로킹 호출을 피하려면 Iterator를 반환하는 `lazy_load` 메서드를 호출할 수 있습니다.
 
 ```python
 docs = loader.load()

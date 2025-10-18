@@ -2,26 +2,26 @@
 title: AirbyteLoader
 ---
 
->[Airbyte](https://github.com/airbytehq/airbyte) is a data integration platform for ELT pipelines from APIs, databases & files to warehouses & lakes. It has the largest catalog of ELT connectors to data warehouses and databases.
+>[Airbyte](https://github.com/airbytehq/airbyte)는 API, 데이터베이스 및 파일에서 웨어하우스 및 레이크로의 ELT 파이프라인을 위한 데이터 통합 플랫폼입니다. 데이터 웨어하우스 및 데이터베이스에 대한 가장 큰 ELT 커넥터 카탈로그를 보유하고 있습니다.
 
-This covers how to load any source from Airbyte into LangChain documents
+이 문서는 Airbyte의 모든 소스를 LangChain 문서로 로드하는 방법을 다룹니다.
 
-## Installation
+## 설치
 
-In order to use `AirbyteLoader` you need to install the `langchain-airbyte` integration package.
+`AirbyteLoader`를 사용하려면 `langchain-airbyte` 통합 패키지를 설치해야 합니다.
 
 ```python
 %pip install -qU langchain-airbyte
 ```
 
-Note: Currently, the `airbyte` library does not support Pydantic v2.
-Please downgrade to Pydantic v1 to use this package.
+참고: 현재 `airbyte` 라이브러리는 Pydantic v2를 지원하지 않습니다.
+이 패키지를 사용하려면 Pydantic v1로 다운그레이드하세요.
 
-Note: This package also currently requires Python 3.10+.
+참고: 이 패키지는 현재 Python 3.10+ 이상이 필요합니다.
 
-## Loading Documents
+## 문서 로드
 
-By default, the `AirbyteLoader` will load any structured data from a stream and output yaml-formatted documents.
+기본적으로 `AirbyteLoader`는 스트림에서 구조화된 데이터를 로드하고 yaml 형식의 문서를 출력합니다.
 
 ```python
 from langchain_airbyte import AirbyteLoader
@@ -63,7 +63,7 @@ updated_at: '2024-02-27T16:41:01+00:00'
 weight: 6
 ```
 
-You can also specify a custom prompt template for formatting documents:
+문서 형식 지정을 위한 사용자 정의 프롬프트 템플릿을 지정할 수도 있습니다:
 
 ```python
 from langchain_core.prompts import PromptTemplate
@@ -84,9 +84,9 @@ print(docs_templated[0].page_content)
 My name is Verdie and I am 1.73 meters tall.
 ```
 
-## Lazy Loading Documents
+## 문서 지연 로드
 
-One of the powerful features of `AirbyteLoader` is its ability to load large documents from upstream sources. When working with large datasets, the default `.load()` behavior can be slow and memory-intensive. To avoid this, you can use the `.lazy_load()` method to load documents in a more memory-efficient manner.
+`AirbyteLoader`의 강력한 기능 중 하나는 업스트림 소스에서 대용량 문서를 로드하는 능력입니다. 대규모 데이터셋으로 작업할 때 기본 `.load()` 동작은 느리고 메모리 집약적일 수 있습니다. 이를 방지하려면 `.lazy_load()` 메서드를 사용하여 더 메모리 효율적인 방식으로 문서를 로드할 수 있습니다.
 
 ```python
 import time
@@ -111,7 +111,7 @@ print(
 Just calling lazy load is quick! This took 0.0001 seconds
 ```
 
-And you can iterate over documents as they're yielded:
+그리고 생성되는 문서를 반복할 수 있습니다:
 
 ```python
 for doc in my_iterator:
@@ -124,7 +124,7 @@ My name is Jody and I am 1.85 meters tall.
 My name is Zonia and I am 1.53 meters tall.
 ```
 
-You can also lazy load documents in an async manner with `.alazy_load()`:
+`.alazy_load()`를 사용하여 비동기 방식으로 문서를 지연 로드할 수도 있습니다:
 
 ```python
 loader = AirbyteLoader(
@@ -148,14 +148,14 @@ My name is Ali and I am 1.90 meters tall.
 My name is Rochell and I am 1.83 meters tall.
 ```
 
-## Configuration
+## 구성
 
-`AirbyteLoader` can be configured with the following options:
+`AirbyteLoader`는 다음 옵션으로 구성할 수 있습니다:
 
-- `source` (str, required): The name of the Airbyte source to load from.
-- `stream` (str, required): The name of the stream to load from (Airbyte sources can return multiple streams)
-- `config` (dict, required): The configuration for the Airbyte source
-- `template` (PromptTemplate, optional): A custom prompt template for formatting documents
-- `include_metadata` (bool, optional, default True): Whether to include all fields as metadata in the output documents
+- `source` (str, 필수): 로드할 Airbyte 소스의 이름입니다.
+- `stream` (str, 필수): 로드할 스트림의 이름입니다(Airbyte 소스는 여러 스트림을 반환할 수 있음).
+- `config` (dict, 필수): Airbyte 소스에 대한 구성입니다.
+- `template` (PromptTemplate, 선택): 문서 형식 지정을 위한 사용자 정의 프롬프트 템플릿입니다.
+- `include_metadata` (bool, 선택, 기본값 True): 출력 문서에 모든 필드를 메타데이터로 포함할지 여부입니다.
 
-The majority of the configuration will be in `config`, and you can find the specific configuration options in the "Config field reference" for each source in the [Airbyte documentation](https://docs.airbyte.com/integrations/).
+대부분의 구성은 `config`에 있으며, [Airbyte 문서](https://docs.airbyte.com/integrations/)에서 각 소스에 대한 "Config field reference"에서 특정 구성 옵션을 찾을 수 있습니다.

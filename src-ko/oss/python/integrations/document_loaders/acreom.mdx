@@ -2,11 +2,11 @@
 title: acreom
 ---
 
-[acreom](https://acreom.com) is a dev-first knowledge base with tasks running on local markdown files.
+[acreom](https://acreom.com)은 로컬 마크다운 파일에서 작동하는 작업 관리 기능이 포함된 개발자 우선 지식 베이스입니다.
 
-Below is an example on how to load a local acreom vault into LangChain. As the local vault in acreom is a folder of plain text .md files, the loader requires the path to the directory.
+아래 예제는 로컬 acreom vault를 LangChain에 로드하는 방법을 보여줍니다. acreom의 로컬 vault는 일반 텍스트 .md 파일들로 구성된 폴더이므로, 로더는 해당 디렉토리의 경로가 필요합니다.
 
-Vault files may contain some metadata which is stored as a YAML header. These values will be added to the document’s metadata if `collect_metadata` is set to true.
+Vault 파일에는 YAML 헤더로 저장된 메타데이터가 포함될 수 있습니다. `collect_metadata`가 true로 설정된 경우 이러한 값들이 문서의 메타데이터에 추가됩니다.
 
 ```python
 from langchain_community.document_loaders import AcreomLoader

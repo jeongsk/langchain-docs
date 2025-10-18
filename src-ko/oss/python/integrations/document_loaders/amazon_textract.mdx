@@ -2,13 +2,13 @@
 title: Amazon Textract
 ---
 
->[Amazon Textract](https://docs.aws.amazon.com/managedservices/latest/userguide/textract.html) is a machine learning (ML) service that automatically extracts text, handwriting, and data from scanned documents.
+>[Amazon Textract](https://docs.aws.amazon.com/managedservices/latest/userguide/textract.html)는 스캔한 문서에서 텍스트, 손글씨 및 데이터를 자동으로 추출하는 머신 러닝(ML) 서비스입니다.
 >
->It goes beyond simple optical character recognition (OCR) to identify, understand, and extract data from forms and tables. Today, many companies manually extract data from scanned documents such as PDFs, images, tables, and forms, or through simple OCR software that requires manual configuration (which often must be updated when the form changes). To overcome these manual and expensive processes, `Textract` uses ML to read and process any type of document, accurately extracting text, handwriting, tables, and other data with no manual effort.
+>단순한 광학 문자 인식(OCR)을 넘어 양식과 표에서 데이터를 식별, 이해 및 추출합니다. 오늘날 많은 기업들은 PDF, 이미지, 표 및 양식과 같은 스캔 문서에서 수동으로 데이터를 추출하거나 수동 구성이 필요한 간단한 OCR 소프트웨어를 통해(양식이 변경될 때마다 업데이트해야 하는 경우가 많음) 데이터를 추출합니다. 이러한 수동적이고 비용이 많이 드는 프로세스를 극복하기 위해 `Textract`는 ML을 사용하여 모든 유형의 문서를 읽고 처리하며, 수동 작업 없이 텍스트, 손글씨, 표 및 기타 데이터를 정확하게 추출합니다.
 
-`Textract` supports `JPEG`, `PNG`, `PDF`, and `TIFF` file formats; more information is available in [the documentation](https://docs.aws.amazon.com/textract/latest/dg/limits-document.html).
+`Textract`는 `JPEG`, `PNG`, `PDF` 및 `TIFF` 파일 형식을 지원합니다. 자세한 정보는 [문서](https://docs.aws.amazon.com/textract/latest/dg/limits-document.html)에서 확인할 수 있습니다.
 
-The following examples demonstrate the use of `Amazon Textract` in combination with LangChain as a DocumentLoader.
+다음 예제는 DocumentLoader로서 LangChain과 결합된 `Amazon Textract`의 사용을 보여줍니다.
 
 ```python
 %pip install -qU  boto3 langchain-openai tiktoken python-dotenv
@@ -20,10 +20,10 @@ The following examples demonstrate the use of `Amazon Textract` in combination w
 
 ## Example 1: Loading from a local file
 
-The first example uses a local file, which internally will be sent to Amazon Textract sync API [DetectDocumentText](https://docs.aws.amazon.com/textract/latest/dg/API_DetectDocumentText.html).
+첫 번째 예제는 로컬 파일을 사용하며, 내부적으로 Amazon Textract sync API [DetectDocumentText](https://docs.aws.amazon.com/textract/latest/dg/API_DetectDocumentText.html)로 전송됩니다.
 
-Local files or URL endpoints like HTTP:// are limited to one page documents for Textract.
-Multi-page documents have to reside on S3. This sample file is a jpeg.
+로컬 파일 또는 HTTP://와 같은 URL 엔드포인트는 Textract의 경우 단일 페이지 문서로 제한됩니다.
+다중 페이지 문서는 S3에 저장되어 있어야 합니다. 이 샘플 파일은 jpeg입니다.
 
 ```python
 from langchain_community.document_loaders import AmazonTextractPDFLoader
@@ -32,7 +32,7 @@ loader = AmazonTextractPDFLoader("example_data/alejandro_rosalez_sample-small.jp
 documents = loader.load()
 ```
 
-Output from the file
+파일의 출력
 
 ```python
 documents
@@ -44,8 +44,8 @@ documents
 
 ## Example 2: Loading from a URL
 
-The next example loads a file from an HTTPS endpoint.
-It has to be single page, as Amazon Textract requires all multi-page documents to be stored on S3.
+다음 예제는 HTTPS 엔드포인트에서 파일을 로드합니다.
+Amazon Textract는 모든 다중 페이지 문서가 S3에 저장되어 있어야 하므로 단일 페이지여야 합니다.
 
 ```python
 from langchain_community.document_loaders import AmazonTextractPDFLoader
@@ -66,7 +66,7 @@ documents
 
 ## Example 3: Loading multi-page PDF documents
 
-Processing a multi-page document requires the document to be on S3. The sample document resides in a bucket in us-east-2 and Textract needs to be called in that same region to be successful, so we set the region_name on the client and pass that in to the loader to ensure Textract is called from us-east-2. You could also to have your notebook running in us-east-2, setting the AWS_DEFAULT_REGION set to us-east-2 or when running in a different environment, pass in a boto3 Textract client with that region name like in the cell below.
+다중 페이지 문서를 처리하려면 문서가 S3에 있어야 합니다. 샘플 문서는 us-east-2의 버킷에 있으며, 성공하려면 동일한 리전에서 Textract를 호출해야 하므로 클라이언트에서 region_name을 설정하고 로더에 전달하여 us-east-2에서 Textract가 호출되도록 합니다. us-east-2에서 노트북을 실행하거나, AWS_DEFAULT_REGION을 us-east-2로 설정하거나, 다른 환경에서 실행할 때 아래 셀처럼 해당 리전 이름으로 boto3 Textract 클라이언트를 전달할 수도 있습니다.
 
 ```python
 import boto3
@@ -78,7 +78,7 @@ loader = AmazonTextractPDFLoader(file_path, client=textract_client)
 documents = loader.load()
 ```
 
-Now getting the number of pages to validate the response (printing out the full response would be quite long...). We expect 16 pages.
+이제 응답을 검증하기 위해 페이지 수를 확인합니다(전체 응답을 출력하면 상당히 길 것입니다...). 16페이지가 예상됩니다.
 
 ```python
 len(documents)
@@ -90,13 +90,13 @@ len(documents)
 
 ## Example 4: Customizing the output format
 
-When Amazon Textract processes a PDF, it extracts all text, including elements like headers, footers, and page numbers. This extra information can be "noisy" and reduce the effectiveness of the output.
+Amazon Textract가 PDF를 처리할 때 헤더, 푸터, 페이지 번호와 같은 요소를 포함한 모든 텍스트를 추출합니다. 이러한 추가 정보는 "노이즈"가 될 수 있으며 출력의 효과를 감소시킬 수 있습니다.
 
-The process of converting a document's 2D layout into a clean, one-dimensional string of text is called linearization.
+문서의 2D 레이아웃을 깨끗한 1차원 텍스트 문자열로 변환하는 프로세스를 선형화(linearization)라고 합니다.
 
-The AmazonTextractPDFLoader gives you precise control over this process with the `linearization_config` parameter. You can use it to specify which elements to exclude from the final output.
+AmazonTextractPDFLoader는 `linearization_config` 매개변수를 통해 이 프로세스를 정밀하게 제어할 수 있습니다. 이를 사용하여 최종 출력에서 제외할 요소를 지정할 수 있습니다.
 
-The following example shows how to hide headers, footers, and figures, resulting in a much cleaner text block, for more advanced use cases see this [AWS blog post](https://aws.amazon.com/blogs/machine-learning/amazon-textracts-new-layout-feature-introduces-efficiencies-in-general-purpose-and-generative-ai-document-processing-tasks/).
+다음 예제는 헤더, 푸터 및 그림을 숨겨 훨씬 깨끗한 텍스트 블록을 생성하는 방법을 보여줍니다. 고급 사용 사례는 이 [AWS 블로그 게시물](https://aws.amazon.com/blogs/machine-learning/amazon-textracts-new-layout-feature-introduces-efficiencies-in-general-purpose-and-generative-ai-document-processing-tasks/)을 참조하세요.
 
 ```python
 from langchain_community.document_loaders import AmazonTextractPDFLoader
@@ -115,8 +115,8 @@ documents = loader.load()
 
 ## Using the AmazonTextractPDFLoader in a LangChain chain (e.g. OpenAI)
 
-The AmazonTextractPDFLoader can be used in a chain the same way the other loaders are used.
-Textract itself does have a [Query feature](https://docs.aws.amazon.com/textract/latest/dg/API_Query.html), which offers similar functionality to the QA chain in this example, which is worth checking out as well.
+AmazonTextractPDFLoader는 다른 로더와 동일한 방식으로 체인에서 사용할 수 있습니다.
+Textract 자체에는 이 예제의 QA 체인과 유사한 기능을 제공하는 [Query 기능](https://docs.aws.amazon.com/textract/latest/dg/API_Query.html)이 있으므로 확인해 볼 가치가 있습니다.
 
 ```python
 # You can store your OPENAI_API_KEY in a .env file as well
