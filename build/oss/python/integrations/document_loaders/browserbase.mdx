@@ -2,27 +2,27 @@
 title: Browserbase
 ---
 
-[Browserbase](https://browserbase.com) is a developer platform to reliably run, manage, and monitor headless browsers.
+[Browserbase](https://browserbase.com)는 헤드리스 브라우저를 안정적으로 실행, 관리 및 모니터링하기 위한 개발자 플랫폼입니다.
 
-Power your AI data retrievals with:
+다음을 통해 AI 데이터 검색을 강화하세요:
 
-- [Serverless Infrastructure](https://docs.browserbase.com/under-the-hood) providing reliable browsers to extract data from complex UIs
-- [Stealth Mode](https://docs.browserbase.com/features/stealth-mode) with included fingerprinting tactics and automatic captcha solving
-- [Session Debugger](https://docs.browserbase.com/features/sessions) to inspect your Browser Session with networks timeline and logs
-- [Live Debug](https://docs.browserbase.com/guides/session-debug-connection/browser-remote-control) to quickly debug your automation
+- 복잡한 UI에서 데이터를 추출하기 위한 안정적인 브라우저를 제공하는 [Serverless Infrastructure](https://docs.browserbase.com/under-the-hood)
+- 지문 인식 전술 및 자동 캡차 해결이 포함된 [Stealth Mode](https://docs.browserbase.com/features/stealth-mode)
+- 네트워크 타임라인 및 로그를 통해 브라우저 세션을 검사하는 [Session Debugger](https://docs.browserbase.com/features/sessions)
+- 자동화를 빠르게 디버그하기 위한 [Live Debug](https://docs.browserbase.com/guides/session-debug-connection/browser-remote-control)
 
-## Installation and Setup
+## 설치 및 설정
 
-- Get an API key and Project ID from [browserbase.com](https://browserbase.com) and set it in environment variables (`BROWSERBASE_API_KEY`, `BROWSERBASE_PROJECT_ID`).
-- Install the [Browserbase SDK](http://github.com/browserbase/python-sdk):
+- [browserbase.com](https://browserbase.com)에서 API 키와 Project ID를 받아 환경 변수에 설정합니다(`BROWSERBASE_API_KEY`, `BROWSERBASE_PROJECT_ID`).
+- [Browserbase SDK](http://github.com/browserbase/python-sdk)를 설치합니다:
 
 ```python
 %pip install browserbase
 ```
 
-## Loading documents
+## 문서 로드하기
 
-You can load webpages into LangChain using `BrowserbaseLoader`. Optionally, you can set `text_content` parameter to convert the pages to text-only representation.
+`BrowserbaseLoader`를 사용하여 웹페이지를 LangChain으로 로드할 수 있습니다. 선택적으로 `text_content` 매개변수를 설정하여 페이지를 텍스트 전용 표현으로 변환할 수 있습니다.
 
 ```python
 import os
@@ -50,14 +50,14 @@ docs = loader.load()
 print(docs[0].page_content[:61])
 ```
 
-### Loader Options
+### 로더 옵션
 
-- `urls` Required. A list of URLs to fetch.
-- `text_content` Retrieve only text content. Default is `False`.
-- `api_key` Browserbase API key. Default is `BROWSERBASE_API_KEY` env variable.
-- `project_id` Browserbase Project ID. Default is `BROWSERBASE_PROJECT_ID` env variable.
-- `session_id` Optional. Provide an existing Session ID.
-- `proxy` Optional. Enable/Disable Proxies.
+- `urls` 필수. 가져올 URL 목록입니다.
+- `text_content` 텍스트 콘텐츠만 검색합니다. 기본값은 `False`입니다.
+- `api_key` Browserbase API 키입니다. 기본값은 `BROWSERBASE_API_KEY` 환경 변수입니다.
+- `project_id` Browserbase Project ID입니다. 기본값은 `BROWSERBASE_PROJECT_ID` 환경 변수입니다.
+- `session_id` 선택 사항. 기존 Session ID를 제공합니다.
+- `proxy` 선택 사항. 프록시를 활성화/비활성화합니다.
 
 ---
 

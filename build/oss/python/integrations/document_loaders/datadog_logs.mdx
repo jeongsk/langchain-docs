@@ -2,9 +2,9 @@
 title: Datadog Logs
 ---
 
->[Datadog](https://www.datadoghq.com/) is a monitoring and analytics platform for cloud-scale applications.
+>[Datadog](https://www.datadoghq.com/)는 클라우드 규모 애플리케이션을 위한 모니터링 및 분석 플랫폼입니다.
 
-This loader fetches the logs from your applications in Datadog using the `datadog_api_client` Python package. You must initialize the loader with your `Datadog API key` and `APP key`, and you need to pass in the query to extract the desired logs.
+이 로더는 `datadog_api_client` Python 패키지를 사용하여 Datadog의 애플리케이션 로그를 가져옵니다. `Datadog API 키`와 `APP 키`로 로더를 초기화해야 하며, 원하는 로그를 추출하기 위한 쿼리를 전달해야 합니다.
 
 ```python
 from langchain_community.document_loaders import DatadogLogsLoader

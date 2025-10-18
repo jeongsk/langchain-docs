@@ -2,45 +2,45 @@
 title: Confluence
 ---
 
-[Confluence](https://www.atlassian.com/software/confluence) is a wiki collaboration platform designed to save and organize all project-related materials. As a knowledge base, Confluence primarily serves content management activities.
+[Confluence](https://www.atlassian.com/software/confluence)는 모든 프로젝트 관련 자료를 저장하고 정리하도록 설계된 위키 협업 플랫폼입니다. 지식 베이스로서 Confluence는 주로 콘텐츠 관리 활동을 제공합니다.
 
-This loader allows you to fetch and process Confluence pages into `Document` objects.
+이 로더를 사용하면 Confluence 페이지를 가져와서 [`Document`](https://reference.langchain.com/python/langchain_core/documents/#langchain_core.documents.base.Document) 객체로 처리할 수 있습니다.
 
 ---
 
-## Authentication Methods
+## 인증 방법
 
-The following authentication methods are supported:
+다음 인증 방법이 지원됩니다:
 
 - `username/api_key`
 - `OAuth2 login`
 - `cookies`
-- On-premises installations: `token` authentication
+- 온프레미스 설치: `token` 인증
 
 ---
 
-## Page Selection
+## 페이지 선택
 
-You can specify which pages to load using:
+다음을 사용하여 로드할 페이지를 지정할 수 있습니다:
 
 - **page_ids** (*list*):
-  A list of `page_id` values to load the corresponding pages.
+  해당 페이지를 로드하기 위한 `page_id` 값의 목록입니다.
 
 - **space_key** (*string*):
-  A string of `space_key` value to load all pages within the specified confluence space.
+  지정된 confluence 스페이스 내의 모든 페이지를 로드하기 위한 `space_key` 값의 문자열입니다.
 
-If both `page_ids` and `space_key` are provided, the loader will return the union of pages from both lists.
+`page_ids`와 `space_key`가 모두 제공되면 로더는 두 목록의 페이지 합집합을 반환합니다.
 
-*Hint:* Both `space_key` and `page_id` can be found in the URL of a Confluence page:
+*힌트:* `space_key`와 `page_id`는 모두 Confluence 페이지의 URL에서 찾을 수 있습니다:
 `https://yoursite.atlassian.com/wiki/spaces/{space_key}/pages/{page_id}`
 
 ---
 
-## Attachments
+## 첨부 파일
 
-You may include attachments in the loaded `Document` objects by setting the boolean parameter **include_attachments** to `True` (default: `False`). When enabled, all attachments are downloaded and their text content is extracted and added to the Document.
+불리언 매개변수 **include_attachments**를 `True`로 설정하여 로드된 [`Document`](https://reference.langchain.com/python/langchain_core/documents/#langchain_core.documents.base.Document) 객체에 첨부 파일을 포함할 수 있습니다(기본값: `False`). 활성화하면 모든 첨부 파일이 다운로드되고 텍스트 콘텐츠가 추출되어 Document에 추가됩니다.
 
-**Currently supported attachment types:**
+**현재 지원되는 첨부 파일 유형:**
 
 - PDF (`.pdf`)
 - PNG (`.png`)
@@ -51,22 +51,22 @@ You may include attachments in the loaded `Document` objects by setting the bool
 
 ---
 
-Before using ConfluenceLoader make sure you have the latest version of the atlassian-python-api package installed:
+ConfluenceLoader를 사용하기 전에 최신 버전의 atlassian-python-api 패키지가 설치되어 있는지 확인하세요:
 
 ```python
 %pip install -qU  atlassian-python-api
 ```
 
-## Examples
+## 예제
 
-### Username and Password or Username and API Token (Atlassian Cloud only)
+### 사용자 이름과 비밀번호 또는 사용자 이름과 API 토큰 (Atlassian Cloud 전용)
 
-This example authenticates using either a username and password or, if you're connecting to an Atlassian Cloud hosted version of Confluence, a username and an API Token.
-You can generate an API token at: [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens).
+이 예제는 사용자 이름과 비밀번호를 사용하거나, Atlassian Cloud 호스팅 버전의 Confluence에 연결하는 경우 사용자 이름과 API 토큰을 사용하여 인증합니다.
+API 토큰은 [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens)에서 생성할 수 있습니다.
 
-The `limit` parameter specifies how many documents will be retrieved in a single call, not how many documents will be retrieved in total.
-By default the code will return up to 1000 documents in 50 documents batches. To control the total number of documents use the `max_pages` parameter.
-Plese note the maximum value for the `limit` parameter in the atlassian-python-api package is currently 100.
+`limit` 매개변수는 단일 호출에서 검색할 문서 수를 지정하며, 총 검색 문서 수를 지정하는 것이 아닙니다.
+기본적으로 코드는 50개 문서 배치로 최대 1000개의 문서를 반환합니다. 총 문서 수를 제어하려면 `max_pages` 매개변수를 사용하세요.
+atlassian-python-api 패키지의 `limit` 매개변수 최대값은 현재 100입니다.
 
 ```python
 from langchain_community.document_loaders import ConfluenceLoader
@@ -82,12 +82,12 @@ loader = ConfluenceLoader(
 documents = loader.load()
 ```
 
-### Personal Access Token (Server/On-Prem only)
+### Personal Access Token (서버/온프레미스 전용)
 
-This method is valid for the Data Center/Server on-prem edition only.
-For more information on how to generate a Personal Access Token (PAT) check the official Confluence documentation at: [confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html).
-When using a PAT you provide only the token value, you cannot provide a username.
-Please note that ConfluenceLoader will run under the permissions of the user that generated the PAT and will only be able to load documents for which said user has access to.
+이 방법은 Data Center/Server 온프레미스 에디션에서만 유효합니다.
+Personal Access Token (PAT) 생성 방법에 대한 자세한 내용은 공식 Confluence 문서 [confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html)을 참조하세요.
+PAT를 사용할 때는 토큰 값만 제공하며 사용자 이름을 제공할 수 없습니다.
+ConfluenceLoader는 PAT를 생성한 사용자의 권한으로 실행되며 해당 사용자가 액세스할 수 있는 문서만 로드할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders import ConfluenceLoader

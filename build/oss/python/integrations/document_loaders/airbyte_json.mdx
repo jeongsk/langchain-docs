@@ -2,34 +2,34 @@
 title: Airbyte JSON (Deprecated)
 ---
 
-Note: `AirbyteJSONLoader` is deprecated. Please use [`AirbyteLoader`](/oss/python/integrations/document_loaders/airbyte) instead.
+참고: `AirbyteJSONLoader`는 더 이상 사용되지 않습니다. 대신 [`AirbyteLoader`](/oss/python/integrations/document_loaders/airbyte)를 사용하세요.
 
->[Airbyte](https://github.com/airbytehq/airbyte) is a data integration platform for ELT pipelines from APIs, databases & files to warehouses & lakes. It has the largest catalog of ELT connectors to data warehouses and databases.
+>[Airbyte](https://github.com/airbytehq/airbyte)는 API, 데이터베이스 및 파일에서 웨어하우스 및 레이크로의 ELT 파이프라인을 위한 데이터 통합 플랫폼입니다. 데이터 웨어하우스 및 데이터베이스에 대한 가장 큰 ELT 커넥터 카탈로그를 보유하고 있습니다.
 
-This covers how to load any source from Airbyte into a local JSON file that can be read in as a document
+이 문서는 Airbyte의 모든 소스를 로컬 JSON 파일로 로드하여 문서로 읽어들이는 방법을 다룹니다.
 
-Prereqs:
-Have docker desktop installed
+사전 요구사항:
+docker desktop이 설치되어 있어야 합니다.
 
-Steps:
+단계:
 
-1) Clone Airbyte from GitHub - `git clone https://github.com/airbytehq/airbyte.git`
+1) GitHub에서 Airbyte 복제 - `git clone https://github.com/airbytehq/airbyte.git`
 
-2) Switch into Airbyte directory - `cd airbyte`
+2) Airbyte 디렉토리로 이동 - `cd airbyte`
 
-3) Start Airbyte - `docker compose up`
+3) Airbyte 시작 - `docker compose up`
 
-4) In your browser, just visit [localhost:8000](http://localhost:8000). You will be asked for a username and password. By default, that's username `airbyte` and password `password`.
+4) 브라우저에서 [localhost:8000](http://localhost:8000)을 방문하세요. 사용자 이름과 비밀번호를 요청받게 됩니다. 기본값은 사용자 이름 `airbyte`과 비밀번호 `password`입니다.
 
-5) Setup any source you wish.
+5) 원하는 소스를 설정하세요.
 
-6) Set destination as Local JSON, with specified destination path - let's say `/json_data`. Set up manual sync.
+6) 대상을 Local JSON으로 설정하고 지정된 대상 경로를 `/json_data`로 설정하세요. 수동 동기화를 설정하세요.
 
-7) Run the connection.
+7) 연결을 실행하세요.
 
-7) To see what files are created, you can navigate to: `file:///tmp/airbyte_local`
+7) 생성된 파일을 확인하려면 `file:///tmp/airbyte_local`로 이동하세요.
 
-8) Find your data and copy path. That path should be saved in the file variable below. It should start with `/tmp/airbyte_local`
+8) 데이터를 찾아 경로를 복사하세요. 해당 경로는 아래 파일 변수에 저장되어야 합니다. `/tmp/airbyte_local`로 시작해야 합니다.
 
 ```python
 from langchain_community.document_loaders import AirbyteJSONLoader

@@ -2,15 +2,15 @@
 title: Azure AI Data
 ---
 
->[Azure AI Foundry (formerly Azure AI Studio](https://ai.azure.com/) provides the capability to upload data assets to cloud storage and register existing data assets from the following sources:
+>[Azure AI Foundry(이전 Azure AI Studio)](https://ai.azure.com/)는 다음 소스에서 클라우드 스토리지에 데이터 자산을 업로드하고 기존 데이터 자산을 등록하는 기능을 제공합니다:
 >
 >- `Microsoft OneLake`
 >- `Azure Blob Storage`
 >- `Azure Data Lake gen 2`
 
-The benefit of this approach over `AzureBlobStorageContainerLoader` and `AzureBlobStorageFileLoader` is that authentication is handled seamlessly to cloud storage. You can use either *identity-based* data access control to the data or *credential-based* (e.g. SAS token, account key). In the case of credential-based data access you do not need to specify secrets in your code or set up key vaults - the system handles that for you.
+`AzureBlobStorageContainerLoader` 및 `AzureBlobStorageFileLoader`에 비해 이 방식의 장점은 클라우드 스토리지에 대한 인증이 원활하게 처리된다는 것입니다. 데이터에 대한 *ID 기반* 데이터 액세스 제어 또는 *자격 증명 기반*(예: SAS 토큰, 계정 키) 중 하나를 사용할 수 있습니다. 자격 증명 기반 데이터 액세스의 경우 코드에서 비밀을 지정하거나 키 자격 증명 모음을 설정할 필요가 없으며, 시스템이 자동으로 처리합니다.
 
-This notebook covers how to load document objects from a data asset in AI Studio.
+이 노트북에서는 AI Studio의 데이터 자산에서 문서 객체를 로드하는 방법을 다룹니다.
 
 ```python
 %pip install -qU azureml-fsspec azure-ai-generative
@@ -23,7 +23,7 @@ from langchain_community.document_loaders import AzureAIDataLoader
 ```
 
 ```python
-# Create a connection to your project
+# 프로젝트에 대한 연결 생성
 client = AIClient(
     credential=DefaultAzureCredential(),
     subscription_id="<subscription_id>",
@@ -33,12 +33,12 @@ client = AIClient(
 ```
 
 ```python
-# get the latest version of your data asset
+# 데이터 자산의 최신 버전 가져오기
 data_asset = client.data.get(name="<data_asset_name>", label="latest")
 ```
 
 ```python
-# load the data asset
+# 데이터 자산 로드
 loader = AzureAIDataLoader(url=data_asset.path)
 ```
 
@@ -50,9 +50,9 @@ loader.load()
 [Document(page_content='Lorem ipsum dolor sit amet.', lookup_str='', metadata={'source': '/var/folders/y6/8_bzdg295ld6s1_97_12m4lr0000gn/T/tmpaa9xl6ch/fake.docx'}, lookup_index=0)]
 ```
 
-## Specifying a glob pattern
+## glob 패턴 지정
 
-You can also specify a glob pattern for more fine-grained control over what files to load. In the example below, only files with a `pdf` extension will be loaded.
+로드할 파일을 보다 세밀하게 제어하기 위해 glob 패턴을 지정할 수도 있습니다. 아래 예제에서는 `pdf` 확장자를 가진 파일만 로드됩니다.
 
 ```python
 loader = AzureAIDataLoader(url=data_asset.path, glob="*.pdf")

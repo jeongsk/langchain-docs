@@ -2,28 +2,28 @@
 title: Blockchain
 ---
 
-The intention of this notebook is to provide a means of testing functionality in the LangChain Document Loader for Blockchain.
+이 노트북의 목적은 Blockchain용 LangChain Document Loader의 기능을 테스트하는 방법을 제공하는 것입니다.
 
-Initially this Loader supports:
+초기에 이 로더는 다음을 지원합니다:
 
-* Loading NFTs as Documents from NFT Smart Contracts (ERC721 and ERC1155)
-* Ethereum Mainnnet, Ethereum Testnet, Polygon Mainnet, Polygon Testnet (default is eth-mainnet)
-* Alchemy's getNFTsForCollection API
+* NFT 스마트 컨트랙트(ERC721 및 ERC1155)에서 NFT를 Document로 로드
+* Ethereum Mainnnet, Ethereum Testnet, Polygon Mainnet, Polygon Testnet (기본값은 eth-mainnet)
+* Alchemy의 getNFTsForCollection API
 
-It can be extended if the community finds value in this loader.  Specifically:
+커뮤니티가 이 로더에서 가치를 발견하면 확장할 수 있습니다. 구체적으로:
 
-* Additional APIs can be added (e.g. Tranction-related APIs)
+* 추가 API를 추가할 수 있습니다 (예: 트랜잭션 관련 API)
 
-This Document Loader Requires:
+이 Document Loader를 사용하려면 다음이 필요합니다:
 
-* A free [Alchemy API Key](https://www.alchemy.com/)
+* 무료 [Alchemy API Key](https://www.alchemy.com/)
 
-The output takes the following format:
+출력은 다음과 같은 형식을 취합니다:
 
-* pageContent= Individual NFT
+* pageContent= 개별 NFT
 * metadata=\{'source': '0x1a92f7381b9f03921564a437210bb9396471050c', 'blockchain': 'eth-mainnet', 'tokenId': '0x15'\}
 
-## Load NFTs into Document Loader
+## Document Loader에 NFT 로드하기
 
 ```python
 # get ALCHEMY_API_KEY from https://www.alchemy.com/
@@ -31,7 +31,7 @@ The output takes the following format:
 alchemyApiKey = "..."
 ```
 
-### Option 1: Ethereum Mainnet (default BlockchainType)
+### 옵션 1: Ethereum Mainnet (기본 BlockchainType)
 
 ```python
 from langchain_community.document_loaders.blockchain import (
@@ -52,7 +52,7 @@ nfts = blockchainLoader.load()
 nfts[:2]
 ```
 
-### Option 2: Polygon Mainnet
+### 옵션 2: Polygon Mainnet
 
 ```python
 contractAddress = (
