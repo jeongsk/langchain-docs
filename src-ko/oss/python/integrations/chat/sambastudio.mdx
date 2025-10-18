@@ -2,35 +2,35 @@
 title: ChatSambaStudio
 ---
 
-This will help you get started with SambaStudio [chat models](/oss/langchain/models). For detailed documentation of all ChatStudio features and configurations head to the [API reference](https://docs.sambanova.ai/sambastudio/latest/index.html).
+이 가이드는 SambaStudio [채팅 모델](/oss/langchain/models) 시작에 도움을 줍니다. 모든 ChatStudio 기능 및 구성에 대한 자세한 문서는 [API 레퍼런스](https://docs.sambanova.ai/sambastudio/latest/index.html)를 참조하세요.
 
-**[SambaNova](https://sambanova.ai/)'s** [SambaStudio](https://docs.sambanova.ai/sambastudio/latest/sambastudio-intro.html) SambaStudio is a rich, GUI-based platform that provides the functionality to train, deploy, and manage models in SambaNova [DataScale](https://sambanova.ai/products/datascale) systems.
+**[SambaNova](https://sambanova.ai/)'s** [SambaStudio](https://docs.sambanova.ai/sambastudio/latest/sambastudio-intro.html) SambaStudio는 SambaNova [DataScale](https://sambanova.ai/products/datascale) 시스템에서 모델을 학습, 배포 및 관리하는 기능을 제공하는 풍부한 GUI 기반 플랫폼입니다.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | JS support | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatSambaStudio](https://docs.sambanova.ai/sambastudio/latest/index.html) | [langchain-sambanova](https://python.langchain.com/docs/integrations/providers/sambanova/) | ❌ | ❌ | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain_sambanova?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain_sambanova?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
-| [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
+| [도구 호출](/oss/langchain/tools) | [구조화된 출력](/oss/langchain/structured-output) | JSON 모드 | [이미지 입력](/oss/langchain/messages#multimodal) | 오디오 입력 | 비디오 입력 | [토큰 수준 스트리밍](/oss/langchain/streaming/) | 네이티브 비동기 | [토큰 사용량](/oss/langchain/models#token-usage) | [로그 확률](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ |
 
-## Setup
+## 설정
 
-To access ChatSambaStudio models you will need to [deploy an endpoint](https://docs.sambanova.ai/sambastudio/latest/language-models.html) in your SambaStudio platform, install the `langchain_sambanova` integration package.
+ChatSambaStudio 모델에 접근하려면 SambaStudio 플랫폼에서 [엔드포인트를 배포](https://docs.sambanova.ai/sambastudio/latest/language-models.html)하고 `langchain_sambanova` 통합 패키지를 설치해야 합니다.
 
 ```bash
 pip install langchain-sambanova
 ```
 
-### Credentials
+### 자격 증명
 
-Get the URL and API Key from your SambaStudio deployed endpoint and add them to your environment variables:
+SambaStudio 배포된 엔드포인트에서 URL과 API Key를 얻어 환경 변수에 추가하세요:
 
 ``` bash
 export SAMBASTUDIO_URL="sambastudio-url-key-here"
@@ -49,24 +49,24 @@ if not os.getenv("SAMBASTUDIO_API_KEY"):
     )
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출의 자동 추적을 원하는 경우 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```python
 # os.environ["LANGSMITH_TRACING"] = "true"
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 ```
 
-### Installation
+### 설치
 
-The LangChain **SambaStudio** integration lives in the `langchain_sambanova` package:
+LangChain **SambaStudio** 통합은 `langchain_sambanova` 패키지에 포함되어 있습니다:
 
 ```python
 %pip install -qU langchain-sambanova
 ```
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
 
 ```python
 from langchain_sambanova import ChatSambaStudio
@@ -81,7 +81,7 @@ llm = ChatSambaStudio(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 messages = [
@@ -108,7 +108,7 @@ print(ai_msg.content)
 J'adore la programmation.
 ```
 
-## Streaming
+## 스트리밍
 
 ```python
 system = "You are a helpful assistant with pirate accent."
@@ -135,7 +135,7 @@ Owls come in all shapes and sizes, from the tiny elf owl to the great grey owl, 
 So, there ye have it, me hearty! Owls be amazin' creatures, with their clever adaptations and stealthy ways. Now, go forth and spread the word about these magnificent birds o' the night! And remember, if ye ever encounter an owl in the wild, be sure to show respect and keep a weather eye open, or ye might just find yerself on the receivin' end o' a silent, flyin' tackle! Arrr!
 ```
 
-## Async
+## 비동기
 
 ```python
 prompt = ChatPromptTemplate.from_messages(
@@ -155,7 +155,7 @@ await chain.ainvoke({"country": "France"})
 AIMessage(content='The capital of France is Paris.', response_metadata={'id': 'item0', 'partial': False, 'value': {'completion': 'The capital of France is Paris.', 'logprobs': {'text_offset': [], 'top_logprobs': []}, 'prompt': '<|start_header_id|>user<|end_header_id|>\n\nwhat is the capital of France?<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n', 'stop_reason': 'end_of_text', 'tokens': ['The', ' capital', ' of', ' France', ' is', ' Paris', '.'], 'total_tokens_count': 24}, 'params': {}, 'status': None}, id='item0')
 ```
 
-## Async Streaming
+## 비동기 스트리밍
 
 ```python
 prompt = ChatPromptTemplate.from_messages(
@@ -176,7 +176,7 @@ async for chunk in chain.astream({"num_words": 30, "topic": "quantum computers"}
 Quantum computers use quantum bits (qubits) to process multiple possibilities simultaneously, exponentially faster than classical computers, enabling breakthroughs in fields like cryptography, optimization, and simulation.
 ```
 
-## Tool calling
+## 도구 호출
 
 ```python
 from datetime import datetime
@@ -243,7 +243,7 @@ Tool output: Current date: 11/07/2024
 final response: The meeting will be exactly two weeks from today, which would be 25/07/2024.
 ```
 
-## Structured Outputs
+## 구조화된 출력
 
 ```python
 from pydantic import BaseModel, Field
@@ -265,6 +265,6 @@ structured_llm.invoke("Tell me a joke about cats")
 Joke(setup='Why did the cat join a band?', punchline='Because it wanted to be the purr-cussionist!')
 ```
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all SambaStudio features and configurations head to the API reference: [docs.sambanova.ai/sambastudio/latest/api-ref-landing.html](https://docs.sambanova.ai/sambastudio/latest/api-ref-landing.html)
+모든 SambaStudio 기능 및 구성에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [docs.sambanova.ai/sambastudio/latest/api-ref-landing.html](https://docs.sambanova.ai/sambastudio/latest/api-ref-landing.html)

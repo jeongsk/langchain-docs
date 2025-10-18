@@ -2,29 +2,29 @@
 title: ChatHuggingFace
 ---
 
-This will help you get started with `langchain_huggingface` [chat models](/oss/langchain/models). For detailed documentation of all `ChatHuggingFace` features and configurations head to the [API reference](https://python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html). For a list of models supported by Hugging Face check out [this page](https://huggingface.co/models).
+이 문서는 `langchain_huggingface` [chat models](/oss/langchain/models). For detailed documentation of all `ChatHuggingFace` features and configurations head to the [API reference](https://python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html). For a list of models supported by Hugging Face check out [this page](https://huggingface.co/models).
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | JS support | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatHuggingFace](https://python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html) | [langchain-huggingface](https://python.langchain.com/api_reference/huggingface/index.html) | ✅ | beta | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain_huggingface?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain_huggingface?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ❌ |
 
-## Setup
+## 설정
 
 To access Hugging Face models you'll need to create a Hugging Face account, get an API key, and install the `langchain-huggingface` integration package.
 
-### Credentials
+### 자격 증명
 
 Generate a [Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens) and store it as an environment variable: `HUGGINGFACEHUB_API_TOKEN`.
 
@@ -36,23 +36,23 @@ if not os.getenv("HUGGINGFACEHUB_API_TOKEN"):
     os.environ["HUGGINGFACEHUB_API_TOKEN"] = getpass.getpass("Enter your token: ")
 ```
 
-### Installation
+### 설치
 
 | Class | Package | Local | Serializable | JS support | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatHuggingFace](https://python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html) | [langchain-huggingface](https://python.langchain.com/api_reference/huggingface/index.html) | ✅ | ❌ | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain_huggingface?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain_huggingface?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
-## Setup
+## 설정
 
 To access `langchain_huggingface` models you'll need to create a `Hugging Face` account, get an API key, and install the `langchain-huggingface` integration package.
 
-### Credentials
+### 자격 증명
 
 You'll need to have a [Hugging Face Access Token](https://huggingface.co/docs/hub/security-tokens) saved as an environment variable: `HUGGINGFACEHUB_API_TOKEN`.
 
@@ -75,7 +75,7 @@ os.environ["HUGGINGFACEHUB_API_TOKEN"] = getpass.getpass(
 Note: you may need to restart the kernel to use updated packages.
 ```
 
-## Instantiation
+## 인스턴스화
 
 You can instantiate a `ChatHuggingFace` model in two different ways, either from a `HuggingFaceEndpoint` or from a `HuggingFacePipeline`.
 
@@ -220,7 +220,7 @@ llm = HuggingFacePipeline.from_model_id(
 chat_model = ChatHuggingFace(llm=llm)
 ```
 
-## Invocation
+## 호출
 
 ```python
 from langchain.messages import (
@@ -248,7 +248,7 @@ According to the popular phrase and hypothetical scenario, when an unstoppable f
 In this scenario, it is un
 ```
 
-## API reference
+## API 참조
 
 For detailed documentation of all `ChatHuggingFace` features and configurations head to the API reference: [python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html](https://python.langchain.com/api_reference/huggingface/chat_models/langchain_huggingface.chat_models.huggingface.ChatHuggingFace.html)
 

@@ -2,59 +2,59 @@
 title: ChatVertexAI
 ---
 
-This page provides a quick overview for getting started with VertexAI [chat models](/oss/langchain/models). For detailed documentation of all ChatVertexAI features and configurations head to the [API reference](https://python.langchain.com/api_reference/google_vertexai/chat_models/langchain_google_vertexai.chat_models.ChatVertexAI.html).
+이 페이지는 VertexAI [채팅 모델](/oss/langchain/models)을 시작하기 위한 빠른 개요를 제공합니다. ChatVertexAI의 모든 기능과 구성에 대한 자세한 문서는 [API 참조](https://python.langchain.com/api_reference/google_vertexai/chat_models/langchain_google_vertexai.chat_models.ChatVertexAI.html)를 참조하세요.
 
-ChatVertexAI exposes all foundational models available in Google Cloud, like `gemini-2.5-pro`, `gemini-2.5-flash`, etc. For a full and updated list of available models visit [VertexAI documentation](https://cloud.google.com/vertex-ai/generative-ai/docs/models).
+ChatVertexAI는 `gemini-2.5-pro`, `gemini-2.5-flash` 등과 같이 Google Cloud에서 사용 가능한 모든 기반 모델을 노출합니다. 사용 가능한 모델의 전체 및 최신 목록은 [VertexAI 문서](https://cloud.google.com/vertex-ai/generative-ai/docs/models)를 참조하세요.
 
 <Info>
 **Google Cloud VertexAI vs Google PaLM**
 
-The Google Cloud VertexAI integration is separate from the [Google PaLM integration](/oss/integrations/chat/google_generative_ai/). Google has chosen to offer an enterprise version of PaLM through GCP, and this supports the models made available through there.
+Google Cloud VertexAI 통합은 [Google PaLM 통합](/oss/integrations/chat/google_generative_ai/)과 별개입니다. Google은 GCP를 통해 PaLM의 엔터프라이즈 버전을 제공하기로 선택했으며, 이는 그곳에서 제공되는 모델을 지원합니다.
 
 </Info>
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
-| Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/google_vertex_ai) | Downloads | Version |
+| 클래스 | 패키지 | 로컬 | 직렬화 가능 | [JS 지원](https://js.langchain.com/docs/integrations/chat/google_vertex_ai) | 다운로드 | 버전 |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatVertexAI](https://python.langchain.com/api_reference/google_vertexai/chat_models/langchain_google_vertexai.chat_models.ChatVertexAI.html) | [langchain-google-vertexai](https://python.langchain.com/api_reference/google_vertexai/index.html) | ❌ | beta | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-google-vertexai?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-google-vertexai?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
-| [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
+| [도구 호출](/oss/langchain/tools) | [구조화된 출력](/oss/langchain/structured-output) | JSON 모드 | [이미지 입력](/oss/langchain/messages#multimodal) | 오디오 입력 | 비디오 입력 | [토큰 수준 스트리밍](/oss/langchain/streaming/) | 네이티브 비동기 | [토큰 사용량](/oss/langchain/models#token-usage) | [로그 확률](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
 
-## Setup
+## 설정
 
-To access VertexAI models you'll need to create a Google Cloud Platform account, set up credentials, and install the `langchain-google-vertexai` integration package.
+VertexAI 모델에 접근하려면 Google Cloud Platform 계정을 생성하고, 인증 정보를 설정하고, `langchain-google-vertexai` 통합 패키지를 설치해야 합니다.
 
-### Credentials
+### 인증 정보
 
-To use the integration you must either:
+통합을 사용하려면 다음 중 하나를 수행해야 합니다:
 
-- Have credentials configured for your environment (gcloud, workload identity, etc...)
-- Store the path to a service account JSON file as the GOOGLE_APPLICATION_CREDENTIALS environment variable
+- 환경에 대해 구성된 인증 정보 보유 (gcloud, workload identity 등...)
+- 서비스 계정 JSON 파일 경로를 GOOGLE_APPLICATION_CREDENTIALS 환경 변수로 저장
 
-This codebase uses the `google.auth` library which first looks for the application credentials variable mentioned above, and then looks for system-level auth.
+이 코드베이스는 위에서 언급한 애플리케이션 인증 정보 변수를 먼저 찾고, 그 다음 시스템 수준 인증을 찾는 `google.auth` 라이브러리를 사용합니다.
 
-For more information, see:
+자세한 정보는 다음을 참조하세요:
 
 - [cloud.google.com/docs/authentication/application-default-credentials#GAC](https://cloud.google.com/docs/authentication/application-default-credentials#GAC)
 - [googleapis.dev/python/google-auth/latest/reference/google.auth.html#module-google.auth](https://googleapis.dev/python/google-auth/latest/reference/google.auth.html#module-google.auth)
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
 
 ```python
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 # os.environ["LANGSMITH_TRACING"] = "true"
 ```
 
-### Installation
+### 설치
 
-The LangChain VertexAI integration lives in the `langchain-google-vertexai` package:
+LangChain VertexAI 통합은 `langchain-google-vertexai` 패키지에 있습니다:
 
 ```python
 %pip install -qU langchain-google-vertexai
@@ -64,9 +64,9 @@ The LangChain VertexAI integration lives in the `langchain-google-vertexai` pack
 Note: you may need to restart the kernel to use updated packages.
 ```
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
 
 ```python
 from langchain_google_vertexai import ChatVertexAI
@@ -81,7 +81,7 @@ llm = ChatVertexAI(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 messages = [
@@ -107,17 +107,17 @@ print(ai_msg.content)
 J'adore programmer.
 ```
 
-## Built-in tools
+## 내장 도구
 
-Gemini supports a range of tools that are executed server-side.
+Gemini는 서버 측에서 실행되는 다양한 도구를 지원합니다.
 
-### Google search
+### Google 검색
 
 <Info>
-    **Requires `langchain-google-vertexai>=2.0.11`**
+    **`langchain-google-vertexai>=2.0.11` 필요**
 </Info>
 
-Gemini can execute a Google search and use the results to [ground its responses](https://ai.google.dev/gemini-api/docs/grounding):
+Gemini는 Google 검색을 실행하고 결과를 사용하여 [응답을 그라운딩](https://ai.google.dev/gemini-api/docs/grounding)할 수 있습니다:
 
 ```python
 from langchain_google_vertexai import ChatVertexAI
@@ -127,13 +127,13 @@ llm = ChatVertexAI(model="gemini-2.5-flash").bind_tools([{"google_search": {}}])
 response = llm.invoke("What is today's news?")
 ```
 
-### Code execution
+### 코드 실행
 
 <Info>
-    **Requires `langchain-google-vertexai>=2.0.25`**
+    **`langchain-google-vertexai>=2.0.25` 필요**
 </Info>
 
-Gemini can [generate and execute Python code](https://ai.google.dev/gemini-api/docs/code-execution):
+Gemini는 [Python 코드를 생성하고 실행](https://ai.google.dev/gemini-api/docs/code-execution)할 수 있습니다:
 
 ```python
 from langchain_google_vertexai import ChatVertexAI
@@ -143,6 +143,6 @@ llm = ChatVertexAI(model="gemini-2.5-flash").bind_tools([{"code_execution": {}}]
 response = llm.invoke("What is 3^3?")
 ```
 
-## API reference
+## API 참조
 
-For detailed documentation of all ChatVertexAI features and configurations, like how to send multimodal inputs and configure safety settings, head to the API reference: [python.langchain.com/api_reference/google_vertexai/chat_models/langchain_google_vertexai.chat_models.ChatVertexAI.html](https://python.langchain.com/api_reference/google_vertexai/chat_models/langchain_google_vertexai.chat_models.ChatVertexAI.html)
+멀티모달 입력 전송 및 안전 설정 구성 방법과 같은 ChatVertexAI의 모든 기능과 구성에 대한 자세한 문서는 API 참조를 참조하세요: [python.langchain.com/api_reference/google_vertexai/chat_models/langchain_google_vertexai.chat_models.ChatVertexAI.html](https://python.langchain.com/api_reference/google_vertexai/chat_models/langchain_google_vertexai.chat_models.ChatVertexAI.html)

@@ -2,50 +2,48 @@
 title: AzureChatOpenAI
 ---
 
-This guide will help you get started with AzureOpenAI [chat models](/oss/langchain/models).
+이 가이드는 AzureOpenAI [채팅 모델](/oss/langchain/models) 시작하기를 도와드립니다.
 
 <Note>
 
-`AzureChatOpenAI` shares the same underlying base implementation as `ChatOpenAI`,
-which interfaces with OpenAI services directly.
+`AzureChatOpenAI`는 OpenAI 서비스와 직접 인터페이스하는 `ChatOpenAI`와 동일한 기본 구현을 공유합니다.
 
-This page serves as a quickstart for authenticating and connecting your Azure OpenAI service to a LangChain chat model.
+이 페이지는 Azure OpenAI 서비스를 LangChain 채팅 모델에 인증하고 연결하기 위한 빠른 시작 가이드입니다.
 
-Visit the [ChatOpenAI docs](/oss/integrations/chat/openai/) for details on available
-features, or head to the [API reference](https://python.langchain.com/api_reference/openai/chat_models/langchain_openai.chat_models.azure.AzureChatOpenAI.html).
+사용 가능한 기능에 대한 자세한 내용은 [ChatOpenAI 문서](/oss/integrations/chat/openai/)를 참조하거나 [API 레퍼런스](https://python.langchain.com/api_reference/openai/chat_models/langchain_openai.chat_models.azure.AzureChatOpenAI.html)를 확인하세요.
 
 </Note>
 
-Azure OpenAI has several chat models. You can find information about their latest models and their costs, context windows, and supported input types in the [Azure docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models).
+Azure OpenAI는 여러 채팅 모델을 제공합니다. 최신 모델과 비용, 컨텍스트 윈도우, 지원되는 입력 타입에 대한 정보는 [Azure 문서](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models)에서 확인할 수 있습니다.
 
 <Info>
 **Azure OpenAI vs OpenAI**
 
-Azure OpenAI refers to OpenAI models hosted on the [Microsoft Azure platform](https://azure.microsoft.com/en-us/products/ai-services/openai-service). OpenAI also provides its own model APIs. To access OpenAI services directly, use the [ChatOpenAI integration](/oss/integrations/chat/openai/).
+Azure OpenAI는 [Microsoft Azure 플랫폼](https://azure.microsoft.com/en-us/products/ai-services/openai-service)에서 호스팅되는 OpenAI 모델을 의미합니다. OpenAI는 자체 모델 API도 제공합니다. OpenAI 서비스에 직접 액세스하려면 [ChatOpenAI 통합](/oss/integrations/chat/openai/)을 사용하세요.
 
 </Info>
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/azure) | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [AzureChatOpenAI](https://python.langchain.com/api_reference/openai/chat_models/langchain_openai.chat_models.azure.AzureChatOpenAI.html) | [langchain-openai](https://python.langchain.com/api_reference/openai/index.html) | ❌ | beta | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-openai?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-openai?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
 
-## Setup
+## 설정
 
-To access AzureOpenAI models you'll need to create an Azure account, create a deployment of an Azure OpenAI model, get the name and endpoint for your deployment, get an Azure OpenAI API key, and install the `langchain-openai` integration package.
+AzureOpenAI 모델에 액세스하려면 Azure 계정을 생성하고, Azure OpenAI 모델의 배포를 생성하고, 배포의 이름과 엔드포인트를 가져오고, Azure OpenAI API 키를 발급받고, `langchain-openai` 통합 패키지를 설치해야 합니다.
 
-### Credentials
+### 자격 증명
 
-Head to the [Azure docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart?tabs=command-line%2Cpython-new&pivots=programming-language-python) to create your deployment and generate an API key. Once you've done this set the AZURE_OPENAI_API_KEY and AZURE_OPENAI_ENDPOINT environment variables:
+배포를 생성하고 API 키를 생성하는 방법은 [Azure 문서](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart?tabs=command-line%2Cpython-new&pivots=programming-language-python)를 참조하세요. 완료한 후 AZURE_OPENAI_API_KEY 및 AZURE_OPENAI_ENDPOINT 환경 변수를 설정하세요:
 
 ```python
 import getpass
@@ -58,27 +56,27 @@ if "AZURE_OPENAI_API_KEY" not in os.environ:
 os.environ["AZURE_OPENAI_ENDPOINT"] = "https://YOUR-ENDPOINT.openai.azure.com/"
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
 
 ```python
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 # os.environ["LANGSMITH_TRACING"] = "true"
 ```
 
-### Installation
+### 설치
 
-The LangChain AzureOpenAI integration lives in the `langchain-openai` package:
+LangChain AzureOpenAI 통합은 `langchain-openai` 패키지에 있습니다:
 
 ```python
 %pip install -qU langchain-openai
 ```
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions.
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다.
 
-- Replace `azure_deployment` with the name of your deployment,
-- You can find the latest supported `api_version` here: [learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference).
+- `azure_deployment`를 배포 이름으로 교체하세요,
+- 지원되는 최신 `api_version`은 여기에서 확인할 수 있습니다: [learn.microsoft.com/en-us/azure/ai-services/openai/reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference).
 
 ```python
 from langchain_openai import AzureChatOpenAI
@@ -94,7 +92,7 @@ llm = AzureChatOpenAI(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 messages = [
@@ -120,11 +118,11 @@ print(ai_msg.content)
 J'adore la programmation.
 ```
 
-## Specifying model version
+## 모델 버전 지정
 
-Azure OpenAI responses contain `model_name` response metadata property, which is name of the model used to generate the response. However unlike native OpenAI responses, it does not contain the specific version of the model, which is set on the deployment in Azure. E.g. it does not distinguish between `gpt-35-turbo-0125` and `gpt-35-turbo-0301`. This makes it tricky to know which version of the model was used to generate the response, which as result can lead to e.g. wrong total cost calculation with `OpenAICallbackHandler`.
+Azure OpenAI 응답에는 응답을 생성하는 데 사용된 모델의 이름인 `model_name` 응답 메타데이터 속성이 포함됩니다. 그러나 네이티브 OpenAI 응답과 달리 Azure의 배포에 설정된 모델의 특정 버전은 포함되지 않습니다. 예를 들어, `gpt-35-turbo-0125`와 `gpt-35-turbo-0301`을 구분하지 않습니다. 이로 인해 응답을 생성하는 데 사용된 모델의 버전을 알기 어렵고, 결과적으로 `OpenAICallbackHandler`로 총 비용을 잘못 계산할 수 있습니다.
 
-To solve this problem, you can pass `model_version` parameter to `AzureChatOpenAI` class, which will be added to the model name in the llm output. This way you can easily distinguish between different versions of the model.
+이 문제를 해결하려면 `AzureChatOpenAI` 클래스에 `model_version` 매개변수를 전달할 수 있으며, 이는 llm 출력의 모델 이름에 추가됩니다. 이렇게 하면 모델의 다른 버전을 쉽게 구분할 수 있습니다.
 
 ```python
 %pip install -qU langchain-community
@@ -159,6 +157,6 @@ with get_openai_callback() as cb:
 Total Cost (USD): $0.000074
 ```
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all AzureChatOpenAI features and configurations head to the API reference: [python.langchain.com/api_reference/openai/chat_models/langchain_openai.chat_models.azure.AzureChatOpenAI.html](https://python.langchain.com/api_reference/openai/chat_models/langchain_openai.chat_models.azure.AzureChatOpenAI.html)
+AzureChatOpenAI의 모든 기능과 설정에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [python.langchain.com/api_reference/openai/chat_models/langchain_openai.chat_models.azure.AzureChatOpenAI.html](https://python.langchain.com/api_reference/openai/chat_models/langchain_openai.chat_models.azure.AzureChatOpenAI.html)

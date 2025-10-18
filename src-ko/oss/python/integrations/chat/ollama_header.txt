@@ -1,0 +1,98 @@
+---
+title: ChatOllama
+---
+
+[Ollama](https://ollama.com/)를 사용하면 `got-oss`와 같은 오픈 소스 대규모 언어 모델을 로컬로 실행할 수 있습니다.
+
+`ollama`는 Modelfile로 정의된 단일 패키지에 모델 가중치, 구성 및 데이터를 번들로 제공합니다.
+
+GPU 사용을 포함한 설정 및 구성 세부 정보를 최적화합니다.
+
+지원되는 모델 및 모델 변형의 전체 목록은 [Ollama model library](https://github.com/jmorganca/ollama#model-library)를 참조하세요.
+
+## 개요
+
+### 통합 세부정보
+
+| Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/ollama) | Downloads | Version |
+| :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
+| [ChatOllama](https://python.langchain.com/api_reference/ollama/chat_models/langchain_ollama.chat_models.ChatOllama.html#chatollama) | [langchain-ollama](https://python.langchain.com/api_reference/ollama/index.html) | ✅ | ❌ | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-ollama?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-ollama?style=flat-square&label=%20) |
+
+### 모델 기능
+
+| [Tool calling](/oss/langchain/tools/) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
+| :---: |:----------------------------------------------------:| :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
+| ✅ |                          ✅                           | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ |
+
+## 설정
+
+먼저 [다음 지침](https://github.com/ollama/ollama?tab=readme-ov-file#ollama)에 따라 로컬 Ollama 인스턴스를 설정하고 실행하세요:
+
+* WSL(Windows Subsystem for Linux), macOS 및 Linux를 포함하여 사용 가능한 지원 플랫폼에 Ollama를 [다운로드](https://ollama.ai/download)하고 설치하세요
+  * macOS 사용자는 `brew install ollama`로 설치하고 `brew services start ollama`로 시작할 수 있습니다
+* `ollama pull <name-of-model>`을 통해 사용 가능한 LLM 모델을 가져오세요
+  * [모델 라이브러리](https://ollama.ai/library)를 통해 사용 가능한 모델 목록을 확인하세요
+  * 예: `ollama pull gpt-oss:20b`
+* 이렇게 하면 모델의 기본 태그 버전이 다운로드됩니다. 일반적으로 기본값은 최신의 가장 작은 크기 매개변수 모델을 가리킵니다.
+
+> Mac에서 모델은 `~/.ollama/models`에 다운로드됩니다
+>
+> Linux(또는 WSL)에서 모델은 `/usr/share/ollama/.ollama/models`에 저장됩니다
+
+* `ollama pull gpt-oss:20b`와 같이 관심 있는 모델의 정확한 버전을 지정하세요([`Vicuna`의 다양한 태그](https://ollama.ai/library/vicuna/tags)를 이 인스턴스에서 확인하세요)
+* 모든 pull된 모델을 보려면 `ollama list`를 사용하세요
+* 명령줄에서 직접 모델과 채팅하려면 `ollama run <name-of-model>`을 사용하세요
+* 더 많은 명령은 [Ollama documentation](https://github.com/ollama/ollama/blob/main/docs/README.md)을 참조하세요. 터미널에서 `ollama help`를 실행하여 사용 가능한 명령을 볼 수 있습니다.
+
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
+
+```python
+# os.environ["LANGSMITH_TRACING"] = "true"
+# os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+```
+
+### 설치
+
+LangChain Ollama 통합은 `langchain-ollama` 패키지에 있습니다:
+
+```python
+%pip install -qU langchain-ollama
+```
+
+<Warning>
+최신 Ollama 버전을 사용하고 있는지 확인하세요!
+</Warning>
+
+다음을 실행하여 업데이트하세요:
+
+```python
+%pip install -U ollama
+```
+
+## 인스턴스화
+
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
+
+```python
+from langchain_ollama import ChatOllama
+
+llm = ChatOllama(
+    model="llama3.1",
+    temperature=0,
+    # other params...
+)
+```
+
+## 호출
+
+```python
+messages = [
+    (
+        "system",
+        "You are a helpful assistant that translates English to French. Translate the user sentence.",
+    ),
+    ("human", "I love programming."),
+]
+ai_msg = llm.invoke(messages)
+ai_msg
+```

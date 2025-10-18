@@ -2,35 +2,35 @@
 title: ChatReka
 ---
 
-이 가이드는 Reka [채팅 모델](/oss/langchain/models) 시작을 위한 간단한 개요를 제공합니다.
+This guide provides a quick overview for getting started with Reka [chat models](/oss/langchain/models).
 
-Reka는 여러 채팅 모델을 제공합니다. 최신 모델과 비용, 컨텍스트 윈도우, 지원되는 입력 유형에 대한 정보는 [Reka 문서](https://docs.reka.ai/available-models)에서 확인할 수 있습니다.
+Reka has several chat models. You can find information about their latest models and their costs, context windows, and supported input types in the [Reka docs](https://docs.reka.ai/available-models).
 
-## 개요
+## Overview
 
-### 통합 세부 정보
+### Integration details
 
 | Class | Package | Local | Serializable | JS support | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatReka] | [langchain_community](https://python.langchain.com/api_reference/community/index.html) | ✅ | ❌ | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain_community?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain_community?style=flat-square&label=%20) |
 
-### 모델 기능
+### Model features
 
-| [도구 호출](/oss/langchain/tools) | [구조화된 출력](/oss/langchain/structured-output) | JSON 모드 | [이미지 입력](/oss/langchain/messages#multimodal) | 오디오 입력 | 비디오 입력 | [토큰 수준 스트리밍](/oss/langchain/streaming/) | 네이티브 비동기 | [토큰 사용량](/oss/langchain/models#token-usage) | [로그 확률](/oss/langchain/models#log-probabilities) |
+| [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
 
-## 설정
+## Setup
 
-Reka 모델에 접근하려면 Reka 개발자 계정을 생성하고, API 키를 얻고, `langchain_community` 통합 패키지와 'pip install reka-api'를 통해 reka python 패키지를 설치해야 합니다.
+To access Reka models you'll need to create a Reka developer account, get an API key, and install the `langchain_community` integration package and the reka python package via 'pip install reka-api'.
 
-### 자격 증명
+### Credentials
 
-[platform.reka.ai/](https://platform.reka.ai/)로 이동하여 Reka에 가입하고 API 키를 생성하세요. 완료하면 REKA_API_KEY 환경 변수를 설정하세요:
+Head to [platform.reka.ai/](https://platform.reka.ai/) to sign up for Reka and generate an API key. Once you've done this set the REKA_API_KEY environment variable:
 
-### 설치
+### Installation
 
-LangChain __ModuleName__ 통합은 `langchain_community` 패키지에 포함되어 있습니다:
+The LangChain __ModuleName__ integration lives in the `langchain_community` package:
 
 ```python
 %pip install -qU langchain_community reka-api
@@ -40,7 +40,7 @@ LangChain __ModuleName__ 통합은 `langchain_community` 패키지에 포함되�
 Note: you may need to restart the kernel to use updated packages.
 ```
 
-## 인스턴스화
+## Instantiation
 
 ```python
 import getpass
@@ -49,7 +49,7 @@ import os
 os.environ["REKA_API_KEY"] = getpass.getpass("Enter your Reka API key: ")
 ```
 
-선택 사항: 모델 실행을 추적하려면 LangSmith를 사용하세요
+Optional: use LangSmith to trace the execution of the model
 
 ```python
 import getpass
@@ -65,7 +65,7 @@ from langchain_community.chat_models import ChatReka
 model = ChatReka()
 ```
 
-## 호출
+## Invocation
 
 ```python
 model.invoke("hi")
@@ -75,7 +75,7 @@ model.invoke("hi")
 AIMessage(content=' Hello! How can I help you today? If you have a question, need assistance, or just want to chat, feel free to let me know. Have a great day!\n\n', additional_kwargs={}, response_metadata={}, id='run-61522ec2-0587-4fd5-a492-5b205fd8860c-0')
 ```
 
-# 이미지 입력
+# Images input
 
 ```python
 from langchain.messages import HumanMessage
@@ -99,7 +99,7 @@ print(response.content)
  The image shows an indoor setting with no visible windows or natural light, and there are no indicators of weather conditions. The focus is on a cat sitting on a computer keyboard, and the background includes a computer monitor and various office supplies.
 ```
 
-# 여러 이미지 입력
+# Multiple images as input
 
 ```python
 message = HumanMessage(
@@ -131,7 +131,7 @@ The second image shows a close-up of a single cat with striking blue eyes, likel
 Overall, the differences lie in the subjects (two dogs vs. one cat), the setting (lush, vibrant grassy field vs. a more muted outdoor background), and the overall mood and activity depicted (playful and active vs. serene and focused).
 ```
 
-## 체이닝
+## Chaining
 
 ```python
 from langchain_core.prompts import ChatPromptTemplate
@@ -160,13 +160,13 @@ chain.invoke(
 AIMessage(content=' Ich liebe Programmieren.\n\n', additional_kwargs={}, response_metadata={}, id='run-ffc4ace1-b73a-4fb3-ad0f-57e60a0f9b8d-0')
 ```
 
-Tavily api 검색과 함께 사용
+Use with Tavily api search
 
-# 도구 사용 및 에이전트 생성
+# Tool use and agent creation
 
-## 도구 정의
+## Define the tools
 
-먼저 사용할 도구를 생성해야 합니다. 주요 도구는 검색 엔진인 Tavily입니다. LangChain에는 Tavily 검색 엔진을 도구로 쉽게 사용할 수 있는 내장 도구가 있습니다.
+We first need to create the tools we want to use. Our main tool of choice will be Tavily - a search engine. We have a built-in tool in LangChain to easily use Tavily search engine as tool.
 
 ```python
 import getpass
@@ -190,13 +190,13 @@ tools = [search]
 [{'url': 'https://www.weatherapi.com/', 'content': "{'location': {'name': 'San Francisco', 'region': 'California', 'country': 'United States of America', 'lat': 37.775, 'lon': -122.4183, 'tz_id': 'America/Los_Angeles', 'localtime_epoch': 1730484342, 'localtime': '2024-11-01 11:05'}, 'current': {'last_updated_epoch': 1730484000, 'last_updated': '2024-11-01 11:00', 'temp_c': 11.1, 'temp_f': 52.0, 'is_day': 1, 'condition': {'text': 'Mist', 'icon': '//cdn.weatherapi.com/weather/64x64/day/143.png', 'code': 1030}, 'wind_mph': 2.9, 'wind_kph': 4.7, 'wind_degree': 247, 'wind_dir': 'WSW', 'pressure_mb': 1019.0, 'pressure_in': 30.08, 'precip_mm': 0.0, 'precip_in': 0.0, 'humidity': 100, 'cloud': 100, 'feelslike_c': 11.1, 'feelslike_f': 52.0, 'windchill_c': 10.3, 'windchill_f': 50.5, 'heatindex_c': 10.8, 'heatindex_f': 51.5, 'dewpoint_c': 10.4, 'dewpoint_f': 50.6, 'vis_km': 2.8, 'vis_miles': 1.0, 'uv': 3.0, 'gust_mph': 3.8, 'gust_kph': 6.1}}"}, {'url': 'https://weatherspark.com/h/m/557/2024/1/Historical-Weather-in-January-2024-in-San-Francisco-California-United-States', 'content': 'San Francisco Temperature History January 2024\nHourly Temperature in January 2024 in San Francisco\nCompare San Francisco to another city:\nCloud Cover in January 2024 in San Francisco\nDaily Precipitation in January 2024 in San Francisco\nObserved Weather in January 2024 in San Francisco\nHours of Daylight and Twilight in January 2024 in San Francisco\nSunrise & Sunset with Twilight in January 2024 in San Francisco\nSolar Elevation and Azimuth in January 2024 in San Francisco\nMoon Rise, Set & Phases in January 2024 in San Francisco\nHumidity Comfort Levels in January 2024 in San Francisco\nWind Speed in January 2024 in San Francisco\nHourly Wind Speed in January 2024 in San Francisco\nHourly Wind Direction in 2024 in San Francisco\nAtmospheric Pressure in January 2024 in San Francisco\nData Sources\n See all nearby weather stations\nLatest Report — 1:56 PM\nFri, Jan 12, 2024\xa0\xa0\xa0\xa04 min ago\xa0\xa0\xa0\xa0UTC 21:56\nCall Sign KSFO\nTemp.\n54.0°F\nPrecipitation\nNo Report\nWind\n8.1 mph\nCloud Cover\nMostly Cloudy\n14,000 ft\nRaw: KSFO 122156Z 08007KT 10SM FEW030 SCT050 BKN140 12/07 A3022 While having the tremendous advantages of temporal and spatial completeness, these reconstructions: (1) are based on computer models that may have model-based errors, (2) are coarsely sampled on a 50 km grid and are therefore unable to reconstruct the local variations of many microclimates, and (3) have particular difficulty with the weather in some coastal areas, especially small islands.\n We further caution that our travel scores are only as good as the data that underpin them, that weather conditions at any given location and time are unpredictable and variable, and that the definition of the scores reflects a particular set of preferences that may not agree with those of any particular reader.\n January 2024 Weather History in San Francisco California, United States\nThe data for this report comes from the San Francisco International Airport.'}]
 ```
 
-이제 이 모델이 도구 호출을 수행할 수 있도록 활성화하는 것이 어떤지 확인할 수 있습니다. 이를 활성화하려면 `.bind_tools`를 사용하여 언어 모델에 이러한 도구에 대한 지식을 제공합니다
+We can now see what it is like to enable this model to do tool calling. In order to enable that we use .bind_tools to give the language model knowledge of these tools
 
 ```python
 model_with_tools = model.bind_tools(tools)
 ```
 
-이제 모델을 호출할 수 있습니다. 먼저 일반 메시지로 호출하고 응답을 확인하겠습니다. content 필드와 tool_calls 필드를 모두 확인할 수 있습니다.
+We can now call the model. Let's first call it with a normal message, and see how it responds. We can look at both the content field as well as the tool_calls field.
 
 ```python
 from langchain.messages import HumanMessage
@@ -214,7 +214,7 @@ ContentString:  Hello! How can I help you today? If you have a question or need 
 ToolCalls: []
 ```
 
-이제 도구를 호출할 것으로 예상되는 입력으로 호출해 보겠습니다.
+Now, let's try calling it with some input that would expect a tool to be called.
 
 ```python
 response = model_with_tools.invoke([HumanMessage(content="What's the weather in SF?")])
@@ -228,17 +228,17 @@ ContentString:
 ToolCalls: [{'name': 'tavily_search_results_json', 'args': {'query': 'weather in SF'}, 'id': '2548c622-3553-42df-8220-39fde0632bdb', 'type': 'tool_call'}]
 ```
 
-이제 텍스트 콘텐츠는 없지만 도구 호출이 있습니다! Tavily Search 도구를 호출하라고 요청하고 있습니다.
+We can see that there's now no text content, but there is a tool call! It wants us to call the Tavily Search tool.
 
-이것은 아직 도구를 호출하는 것이 아니라 호출하라고 알려주는 것입니다. 실제로 호출하려면 에이전트를 생성해야 합니다.
+This isn't calling that tool yet - it's just telling us to. In order to actually call it, we'll want to create our agent.
 
-# 에이전트 생성
+# Create the agent
 
-이제 도구와 LLM을 정의했으므로 에이전트를 생성할 수 있습니다. LangGraph를 사용하여 에이전트를 구성할 것입니다. 현재 에이전트를 구성하기 위해 고수준 인터페이스를 사용하고 있지만, LangGraph의 장점은 이 고수준 인터페이스가 에이전트 로직을 수정하려는 경우 저수준의 고도로 제어 가능한 API로 지원된다는 것입니다.
+Now that we have defined the tools and the LLM, we can create the agent. We will be using LangGraph to construct the agent. Currently, we are using a high level interface to construct the agent, but the nice thing about LangGraph is that this high-level interface is backed by a low-level, highly controllable API in case you want to modify the agent logic.
 
-이제 LLM과 도구로 에이전트를 초기화할 수 있습니다.
+Now, we can initialize the agent with the LLM and the tools.
 
-`model_with_tools`가 아닌 `model`을 전달하고 있습니다. 그 이유는 @[`create_agent`]가 내부적으로 `.bind_tools`를 호출하기 때문입니다.
+Note that we are passing in the model, not model_with_tools. That is because @[`create_agent`] will call `.bind_tools` for us under the hood.
 
 ```python
 from langchain.agents import create_agent
@@ -246,7 +246,7 @@ from langchain.agents import create_agent
 agent_executor = create_agent(model, tools)
 ```
 
-이제 도구를 호출해야 하는 예제에서 시도해 보겠습니다
+Let's now try it out on an example where it should be invoking the tool
 
 ```python
 response = agent_executor.invoke({"messages": [HumanMessage(content="hi!")]})
@@ -259,7 +259,7 @@ response["messages"]
  AIMessage(content=' Hello! How can I help you today? If you have a question or need information on a specific topic, feel free to ask. For example, you can start with a search query like "latest news on climate change" or "biography of Albert Einstein".\n\n', additional_kwargs={}, response_metadata={}, id='run-276d9dcd-13f3-481d-b562-8fe3962d9ba1-0')]
 ```
 
-내부에서 정확히 무슨 일이 일어나는지 확인하려면(그리고 도구를 호출하지 않는지 확인하려면) LangSmith 추적을 살펴볼 수 있습니다: [smith.langchain.com/public/2372d9c5-855a-45ee-80f2-94b63493563d/r](https://smith.langchain.com/public/2372d9c5-855a-45ee-80f2-94b63493563d/r)
+In order to see exactly what is happening under the hood (and to make sure it's not calling a tool) we can take a look at the LangSmith trace: [smith.langchain.com/public/2372d9c5-855a-45ee-80f2-94b63493563d/r](https://smith.langchain.com/public/2372d9c5-855a-45ee-80f2-94b63493563d/r)
 
 ```python
 response = agent_executor.invoke(
@@ -275,11 +275,11 @@ response["messages"]
  AIMessage(content=' The current weather in San Francisco is mist with a temperature of 11.4°C (52.5°F). There is a 100% humidity and the wind is blowing at 2.2 mph from the WSW direction. The forecast for the coming weeks shows a mix of cloudy and partly cloudy days with some chances of thunderstorms. Temperatures are expected to range between 53°F and 60°F.\n\n', additional_kwargs={}, response_metadata={}, id='run-de4207d6-e8e8-4382-ad16-4de0dcf0812a-0')]
 ```
 
-검색 도구를 효과적으로 호출하는지 확인하기 위해 LangSmith 추적을 확인할 수 있습니다.
+We can check out the LangSmith trace to make sure it's calling the search tool effectively.
 
 [smith.langchain.com/public/013ef704-654b-4447-8428-637b343d646e/r](https://smith.langchain.com/public/013ef704-654b-4447-8428-637b343d646e/r)
 
-에이전트가 `invoke`로 호출되어 최종 응답을 얻는 방법을 살펴봤습니다. 에이전트가 여러 단계를 실행하는 경우 시간이 걸릴 수 있습니다. 중간 진행 상황을 표시하려면 메시지가 발생하는 대로 스트리밍할 수 있습니다.
+We've seen how the agent can be called with `invoke` to get a final response. If the agent executes multiple steps, this may take a while. To show intermediate progress, we can stream back messages as they occur.
 
 ```python
 for chunk in agent_executor.stream(
@@ -298,6 +298,6 @@ for chunk in agent_executor.stream(
 ----
 ```
 
-## API 레퍼런스
+## API reference
 
 [docs.reka.ai/quick-start](https://docs.reka.ai/quick-start)

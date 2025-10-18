@@ -2,25 +2,25 @@
 title: Dappier AI
 ---
 
-**Dappier: Powering AI with Dynamic, Real-Time Data Models**
+**Dappier: 동적이고 실시간 데이터 모델로 AI 강화**
 
-Dappier offers a cutting-edge platform that grants developers immediate access to a wide array of real-time data models spanning news, entertainment, finance, market data, weather, and beyond. With our pre-trained data models, you can supercharge your AI applications, ensuring they deliver precise, up-to-date responses and minimize inaccuracies.
+Dappier는 뉴스, 엔터테인먼트, 금융, 시장 데이터, 날씨 등을 포괄하는 광범위한 실시간 데이터 모델에 대한 즉각적인 액세스를 개발자에게 제공하는 최첨단 플랫폼을 제공합니다. 사전 훈련된 데이터 모델을 사용하면 AI 애플리케이션을 강화하여 정확하고 최신 응답을 제공하고 부정확성을 최소화할 수 있습니다.
 
-Dappier data models help you build next-gen LLM apps with trusted, up-to-date content from the world's leading brands. Unleash your creativity and enhance any GPT App or AI workflow with actionable, proprietary, data through a simple API. Augment your AI with proprietary data from trusted sources is the best way to ensure factual, up-to-date, responses with fewer hallucinations no matter the question.
+Dappier 데이터 모델은 세계 최고의 브랜드에서 제공하는 신뢰할 수 있고 최신 콘텐츠를 사용하여 차세대 LLM 앱을 구축하는 데 도움이 됩니다. 간단한 API를 통해 실행 가능하고 독점적인 데이터로 모든 GPT 앱 또는 AI 워크플로를 창의적으로 향상시킬 수 있습니다. 신뢰할 수 있는 소스의 독점 데이터로 AI를 강화하는 것은 질문에 관계없이 환각이 적은 사실적이고 최신 응답을 보장하는 가장 좋은 방법입니다.
 
-For Developers, By Developers
-Designed with developers in mind, Dappier simplifies the journey from data integration to monetization, providing clear, straightforward paths to deploy and earn from your AI models. Experience the future of monetization infrastructure for the new internet at **[dappier.com/](https://dappier.com/)**.
+개발자를 위한, 개발자에 의한
+Dappier는 개발자를 염두에 두고 설계되어 데이터 통합에서 수익화까지의 여정을 단순화하고 AI 모델을 배포하고 수익을 창출할 수 있는 명확하고 간단한 경로를 제공합니다. **[dappier.com/](https://dappier.com/)**에서 새로운 인터넷을 위한 수익화 인프라의 미래를 경험하세요.
 
-This example goes over how to use LangChain to interact with Dappier AI models
+이 예제는 LangChain을 사용하여 Dappier AI 모델과 상호작용하는 방법을 다룹니다.
 
 -----------------------------------------------------------------------------------
 
-To use one of our Dappier AI Data Models, you will need an API key. Please visit Dappier Platform ([platform.dappier.com/](https://platform.dappier.com/)) to log in and create an API key in your profile.
+Dappier AI 데이터 모델 중 하나를 사용하려면 API 키가 필요합니다. Dappier Platform ([platform.dappier.com/](https://platform.dappier.com/))을 방문하여 로그인하고 프로필에서 API 키를 생성하세요.
 
-You can find more details on the API reference : [docs.dappier.com/introduction](https://docs.dappier.com/introduction)
+API 레퍼런스에서 자세한 내용을 확인할 수 있습니다: [docs.dappier.com/introduction](https://docs.dappier.com/introduction)
 
-To work with our Dappier Chat Model you can pass the key directly through the parameter named dappier_api_key when initiating the class
-or set as an environment variable.
+Dappier Chat Model을 사용하려면 클래스를 초기화할 때 dappier_api_key라는 매개변수를 통해 키를 직접 전달하거나
+환경 변수로 설정할 수 있습니다.
 
 ```bash
 export DAPPIER_API_KEY="..."

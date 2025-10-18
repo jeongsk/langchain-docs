@@ -2,9 +2,9 @@
 title: SparkLLM Chat
 ---
 
-SparkLLM chat models API by iFlyTek. For more information, see [iFlyTek Open Platform](https://www.xfyun.cn/).
+iFlyTek의 SparkLLM chat models API입니다. 자세한 내용은 [iFlyTek Open Platform](https://www.xfyun.cn/)을 참조하세요.
 
-## Basic use
+## 기본 사용법
 
 ```python
 """For basic init and call"""
@@ -22,9 +22,9 @@ chat([message])
 AIMessage(content='Hello! How can I help you today?')
 ```
 
-- Get SparkLLM's app_id, api_key and api_secret from [iFlyTek SparkLLM API Console](https://console.xfyun.cn/services/bm3) (for more info, see [iFlyTek SparkLLM Intro](https://xinghuo.xfyun.cn/sparkapi) ), then set environment variables `IFLYTEK_SPARK_APP_ID`, `IFLYTEK_SPARK_API_KEY` and `IFLYTEK_SPARK_API_SECRET` or pass parameters when creating `ChatSparkLLM` as the demo above.
+- SparkLLM의 app_id, api_key 및 api_secret은 [iFlyTek SparkLLM API Console](https://console.xfyun.cn/services/bm3)에서 발급받을 수 있습니다 (자세한 내용은 [iFlyTek SparkLLM Intro](https://xinghuo.xfyun.cn/sparkapi) 참조). 발급받은 후 환경 변수 `IFLYTEK_SPARK_APP_ID`, `IFLYTEK_SPARK_API_KEY`, `IFLYTEK_SPARK_API_SECRET`을 설정하거나 위 예제처럼 `ChatSparkLLM` 생성 시 파라미터로 전달하세요.
 
-## For ChatSparkLLM with Streaming
+## ChatSparkLLM 스트리밍 사용
 
 ```python
 chat = ChatSparkLLM(
@@ -41,7 +41,7 @@ for chunk in chat.stream("Hello!"):
 Hello! How can I help you today?
 ```
 
-## For v2
+## v2 사용
 
 ```python
 """For basic init and call"""

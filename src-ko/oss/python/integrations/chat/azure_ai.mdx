@@ -2,65 +2,65 @@
 title: AzureAIChatCompletionsModel
 ---
 
-This will help you get started with AzureAIChatCompletionsModel [chat models](/oss/langchain/models). For detailed documentation of all AzureAIChatCompletionsModel features and configurations, head to the [API reference](https://python.langchain.com/api_reference/azure_ai/chat_models/langchain_azure_ai.chat_models.AzureAIChatCompletionsModel.html)
+이 가이드는 AzureAIChatCompletionsModel [채팅 모델](/oss/langchain/models) 시작하기를 도와드립니다. AzureAIChatCompletionsModel의 모든 기능과 설정에 대한 자세한 문서는 [API 레퍼런스](https://python.langchain.com/api_reference/azure_ai/chat_models/langchain_azure_ai.chat_models.AzureAIChatCompletionsModel.html)를 참조하세요.
 
-The AzureAIChatCompletionsModel class uses the Azure AI Foundry SDK. AI Foundry has several chat models, including AzureOpenAI, Cohere, Llama, Phi-3/4, and DeepSeek-R1, among others. You can find information about their latest models and their costs, context windows, and supported input types in the [Azure docs](https://learn.microsoft.com/azure/ai-studio/how-to/model-catalog-overview).
+AzureAIChatCompletionsModel 클래스는 Azure AI Foundry SDK를 사용합니다. AI Foundry는 AzureOpenAI, Cohere, Llama, Phi-3/4, DeepSeek-R1 등 여러 채팅 모델을 제공합니다. 최신 모델과 비용, 컨텍스트 윈도우, 지원되는 입력 타입에 대한 정보는 [Azure 문서](https://learn.microsoft.com/azure/ai-studio/how-to/model-catalog-overview)에서 확인할 수 있습니다.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | [JS support](https://v03.api.js.langchain.com/classes/_langchain_openai.AzureChatOpenAI.html) | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [AzureAIChatCompletionsModel](https://python.langchain.com/api_reference/azure_ai/chat_models/langchain_azure_ai.chat_models.AzureAIChatCompletionsModel.html) | [langchain-azure-ai](https://python.langchain.com/api_reference/langchain_azure_ai/index.html) | ❌ | ✅ | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-azure-ai?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-azure-ai?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
 | [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅|
 
-## Setup
+## 설정
 
-To access AzureAIChatCompletionsModel models, you'll need to create an [Azure account](https://azure.microsoft.com/pricing/purchase-options/azure-account), get an API key, and install the `langchain-azure-ai` integration package.
+AzureAIChatCompletionsModel 모델에 액세스하려면 [Azure 계정](https://azure.microsoft.com/pricing/purchase-options/azure-account)을 생성하고, API 키를 발급받고, `langchain-azure-ai` 통합 패키지를 설치해야 합니다.
 
-### Credentials
+### 자격 증명
 
-Head to the [Azure docs](https://learn.microsoft.com/en-us/azure/ai-studio/how-to/develop/sdk-overview?tabs=sync&pivots=programming-language-python) to see how to create your deployment and generate an API key. Once your model is deployed, you click the 'get endpoint' button in AI Foundry. This will show you your endpoint and api key. Once you've done this, set the AZURE_INFERENCE_CREDENTIAL and AZURE_INFERENCE_ENDPOINT environment variables:
+배포를 생성하고 API 키를 생성하는 방법은 [Azure 문서](https://learn.microsoft.com/en-us/azure/ai-studio/how-to/develop/sdk-overview?tabs=sync&pivots=programming-language-python)를 참조하세요. 모델이 배포되면 AI Foundry에서 'get endpoint' 버튼을 클릭하세요. 그러면 엔드포인트와 API 키가 표시됩니다. 완료한 후 AZURE_AI_CREDENTIAL 및 AZURE_AI_ENDPOINT 환경 변수를 설정하세요:
 
 ```python
 import getpass
 import os
 
-if not os.getenv("AZURE_INFERENCE_CREDENTIAL"):
-    os.environ["AZURE_INFERENCE_CREDENTIAL"] = getpass.getpass(
+if not os.getenv("AZURE_AI_CREDENTIAL"):
+    os.environ["AZURE_AI_CREDENTIAL"] = getpass.getpass(
         "Enter your AzureAIChatCompletionsModel API key: "
     )
 
-if not os.getenv("AZURE_INFERENCE_ENDPOINT"):
-    os.environ["AZURE_INFERENCE_ENDPOINT"] = getpass.getpass(
+if not os.getenv("AZURE_AI_ENDPOINT"):
+    os.environ["AZURE_AI_ENDPOINT"] = getpass.getpass(
         "Enter your model endpoint: "
     )
 ```
 
-If you want to get automated tracing of your model calls, you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출의 자동 추적을 활성화하려면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```python
 # os.environ["LANGSMITH_TRACING"] = "true"
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 ```
 
-### Installation
+### 설치
 
-The LangChain AzureAIChatCompletionsModel integration lives in the `langchain-azure-ai` package:
+LangChain AzureAIChatCompletionsModel 통합은 `langchain-azure-ai` 패키지에 있습니다:
 
 ```python
 %pip install -qU langchain-azure-ai
 ```
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
 
 ```python
 from langchain_azure_ai.chat_models import AzureAIChatCompletionsModel
@@ -74,7 +74,7 @@ llm = AzureAIChatCompletionsModel(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 messages = [
@@ -100,6 +100,6 @@ print(ai_msg.content)
 J'adore programmer.
 ```
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all AzureAIChatCompletionsModel features and configurations, head to the API reference: [python.langchain.com/api_reference/azure_ai/chat_models/langchain_azure_ai.chat_models.AzureAIChatCompletionsModel.html](https://python.langchain.com/api_reference/azure_ai/chat_models/langchain_azure_ai.chat_models.AzureAIChatCompletionsModel.html)
+AzureAIChatCompletionsModel의 모든 기능과 설정에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [python.langchain.com/api_reference/azure_ai/chat_models/langchain_azure_ai.chat_models.AzureAIChatCompletionsModel.html](https://python.langchain.com/api_reference/azure_ai/chat_models/langchain_azure_ai.chat_models.AzureAIChatCompletionsModel.html)

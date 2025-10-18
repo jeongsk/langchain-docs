@@ -2,31 +2,31 @@
 title: ChatGradient
 ---
 
-This will help you getting started with DigitalOcean Gradient Chat Models.
+이 문서는 DigitalOcean Gradient Chat Models을 시작하는 데 도움을 드립니다.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Downloads | Version |
 | :--- | :--- | :---: | :---: |
 | [DigitalOcean Gradient](https://python.langchain.com/docs/api_reference/llms/langchain_gradient.llms.LangchainGradient/) | [langchain-gradient](https://python.langchain.com/docs/api_reference/langchain-gradient_api_reference/) | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-gradient?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-gradient?style=flat-square&label=%20) |
 
-## Setup
+## 설정
 
-langchain-gradient uses DigitalOcean Gradient Platform.
+langchain-gradient는 DigitalOcean Gradient Platform을 사용합니다.
 
-Create an account on DigitalOcean, acquire a `DIGITALOCEAN_INFERENCE_KEY` API key from the Gradient Platform, and install the `langchain-gradient` integration package.
+DigitalOcean에 계정을 생성하고, Gradient Platform에서 `DIGITALOCEAN_INFERENCE_KEY` API 키를 획득한 후, `langchain-gradient` 통합 패키지를 설치하세요.
 
-### Credentials
+### 자격 증명
 
-Head to [DigitalOcean Login](https://cloud.digitalocean.com/login)
+[DigitalOcean Login](https://cloud.digitalocean.com/login)으로 이동하세요.
 
-1. Sign up/Login to DigitalOcean Cloud Console
-2. Go to the Gradient Platform and navigate to Serverless Inference.
-3. Click on Create model access key, enter a name, and create the key.
+1. DigitalOcean Cloud Console에 가입/로그인합니다.
+2. Gradient Platform으로 이동하여 Serverless Inference로 이동합니다.
+3. Create model access key를 클릭하고, 이름을 입력한 후 키를 생성합니다.
 
-Once you've done this set the `DIGITALOCEAN_INFERENCE_KEY` environment variable:
+완료되면 `DIGITALOCEAN_INFERENCE_KEY` 환경 변수를 설정하세요:
 
 ```python
 import getpass
@@ -38,16 +38,16 @@ if not os.getenv("DIGITALOCEAN_INFERENCE_KEY"):
     )
 ```
 
-If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수 있습니다:
 
 ```python
 # os.environ["LANGSMITH_TRACING"] = "true"
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 ```
 
-### Installation
+### 설치
 
-The DigitalOcean Gradient integration lives in the `langchain-gradient` package:
+DigitalOcean Gradient 통합은 `langchain-gradient` 패키지에 포함되어 있습니다:
 
 ```python
 %pip install -qU langchain-gradient
@@ -59,9 +59,9 @@ The DigitalOcean Gradient integration lives in the `langchain-gradient` package:
 Note: you may need to restart the kernel to use updated packages.
 ```
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
 
 ```python
 from langchain_gradient import ChatGradient
@@ -72,7 +72,7 @@ llm = ChatGradient(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 messages = [
@@ -111,9 +111,9 @@ Suddenly, the trees parted, and Mira found herself standing at the edge of a cle
 Mira felt a sense of awe wash over her, as she approached the tree, the stone still clutched in her hand. She could feel the magic of the forest pulsing through her, calling to her, drawing her closer to the heart of the mystery. And as she reached out to touch the trunk of the tree, the stone's glow surged to a brilliant intensity, illuminating a doorway that had been hidden in the trunk all along...
 ```
 
-## Chaining
+## 체이닝
 
-We can chain our model with a prompt template like so:
+다음과 같이 모델을 프롬프트 템플릿과 연결할 수 있습니다:
 
 ```python
 from langchain_core.prompts import ChatPromptTemplate
@@ -146,6 +146,6 @@ chain.invoke(
 AIMessage(content='The Eiffel Tower was designed by Gustave Eiffel\'s engineering company and was completed in 1889. (Sentence: "It was designed by Gustave Eiffel\'s engineering company. The tower is one of the most recognizable structures in the world. ...  The Eiffel Tower is located in Paris and was completed in 1889.")', additional_kwargs={}, response_metadata={'finish_reason': 'stop'}, id='run--c23ffab6-06ae-4130-87b1-d5b2e7744906-0', usage_metadata={'input_tokens': 153, 'output_tokens': 74, 'total_tokens': 227})
 ```
 
-## API reference
+## API 참조
 
-For detailed documentation of all ChatGradient features and configurations head to the API reference.
+모든 ChatGradient 기능 및 구성에 대한 자세한 문서는 API 참조를 확인하세요.

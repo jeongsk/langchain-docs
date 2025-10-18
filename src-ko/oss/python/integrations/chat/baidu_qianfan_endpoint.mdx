@@ -2,31 +2,30 @@
 title: QianfanChatEndpoint
 ---
 
-Baidu AI Cloud Qianfan Platform is a one-stop large model development and service operation platform for enterprise developers. Qianfan not only provides including the model of Wenxin Yiyan (ERNIE-Bot) and the third-party open-source models, but also provides various AI development tools and the whole set of development environment, which facilitates customers to use and develop large model applications easily.
+Baidu AI Cloud Qianfan Platform은 기업 개발자를 위한 원스톱 대규모 모델 개발 및 서비스 운영 플랫폼입니다. Qianfan은 Wenxin Yiyan(ERNIE-Bot) 모델과 타사 오픈소스 모델을 제공할 뿐만 아니라 다양한 AI 개발 도구와 완전한 개발 환경을 제공하여 고객이 대규모 모델 애플리케이션을 쉽게 사용하고 개발할 수 있도록 합니다.
 
-Basically, those model are split into the following type:
+기본적으로 이러한 모델은 다음 타입으로 분류됩니다:
 
 - Embedding
 - Chat
 - Completion
 
-In this notebook, we will introduce how to use langchain with [Qianfan](https://cloud.baidu.com/doc/WENXINWORKSHOP/index.html) mainly in `Chat` corresponding
- to the package `langchain/chat_models` in langchain:
+이 노트북에서는 langchain과 [Qianfan](https://cloud.baidu.com/doc/WENXINWORKSHOP/index.html)을 주로 `Chat`에서 사용하는 방법을 소개합니다. 이는 langchain의 `langchain/chat_models` 패키지에 해당합니다:
 
-## API Initialization
+## API 초기화
 
-To use the LLM services based on Baidu Qianfan, you have to initialize these parameters:
+Baidu Qianfan 기반 LLM 서비스를 사용하려면 다음 매개변수를 초기화해야 합니다:
 
-You could either choose to init the AK,SK in environment variables or init params:
+환경 변수 또는 초기화 매개변수에서 AK, SK를 초기화할 수 있습니다:
 
 ```base
 export QIANFAN_AK=XXX
 export QIANFAN_SK=XXX
 ```
 
-## Current supported models
+## 현재 지원되는 모델
 
-- ERNIE-Bot-turbo (default models)
+- ERNIE-Bot-turbo (기본 모델)
 - ERNIE-Bot
 - BLOOMZ-7B
 - Llama-2-7b-chat
@@ -37,7 +36,7 @@ export QIANFAN_SK=XXX
 - ChatGLM2-6B-32K
 - AquilaChat-7B
 
-## Set up
+## 설정
 
 ```python
 """For basic init and call"""
@@ -50,7 +49,7 @@ os.environ["QIANFAN_AK"] = "Your_api_key"
 os.environ["QIANFAN_SK"] = "You_secret_Key"
 ```
 
-## Usage
+## 사용법
 
 ```python
 chat = QianfanChatEndpoint(streaming=True)
@@ -78,7 +77,7 @@ chat.batch([messages])
 [AIMessage(content='您好！有什么我可以帮助您的吗？')]
 ```
 
-### Streaming
+### 스트리밍
 
 ```python
 try:
@@ -92,12 +91,12 @@ except TypeError as e:
 您好！有什么我可以帮助您的吗？
 ```
 
-## Use different models in Qianfan
+## Qianfan에서 다른 모델 사용
 
-The default model is ERNIE-Bot-turbo, in the case you want to deploy your own model based on Ernie Bot or third-party open-source model, you could follow these steps:
+기본 모델은 ERNIE-Bot-turbo입니다. Ernie Bot 또는 타사 오픈소스 모델을 기반으로 자체 모델을 배포하려는 경우 다음 단계를 따르세요:
 
-1. (Optional, if the model are included in the default models, skip it) Deploy your model in Qianfan Console, get your own customized deploy endpoint.
-2. Set up the field called `endpoint` in the initialization:
+1. (선택사항, 모델이 기본 모델에 포함된 경우 건너뜀) Qianfan Console에서 모델을 배포하고 사용자 정의 배포 엔드포인트를 가져옵니다.
+2. 초기화 시 `endpoint` 필드를 설정합니다:
 
 ```python
 chatBot = QianfanChatEndpoint(
@@ -113,9 +112,9 @@ chatBot.invoke(messages)
 AIMessage(content='Hello，可以回答问题了，我会竭尽全力为您解答，请问有什么问题吗？')
 ```
 
-## Model Params
+## 모델 매개변수
 
-For now, only `ERNIE-Bot` and `ERNIE-Bot-turbo` support model params below, we might support more models in the future.
+현재 `ERNIE-Bot`과 `ERNIE-Bot-turbo`만 아래 모델 매개변수를 지원하며, 향후 더 많은 모델을 지원할 수 있습니다.
 
 - temperature
 - top_p

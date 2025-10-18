@@ -2,9 +2,9 @@
 title: Llama2Chat
 ---
 
-This notebook shows how to augment Llama-2 `LLM`s with the `Llama2Chat` wrapper to support the [Llama-2 chat prompt format](https://huggingface.co/blog/llama2#how-to-prompt-llama-2). Several `LLM` implementations in LangChain can be used as interface to Llama-2 chat models. These include [ChatHuggingFace](/oss/integrations/chat/huggingface), [LlamaCpp](/oss/integrations/chat/llamacpp/), [GPT4All](/oss/integrations/llms/gpt4all), ..., to mention a few examples.
+이 노트북은 `Llama2Chat` 래퍼로 Llama-2 `LLM`을 보강하여 [Llama-2 채팅 프롬프트 형식](https://huggingface.co/blog/llama2#how-to-prompt-llama-2)을 지원하는 방법을 보여줍니다. LangChain의 여러 `LLM` 구현을 Llama-2 채팅 모델의 인터페이스로 사용할 수 있습니다. 여기에는 [ChatHuggingFace](/oss/integrations/chat/huggingface), [LlamaCpp](/oss/integrations/chat/llamacpp/), [GPT4All](/oss/integrations/llms/gpt4all) 등이 포함됩니다.
 
-`Llama2Chat` is a generic wrapper that implements `BaseChatModel` and can therefore be used in applications as [chat model](/oss/langchain/models). `Llama2Chat` converts a list of Messages into the [required chat prompt format](https://huggingface.co/blog/llama2#how-to-prompt-llama-2) and forwards the formatted prompt as `str` to the wrapped `LLM`.
+`Llama2Chat`은 `BaseChatModel`을 구현하는 범용 래퍼이므로 애플리케이션에서 [채팅 모델](/oss/langchain/models)로 사용할 수 있습니다. `Llama2Chat`은 Messages 목록을 [필요한 채팅 프롬프트 형식](https://huggingface.co/blog/llama2#how-to-prompt-llama-2)으로 변환하고, 형식화된 프롬프트를 `str`로 래핑된 `LLM`에 전달합니다.
 
 ```python
 from langchain.chains import LLMChain
@@ -12,7 +12,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain_experimental.chat_models import Llama2Chat
 ```
 
-For the chat application examples below, we'll use the following chat `prompt_template`:
+아래 채팅 애플리케이션 예제에서는 다음 채팅 `prompt_template`을 사용합니다:
 
 ```python
 from langchain.messages import SystemMessage
@@ -30,9 +30,9 @@ template_messages = [
 prompt_template = ChatPromptTemplate.from_messages(template_messages)
 ```
 
-## Chat with Llama-2 via `HuggingFaceTextGenInference` LLM
+## `HuggingFaceTextGenInference` LLM을 통한 Llama-2 채팅
 
-A HuggingFaceTextGenInference LLM encapsulates access to a [text-generation-inference](https://github.com/huggingface/text-generation-inference) server. In the following example, the inference server serves a [meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf) model. It can be started locally with:
+HuggingFaceTextGenInference LLM은 [text-generation-inference](https://github.com/huggingface/text-generation-inference) 서버에 대한 액세스를 캡슐화합니다. 다음 예제에서 추론 서버는 [meta-llama/Llama-2-13b-chat-hf](https://huggingface.co/meta-llama/Llama-2-13b-chat-hf) 모델을 제공합니다. 다음과 같이 로컬에서 시작할 수 있습니다:
 
 ```bash
 docker run \
@@ -49,13 +49,13 @@ docker run \
   --num-shard 4
 ```
 
-This works on a machine with 4 x RTX 3080ti cards, for example. Adjust the `--num_shard` value to the number of GPUs available. The `HF_API_TOKEN` environment variable holds the Hugging Face API token.
+이는 예를 들어 4개의 RTX 3080ti 카드가 있는 머신에서 작동합니다. 사용 가능한 GPU 수에 맞게 `--num_shard` 값을 조정하세요. `HF_API_TOKEN` 환경 변수는 Hugging Face API 토큰을 보유합니다.
 
 ```python
 # !pip3 install text-generation
 ```
 
-Create a `HuggingFaceTextGenInference` instance that connects to the local inference server and wrap it into `Llama2Chat`.
+로컬 추론 서버에 연결하는 `HuggingFaceTextGenInference` 인스턴스를 생성하고 `Llama2Chat`으로 래핑합니다.
 
 ```python
 from langchain_community.llms import HuggingFaceTextGenInference
@@ -71,7 +71,7 @@ llm = HuggingFaceTextGenInference(
 model = Llama2Chat(llm=llm)
 ```
 
-Then you are ready to use the chat `model` together with `prompt_template` and conversation `memory` in an `LLMChain`.
+그런 다음 `LLMChain`에서 채팅 `model`을 `prompt_template` 및 대화 `memory`와 함께 사용할 준비가 되었습니다.
 
 ```python
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
@@ -111,11 +111,11 @@ print(chain.run(text="Tell me more about #2."))
 The cathedral was built in the 12th century and has been the site of many important events throughout history, including the coronation of Holy Roman emperors and the funeral of Mozart. Today, it is still an active place of worship and offers guided tours, concerts, and special events. Visitors can climb up the south tower for panoramic views of the city or attend a service to experience the beautiful music and chanting.
 ```
 
-## Chat with Llama-2 via `LlamaCPP` LLM
+## `LlamaCPP` LLM을 통한 Llama-2 채팅
 
-For using a Llama-2 chat model with a [LlamaCPP](/oss/integrations/providers/llamacpp) `LMM`, install the `llama-cpp-python` library using [these installation instructions](/oss/integrations/providers/llamacpp#installation-and-setup). The following example uses a quantized [llama-2-7b-chat.Q4_0.gguf](https://huggingface.co/TheBloke/Llama-2-7b-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_0.gguf) model stored locally at `~/Models/llama-2-7b-chat.Q4_0.gguf`.
+[LlamaCPP](/oss/integrations/providers/llamacpp) `LMM`과 함께 Llama-2 채팅 모델을 사용하려면 [이 설치 지침](/oss/integrations/providers/llamacpp#installation-and-setup)을 사용하여 `llama-cpp-python` 라이브러리를 설치하세요. 다음 예제는 `~/Models/llama-2-7b-chat.Q4_0.gguf`에 로컬로 저장된 양자화된 [llama-2-7b-chat.Q4_0.gguf](https://huggingface.co/TheBloke/Llama-2-7b-Chat-GGUF/resolve/main/llama-2-7b-chat.Q4_0.gguf) 모델을 사용합니다.
 
-After creating a `LlamaCpp` instance, the `llm` is again wrapped into `Llama2Chat`
+`LlamaCpp` 인스턴스를 생성한 후 `llm`은 다시 `Llama2Chat`으로 래핑됩니다.
 
 ```python
 from os.path import expanduser
@@ -131,7 +131,7 @@ llm = LlamaCpp(
 model = Llama2Chat(llm=llm)
 ```
 
-and used in the same way as in the previous example.
+이전 예제와 동일한 방식으로 사용됩니다.
 
 ```python
 memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)

@@ -2,45 +2,45 @@
 title: ChatCerebras
 ---
 
-This guide provides a quick overview for getting started with Cerebras [chat models](/oss/langchain/models). For detailed documentation of all ChatCerebras features and configurations head to the [API reference](https://python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#).
+이 가이드는 Cerebras [채팅 모델](/oss/langchain/models) 시작하기를 위한 빠른 개요를 제공합니다. 모든 ChatCerebras 기능 및 구성에 대한 자세한 문서는 [API 레퍼런스](https://python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#)를 참조하세요.
 
-At Cerebras, we've developed the world's largest and fastest AI processor, the Wafer-Scale Engine-3 (WSE-3). The Cerebras CS-3 system, powered by the WSE-3, represents a new class of AI supercomputer that sets the standard for generative AI training and inference with unparalleled performance and scalability.
+Cerebras에서는 세계 최대이자 가장 빠른 AI 프로세서인 Wafer-Scale Engine-3(WSE-3)를 개발했습니다. WSE-3로 구동되는 Cerebras CS-3 시스템은 비할 데 없는 성능과 확장성으로 생성형 AI 훈련 및 추론의 표준을 설정하는 새로운 클래스의 AI 슈퍼컴퓨터를 나타냅니다.
 
-With Cerebras as your inference provider, you can:
+Cerebras를 추론 제공자로 사용하면 다음을 수행할 수 있습니다:
 
-- Achieve unprecedented speed for AI inference workloads
-- Build commercially with high throughput
-- Effortlessly scale your AI workloads with our seamless clustering technology
+- AI 추론 워크로드에 대한 전례 없는 속도 달성
+- 높은 처리량으로 상업적 구축
+- 원활한 클러스터링 기술로 AI 워크로드를 손쉽게 확장
 
-Our CS-3 systems can be quickly and easily clustered to create the largest AI supercomputers in the world, making it simple to place and run the largest models. Leading corporations, research institutions, and governments are already using Cerebras solutions to develop proprietary models and train popular open-source models.
+CS-3 시스템은 신속하고 쉽게 클러스터링하여 세계 최대의 AI 슈퍼컴퓨터를 생성할 수 있으며, 최대 모델을 배치하고 실행하기 쉽게 만듭니다. 주요 기업, 연구 기관 및 정부 기관에서 이미 Cerebras 솔루션을 사용하여 독점 모델을 개발하고 인기 있는 오픈 소스 모델을 훈련하고 있습니다.
 
-Want to experience the power of Cerebras? Check out our [website](https://cerebras.ai) for more resources and explore options for accessing our technology through the Cerebras Cloud or on-premise deployments!
+Cerebras의 성능을 경험하고 싶으신가요? 더 많은 리소스를 확인하고 Cerebras Cloud 또는 온프레미스 배포를 통해 우리 기술에 액세스하는 옵션을 탐색하려면 [웹사이트](https://cerebras.ai)를 확인하세요!
 
-For more information about Cerebras Cloud, visit [cloud.cerebras.ai](https://cloud.cerebras.ai/). Our API reference is available at [inference-docs.cerebras.ai](https://inference-docs.cerebras.ai/).
+Cerebras Cloud에 대한 자세한 내용은 [cloud.cerebras.ai](https://cloud.cerebras.ai/)를 방문하세요. API 레퍼런스는 [inference-docs.cerebras.ai](https://inference-docs.cerebras.ai/)에서 확인할 수 있습니다.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/cerebras) | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatCerebras](https://python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#) | [langchain-cerebras](https://python.langchain.com/api_reference/cerebras/index.html) | ❌ | beta | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-cerebras?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-cerebras?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
-| [Tool calling](/oss/langchain/tools/) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
+| [도구 호출](/oss/langchain/tools/) | [구조화된 출력](/oss/langchain/structured-output) | JSON mode | [이미지 입력](/oss/langchain/messages#multimodal) | Audio input | Video input | [토큰 수준 스트리밍](/oss/langchain/streaming/) | Native async | [토큰 사용량](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ | ✅  | ✅ | ❌ |
 
-## Setup
+## 설정
 
 ```bash
 pip install langchain-cerebras
 ```
 
-### Credentials
+### 자격 증명
 
-Get an API Key from [cloud.cerebras.ai](https://cloud.cerebras.ai/) and add it to your environment variables:
+[cloud.cerebras.ai](https://cloud.cerebras.ai/)에서 API 키를 받아 환경 변수에 추가하세요:
 
 ```
 export CEREBRAS_API_KEY="your-api-key-here"
@@ -58,24 +58,24 @@ if "CEREBRAS_API_KEY" not in os.environ:
 Enter your Cerebras API key:  ········
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
 
 ```python
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 # os.environ["LANGSMITH_TRACING"] = "true"
 ```
 
-### Installation
+### 설치
 
-The LangChain Cerebras integration lives in the `langchain-cerebras` package:
+LangChain Cerebras 통합은 `langchain-cerebras` 패키지에 있습니다:
 
 ```python
 %pip install -qU langchain-cerebras
 ```
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
 
 ```python
 from langchain_cerebras import ChatCerebras
@@ -86,7 +86,7 @@ llm = ChatCerebras(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 messages = [
@@ -104,7 +104,7 @@ ai_msg
 AIMessage(content='Je adore le programmation.', response_metadata={'token_usage': {'completion_tokens': 7, 'prompt_tokens': 35, 'total_tokens': 42}, 'model_name': 'llama3-8b-8192', 'system_fingerprint': 'fp_be27ec77ff', 'finish_reason': 'stop'}, id='run-e5d66faf-019c-4ac6-9265-71093b13202d-0', usage_metadata={'input_tokens': 35, 'output_tokens': 7, 'total_tokens': 42})
 ```
 
-## Streaming
+## 스트리밍
 
 ```python
 from langchain_cerebras import ChatCerebras
@@ -143,7 +143,7 @@ And guess what? Lions are very social. They like to play and cuddle with each ot
 So, that's lions! Aren't they just the coolest?
 ```
 
-## Async
+## 비동기
 
 ```python
 from langchain_cerebras import ChatCerebras
@@ -170,7 +170,7 @@ await chain.ainvoke({"topic": "fire"})
 AIMessage(content='Ice', response_metadata={'token_usage': {'completion_tokens': 2, 'prompt_tokens': 36, 'total_tokens': 38}, 'model_name': 'llama3-8b-8192', 'system_fingerprint': 'fp_be27ec77ff', 'finish_reason': 'stop'}, id='run-7434bdde-1bec-44cf-827b-8d978071dfe8-0', usage_metadata={'input_tokens': 36, 'output_tokens': 2, 'total_tokens': 38})
 ```
 
-## Async Streaming
+## 비동기 스트리밍
 
 ```python
 from langchain_cerebras import ChatCerebras
@@ -203,6 +203,6 @@ As the centuries passed, astronomers from across the galaxy became increasingly 
 As Dr. Vex delved deeper into her research, she began to experience strange and vivid dreams, visions that seemed to transport her to the very heart of the blackhole itself. In these dreams, she saw ancient beings, their faces twisted in agony as they were consumed by the void. She saw stars and galaxies, their light warped and distorted by the blackhole's gravitational pull. And she saw the Eclipse of Eternity itself, its swirling vortex of darkness pulsing with an otherworldly energy that seemed to be calling to her. As the dreams grew more vivid and more frequent, Dr. Vex became convinced that she was being drawn into the heart of the blackhole, and that the secrets of the universe lay waiting for her on the other side.
 ```
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all ChatCerebras features and configurations head to the API reference: [python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#](https://python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#)
+모든 ChatCerebras 기능 및 구성에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#](https://python.langchain.com/api_reference/cerebras/chat_models/langchain_cerebras.chat_models.ChatCerebras.html#)

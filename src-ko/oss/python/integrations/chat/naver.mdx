@@ -2,38 +2,38 @@
 title: ChatClovaX
 ---
 
-This guide provides a quick overview for getting started with Naver’s HyperCLOVA X [chat models](https://python.langchain.com/docs/concepts/chat_models) via CLOVA Studio. For detailed documentation of all ChatClovaX features and configurations head to the [API reference](https://guide.ncloud-docs.com/docs/clovastudio-dev-langchain).
+이 가이드는 CLOVA Studio를 통해 Naver의 HyperCLOVA X [채팅 모델](https://python.langchain.com/docs/concepts/chat_models)을 시작하는 방법에 대한 간단한 개요를 제공합니다. 모든 ChatClovaX 기능 및 구성에 대한 자세한 문서는 [API 참조](https://guide.ncloud-docs.com/docs/clovastudio-dev-langchain)를 확인하세요.
 
-[CLOVA Studio](http://clovastudio.ncloud.com/) has several chat models. You can find information about the latest models, including their costs, context windows, and supported input types, in the CLOVA Studio Guide [documentation](https://guide.ncloud-docs.com/docs/clovastudio-model).
+[CLOVA Studio](http://clovastudio.ncloud.com/)는 여러 채팅 모델을 제공합니다. 비용, 컨텍스트 윈도우, 지원하는 입력 유형을 포함한 최신 모델에 대한 정보는 CLOVA Studio 가이드 [문서](https://guide.ncloud-docs.com/docs/clovastudio-model)에서 확인할 수 있습니다.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | JS support | Downloads | Version |
 | :--- | :--- |:-----:| :---: |:------------------------------------------------------------------------:| :---: | :---: |
 | [ChatClovaX](https://guide.ncloud-docs.com/docs/clovastudio-dev-langchain#HyperCLOVAX%EB%AA%A8%EB%8D%B8%EC%9D%B4%EC%9A%A9) | [langchain-naver](https://pypi.org/project/langchain-naver/) |   ❌   | ❌ |                                    ❌                                     | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain_naver?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain_naver?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
 | [Tool calling](/oss/langchain/tools/) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 |:------------------------------------------:| :---: | :---: | :---: |  :---: | :---: |:-----------------------------------------------------:| :---: |:------------------------------------------------------:|:----------------------------------:|
 |✅| ✅ | ❌ | ✅ | ❌ | ❌ |                          ✅                            | ✅ |                           ✅                            |                 ❌                  |
 
-## Setup
+## 설정
 
-Before using the chat model, you must go through the four steps below.
+채팅 모델을 사용하기 전에 아래 4단계를 거쳐야 합니다.
 
-1. Creating [NAVER Cloud Platform](https://www.ncloud.com/) account
-2. Apply to use [CLOVA Studio](https://www.ncloud.com/product/aiService/clovaStudio)
-3. Create a CLOVA Studio Test App or Service App of a model to use (See [here](https://guide.ncloud-docs.com/docs/clovastudio-playground-testapp).)
-4. Issue a Test or Service API key (See [here](https://api.ncloud-docs.com/docs/ai-naver-clovastudio-summary#API%ED%82%A4).)
+1. [NAVER Cloud Platform](https://www.ncloud.com/) 계정 생성
+2. [CLOVA Studio](https://www.ncloud.com/product/aiService/clovaStudio) 사용 신청
+3. 사용할 모델의 CLOVA Studio 테스트 앱 또는 서비스 앱 생성 ([여기](https://guide.ncloud-docs.com/docs/clovastudio-playground-testapp) 참조)
+4. 테스트 또는 서비스 API 키 발급 ([여기](https://api.ncloud-docs.com/docs/ai-naver-clovastudio-summary#API%ED%82%A4) 참조)
 
-### Credentials
+### 자격 증명
 
-Set the `CLOVASTUDIO_API_KEY` environment variable with your API key.
+API 키로 `CLOVASTUDIO_API_KEY` 환경 변수를 설정하세요.
 
-You can add them to your environment variables as below:
+다음과 같이 환경 변수에 추가할 수 있습니다:
 
 ``` bash
 export CLOVASTUDIO_API_KEY="your-api-key-here"
@@ -49,25 +49,25 @@ if not os.getenv("CLOVASTUDIO_API_KEY"):
     )
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출에 대한 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
 
 ```python
 # os.environ["LANGSMITH_TRACING"] = "true"
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 ```
 
-### Installation
+### 설치
 
-The LangChain Naver integration lives in the `langchain-naver` package:
+LangChain Naver 통합은 `langchain-naver` 패키지에 포함되어 있습니다:
 
 ```python
 # install package
 %pip install -qU langchain-naver
 ```
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
 
 ```python
 from langchain_naver import ChatClovaX
@@ -82,9 +82,9 @@ chat = ChatClovaX(
 )
 ```
 
-## Invocation
+## 호출
 
-In addition to `invoke` below, `ChatClovaX` also supports batch, stream and their async functionalities.
+아래의 `invoke` 외에도 `ChatClovaX`는 배치, 스트림 및 이들의 비동기 기능을 지원합니다.
 
 ```python
 messages = [
@@ -111,7 +111,7 @@ print(ai_msg.content)
 네이버 인공지능을 사용하는 것이 정말 좋아요.
 ```
 
-## Streaming
+## 스트리밍
 
 ```python
 system = "You are a helpful assistant that can teach Korean pronunciation."
@@ -128,15 +128,15 @@ for chunk in chain.stream({"phrase": "Hi"}):
 In Korean, 'Hi' is typically translated as '안녕하세요' (annyeonghaseyo). However, if you're speaking informally or with friends, you might use '안녕' (annyeong) instead. Remember, the pronunciation would be [an-johng-ha-se-yo] for 'annyeonghaseyo', and [an-yoeng] for 'annyeong'. The stress usually falls on the second syllable of each word. Keep practicing!
 ```
 
-## Tool calling
+## 도구 호출
 
-CLOVA Studio supports tool calling (also known as "[function calling](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3-fc)") that lets you describe tools and their arguments, and have the model return a JSON object with a tool to invoke and the inputs to that tool. It is extremely useful for building tool-using chains and agents, and for getting structured outputs from models more generally.
+CLOVA Studio는 도구와 인수를 설명하고 모델이 호출할 도구와 해당 도구에 대한 입력이 포함된 JSON 객체를 반환하도록 하는 도구 호출("[function calling](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3-fc)"이라고도 함)을 지원합니다. 이는 도구 사용 체인 및 에이전트를 구축하고 모델에서 구조화된 출력을 얻는 데 매우 유용합니다.
 
-**Note**: You should set `max_tokens` larger than 1024 to utilize the tool calling feature in CLOVA Studio.
+**참고**: CLOVA Studio에서 도구 호출 기능을 사용하려면 `max_tokens`를 1024보다 크게 설정해야 합니다.
 
 ### ChatClovaX.bind_tools()
 
-With `ChatClovaX.bind_tools`, we can easily pass in Pydantic classes, dict schemas, LangChain tools, or even functions as tools to the model. Under the hood these are converted to an OpenAI-compatible tool schemas, which looks like:
+`ChatClovaX.bind_tools`를 사용하면 Pydantic 클래스, dict 스키마, LangChain 도구, 심지어 함수까지 모델에 도구로 쉽게 전달할 수 있습니다. 내부적으로 이들은 다음과 같은 OpenAI 호환 도구 스키마로 변환됩니다:
 
 ```
 {
@@ -146,7 +146,7 @@ With `ChatClovaX.bind_tools`, we can easily pass in Pydantic classes, dict schem
 }
 ```
 
-and passed in every model invocation.
+그리고 모든 모델 호출 시 전달됩니다.
 
 ```python
 from langchain_naver import ChatClovaX
@@ -185,7 +185,7 @@ AIMessage(content='', additional_kwargs={'tool_calls': [{'id': 'call_EOh69hbtl8p
 
 ### AIMessage.tool_calls
 
-Notice that the AIMessage has a `tool_calls` attribute. This contains in a standardized ToolCall format that is model-provider agnostic.
+AIMessage에 `tool_calls` 속성이 있다는 점에 주목하세요. 이는 모델 제공업체에 구애받지 않는 표준화된 ToolCall 형식으로 포함되어 있습니다.
 
 ```python
 ai_msg.tool_calls
@@ -198,11 +198,11 @@ ai_msg.tool_calls
   'type': 'tool_call'}]
 ```
 
-## Structured Outputs
+## 구조화된 출력
 
-For supporting model(s), you can use the [Structured Outputs](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3-so) feature to force the model to generates responses in a specific structure, such as Pydantic model or TypedDict or JSON.
+지원하는 모델의 경우 [구조화된 출력](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3-so) 기능을 사용하여 모델이 Pydantic 모델, TypedDict 또는 JSON과 같은 특정 구조로 응답을 생성하도록 강제할 수 있습니다.
 
-**Note**: Structured Outputs requires Thinking mode to be disabled. Set `thinking.effort` to `none`.
+**참고**: 구조화된 출력을 사용하려면 Thinking 모드를 비활성화해야 합니다. `thinking.effort`를 `none`으로 설정하세요.
 
 ```python
 from langchain_naver import ChatClovaX
@@ -232,7 +232,7 @@ class Weather(BaseModel):
     )
 ```
 
-**Note**: CLOVA Studio supports Structured Outputs with a json schema method. Set `method` to `json_schema`.
+**참고**: CLOVA Studio는 JSON 스키마 방식으로 구조화된 출력을 지원합니다. `method`를 `json_schema`로 설정하세요.
 
 ```python
 structured_chat = chat.with_structured_output(Weather, method="json_schema")
@@ -248,9 +248,9 @@ Weather(temp_high_c=30, temp_low_c=20, condition='sunny', precipitation_percent=
 
 ## Thinking
 
-For supporting model(s), when [Thinking](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3-thinking) feature is enabled (by default), it will output the step-by-step reasoning process that led to its final answer.
+지원하는 모델의 경우 [Thinking](https://api.ncloud-docs.com/docs/clovastudio-chatcompletionsv3-thinking) 기능이 활성화되면(기본적으로) 최종 답변에 도달한 단계별 추론 과정을 출력합니다.
 
-Specify the `thinking` parameter to control the feature—enable or disable the thinking process and configure its depth.
+`thinking` 매개변수를 지정하여 기능을 제어할 수 있습니다. 사고 과정을 활성화하거나 비활성화하고 깊이를 구성할 수 있습니다.
 
 ```python
 from langchain_naver import ChatClovaX
@@ -285,9 +285,9 @@ Final token count: ~500 (within limit).
 Answer: \boxed{27}
 ```
 
-### Accessing the thinking process
+### 사고 과정 액세스
 
-When Thinking mode is enabled, you can access the thinking process through the `thinking_content` attribute in `AIMessage.additional_kwargs`.
+Thinking 모드가 활성화되면 `AIMessage.additional_kwargs`의 `thinking_content` 속성을 통해 사고 과정에 액세스할 수 있습니다.
 
 ```python
 print(ai_msg.additional_kwargs["thinking_content"])
@@ -303,13 +303,13 @@ So breaking it down: 3 × 3 = 9 first. Then take that result and multiply by ano
 I think there's no trick question here. Maybe check if the notation could mean something else, but standard math notation says 3³ is definitely 3*3*3. No parentheses or other operations involved. Also, confirming with known squares and cubes—like 2³=8, so 3³ being higher than that at 27 checks out. Yep, answer must be 27. Shouldn't overcomplicate it. Just straightforward multiplication. Alright, confident now.
 ```
 
-## Additional functionalities
+## 추가 기능
 
-### Using fine-tuned models
+### 파인 튜닝된 모델 사용
 
-You can call fine-tuned models by passing the `task_id` to the `model` parameter as: `ft:{task_id}`.
+`model` 매개변수에 `task_id`를 `ft:{task_id}` 형식으로 전달하여 파인 튜닝된 모델을 호출할 수 있습니다.
 
-You can check `task_id` from corresponding Test App or Service App details.
+해당 테스트 앱 또는 서비스 앱 세부 정보에서 `task_id`를 확인할 수 있습니다.
 
 ```python
 fine_tuned_model = ChatClovaX(
@@ -324,6 +324,6 @@ fine_tuned_model.invoke(messages)
 AIMessage(content='네이버 인공지능을 사용하는 것을 정말 좋아합니다.', additional_kwargs={'refusal': None}, response_metadata={'token_usage': {'completion_tokens': 11, 'prompt_tokens': 28, 'total_tokens': 39, 'completion_tokens_details': None, 'prompt_tokens_details': None}, 'model_name': 'HCX-005', 'system_fingerprint': None, 'id': '2222d6d411a948c883aac1e03ca6cebe', 'finish_reason': 'stop', 'logprobs': None}, id='run-9696d7e2-7afa-4bb4-9c03-b95fcf678ab8-0', usage_metadata={'input_tokens': 28, 'output_tokens': 11, 'total_tokens': 39, 'input_token_details': {}, 'output_token_details': {}})
 ```
 
-## API reference
+## API 참조
 
-For detailed documentation of all ChatClovaX features and configurations head to the [API reference](https://guide.ncloud-docs.com/docs/clovastudio-dev-langchain)
+모든 ChatClovaX 기능 및 구성에 대한 자세한 문서는 [API 참조](https://guide.ncloud-docs.com/docs/clovastudio-dev-langchain)를 확인하세요

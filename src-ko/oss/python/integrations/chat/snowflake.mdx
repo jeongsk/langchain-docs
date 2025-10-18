@@ -2,13 +2,13 @@
 title: Snowflake Cortex
 ---
 
-[Snowflake Cortex](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions) gives you instant access to industry-leading large language models (LLMs) trained by researchers at companies like Mistral, Reka, Meta, and Google, including [Snowflake Arctic](https://www.snowflake.com/en/data-cloud/arctic/), an open enterprise-grade model developed by Snowflake.
+[Snowflake Cortex](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions)는 Mistral, Reka, Meta, Google과 같은 회사의 연구원들이 학습한 업계 최고의 대형 언어 모델(LLM)과 Snowflake가 개발한 오픈 엔터프라이즈급 모델인 [Snowflake Arctic](https://www.snowflake.com/en/data-cloud/arctic/)에 즉시 접근할 수 있게 해줍니다.
 
-This example goes over how to use LangChain to interact with Snowflake Cortex.
+이 예제는 LangChain을 사용하여 Snowflake Cortex와 상호 작용하는 방법을 설명합니다.
 
-### Installation and setup
+### 설치 및 설정
 
-We start by installing the `snowflake-snowpark-python` library, using the command below. Then we configure the credentials for connecting to Snowflake, as environment variables or pass them directly.
+먼저 아래 명령을 사용하여 `snowflake-snowpark-python` 라이브러리를 설치합니다. 그런 다음 Snowflake에 연결하기 위한 자격 증명을 환경 변수로 구성하거나 직접 전달합니다.
 
 ```python
 %pip install -qU snowflake-snowpark-python
@@ -51,7 +51,7 @@ from langchain.messages import HumanMessage, SystemMessage
 chat = ChatSnowflakeCortex()
 ```
 
-The above cell assumes that your Snowflake credentials are set in your environment variables. If you would rather manually specify them, use the following code:
+위 셀은 Snowflake 자격 증명이 환경 변수에 설정되어 있다고 가정합니다. 수동으로 지정하려면 다음 코드를 사용하세요:
 
 ```python
 chat = ChatSnowflakeCortex(
@@ -75,9 +75,9 @@ chat = ChatSnowflakeCortex(
 )
 ```
 
-### Calling the chat model
+### 채팅 모델 호출
 
-We can now call the chat model using the `invoke` or `stream` methods.
+이제 `invoke` 또는 `stream` 메서드를 사용하여 채팅 모델을 호출할 수 있습니다.
 
 messages = [
         SystemMessage(content="You are a friendly assistant."),
@@ -85,7 +85,7 @@ messages = [
 ]
 chat.invoke(messages)
 
-### Stream
+### 스트림
 
 ```python
 # Sample input prompt

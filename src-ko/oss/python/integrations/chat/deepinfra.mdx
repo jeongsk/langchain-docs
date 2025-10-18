@@ -2,14 +2,14 @@
 title: DeepInfra
 ---
 
-[DeepInfra](https://deepinfra.com/?utm_source=langchain) is a serverless inference as a service that provides access to a [variety of LLMs](https://deepinfra.com/models?utm_source=langchain) and [embeddings models](https://deepinfra.com/models?type=embeddings&utm_source=langchain). This notebook goes over how to use LangChain with DeepInfra for chat models.
+[DeepInfra](https://deepinfra.com/?utm_source=langchain)는 [다양한 LLM](https://deepinfra.com/models?utm_source=langchain) 및 [임베딩 모델](https://deepinfra.com/models?type=embeddings&utm_source=langchain)에 대한 액세스를 제공하는 서버리스 추론 as a service입니다. 이 노트북은 채팅 모델에 DeepInfra와 함께 LangChain을 사용하는 방법을 다룹니다.
 
-## Set the Environment API Key
+## 환경 API 키 설정
 
-Make sure to get your API key from DeepInfra. You have to [Login](https://deepinfra.com/login?from=%2Fdash) and get a new token.
+DeepInfra에서 API 키를 받아야 합니다. [로그인](https://deepinfra.com/login?from=%2Fdash)하여 새 토큰을 받아야 합니다.
 
-You are given a 1 hour free of serverless GPU compute to test different models. (see [here](https://github.com/deepinfra/deepctl#deepctl))
-You can print your token with `deepctl auth token`
+다양한 모델을 테스트하기 위해 1시간의 무료 서버리스 GPU 컴퓨팅이 제공됩니다([여기](https://github.com/deepinfra/deepctl#deepctl) 참조).
+`deepctl auth token`으로 토큰을 출력할 수 있습니다.
 
 ```python
 # get a new token: https://deepinfra.com/login?from=%2Fdash
@@ -35,7 +35,7 @@ messages = [
 chat.invoke(messages)
 ```
 
-## `ChatDeepInfra` also supports async and streaming functionality
+## `ChatDeepInfra`는 비동기 및 스트리밍 기능도 지원합니다
 
 ```python
 from langchain_core.callbacks import StreamingStdOutCallbackHandler
@@ -54,11 +54,11 @@ chat = ChatDeepInfra(
 chat.invoke(messages)
 ```
 
-# Tool Calling
+# 도구 호출
 
-DeepInfra currently supports only invoke and async invoke tool calling.
+DeepInfra는 현재 invoke 및 async invoke 도구 호출만 지원합니다.
 
-For a complete list of models that support tool calling, please refer to our [tool calling documentation](https://deepinfra.com/docs/advanced/function_calling).
+도구 호출을 지원하는 전체 모델 목록은 [도구 호출 문서](https://deepinfra.com/docs/advanced/function_calling)를 참조하세요.
 
 ```python
 import asyncio

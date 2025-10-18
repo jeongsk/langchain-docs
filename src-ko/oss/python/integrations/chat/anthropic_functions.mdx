@@ -3,24 +3,24 @@ title: (Deprecated) Experimental Anthropic Tools Wrapper
 ---
 
 <Warning>
-**The Anthropic API officially supports tool-calling so this workaround is no longer needed. Please use [ChatAnthropic](/oss/integrations/chat/anthropic) with `langchain-anthropic>=0.1.15`.**
+**Anthropic API는 공식적으로 도구 호출을 지원하므로 이 해결 방법은 더 이상 필요하지 않습니다. `langchain-anthropic>=0.1.15`와 함께 [ChatAnthropic](/oss/integrations/chat/anthropic)을 사용하세요.**
 
 </Warning>
 
-This notebook shows how to use an experimental wrapper around Anthropic that gives it tool calling and structured output capabilities. It follows Anthropic's guide [here](https://docs.anthropic.com/claude/docs/functions-external-tools)
+이 노트북은 Anthropic에 도구 호출 및 구조화된 출력 기능을 제공하는 실험적 래퍼를 사용하는 방법을 보여줍니다. [여기](https://docs.anthropic.com/claude/docs/functions-external-tools)에 있는 Anthropic 가이드를 따릅니다.
 
-The wrapper is available from the `langchain-anthropic` package, and it also requires the optional dependency `defusedxml` for parsing XML output from the llm.
+래퍼는 `langchain-anthropic` 패키지에서 사용할 수 있으며, LLM의 XML 출력을 파싱하기 위해 선택적 종속성 `defusedxml`도 필요합니다.
 
-Note: this is a beta feature that will be replaced by Anthropic's formal implementation of tool calling, but it is useful for testing and experimentation in the meantime.
+참고: 이것은 Anthropic의 공식 도구 호출 구현으로 대체될 베타 기능이지만, 그동안 테스트 및 실험에 유용합니다.
 
 ```python
 %pip install -qU langchain-anthropic defusedxml
 from langchain_anthropic.experimental import ChatAnthropicTools
 ```
 
-## Tool Binding
+## 도구 바인딩
 
-`ChatAnthropicTools` exposes a `bind_tools` method that allows you to pass in Pydantic models or BaseTools to the llm.
+`ChatAnthropicTools`는 Pydantic 모델이나 BaseTools를 LLM에 전달할 수 있는 `bind_tools` 메서드를 제공합니다.
 
 ```python
 from pydantic import BaseModel
@@ -39,9 +39,9 @@ model.invoke("I am a 27 year old named Erick")
 AIMessage(content='', additional_kwargs={'tool_calls': [{'function': {'name': 'Person', 'arguments': '{"name": "Erick", "age": "27"}'}, 'type': 'function'}]})
 ```
 
-## Structured Output
+## 구조화된 출력
 
-`ChatAnthropicTools` also implements the [`with_structured_output` spec](/oss/langchain/structured-output) for extracting values. Note: this may not be as stable as with models that explicitly offer tool calling.
+`ChatAnthropicTools`는 값 추출을 위한 [`with_structured_output` 사양](/oss/langchain/structured-output)도 구현합니다. 참고: 명시적으로 도구 호출을 제공하는 모델만큼 안정적이지 않을 수 있습니다.
 
 ```python
 chain = ChatAnthropicTools(model="claude-3-opus-20240229").with_structured_output(

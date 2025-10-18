@@ -2,7 +2,7 @@
 title: Chat with Coze Bot
 ---
 
-ChatCoze chat models API by coze.com. For more information, see [https://www.coze.com/open/docs/chat](https://www.coze.com/open/docs/chat)
+coze.com의 ChatCoze 채팅 모델 API입니다. 자세한 내용은 [https://www.coze.com/open/docs/chat](https://www.coze.com/open/docs/chat)를 참조하세요.
 
 ```python
 from langchain_community.chat_models import ChatCoze
@@ -20,7 +20,7 @@ chat = ChatCoze(
 )
 ```
 
-Alternatively, you can set your API key and API base with:
+또는 다음과 같이 API 키와 API 베이스를 설정할 수 있습니다:
 
 ```python
 import os
@@ -38,12 +38,12 @@ AIMessage(content='为你找到关于coze的信息如下：
 
 Coze是一个由字节跳动推出的AI聊天机器人和应用程序编辑开发平台。
 
-用户无论是否有编程经验，都可以通过该平台快速创建各种类型的聊天机器人、智能体、AI应用和插件，并将其部署在社交平台和即时聊天应用程序中。
+用户无论是否有编程经验,都可以通过该平台快速创建各种类型的聊天机器人、智能体、AI应用和插件,并将其部署在社交平台和即时聊天应用程序中。
 
 国际版使用的模型比国内版更强大。')
 ```
 
-## Chat with Coze Streaming
+## Coze 스트리밍과 채팅하기
 
 ```python
 chat = ChatCoze(

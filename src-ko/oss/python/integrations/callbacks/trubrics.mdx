@@ -2,24 +2,23 @@
 title: Trubrics
 ---
 
->[Trubrics](https://trubrics.com) is an LLM user analytics platform that lets you collect, analyse and manage user
-prompts & feedback on AI models.
+>[Trubrics](https://trubrics.com)는 AI 모델에 대한 사용자 프롬프트와 피드백을 수집, 분석 및 관리할 수 있는 LLM 사용자 분석 플랫폼입니다.
 >
->Check out [Trubrics repo](https://github.com/trubrics/trubrics-sdk) for more information on `Trubrics`.
+>`Trubrics`에 대한 자세한 내용은 [Trubrics 저장소](https://github.com/trubrics/trubrics-sdk)를 확인하세요.
 
-In this guide, we will go over how to set up the `TrubricsCallbackHandler`.
+이 가이드에서는 `TrubricsCallbackHandler`를 설정하는 방법을 다룹니다.
 
-## Installation and Setup
+## 설치 및 설정
 
 ```python
 %pip install -qU  trubrics langchain langchain-community
 ```
 
-### Getting Trubrics Credentials
+### Trubrics 자격 증명 가져오기
 
-If you do not have a Trubrics account, create one on [here](https://trubrics.streamlit.app/). In this tutorial, we will use the `default` project that is built upon account creation.
+Trubrics 계정이 없다면 [여기](https://trubrics.streamlit.app/)에서 계정을 생성하세요. 이 튜토리얼에서는 계정 생성 시 자동으로 만들어지는 `default` 프로젝트를 사용합니다.
 
-Now set your credentials as environment variables:
+이제 자격 증명을 환경 변수로 설정하세요:
 
 ```python
 import os
@@ -32,9 +31,9 @@ os.environ["TRUBRICS_PASSWORD"] = "***"
 from langchain_community.callbacks.trubrics_callback import TrubricsCallbackHandler
 ```
 
-### Usage
+### 사용법
 
-The `TrubricsCallbackHandler` can receive various optional arguments. See [here](https://trubrics.github.io/trubrics-sdk/platform/user_prompts/#saving-prompts-to-trubrics) for kwargs that can be passed to Trubrics prompts.
+`TrubricsCallbackHandler`는 다양한 선택적 인자를 받을 수 있습니다. Trubrics 프롬프트에 전달할 수 있는 kwargs에 대해서는 [여기](https://trubrics.github.io/trubrics-sdk/platform/user_prompts/#saving-prompts-to-trubrics)를 참조하세요.
 
 ```python
 class TrubricsCallbackHandler(BaseCallbackHandler):
@@ -50,15 +49,15 @@ class TrubricsCallbackHandler(BaseCallbackHandler):
     """
 ```
 
-## Examples
+## 예제
 
-Here are two examples of how to use the `TrubricsCallbackHandler` with LangChain [LLMs](/oss/langchain/models) or [Chat Models](/oss/langchain/models). We will use OpenAI models, so set your `OPENAI_API_KEY` key here:
+다음은 LangChain [LLMs](/oss/langchain/models) 또는 [Chat Models](/oss/langchain/models)와 함께 `TrubricsCallbackHandler`를 사용하는 두 가지 예제입니다. OpenAI 모델을 사용할 것이므로 여기서 `OPENAI_API_KEY` 키를 설정하세요:
 
 ```python
 os.environ["OPENAI_API_KEY"] = "sk-***"
 ```
 
-### 1. With an LLM
+### 1. LLM 사용
 
 ```python
 from langchain_openai import OpenAI
@@ -123,7 +122,7 @@ I am ready to take the lead,
 And to create my own destiny.
 ```
 
-### 2. With a chat model
+### 2. 채팅 모델 사용
 
 ```python
 from langchain.messages import HumanMessage, SystemMessage

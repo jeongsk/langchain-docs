@@ -2,39 +2,39 @@
 title: ChatDeepSeek
 ---
 
-This will help you get started with DeepSeek's hosted [chat models](/oss/langchain/models). For detailed documentation of all ChatDeepSeek features and configurations head to the [API reference](https://python.langchain.com/api_reference/deepseek/chat_models/langchain_deepseek.chat_models.ChatDeepSeek.html).
+이 문서는 DeepSeek의 호스팅된 [채팅 모델](/oss/langchain/models) 시작하기를 도와드립니다. 모든 ChatDeepSeek 기능 및 구성에 대한 자세한 문서는 [API 레퍼런스](https://python.langchain.com/api_reference/deepseek/chat_models/langchain_deepseek.chat_models.ChatDeepSeek.html)를 참조하세요.
 
 <Tip>
-**DeepSeek's models are open source and can be run locally (e.g. in [Ollama](./ollama.ipynb)) or on other inference providers (e.g. [Fireworks](./fireworks.ipynb), [Together](./together.ipynb)) as well.**
+**DeepSeek의 모델은 오픈 소스이며 로컬에서([Ollama](./ollama.ipynb)에서 예를 들어) 또는 다른 추론 제공자([Fireworks](./fireworks.ipynb), [Together](./together.ipynb) 등)에서도 실행할 수 있습니다.**
 
 </Tip>
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/deepseek) | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatDeepSeek](https://python.langchain.com/api_reference/deepseek/chat_models/langchain_deepseek.chat_models.ChatDeepSeek.html) | [langchain-deepseek](https://python.langchain.com/api_reference/deepseek/) | ❌ | beta | ✅ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-deepseek?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-deepseek?style=flat-square&label=%20) |
 
-### Model features
+### 모델 기능
 
-| [Tool calling](/oss/langchain/tools) | [Structured output](/oss/langchain/structured-output) | JSON mode | [Image input](/oss/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/langchain/streaming/) | Native async | [Token usage](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
+| [도구 호출](/oss/langchain/tools) | [구조화된 출력](/oss/langchain/structured-output) | JSON mode | [이미지 입력](/oss/langchain/messages#multimodal) | Audio input | Video input | [토큰 수준 스트리밍](/oss/langchain/streaming/) | Native async | [토큰 사용량](/oss/langchain/models#token-usage) | [Logprobs](/oss/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ |
 
 <Note>
-**DeepSeek-R1, specified via `model="deepseek-reasoner"`, does not support tool calling or structured output. Those features [are supported](https://api-docs.deepseek.com/guides/function_calling) by DeepSeek-V3 (specified via `model="deepseek-chat"`).**
+**`model="deepseek-reasoner"`를 통해 지정되는 DeepSeek-R1은 도구 호출 또는 구조화된 출력을 지원하지 않습니다. 이러한 기능은 `model="deepseek-chat"`를 통해 지정되는 DeepSeek-V3에서 [지원됩니다](https://api-docs.deepseek.com/guides/function_calling).**
 
 </Note>
 
-## Setup
+## 설정
 
-To access DeepSeek models you'll need to create a/an DeepSeek account, get an API key, and install the `langchain-deepseek` integration package.
+DeepSeek 모델에 액세스하려면 DeepSeek 계정을 생성하고, API 키를 받고, `langchain-deepseek` 통합 패키지를 설치해야 합니다.
 
-### Credentials
+### 자격 증명
 
-Head to [DeepSeek's API Key page](https://platform.deepseek.com/api_keys) to sign up to DeepSeek and generate an API key. Once you've done this set the `DEEPSEEK_API_KEY` environment variable:
+[DeepSeek의 API 키 페이지](https://platform.deepseek.com/api_keys)로 이동하여 DeepSeek에 가입하고 API 키를 생성하세요. 이 작업을 완료한 후 `DEEPSEEK_API_KEY` 환경 변수를 설정하세요:
 
 ```python
 import getpass
@@ -44,24 +44,24 @@ if not os.getenv("DEEPSEEK_API_KEY"):
     os.environ["DEEPSEEK_API_KEY"] = getpass.getpass("Enter your DeepSeek API key: ")
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
 
 ```python
 # os.environ["LANGSMITH_TRACING"] = "true"
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 ```
 
-### Installation
+### 설치
 
-The LangChain DeepSeek integration lives in the `langchain-deepseek` package:
+LangChain DeepSeek 통합은 `langchain-deepseek` 패키지에 있습니다:
 
 ```python
 %pip install -qU langchain-deepseek
 ```
 
-## Instantiation
+## 인스턴스화
 
-Now we can instantiate our model object and generate chat completions:
+이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
 
 ```python
 from langchain_deepseek import ChatDeepSeek
@@ -76,7 +76,7 @@ llm = ChatDeepSeek(
 )
 ```
 
-## Invocation
+## 호출
 
 ```python
 messages = [
@@ -90,6 +90,6 @@ ai_msg = llm.invoke(messages)
 ai_msg.content
 ```
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all ChatDeepSeek features and configurations head to the [API Reference](https://python.langchain.com/api_reference/deepseek/chat_models/langchain_deepseek.chat_models.ChatDeepSeek.html).
+모든 ChatDeepSeek 기능 및 구성에 대한 자세한 문서는 [API 레퍼런스](https://python.langchain.com/api_reference/deepseek/chat_models/langchain_deepseek.chat_models.ChatDeepSeek.html)를 참조하세요.
