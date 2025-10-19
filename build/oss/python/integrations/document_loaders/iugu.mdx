@@ -2,20 +2,20 @@
 title: Iugu
 ---
 
->[Iugu](https://www.iugu.com/) is a Brazilian services and software as a service (SaaS) company. It offers payment-processing software and application programming interfaces for e-commerce websites and mobile applications.
+>[Iugu](https://www.iugu.com/)는 브라질의 서비스형 소프트웨어(SaaS) 회사입니다. 전자상거래 웹사이트 및 모바일 애플리케이션을 위한 결제 처리 소프트웨어 및 애플리케이션 프로그래밍 인터페이스를 제공합니다.
 
-This notebook covers how to load data from the `Iugu REST API` into a format that can be ingested into LangChain, along with example usage for vectorization.
+이 노트북은 `Iugu REST API`에서 데이터를 LangChain에 수집할 수 있는 형식으로 로드하는 방법을 다루며, 벡터화를 위한 예제 사용법을 포함합니다.
 
 ```python
 from langchain.indexes import VectorstoreIndexCreator
 from langchain_community.document_loaders import IuguLoader
 ```
 
-The Iugu API requires an access token, which can be found inside of the Iugu dashboard.
+Iugu API에는 액세스 토큰이 필요하며, Iugu 대시보드 내에서 찾을 수 있습니다.
 
-This document loader also requires a `resource` option which defines what data you want to load.
+이 문서 로더는 로드할 데이터를 정의하는 `resource` 옵션도 필요합니다.
 
-Following resources are available:
+사용 가능한 리소스:
 
 `Documentation` [Documentation](https://dev.iugu.com/reference/metadados)
 
@@ -24,8 +24,8 @@ iugu_loader = IuguLoader("charges")
 ```
 
 ```python
-# Create a vectorstore retriever from the loader
-# see https://python.langchain.com/en/latest/modules/data_connection/getting_started.html for more details
+# 로더에서 벡터 저장소 검색기를 생성합니다
+# 자세한 내용은 https://python.langchain.com/en/latest/modules/data_connection/getting_started.html을 참조하세요
 
 index = VectorstoreIndexCreator().from_loaders([iugu_loader])
 iugu_doc_retriever = index.vectorstore.as_retriever()

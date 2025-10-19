@@ -2,24 +2,24 @@
 title: UnDatasIO
 ---
 
-This notebook provides a quick overview for getting started with the __UnDatasIO document loader__. UnDatasIO enables efficient loading and parsing of various document formats including PDF, PNG, JPG, JPEG, and JFIF, with features like document lazy loading and native async support, all through UnDatasIO's secure cloud API. These capabilities make the processed data ready for generative AI workflows like RAG.
+이 노트북은 __UnDatasIO document loader__를 시작하기 위한 빠른 개요를 제공합니다. UnDatasIO는 PDF, PNG, JPG, JPEG, JFIF를 포함한 다양한 문서 형식의 효율적인 로드 및 파싱을 가능하게 하며, 문서 지연 로딩 및 네이티브 비동기 지원과 같은 기능을 UnDatasIO의 안전한 클라우드 API를 통해 제공합니다. 이러한 기능들은 처리된 데이터를 RAG와 같은 생성형 AI 워크플로우에 즉시 사용할 수 있도록 합니다.
 
-For detailed documentation on all features and configurations, refer to the official API reference.
+자세한 문서는 공식 API 레퍼런스를 참조하세요.
 
-## Overview
+## 개요
 
-### Loader features
+### 로더 기능
 
 | Source | Document Lazy Loading | Native Async Support |
 | :---: | :---: | :---: |
 | UnDatasIOLoader | ✅ | ✅ |
 
-## Setup
+## 설정
 
-### Credentials
+### 자격 증명
 
-UnDatasIO requires an API token.  
-Generate a free token at [undatas.io](https://undatas.io) and set it in the cell below:
+UnDatasIO는 API 토큰이 필요합니다.  
+[undatas.io](https://undatas.io)에서 무료 토큰을 생성하고 아래 셀에 설정하세요:
 
 ```python
 import getpass
@@ -31,20 +31,20 @@ if "UNDATASIO_TOKEN" not in os.environ:
     )
 ```
 
-### Installation
+### 설치
 
-#### Normal Installation
+#### 일반 설치
 
-The following packages are required to run the rest of this notebook.
+이 노트북의 나머지 부분을 실행하려면 다음 패키지가 필요합니다.
 
 ```python
 # Install package, compatible with API partitioning
 %pip install langchain-undatasio
 ```
 
-### Initialization
+### 초기화
 
-The __UnDatasIOLoader__ supports single-file upload & parsing via the UnDatasIO cloud API.
+__UnDatasIOLoader__는 UnDatasIO 클라우드 API를 통한 단일 파일 업로드 및 파싱을 지원합니다.
 
 ```python
 from langchain_undatasio import UnDatasIOLoader
@@ -55,7 +55,7 @@ loader = UnDatasIOLoader(
 )
 ```
 
-### Load
+### 로드
 
 ```python
 docs = loader.load()
@@ -85,9 +85,9 @@ Affiliations:
 2Faculty of Computer Science, Technion – I
 ```
 
-### Lazy Load
+### 지연 로드
 
-__UnDatasIOLoader__ supports lazy loading for memory-efficient iteration.
+__UnDatasIOLoader__는 메모리 효율적인 반복을 위한 지연 로딩을 지원합니다.
 
 ```python
 pages = []
@@ -104,7 +104,7 @@ Document(
 )
 ```
 
-## See Also
+## 참고 자료
 
 - [UnDatasIO](https://undatas.io)
 - [langchain-undatasio](https://pypi.org/project/langchain-undatasio/)

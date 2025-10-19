@@ -2,45 +2,45 @@
 title: WebBaseLoader
 ---
 
-This covers how to use `WebBaseLoader` to load all text from `HTML` webpages into a document format that we can use downstream. For more custom logic for loading webpages look at some child class examples such as `IMSDbLoader`, `AZLyricsLoader`, and `CollegeConfidentialLoader`.
+이는 `WebBaseLoader`를 사용하여 `HTML` 웹 페이지의 모든 텍스트를 다운스트림에서 사용할 수 있는 문서 형식으로 로드하는 방법을 다룹니다. 웹 페이지 로드를 위한 더 많은 사용자 정의 로직을 보려면 `IMSDbLoader`, `AZLyricsLoader`, `CollegeConfidentialLoader`와 같은 하위 클래스 예제를 참조하세요.
 
-If you don't want to worry about website crawling, bypassing JS-blocking sites, and data cleaning, consider using `FireCrawlLoader` or the faster option `SpiderLoader`.
+웹 사이트 크롤링, JS 차단 사이트 우회 및 데이터 정리에 대해 걱정하고 싶지 않다면 `FireCrawlLoader` 또는 더 빠른 옵션인 `SpiderLoader`를 사용하는 것이 좋습니다.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
-- TODO: Fill in table features.
-- TODO: Remove JS support link if not relevant, otherwise ensure link is correct.
-- TODO: Make sure API reference links are correct.
+- TODO: 표 기능을 채우세요.
+- TODO: 관련이 없는 경우 JS 지원 링크를 제거하고, 그렇지 않으면 링크가 올바른지 확인하세요.
+- TODO: API 레퍼런스 링크가 올바른지 확인하세요.
 
-| Class | Package | Local | Serializable | JS support|
+| 클래스 | 패키지 | 로컬 | 직렬화 가능 | JS 지원|
 | :--- | :--- | :---: | :---: |  :---: |
 | [WebBaseLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.web_base.WebBaseLoader.html) | [langchain-community](https://python.langchain.com/api_reference/community/index.html) | ✅ | ❌ | ❌ |
 
-### Loader features
+### 로더 기능
 
-| Source | Document Lazy Loading | Native Async Support
+| 소스 | 문서 지연 로딩 | 네이티브 비동기 지원
 | :---: | :---: | :---: |
 | WebBaseLoader | ✅ | ✅ |
 
-## Setup
+## 설정
 
-### Credentials
+### 자격 증명
 
-`WebBaseLoader` does not require any credentials.
+`WebBaseLoader`는 자격 증명이 필요하지 않습니다.
 
-### Installation
+### 설치
 
-To use the `WebBaseLoader` you first need to install the `langchain-community` python package.
+`WebBaseLoader`를 사용하려면 먼저 `langchain-community` python 패키지를 설치해야 합니다.
 
 ```python
 %pip install -qU langchain-community beautifulsoup4
 ```
 
-## Initialization
+## 초기화
 
-Now we can instantiate our model object and load documents:
+이제 모델 객체를 인스턴스화하고 문서를 로드할 수 있습니다:
 
 ```python
 from langchain_community.document_loaders import WebBaseLoader
@@ -48,13 +48,13 @@ from langchain_community.document_loaders import WebBaseLoader
 loader = WebBaseLoader("https://www.example.com/")
 ```
 
-To bypass SSL verification errors during fetching, you can set the "verify" option:
+가져오는 동안 SSL 확인 오류를 우회하려면 "verify" 옵션을 설정할 수 있습니다:
 
 `loader.requests_kwargs = {'verify':False}`
 
-### Initialization with multiple pages
+### 여러 페이지로 초기화
 
-You can also pass in a list of pages to load from.
+로드할 페이지 목록을 전달할 수도 있습니다.
 
 ```python
 loader_multiple_pages = WebBaseLoader(
@@ -62,7 +62,7 @@ loader_multiple_pages = WebBaseLoader(
 )
 ```
 
-## Load
+## 로드
 
 ```python
 docs = loader.load()
@@ -82,16 +82,16 @@ print(docs[0].metadata)
 {'source': 'https://www.example.com/', 'title': 'Example Domain', 'language': 'No language found.'}
 ```
 
-### Load multiple urls concurrently
+### 여러 URL 동시 로드
 
-You can speed up the scraping process by scraping and parsing multiple urls concurrently.
+여러 URL을 동시에 스크래핑하고 파싱하여 스크래핑 프로세스의 속도를 높일 수 있습니다.
 
-There are reasonable limits to concurrent requests, defaulting to 2 per second.  If you aren't concerned about being a good citizen, or you control the server you are scraping and don't care about load, you can change the `requests_per_second` parameter to increase the max concurrent requests.  Note, while this will speed up the scraping process, but may cause the server to block you.  Be careful!
+동시 요청에는 합리적인 제한이 있으며 기본값은 초당 2개입니다. 좋은 시민이 되는 것에 대해 걱정하지 않거나 스크래핑하는 서버를 제어하고 부하에 대해 신경 쓰지 않는다면 `requests_per_second` 매개변수를 변경하여 최대 동시 요청을 늘릴 수 있습니다. 이렇게 하면 스크래핑 프로세스의 속도가 빨라지지만 서버가 차단할 수 있습니다. 조심하세요!
 
 ```python
 %pip install -qU  nest_asyncio
 
-# fixes a bug with asyncio and jupyter
+# asyncio와 jupyter의 버그 수정
 import nest_asyncio
 
 nest_asyncio.apply()
@@ -117,9 +117,9 @@ Fetching pages: 100%|###########################################################
  Document(metadata={'source': 'https://google.com', 'title': 'Google', 'description': "Search the world's information, including webpages, images, videos and more. Google has many special features to help you find exactly what you're looking for.", 'language': 'en'}, page_content='GoogleSearch Images Maps Play YouTube News Gmail Drive More »Web History | Settings | Sign in\xa0Advanced search5 ways Gemini can help during the HolidaysAdvertisingBusiness SolutionsAbout Google© 2024 - Privacy - Terms  ')]
 ```
 
-### Loading a xml file, or using a different BeautifulSoup parser
+### XML 파일 로드 또는 다른 BeautifulSoup 파서 사용
 
-You can also look at `SitemapLoader` for an example of how to load a sitemap file, which is an example of using this feature.
+이 기능을 사용하는 예제는 sitemap 파일을 로드하는 방법의 예인 `SitemapLoader`를 참조할 수도 있습니다.
 
 ```python
 loader = WebBaseLoader(
@@ -131,12 +131,12 @@ docs
 ```
 
 ```output
-[Document(metadata={'source': 'https://www.govinfo.gov/content/pkg/CFR-2018-title10-vol3/xml/CFR-2018-title10-vol3-sec431-86.xml'}, page_content='\n\n10\nEnergy\n3\n2018-01-01\n2018-01-01\nfalse\nUniform test method for the measurement of energy efficiency of commercial packaged boilers.\nÂ§ 431.86\nSection Â§ 431.86\n\nEnergy\nDEPARTMENT OF ENERGY\nENERGY CONSERVATION\nENERGY EFFICIENCY PROGRAM FOR CERTAIN COMMERCIAL AND INDUSTRIAL EQUIPMENT\nCommercial Packaged Boilers\nTest Procedures\n\n\n\n\n§\u2009431.86\nUniform test method for the measurement of energy efficiency of commercial packaged boilers.\n(a) Scope. This section provides test procedures, pursuant to the Energy Policy and Conservation Act (EPCA), as amended, which must be followed for measuring the combustion efficiency and/or thermal efficiency of a gas- or oil-fired commercial packaged boiler.\n(b) Testing and Calculations. Determine the thermal efficiency or combustion efficiency of commercial packaged boilers by conducting the appropriate test procedure(s) indicated in Table 1 of this section.\n\nTable 1—Test Requirements for Commercial Packaged Boiler Equipment Classes\n\nEquipment category\nSubcategory\nCertified rated inputBtu/h\n\nStandards efficiency metric(§\u2009431.87)\n\nTest procedure(corresponding to\nstandards efficiency\nmetric required\nby §\u2009431.87)\n\n\n\nHot Water\nGas-fired\n≥300,000 and ≤2,500,000\nThermal Efficiency\nAppendix A, Section 2.\n\n\nHot Water\nGas-fired\n>2,500,000\nCombustion Efficiency\nAppendix A, Section 3.\n\n\nHot Water\nOil-fired\n≥300,000 and ≤2,500,000\nThermal Efficiency\nAppendix A, Section 2.\n\n\nHot Water\nOil-fired\n>2,500,000\nCombustion Efficiency\nAppendix A, Section 3.\n\n\nSteam\nGas-fired (all*)\n≥300,000 and ≤2,500,000\nThermal Efficiency\nAppendix A, Section 2.\n\n\nSteam\nGas-fired (all*)\n>2,500,000 and ≤5,000,000\nThermal Efficiency\nAppendix A, Section 2.\n\n\n\u2003\n\n>5,000,000\nThermal Efficiency\nAppendix A, Section 2.OR\nAppendix A, Section 3 with Section 2.4.3.2.\n\n\n\nSteam\nOil-fired\n≥300,000 and ≤2,500,000\nThermal Efficiency\nAppendix A, Section 2.\n\n\nSteam\nOil-fired\n>2,500,000 and ≤5,000,000\nThermal Efficiency\nAppendix A, Section 2.\n\n\n\u2003\n\n>5,000,000\nThermal Efficiency\nAppendix A, Section 2.OR\nAppendix A, Section 3. with Section 2.4.3.2.\n\n\n\n*\u2009Equipment classes for commercial packaged boilers as of July 22, 2009 (74 FR 36355) distinguish between gas-fired natural draft and all other gas-fired (except natural draft).\n\n(c) Field Tests. The field test provisions of appendix A may be used only to test a unit of commercial packaged boiler with rated input greater than 5,000,000 Btu/h.\n[81 FR 89305, Dec. 9, 2016]\n\n\nEnergy Efficiency Standards\n\n')]
+[Document(metadata={'source': 'https://www.govinfo.gov/content/pkg/CFR-2018-title10-vol3/xml/CFR-2018-title10-vol3-sec431-86.xml'}, page_content='\n\n10\nEnergy\n3\n2018-01-01\n2018-01-01\nfalse\nUniform test method for the measurement of energy efficiency of commercial packaged boilers.\n§ 431.86\nSection § 431.86\n\nEnergy\nDEPARTMENT OF ENERGY\nENERGY CONSERVATION\nENERGY EFFICIENCY PROGRAM FOR CERTAIN COMMERCIAL AND INDUSTRIAL EQUIPMENT\nCommercial Packaged Boilers\nTest Procedures\n\n\n\n\n§\u2009431.86\nUniform test method for the measurement of energy efficiency of commercial packaged boilers.\n...')]
 ```
 
-## Lazy Load
+## 지연 로드
 
-You can use lazy loading to only load one page at a time in order to minimize memory requirements.
+메모리 요구 사항을 최소화하기 위해 지연 로딩을 사용하여 한 번에 하나의 페이지만 로드할 수 있습니다.
 
 ```python
 pages = []
@@ -158,7 +158,7 @@ Uniform test method for the measurement of energy efficien
 {'source': 'https://www.govinfo.gov/content/pkg/CFR-2018-title10-vol3/xml/CFR-2018-title10-vol3-sec431-86.xml'}
 ```
 
-### Async
+### 비동기
 
 ```python
 pages = []
@@ -183,9 +183,9 @@ Uniform test method for the measurement of energy efficien
 {'source': 'https://www.govinfo.gov/content/pkg/CFR-2018-title10-vol3/xml/CFR-2018-title10-vol3-sec431-86.xml'}
 ```
 
-## Using proxies
+## 프록시 사용
 
-Sometimes you might need to use proxies to get around IP blocks. You can pass in a dictionary of proxies to the loader (and `requests` underneath) to use them.
+때때로 IP 차단을 우회하기 위해 프록시를 사용해야 할 수 있습니다. 프록시 사전을 로더(및 하위 `requests`)에 전달하여 사용할 수 있습니다.
 
 ```python
 loader = WebBaseLoader(
@@ -198,9 +198,9 @@ loader = WebBaseLoader(
 docs = loader.load()
 ```
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all `WebBaseLoader` features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.web_base.WebBaseLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.web_base.WebBaseLoader.html)
+모든 `WebBaseLoader` 기능 및 구성에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.web_base.WebBaseLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.web_base.WebBaseLoader.html)
 
 ---
 

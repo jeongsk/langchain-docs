@@ -2,33 +2,33 @@
 title: FireCrawl
 ---
 
-[FireCrawl](https://firecrawl.dev/?ref=langchain) crawls and convert any website into LLM-ready data. It crawls all accessible subpages and give you clean markdown and metadata for each. No sitemap required.
+[FireCrawl](https://firecrawl.dev/?ref=langchain)은 모든 웹사이트를 크롤링하고 LLM에 최적화된 데이터로 변환합니다. 모든 접근 가능한 하위 페이지를 크롤링하고 각 페이지에 대한 깔끔한 markdown과 메타데이터를 제공합니다. 사이트맵이 필요하지 않습니다.
 
-FireCrawl handles complex tasks such as reverse proxies, caching, rate limits, and content blocked by JavaScript. Built by the [mendable.ai](https://mendable.ai) team.
+FireCrawl은 역방향 프록시, 캐싱, 속도 제한, JavaScript로 차단된 콘텐츠와 같은 복잡한 작업을 처리합니다. [mendable.ai](https://mendable.ai) 팀에서 제작했습니다.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부정보
 
 | Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/document_loaders/web_loaders/firecrawl/)|
 | :--- | :--- | :---: | :---: |  :---: |
 | [FireCrawlLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.firecrawl.FireCrawlLoader.html) | [langchain-community](https://python.langchain.com/api_reference/community/index.html) | ✅ | ❌ | ✅ |
 
-### Loader features
+### 로더 기능
 
 | Source | Document Lazy Loading | Native Async Support
 | :---: | :---: | :---: |
 | FireCrawlLoader | ✅ | ❌ |
 
-## Setup
+## 설정
 
 ```python
 pip install firecrawl-py
 ```
 
-## Usage
+## 사용법
 
-You will need to get your own API key. See [firecrawl.dev](https://firecrawl.dev)
+자신의 API 키를 받아야 합니다. [firecrawl.dev](https://firecrawl.dev)를 참조하세요
 
 ```python
 from langchain_community.document_loaders.firecrawl import FireCrawlLoader
@@ -49,7 +49,7 @@ pages = []
 for doc in loader.lazy_load():
     pages.append(doc)
     if len(pages) >= 10:
-        # do some paged operation, e.g.
+        # 일부 페이지 작업을 수행합니다, 예:
         # index.upsert(page)
 
         pages = []
@@ -59,13 +59,13 @@ for doc in loader.lazy_load():
 pages
 ```
 
-## Modes
+## 모드
 
-- `scrape`: Scrape single url and return the markdown.
-- `crawl`: Crawl the url and all accessible sub pages and return the markdown for each one.
-- `map`: Maps the URL and returns a list of semantically related pages.
+- `scrape`: 단일 URL을 스크랩하고 markdown을 반환합니다.
+- `crawl`: URL과 접근 가능한 모든 하위 페이지를 크롤링하고 각각에 대한 markdown을 반환합니다.
+- `map`: URL을 매핑하고 의미적으로 관련된 페이지 목록을 반환합니다.
 
-### Crawl
+### 크롤
 
 ```python
 loader = FireCrawlLoader(
@@ -84,9 +84,9 @@ print(pages[0].page_content[:100])
 print(pages[0].metadata)
 ```
 
-#### Crawl Options
+#### 크롤 옵션
 
-You can also pass `params` to the loader. This is a dictionary of options to pass to the crawler. See the [FireCrawl API documentation](https://github.com/mendableai/firecrawl-py) for more information.
+로더에 `params`를 전달할 수도 있습니다. 이것은 크롤러에 전달할 옵션 사전입니다. 자세한 내용은 [FireCrawl API 문서](https://github.com/mendableai/firecrawl-py)를 참조하세요.
 
 ### Map
 
@@ -102,13 +102,13 @@ docs = loader.load()
 docs
 ```
 
-#### Map Options
+#### Map 옵션
 
-You can also pass `params` to the loader. This is a dictionary of options to pass to the loader. See the [FireCrawl API documentation](https://github.com/mendableai/firecrawl-py) for more information.
+로더에 `params`를 전달할 수도 있습니다. 이것은 로더에 전달할 옵션 사전입니다. 자세한 내용은 [FireCrawl API 문서](https://github.com/mendableai/firecrawl-py)를 참조하세요.
 
 ## API reference
 
-For detailed documentation of all `FireCrawlLoader` features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.firecrawl.FireCrawlLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.firecrawl.FireCrawlLoader.html)
+모든 `FireCrawlLoader` 기능 및 구성에 대한 자세한 문서는 API 참조를 확인하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.firecrawl.FireCrawlLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.firecrawl.FireCrawlLoader.html)
 
 ---
 

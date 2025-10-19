@@ -2,67 +2,67 @@
 title: Google Firestore in Datastore Mode
 ---
 
-> [Firestore in Datastore Mode](https://cloud.google.com/datastore) is a NoSQL document database built for automatic scaling, high performance and ease of application development. Extend your database application to build AI-powered experiences leveraging Datastore's LangChain integrations.
+> [Firestore in Datastore Mode](https://cloud.google.com/datastore)는 자동 확장, 고성능 및 애플리케이션 개발 용이성을 위해 구축된 NoSQL 문서 데이터베이스입니다. Datastore의 LangChain 통합을 활용하여 AI 기반 경험을 구축하도록 데이터베이스 애플리케이션을 확장하세요.
 
-This notebook goes over how to use [Firestore in Datastore Mode](https://cloud.google.com/datastore) to [save, load and delete langchain documents](/oss/python/integrations/document_loaders) with `DatastoreLoader` and `DatastoreSaver`.
+이 노트북은 [Firestore in Datastore Mode](https://cloud.google.com/datastore)를 사용하여 `DatastoreLoader` 및 `DatastoreSaver`로 [langchain 문서를 저장, 로드 및 삭제](/oss/python/integrations/document_loaders)하는 방법을 다룹니다.
 
-Learn more about the package on [GitHub](https://github.com/googleapis/langchain-google-datastore-python/).
+패키지에 대한 자세한 내용은 [GitHub](https://github.com/googleapis/langchain-google-datastore-python/)에서 확인하세요.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/googleapis/langchain-google-datastore-python/blob/main/docs/document_loader.ipynb)
 
-## Before You Begin
+## 시작하기 전에
 
-To run this notebook, you will need to do the following:
+이 노트북을 실행하려면 다음을 수행해야 합니다:
 
-* [Create a Google Cloud Project](https://developers.google.com/workspace/guides/create-project)
-* [Enable the Datastore API](https://console.cloud.google.com/flows/enableapi?apiid=datastore.googleapis.com)
-* [Create a Firestore in Datastore Mode database](https://cloud.google.com/datastore/docs/manage-databases)
+* [Google Cloud 프로젝트 만들기](https://developers.google.com/workspace/guides/create-project)
+* [Datastore API 활성화](https://console.cloud.google.com/flows/enableapi?apiid=datastore.googleapis.com)
+* [Firestore in Datastore Mode 데이터베이스 만들기](https://cloud.google.com/datastore/docs/manage-databases)
 
-After confirmed access to database in the runtime environment of this notebook, filling the following values and run the cell before running example scripts.
+이 노트북의 런타임 환경에서 데이터베이스에 대한 액세스를 확인한 후 다음 값을 입력하고 예제 스크립트를 실행하기 전에 셀을 실행하세요.
 
-### 🦜🔗 Library Installation
+### 🦜🔗 라이브러리 설치
 
-The integration lives in its own `langchain-google-datastore` package, so we need to install it.
+통합은 자체 `langchain-google-datastore` 패키지에 있으므로 설치해야 합니다.
 
 ```python
 %pip install -upgrade --quiet langchain-google-datastore
 ```
 
-**Colab only**: Uncomment the following cell to restart the kernel or use the button to restart the kernel. For Vertex AI Workbench you can restart the terminal using the button on top.
+**Colab만 해당**: 다음 셀의 주석을 제거하여 커널을 다시 시작하거나 버튼을 사용하여 커널을 다시 시작하세요. Vertex AI Workbench의 경우 상단의 버튼을 사용하여 터미널을 다시 시작할 수 있습니다.
 
 ```python
-# # Automatically restart kernel after installs so that your environment can access the new packages
+# # 설치 후 커널을 자동으로 다시 시작하여 환경이 새 패키지에 액세스할 수 있도록 합니다
 # import IPython
 
 # app = IPython.Application.instance()
 # app.kernel.do_shutdown(True)
 ```
 
-### ☁ Set Your Google Cloud Project
+### ☁ Google Cloud 프로젝트 설정
 
-Set your Google Cloud project so that you can leverage Google Cloud resources within this notebook.
+이 노트북 내에서 Google Cloud 리소스를 활용할 수 있도록 Google Cloud 프로젝트를 설정하세요.
 
-If you don't know your project ID, try the following:
+프로젝트 ID를 모르는 경우 다음을 시도하세요:
 
-* Run `gcloud config list`.
-* Run `gcloud projects list`.
-* See the support page: [Locate the project ID](https://support.google.com/googleapi/answer/7014113).
+* `gcloud config list`를 실행하세요.
+* `gcloud projects list`를 실행하세요.
+* 지원 페이지를 참조하세요: [프로젝트 ID 찾기](https://support.google.com/googleapi/answer/7014113).
 
 ```python
-# @markdown Please fill in the value below with your Google Cloud project ID and then run the cell.
+# @markdown 아래에 Google Cloud 프로젝트 ID를 입력하고 셀을 실행하세요.
 
 PROJECT_ID = "my-project-id"  # @param {type:"string"}
 
-# Set the project id
+# 프로젝트 ID 설정
 !gcloud config set project {PROJECT_ID}
 ```
 
-### 🔐 Authentication
+### 🔐 인증
 
-Authenticate to Google Cloud as the IAM user logged into this notebook in order to access your Google Cloud Project.
+이 노트북에 로그인한 IAM 사용자로 Google Cloud에 인증하여 Google Cloud 프로젝트에 액세스합니다.
 
-* If you are using Colab to run this notebook, use the cell below and continue.
-* If you are using Vertex AI Workbench, check out the setup instructions [here](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env).
+* Colab을 사용하여 이 노트북을 실행하는 경우 아래 셀을 사용하고 계속하세요.
+* Vertex AI Workbench를 사용하는 경우 [여기](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env)에서 설정 지침을 확인하세요.
 
 ```python
 from google.colab import auth
@@ -70,11 +70,11 @@ from google.colab import auth
 auth.authenticate_user()
 ```
 
-## Basic Usage
+## 기본 사용법
 
-### Save documents
+### 문서 저장
 
-Save langchain documents with `DatastoreSaver.upsert_documents(<documents>)`. By default it will try to extract the entity key from the `key` in the Document metadata.
+`DatastoreSaver.upsert_documents(<documents>)`를 사용하여 langchain 문서를 저장합니다. 기본적으로 Document 메타데이터의 `key`에서 엔티티 키를 추출하려고 시도합니다.
 
 ```python
 from langchain_core.documents import Document
@@ -86,9 +86,9 @@ data = [Document(page_content="Hello, World!")]
 saver.upsert_documents(data)
 ```
 
-#### Save documents without key
+#### 키 없이 문서 저장
 
-If a `kind` is specified the documents will be stored with an auto generated id.
+`kind`가 지정되면 문서는 자동 생성된 ID로 저장됩니다.
 
 ```python
 saver = DatastoreSaver("MyKind")
@@ -96,11 +96,11 @@ saver = DatastoreSaver("MyKind")
 saver.upsert_documents(data)
 ```
 
-### Load documents via Kind
+### Kind를 통해 문서 로드
 
-Load langchain documents with `DatastoreLoader.load()` or `DatastoreLoader.lazy_load()`. `lazy_load` returns a generator that only queries database during the iteration. To initialize `DatastoreLoader` class you need to provide:
+`DatastoreLoader.load()` 또는 `DatastoreLoader.lazy_load()`를 사용하여 langchain 문서를 로드합니다. `lazy_load`는 반복 중에만 데이터베이스를 쿼리하는 제너레이터를 반환합니다. `DatastoreLoader` 클래스를 초기화하려면 다음을 제공해야 합니다:
 
-1. `source` - The source to load the documents. It can be an instance of Query or the name of the Datastore kind to read from.
+1. `source` - 문서를 로드할 소스. Query의 인스턴스이거나 읽을 Datastore kind의 이름일 수 있습니다.
 
 ```python
 from langchain_google_datastore import DatastoreLoader
@@ -109,9 +109,9 @@ loader = DatastoreLoader("MyKind")
 data = loader.load()
 ```
 
-### Load documents via query
+### 쿼리를 통해 문서 로드
 
-Other than loading documents from kind, we can also choose to load documents from query. For example:
+kind에서 문서를 로드하는 것 외에도 쿼리에서 문서를 로드하도록 선택할 수도 있습니다. 예를 들어:
 
 ```python
 from google.cloud import datastore
@@ -125,9 +125,9 @@ loader_document = DatastoreLoader(query_load)
 data = loader_document.load()
 ```
 
-### Delete documents
+### 문서 삭제
 
-Delete a list of langchain documents from Datastore with `DatastoreSaver.delete_documents(<documents>)`.
+`DatastoreSaver.delete_documents(<documents>)`를 사용하여 Datastore에서 langchain 문서 목록을 삭제합니다.
 
 ```python
 saver = DatastoreSaver()
@@ -139,15 +139,15 @@ keys_to_delete = [
     ["Kind2", 123],
     ["Kind3", "identifier", "NestedKind", 456],
 ]
-# The Documents will be ignored and only the document ids will be used.
+# Document는 무시되고 문서 ID만 사용됩니다.
 saver.delete_documents(data, keys_to_delete)
 ```
 
-## Advanced Usage
+## 고급 사용법
 
-### Load documents with customized document page content & metadata
+### 사용자 정의된 문서 페이지 콘텐츠 및 메타데이터로 문서 로드
 
-The arguments of `page_content_properties` and `metadata_properties` will specify the Entity properties to be written into LangChain Document `page_content` and `metadata`.
+`page_content_properties` 및 `metadata_properties` 인수는 LangChain Document `page_content` 및 `metadata`에 기록될 Entity 속성을 지정합니다.
 
 ```python
 loader = DatastoreLoader(
@@ -159,11 +159,11 @@ loader = DatastoreLoader(
 data = loader.load()
 ```
 
-### Customize Page Content Format
+### 페이지 콘텐츠 형식 사용자 정의
 
-When the `page_content` contains only one field the information will be the field value only. Otherwise the `page_content` will be in JSON format.
+`page_content`에 하나의 필드만 포함된 경우 정보는 필드 값만 됩니다. 그렇지 않으면 `page_content`는 JSON 형식이 됩니다.
 
-### Customize Connection & Authentication
+### 연결 및 인증 사용자 정의
 
 ```python
 from google.auth import compute_engine

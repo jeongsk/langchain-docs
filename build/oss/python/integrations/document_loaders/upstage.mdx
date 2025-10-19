@@ -2,25 +2,25 @@
 title: Upstage
 ---
 
-This notebook covers how to get started with `UpstageDocumentParseLoader`.
+이 노트북은 `UpstageDocumentParseLoader` 시작하기에 대해 다룹니다.
 
-## Installation
+## 설치
 
-Install `langchain-upstage` package.
+`langchain-upstage` 패키지를 설치하세요.
 
 ```bash
 pip install -U langchain-upstage
 ```
 
-## Environment Setup
+## 환경 설정
 
-Make sure to set the following environment variables:
+다음 환경 변수를 설정해야 합니다:
 
-- `UPSTAGE_API_KEY`: Your Upstage API key. Read [Upstage developers document](https://developers.upstage.ai/docs/getting-started/quick-start) to get your API key.
+- `UPSTAGE_API_KEY`: Upstage API 키. API 키를 얻으려면 [Upstage 개발자 문서](https://developers.upstage.ai/docs/getting-started/quick-start)를 읽어보세요.
 
-> The previously used UPSTAGE_DOCUMENT_AI_API_KEY is deprecated. However, the key previously used in UPSTAGE_DOCUMENT_AI_API_KEY can now be used in UPSTAGE_API_KEY.
+> 이전에 사용되던 UPSTAGE_DOCUMENT_AI_API_KEY는 더 이상 사용되지 않습니다. 그러나 이전에 UPSTAGE_DOCUMENT_AI_API_KEY에서 사용되던 키는 이제 UPSTAGE_API_KEY에서 사용할 수 있습니다.
 
-## Usage
+## 사용법
 
 ```python
 import os
@@ -34,7 +34,7 @@ from langchain_upstage import UpstageDocumentParseLoader
 file_path = "/PATH/TO/YOUR/FILE.pdf"
 layzer = UpstageDocumentParseLoader(file_path, split="page")
 
-# For improved memory efficiency, consider using the lazy_load method to load documents page by page.
+# 메모리 효율성을 높이려면 lazy_load 메서드를 사용하여 페이지별로 문서를 로드하는 것을 고려하세요.
 docs = layzer.load()  # or layzer.lazy_load()
 
 for doc in docs[:3]:

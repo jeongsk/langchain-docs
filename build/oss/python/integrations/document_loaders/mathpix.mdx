@@ -2,27 +2,27 @@
 title: MathPixPDFLoader
 ---
 
-Inspired by Daniel Gross's snippet here: [https://gist.github.com/danielgross/3ab4104e14faccc12b49200843adab21](https://gist.github.com/danielgross/3ab4104e14faccc12b49200843adab21)
+Daniel Gross의 스니펫에서 영감을 받았습니다: [https://gist.github.com/danielgross/3ab4104e14faccc12b49200843adab21](https://gist.github.com/danielgross/3ab4104e14faccc12b49200843adab21)
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
-| Class | Package | Local | Serializable | JS support|
+| 클래스 | 패키지 | 로컬 | 직렬화 가능 | JS 지원|
 | :--- | :--- | :---: | :---: |  :---: |
 | [MathPixPDFLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.MathpixPDFLoader.html) | [langchain-community](https://python.langchain.com/api_reference/community/index.html) | ✅ | ❌ | ❌ |
 
-### Loader features
+### 로더 기능
 
-| Source | Document Lazy Loading | Native Async Support
+| 소스 | 문서 지연 로딩 | 네이티브 비동기 지원
 | :---: | :---: | :---: |
 | MathPixPDFLoader | ✅ | ❌ |
 
-## Setup
+## 설정
 
-### Credentials
+### 인증 정보
 
-Sign up for Mathpix and [create an API key](https://mathpix.com/docs/ocr/creating-an-api-key) to set the `MATHPIX_API_KEY` variables in your environment
+Mathpix에 가입하고 [API 키를 생성](https://mathpix.com/docs/ocr/creating-an-api-key)하여 환경에 `MATHPIX_API_KEY` 변수를 설정하세요.
 
 ```python
 import getpass
@@ -32,24 +32,24 @@ if "MATHPIX_API_KEY" not in os.environ:
     os.environ["MATHPIX_API_KEY"] = getpass.getpass("Enter your Mathpix API key: ")
 ```
 
-To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
+모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
 
 ```python
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 # os.environ["LANGSMITH_TRACING"] = "true"
 ```
 
-### Installation
+### 설치
 
-Install **langchain-community**.
+**langchain-community**를 설치하세요.
 
 ```python
 %pip install -qU langchain-community
 ```
 
-## Initialization
+## 초기화
 
-Now we are ready to initialize our loader:
+이제 로더를 초기화할 준비가 되었습니다:
 
 ```python
 from langchain_community.document_loaders import MathpixPDFLoader
@@ -58,7 +58,7 @@ file_path = "./example_data/layout-parser-paper.pdf"
 loader = MathpixPDFLoader(file_path)
 ```
 
-## Load
+## 로드
 
 ```python
 docs = loader.load()
@@ -69,7 +69,7 @@ docs[0]
 print(docs[0].metadata)
 ```
 
-## Lazy Load
+## 지연 로드
 
 ```python
 page = []
@@ -82,9 +82,9 @@ for doc in loader.lazy_load():
         page = []
 ```
 
-## API reference
+## API 참조
 
-For detailed documentation of all MathpixPDFLoader features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.MathpixPDFLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.MathpixPDFLoader.html)
+MathpixPDFLoader의 모든 기능과 구성에 대한 자세한 문서는 API 참조를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.MathpixPDFLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.MathpixPDFLoader.html)
 
 ---
 

@@ -2,9 +2,9 @@
 title: Google Cloud Storage Directory
 ---
 
->[Google Cloud Storage](https://en.wikipedia.org/wiki/Google_Cloud_Storage) is a managed service for storing unstructured data.
+>[Google Cloud Storage](https://en.wikipedia.org/wiki/Google_Cloud_Storage)는 비정형 데이터를 저장하기 위한 관리형 서비스입니다.
 
-This covers how to load document objects from an `Google Cloud Storage (GCS) directory (bucket)`.
+이 문서는 `Google Cloud Storage (GCS) 디렉토리(버킷)`에서 문서 객체를 로드하는 방법을 다룹니다.
 
 ```python
 %pip install -qU  langchain-google-community[gcs]
@@ -33,9 +33,9 @@ loader.load()
 [Document(page_content='Lorem ipsum dolor sit amet.', lookup_str='', metadata={'source': '/var/folders/y6/8_bzdg295ld6s1_97_12m4lr0000gn/T/tmpz37njh7u/fake.docx'}, lookup_index=0)]
 ```
 
-## Specifying a prefix
+## 접두사 지정
 
-You can also specify a prefix for more fine-grained control over what files to load -including loading all files from a specific folder-.
+접두사를 지정하여 로드할 파일을 더 세밀하게 제어할 수 있습니다. 특정 폴더에서 모든 파일을 로드하는 것도 포함됩니다.
 
 ```python
 loader = GCSDirectoryLoader(project_name="aist", bucket="testing-hwc", prefix="fake")
@@ -56,9 +56,9 @@ loader.load()
 [Document(page_content='Lorem ipsum dolor sit amet.', lookup_str='', metadata={'source': '/var/folders/y6/8_bzdg295ld6s1_97_12m4lr0000gn/T/tmpylg6291i/fake.docx'}, lookup_index=0)]
 ```
 
-## Continue on failure to load a single file
+## 단일 파일 로드 실패 시 계속 진행
 
-Files in a GCS bucket may cause errors during processing. Enable the `continue_on_failure=True` argument to allow silent failure. This means failure to process a single file will not break the function, it will log a warning instead.
+GCS 버킷의 파일이 처리 중 오류를 발생시킬 수 있습니다. `continue_on_failure=True` 인수를 활성화하여 자동 실패를 허용합니다. 이는 단일 파일 처리 실패가 함수를 중단하지 않고 경고를 로그합니다.
 
 ```python
 loader = GCSDirectoryLoader(

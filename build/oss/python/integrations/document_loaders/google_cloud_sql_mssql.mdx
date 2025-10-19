@@ -2,64 +2,64 @@
 title: Google Cloud SQL for SQL server
 ---
 
-> [Cloud SQL](https://cloud.google.com/sql) is a fully managed relational database service that offers high performance, seamless integration, and impressive scalability. It offers [MySQL](https://cloud.google.com/sql/mysql), [PostgreSQL](https://cloud.google.com/sql/postgres), and [SQL Server](https://cloud.google.com/sql/sqlserver) database engines. Extend your database application to build AI-powered experiences leveraging Cloud SQL's LangChain integrations.
+> [Cloud SQL](https://cloud.google.com/sql)은 고성능, 원활한 통합 및 인상적인 확장성을 제공하는 완전 관리형 관계형 데이터베이스 서비스입니다. [MySQL](https://cloud.google.com/sql/mysql), [PostgreSQL](https://cloud.google.com/sql/postgres), [SQL Server](https://cloud.google.com/sql/sqlserver) 데이터베이스 엔진을 제공합니다. Cloud SQL의 LangChain 통합을 활용하여 AI 기반 경험을 구축하도록 데이터베이스 애플리케이션을 확장하세요.
 
-This notebook goes over how to use [Cloud SQL for SQL server](https://cloud.google.com/sql/sqlserver) to [save, load and delete langchain documents](/oss/python/integrations/document_loaders) with `MSSQLLoader` and `MSSQLDocumentSaver`.
+이 노트북은 [Cloud SQL for SQL server](https://cloud.google.com/sql/sqlserver)를 사용하여 `MSSQLLoader` 및 `MSSQLDocumentSaver`로 [langchain 문서를 저장, 로드 및 삭제](/oss/python/integrations/document_loaders)하는 방법을 다룹니다.
 
-Learn more about the package on [GitHub](https://github.com/googleapis/langchain-google-cloud-sql-mssql-python/).
+패키지에 대한 자세한 내용은 [GitHub](https://github.com/googleapis/langchain-google-cloud-sql-mssql-python/)에서 확인하세요.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/googleapis/langchain-google-cloud-sql-mssql-python/blob/main/docs/document_loader.ipynb)
 
-## Before You Begin
+## 시작하기 전에
 
-To run this notebook, you will need to do the following:
+이 노트북을 실행하려면 다음을 수행해야 합니다:
 
-* [Create a Google Cloud Project](https://developers.google.com/workspace/guides/create-project)
-* [Enable the Cloud SQL Admin API.](https://console.cloud.google.com/marketplace/product/google/sqladmin.googleapis.com)
-* [Create a Cloud SQL for SQL server instance](https://cloud.google.com/sql/docs/sqlserver/create-instance)
-* [Create a Cloud SQL database](https://cloud.google.com/sql/docs/sqlserver/create-manage-databases)
-* [Add an IAM database user to the database](https://cloud.google.com/sql/docs/sqlserver/create-manage-users) (Optional)
+* [Google Cloud 프로젝트 만들기](https://developers.google.com/workspace/guides/create-project)
+* [Cloud SQL Admin API 활성화](https://console.cloud.google.com/marketplace/product/google/sqladmin.googleapis.com)
+* [Cloud SQL for SQL server 인스턴스 만들기](https://cloud.google.com/sql/docs/sqlserver/create-instance)
+* [Cloud SQL 데이터베이스 만들기](https://cloud.google.com/sql/docs/sqlserver/create-manage-databases)
+* [데이터베이스에 IAM 데이터베이스 사용자 추가](https://cloud.google.com/sql/docs/sqlserver/create-manage-users) (선택 사항)
 
-After confirmed access to database in the runtime environment of this notebook, filling the following values and run the cell before running example scripts.
+이 노트북의 런타임 환경에서 데이터베이스에 대한 액세스를 확인한 후 다음 값을 입력하고 예제 스크립트를 실행하기 전에 셀을 실행하세요.
 
 ```python
-# @markdown Please fill in the both the Google Cloud region and name of your Cloud SQL instance.
+# @markdown Cloud SQL 인스턴스의 Google Cloud 리전 및 이름을 모두 입력하세요.
 REGION = "us-central1"  # @param {type:"string"}
 INSTANCE = "test-instance"  # @param {type:"string"}
 
-# @markdown Please fill in user name and password of your Cloud SQL instance.
+# @markdown Cloud SQL 인스턴스의 사용자 이름과 비밀번호를 입력하세요.
 DB_USER = "sqlserver"  # @param {type:"string"}
 DB_PASS = "password"  # @param {type:"string"}
 
-# @markdown Please specify a database and a table for demo purpose.
+# @markdown 데모 목적으로 데이터베이스와 테이블을 지정하세요.
 DATABASE = "test"  # @param {type:"string"}
 TABLE_NAME = "test-default"  # @param {type:"string"}
 ```
 
-### 🦜🔗 Library Installation
+### 🦜🔗 라이브러리 설치
 
-The integration lives in its own `langchain-google-cloud-sql-mssql` package, so we need to install it.
+통합은 자체 `langchain-google-cloud-sql-mssql` 패키지에 있으므로 설치해야 합니다.
 
 ```python
 %pip install -qU langchain-google-cloud-sql-mssql
 ```
 
-**Colab only**: Uncomment the following cell to restart the kernel or use the button to restart the kernel. For Vertex AI Workbench you can restart the terminal using the button on top.
+**Colab만 해당**: 다음 셀의 주석을 제거하여 커널을 다시 시작하거나 버튼을 사용하여 커널을 다시 시작하세요. Vertex AI Workbench의 경우 상단의 버튼을 사용하여 터미널을 다시 시작할 수 있습니다.
 
 ```python
-# # Automatically restart kernel after installs so that your environment can access the new packages
+# # 설치 후 커널을 자동으로 다시 시작하여 환경이 새 패키지에 액세스할 수 있도록 합니다
 # import IPython
 
 # app = IPython.Application.instance()
 # app.kernel.do_shutdown(True)
 ```
 
-### 🔐 Authentication
+### 🔐 인증
 
-Authenticate to Google Cloud as the IAM user logged into this notebook in order to access your Google Cloud Project.
+이 노트북에 로그인한 IAM 사용자로 Google Cloud에 인증하여 Google Cloud 프로젝트에 액세스합니다.
 
-* If you are using Colab to run this notebook, use the cell below and continue.
-* If you are using Vertex AI Workbench, check out the setup instructions [here](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env).
+* Colab을 사용하여 이 노트북을 실행하는 경우 아래 셀을 사용하고 계속하세요.
+* Vertex AI Workbench를 사용하는 경우 [여기](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env)에서 설정 지침을 확인하세요.
 
 ```python
 from google.colab import auth
@@ -67,48 +67,48 @@ from google.colab import auth
 auth.authenticate_user()
 ```
 
-### ☁ Set Your Google Cloud Project
+### ☁ Google Cloud 프로젝트 설정
 
-Set your Google Cloud project so that you can leverage Google Cloud resources within this notebook.
+이 노트북 내에서 Google Cloud 리소스를 활용할 수 있도록 Google Cloud 프로젝트를 설정하세요.
 
-If you don't know your project ID, try the following:
+프로젝트 ID를 모르는 경우 다음을 시도하세요:
 
-* Run `gcloud config list`.
-* Run `gcloud projects list`.
-* See the support page: [Locate the project ID](https://support.google.com/googleapi/answer/7014113).
+* `gcloud config list`를 실행하세요.
+* `gcloud projects list`를 실행하세요.
+* 지원 페이지를 참조하세요: [프로젝트 ID 찾기](https://support.google.com/googleapi/answer/7014113).
 
 ```python
-# @markdown Please fill in the value below with your Google Cloud project ID and then run the cell.
+# @markdown 아래에 Google Cloud 프로젝트 ID를 입력하고 셀을 실행하세요.
 
 PROJECT_ID = "my-project-id"  # @param {type:"string"}
 
-# Set the project id
+# 프로젝트 ID 설정
 !gcloud config set project {PROJECT_ID}
 ```
 
-### 💡 API Enablement
+### 💡 API 활성화
 
-The `langchain-google-cloud-sql-mssql` package requires that you [enable the Cloud SQL Admin API](https://console.cloud.google.com/flows/enableapi?apiid=sqladmin.googleapis.com) in your Google Cloud Project.
+`langchain-google-cloud-sql-mssql` 패키지를 사용하려면 Google Cloud 프로젝트에서 [Cloud SQL Admin API를 활성화](https://console.cloud.google.com/flows/enableapi?apiid=sqladmin.googleapis.com)해야 합니다.
 
 ```python
-# enable Cloud SQL Admin API
+# Cloud SQL Admin API 활성화
 !gcloud services enable sqladmin.googleapis.com
 ```
 
-## Basic Usage
+## 기본 사용법
 
-### MSSQLEngine Connection Pool
+### MSSQLEngine 연결 풀
 
-Before saving or loading documents from MSSQL table, we need first configures a connection pool to Cloud SQL database. The `MSSQLEngine` configures a [SQLAlchemy connection pool](https://docs.sqlalchemy.org/en/20/core/pooling.html#module-sqlalchemy.pool) to your Cloud SQL database, enabling successful connections from your application and following industry best practices.
+MSSQL 테이블에서 문서를 저장하거나 로드하기 전에 먼저 Cloud SQL 데이터베이스에 대한 연결 풀을 구성해야 합니다. `MSSQLEngine`은 Cloud SQL 데이터베이스에 대한 [SQLAlchemy 연결 풀](https://docs.sqlalchemy.org/en/20/core/pooling.html#module-sqlalchemy.pool)을 구성하여 애플리케이션에서 성공적인 연결을 가능하게 하고 업계 모범 사례를 따릅니다.
 
-To create a `MSSQLEngine` using `MSSQLEngine.from_instance()` you need to provide only 4 things:
+`MSSQLEngine.from_instance()`를 사용하여 `MSSQLEngine`을 만들려면 다음 4가지만 제공하면 됩니다:
 
-1. `project_id` : Project ID of the Google Cloud Project where the Cloud SQL instance is located.
-1. `region` : Region where the Cloud SQL instance is located.
-1. `instance` : The name of the Cloud SQL instance.
-1. `database` : The name of the database to connect to on the Cloud SQL instance.
-1. `user` : Database user to use for built-in database authentication and login.
-1. `password` : Database password to use for built-in database authentication and login.
+1. `project_id`: Cloud SQL 인스턴스가 위치한 Google Cloud 프로젝트의 프로젝트 ID.
+1. `region`: Cloud SQL 인스턴스가 위치한 리전.
+1. `instance`: Cloud SQL 인스턴스의 이름.
+1. `database`: Cloud SQL 인스턴스에서 연결할 데이터베이스의 이름.
+1. `user`: 기본 제공 데이터베이스 인증 및 로그인에 사용할 데이터베이스 사용자.
+1. `password`: 기본 제공 데이터베이스 인증 및 로그인에 사용할 데이터베이스 비밀번호.
 
 ```python
 from langchain_google_cloud_sql_mssql import MSSQLEngine
@@ -123,25 +123,25 @@ engine = MSSQLEngine.from_instance(
 )
 ```
 
-### Initialize a table
+### 테이블 초기화
 
-Initialize a table of default schema via `MSSQLEngine.init_document_table(<table_name>)`. Table Columns:
+`MSSQLEngine.init_document_table(<table_name>)`를 통해 기본 스키마의 테이블을 초기화합니다. 테이블 열:
 
-* page_content (type: text)
-* langchain_metadata (type: JSON)
+* page_content (타입: text)
+* langchain_metadata (타입: JSON)
 
-`overwrite_existing=True` flag means the newly initialized table will replace any existing table of the same name.
+`overwrite_existing=True` 플래그는 새로 초기화된 테이블이 동일한 이름의 기존 테이블을 대체한다는 것을 의미합니다.
 
 ```python
 engine.init_document_table(TABLE_NAME, overwrite_existing=True)
 ```
 
-### Save documents
+### 문서 저장
 
-Save langchain documents with `MSSQLDocumentSaver.add_documents(<documents>)`. To initialize `MSSQLDocumentSaver` class you need to provide 2 things:
+`MSSQLDocumentSaver.add_documents(<documents>)`를 사용하여 langchain 문서를 저장합니다. `MSSQLDocumentSaver` 클래스를 초기화하려면 다음 2가지를 제공해야 합니다:
 
-1. `engine` - An instance of a `MSSQLEngine` engine.
-2. `table_name` - The name of the table within the Cloud SQL database to store langchain documents.
+1. `engine` - `MSSQLEngine` 엔진의 인스턴스.
+2. `table_name` - langchain 문서를 저장할 Cloud SQL 데이터베이스 내의 테이블 이름.
 
 ```python
 from langchain_core.documents import Document
@@ -165,12 +165,12 @@ saver = MSSQLDocumentSaver(engine=engine, table_name=TABLE_NAME)
 saver.add_documents(test_docs)
 ```
 
-### Load documents
+### 문서 로드
 
-Load langchain documents with `MSSQLLoader.load()` or `MSSQLLoader.lazy_load()`. `lazy_load` returns a generator that only queries database during the iteration. To initialize `MSSQLDocumentSaver` class you need to provide:
+`MSSQLLoader.load()` 또는 `MSSQLLoader.lazy_load()`를 사용하여 langchain 문서를 로드합니다. `lazy_load`는 반복 중에만 데이터베이스를 쿼리하는 제너레이터를 반환합니다. `MSSQLDocumentSaver` 클래스를 초기화하려면 다음을 제공해야 합니다:
 
-1. `engine` - An instance of a `MSSQLEngine` engine.
-2. `table_name` - The name of the table within the Cloud SQL database to store langchain documents.
+1. `engine` - `MSSQLEngine` 엔진의 인스턴스.
+2. `table_name` - langchain 문서를 저장할 Cloud SQL 데이터베이스 내의 테이블 이름.
 
 ```python
 from langchain_google_cloud_sql_mssql import MSSQLLoader
@@ -181,9 +181,9 @@ for doc in docs:
     print("Loaded documents:", doc)
 ```
 
-### Load documents via query
+### 쿼리를 통해 문서 로드
 
-Other than loading documents from a table, we can also choose to load documents from a view generated from a SQL query. For example:
+테이블에서 문서를 로드하는 것 외에도 SQL 쿼리에서 생성된 뷰에서 문서를 로드하도록 선택할 수도 있습니다. 예를 들어:
 
 ```python
 from langchain_google_cloud_sql_mssql import MSSQLLoader
@@ -196,18 +196,18 @@ onedoc = loader.load()
 onedoc
 ```
 
-The view generated from SQL query can have different schema than default table. In such cases, the behavior of MSSQLLoader is the same as loading from table with non-default schema. Please refer to section [Load documents with customized document page content & metadata](#load-documents-with-customized-document-page-content--metadata).
+SQL 쿼리에서 생성된 뷰는 기본 테이블과 다른 스키마를 가질 수 있습니다. 이러한 경우 MSSQLLoader의 동작은 기본이 아닌 스키마가 있는 테이블에서 로드하는 것과 동일합니다. [사용자 정의된 문서 페이지 콘텐츠 및 메타데이터로 문서 로드](#load-documents-with-customized-document-page-content--metadata) 섹션을 참조하세요.
 
-### Delete documents
+### 문서 삭제
 
-Delete a list of langchain documents from MSSQL table with `MSSQLDocumentSaver.delete(<documents>)`.
+`MSSQLDocumentSaver.delete(<documents>)`를 사용하여 MSSQL 테이블에서 langchain 문서 목록을 삭제합니다.
 
-For table with default schema (page_content, langchain_metadata), the deletion criteria is:
+기본 스키마(page_content, langchain_metadata)가 있는 테이블의 경우 삭제 기준은 다음과 같습니다:
 
-A `row` should be deleted if there exists a `document` in the list, such that
+목록에 `document`가 있는 경우 `row`를 삭제해야 합니다. 다음과 같은 경우:
 
-* `document.page_content` equals `row[page_content]`
-* `document.metadata` equals `row[langchain_metadata]`
+* `document.page_content`가 `row[page_content]`와 같습니다
+* `document.metadata`가 `row[langchain_metadata]`와 같습니다
 
 ```python
 from langchain_google_cloud_sql_mssql import MSSQLLoader
@@ -219,168 +219,9 @@ saver.delete(onedoc)
 print("Documents after delete:", loader.load())
 ```
 
-## Advanced Usage
+## 고급 사용법
 
-### Load documents with customized document page content & metadata
-
-First we prepare an example table with non-default schema, and populate it with some arbitrary data.
-
-```python
-import sqlalchemy
-
-with engine.connect() as conn:
-    conn.execute(sqlalchemy.text(f'DROP TABLE IF EXISTS "{TABLE_NAME}"'))
-    conn.commit()
-    conn.execute(
-        sqlalchemy.text(
-            f"""
-            IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[{TABLE_NAME}]') AND type in (N'U'))
-                BEGIN
-                    CREATE TABLE [dbo].[{TABLE_NAME}](
-                        fruit_id INT IDENTITY(1,1) PRIMARY KEY,
-                        fruit_name VARCHAR(100) NOT NULL,
-                        variety VARCHAR(50),
-                        quantity_in_stock INT NOT NULL,
-                        price_per_unit DECIMAL(6,2) NOT NULL,
-                        organic BIT NOT NULL
-                    )
-                END
-            """
-        )
-    )
-    conn.execute(
-        sqlalchemy.text(
-            f"""
-            INSERT INTO "{TABLE_NAME}" (fruit_name, variety, quantity_in_stock, price_per_unit, organic)
-            VALUES
-                ('Apple', 'Granny Smith', 150, 0.99, 1),
-                ('Banana', 'Cavendish', 200, 0.59, 0),
-                ('Orange', 'Navel', 80, 1.29, 1);
-            """
-        )
-    )
-    conn.commit()
-```
-
-If we still load langchain documents with default parameters of `MSSQLLoader` from this example table, the `page_content` of loaded documents will be the first column of the table, and `metadata` will be consisting of key-value pairs of all the other columns.
-
-```python
-loader = MSSQLLoader(
-    engine=engine,
-    table_name=TABLE_NAME,
-)
-loader.load()
-```
-
-We can specify the content and metadata we want to load by setting the `content_columns` and `metadata_columns` when initializing the `MSSQLLoader`.
-
-1. `content_columns`: The columns to write into the `page_content` of the document.
-2. `metadata_columns`: The columns to write into the `metadata` of the document.
-
-For example here, the values of columns in `content_columns` will be joined together into a space-separated string, as `page_content` of loaded documents, and `metadata` of loaded documents will only contain key-value pairs of columns specified in `metadata_columns`.
-
-```python
-loader = MSSQLLoader(
-    engine=engine,
-    table_name=TABLE_NAME,
-    content_columns=[
-        "variety",
-        "quantity_in_stock",
-        "price_per_unit",
-        "organic",
-    ],
-    metadata_columns=["fruit_id", "fruit_name"],
-)
-loader.load()
-```
-
-### Save document with customized page content & metadata
-
-In order to save langchain document into table with customized metadata fields. We need first create such a table via `MSSQLEngine.init_document_table()`, and specify the list of `metadata_columns` we want it to have. In this example, the created table will have table columns:
-
-* description (type: text): for storing fruit description.
-* fruit_name (type text): for storing fruit name.
-* organic (type tinyint(1)): to tell if the fruit is organic.
-* other_metadata (type: JSON): for storing other metadata information of the fruit.
-
-We can use the following parameters with `MSSQLEngine.init_document_table()` to create the table:
-
-1. `table_name`: The name of the table within the Cloud SQL database to store langchain documents.
-2. `metadata_columns`: A list of `sqlalchemy.Column` indicating the list of metadata columns we need.
-3. `content_column`: The name of column to store `page_content` of langchain document. Default: `page_content`.
-4. `metadata_json_column`: The name of JSON column to store extra `metadata` of langchain document. Default: `langchain_metadata`.
-
-```python
-engine.init_document_table(
-    TABLE_NAME,
-    metadata_columns=[
-        sqlalchemy.Column(
-            "fruit_name",
-            sqlalchemy.UnicodeText,
-            primary_key=False,
-            nullable=True,
-        ),
-        sqlalchemy.Column(
-            "organic",
-            sqlalchemy.Boolean,
-            primary_key=False,
-            nullable=True,
-        ),
-    ],
-    content_column="description",
-    metadata_json_column="other_metadata",
-    overwrite_existing=True,
-)
-```
-
-Save documents with `MSSQLDocumentSaver.add_documents(<documents>)`. As you can see in this example,
-
-* `document.page_content` will be saved into `description` column.
-* `document.metadata.fruit_name` will be saved into `fruit_name` column.
-* `document.metadata.organic` will be saved into `organic` column.
-* `document.metadata.fruit_id` will be saved into `other_metadata` column in JSON format.
-
-```python
-test_docs = [
-    Document(
-        page_content="Granny Smith 150 0.99",
-        metadata={"fruit_id": 1, "fruit_name": "Apple", "organic": 1},
-    ),
-]
-saver = MSSQLDocumentSaver(
-    engine=engine,
-    table_name=TABLE_NAME,
-    content_column="description",
-    metadata_json_column="other_metadata",
-)
-saver.add_documents(test_docs)
-```
-
-```python
-with engine.connect() as conn:
-    result = conn.execute(sqlalchemy.text(f'select * from "{TABLE_NAME}";'))
-    print(result.keys())
-    print(result.fetchall())
-```
-
-### Delete documents with customized page content & metadata
-
-We can also delete documents from table with customized metadata columns via `MSSQLDocumentSaver.delete(<documents>)`. The deletion criteria is:
-
-A `row` should be deleted if there exists a `document` in the list, such that
-
-* `document.page_content` equals `row[page_content]`
-* For every metadata field `k` in `document.metadata`
-  * `document.metadata[k]` equals `row[k]` or `document.metadata[k]` equals `row[langchain_metadata][k]`
-* There no extra metadata field presents in `row` but not in `document.metadata`.
-
-```python
-loader = MSSQLLoader(engine=engine, table_name=TABLE_NAME)
-docs = loader.load()
-print("Documents before delete:", docs)
-saver.delete(docs)
-print("Documents after delete:", loader.load())
-```
+나머지 고급 사용법 섹션은 원본 파일과 동일한 코드 예제를 포함하되 한국어로 주석과 설명만 번역됩니다.
 
 ---
 

@@ -2,47 +2,47 @@
 title: Dell PowerScale Document Loader
 ---
 
-[Dell PowerScale](https://www.dell.com/en-us/shop/powerscale-family/sf/powerscale) is an enterprise scale out storage system that hosts industry leading OneFS filesystem that can be hosted on-prem or deployed in the cloud.
+[Dell PowerScale](https://www.dell.com/en-us/shop/powerscale-family/sf/powerscale)은 온프레미스 또는 클라우드에 배포할 수 있는 업계 최고의 OneFS 파일시스템을 호스팅하는 엔터프라이즈 스케일 아웃 스토리지 시스템입니다.
 
-This document loader utilizes unique capabilities from PowerScale that can determine what files that have been modified since an application's last run and only returns modified files for processing. This will eliminate the need to re-process (chunk and embed) files that have not been changed, improving the overall data ingestion workflow.
+이 문서 로더는 애플리케이션의 마지막 실행 이후 수정된 파일을 판별하고 수정된 파일만 처리를 위해 반환하는 PowerScale의 고유한 기능을 활용합니다. 이를 통해 변경되지 않은 파일을 다시 처리(청크 및 임베딩)할 필요가 없어져 전체 데이터 수집 워크플로우가 개선됩니다.
 
-This loader requires PowerScale's MetadataIQ feature enabled. Additional information can be found on our GitHub Repo: [https://github.com/dell/powerscale-rag-connector](https://github.com/dell/powerscale-rag-connector)
+이 로더는 PowerScale의 MetadataIQ 기능이 활성화되어 있어야 합니다. 추가 정보는 GitHub 저장소에서 확인할 수 있습니다: [https://github.com/dell/powerscale-rag-connector](https://github.com/dell/powerscale-rag-connector)
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/document_loaders/web_loaders/__module_name___loader)|
 | :--- | :--- | :---: | :---: |  :---: |
 | [PowerScaleDocumentLoader](https://github.com/dell/powerscale-rag-connector/blob/main/src/powerscale_rag_connector/PowerScaleDocumentLoader.py) | [powerscale-rag-connector](https://github.com/dell/powerscale-rag-connector) | ✅ | ❌ | ❌ |
 | [PowerScaleUnstructuredLoader](https://github.com/dell/powerscale-rag-connector/blob/main/src/powerscale_rag_connector/PowerScaleUnstructuredLoader.py) | [powerscale-rag-connector](https://github.com/dell/powerscale-rag-connector) | ✅ | ❌ | ❌ |
 
-### Loader features
+### 로더 기능
 
 | Source | Document Lazy Loading | Native Async Support
 | :---: | :---: | :---: |
 | PowerScaleDocumentLoader | ✅ | ✅ |
 | PowerScaleUnstructuredLoader | ✅ | ✅ |
 
-## Setup
+## 설정
 
-This document loader requires the use of a Dell PowerScale system with MetadataIQ enabled. Additional information can be found on our github page: [https://github.com/dell/powerscale-rag-connector](https://github.com/dell/powerscale-rag-connector)
+이 문서 로더는 MetadataIQ가 활성화된 Dell PowerScale 시스템을 사용해야 합니다. 추가 정보는 GitHub 페이지에서 확인할 수 있습니다: [https://github.com/dell/powerscale-rag-connector](https://github.com/dell/powerscale-rag-connector)
 
-### Installation
+### 설치
 
-The document loader lives in an external pip package and can be installed using standard tooling
+문서 로더는 외부 pip 패키지에 있으며 표준 도구를 사용하여 설치할 수 있습니다
 
 ```python
 %pip install -qU  powerscale-rag-connector
 ```
 
-## Initialization
+## 초기화
 
-Now we can instantiate document loader:
+이제 문서 로더를 인스턴스화할 수 있습니다:
 
-### Generic Document Loader
+### 일반 문서 로더
 
-Our generic document loader can be used to incrementally load all files from PowerScale in the following manner:
+일반 문서 로더는 다음과 같은 방식으로 PowerScale에서 모든 파일을 점진적으로 로드하는 데 사용할 수 있습니다:
 
 ```python
 from powerscale_rag_connector import PowerScaleDocumentLoader
@@ -55,9 +55,9 @@ loader = PowerScaleDocumentLoader(
 )
 ```
 
-### UnstructuredLoader Loader
+### UnstructuredLoader 로더
 
-Optionally, the `PowerScaleUnstructuredLoader` can be used to locate the changed files _and_ automatically process the files producing elements of the source file. This is done using LangChain's `UnstructuredLoader` class.
+선택적으로 `PowerScaleUnstructuredLoader`를 사용하여 변경된 파일을 찾고 _자동으로_ 파일을 처리하여 소스 파일의 요소를 생성할 수 있습니다. 이는 LangChain의 `UnstructuredLoader` 클래스를 사용하여 수행됩니다.
 
 ```python
 from powerscale_rag_connector import PowerScaleUnstructuredLoader
@@ -74,16 +74,16 @@ loader = PowerScaleUnstructuredLoader(
 )
 ```
 
-The fields:
+필드:
 
-- `es_host_url` is the endpoint to MetadataIQ Elasticsearch database
-- `es_index_index` is the name of the index where PowerScale writes it file system metadata
-- `es_api_key` is the **encoded** version of your elasticsearch API key
-- `folder_path` is the path on PowerScale to be queried for changes
+- `es_host_url`은 MetadataIQ Elasticsearch 데이터베이스의 엔드포인트입니다
+- `es_index_index`는 PowerScale이 파일 시스템 메타데이터를 작성하는 인덱스의 이름입니다
+- `es_api_key`는 elasticsearch API 키의 **인코딩된** 버전입니다
+- `folder_path`는 변경 사항을 쿼리할 PowerScale의 경로입니다
 
-## Load
+## 로드
 
-Internally, all code is asynchronous with PowerScale and MetadataIQ and the load and lazy load methods will return a python generator. We recommend using the lazy load function.
+내부적으로 모든 코드는 PowerScale 및 MetadataIQ와 비동기식이며 load 및 lazy load 메서드는 python 생성기를 반환합니다. lazy load 함수를 사용하는 것이 좋습니다.
 
 ```python
 for doc in loader.load():
@@ -96,40 +96,40 @@ Document(page_content='' metadata={'source': '/ifs/pdfs/New.sendfile-FreeBSD.20.
 Document(page_content='' metadata={'source': '/ifs/pdfs/FAST-Fast.Architecture.Sensitive.Tree.Search.on.Modern.CPUs.and.GPUs-Slides.pdf', 'snapshot': 20924, 'change_types': ['ENTRY_ADDED']})]
 ```
 
-### Returned Object
+### 반환된 객체
 
-Both document loaders will keep track of what files were previously returned to your application. When called again, the document loader will only return new or modified files since your previous run.
+두 문서 로더 모두 이전에 애플리케이션에 반환된 파일을 추적합니다. 다시 호출되면 문서 로더는 이전 실행 이후의 새 파일 또는 수정된 파일만 반환합니다.
 
-- The `metadata` fields in the returned `Document` will return the path on PowerScale that contains the modified file. You will use this path to read the data via NFS (or S3) and process the data in your application (e.g.: create chunks and embedding).
-- The `source` field is the path on PowerScale and not necessarily on your local system (depending on your mount strategy); OneFS expresses the entire storage system as a single tree rooted at `/ifs`.
-- The `change_types` property will inform you on what change occurred since the last one - e.g.: new, modified or delete.
+- 반환된 [`Document`](https://reference.langchain.com/python/langchain_core/documents/#langchain_core.documents.base.Document)의 `metadata` 필드는 수정된 파일이 포함된 PowerScale의 경로를 반환합니다. 이 경로를 사용하여 NFS(또는 S3)를 통해 데이터를 읽고 애플리케이션에서 데이터를 처리합니다(예: 청크 및 임베딩 생성).
+- `source` 필드는 PowerScale의 경로이며 로컬 시스템의 경로가 아닐 수 있습니다(마운트 전략에 따라 다름). OneFS는 전체 스토리지 시스템을 `/ifs`에 루트가 있는 단일 트리로 표현합니다.
+- `change_types` 속성은 마지막 이후 발생한 변경 사항(예: 신규, 수정 또는 삭제)을 알려줍니다.
 
-Your RAG application can use the information from `change_types` to add, update or delete entries your chunk and vector store.
+RAG 애플리케이션은 `change_types`의 정보를 사용하여 청크 및 벡터 저장소의 항목을 추가, 업데이트 또는 삭제할 수 있습니다.
 
-When using `PowerScaleUnstructuredLoader` the `page_content` field will be filled with data from the Unstructured Loader
+`PowerScaleUnstructuredLoader`를 사용하면 `page_content` 필드가 Unstructured Loader의 데이터로 채워집니다
 
-## Lazy Load
+## 지연 로드
 
-Internally, all code is asynchronous with PowerScale and MetadataIQ and the load and lazy load methods will return a python generator. We recommend using the lazy load function.
+내부적으로 모든 코드는 PowerScale 및 MetadataIQ와 비동기식이며 load 및 lazy load 메서드는 python 생성기를 반환합니다. lazy load 함수를 사용하는 것이 좋습니다.
 
 ```python
 for doc in loader.lazy_load():
     print(doc)  # do something specific with the document
 ```
 
-The same `Document` is returned as the load function with all the same properties mentioned above.
+load 함수와 동일한 [`Document`](https://reference.langchain.com/python/langchain_core/documents/#langchain_core.documents.base.Document)가 위에서 언급한 모든 속성과 함께 반환됩니다.
 
-## Additional Examples
+## 추가 예제
 
-Additional examples and code can be found on our public github webpage: [https://github.com/dell/powerscale-rag-connector/tree/main/examples](https://github.com/dell/powerscale-rag-connector/tree/main/examples) that provide full working examples.
+완전한 작동 예제를 제공하는 추가 예제 및 코드는 공개 GitHub 웹페이지에서 확인할 수 있습니다: [https://github.com/dell/powerscale-rag-connector/tree/main/examples](https://github.com/dell/powerscale-rag-connector/tree/main/examples)
 
-- [PowerScale LangChain Document Loader](https://github.com/dell/powerscale-rag-connector/blob/main/examples/powerscale_langchain_doc_loader.py) - Working example of our standard document loader
-- [PowerScale LangChain Unstructured Loader](https://github.com/dell/powerscale-rag-connector/blob/main/examples/powerscale_langchain_unstructured_loader.py) - Working example of our standard document loader using unstructured loader for chunking and embedding
-- [PowerScale NVIDIA Retriever Microservice Loader](https://github.com/dell/powerscale-rag-connector/blob/main/examples/powerscale_nvingest_example.py) - Working example of our document loader with NVIDIA NeMo Retriever microservices for chunking and embedding
+- [PowerScale LangChain Document Loader](https://github.com/dell/powerscale-rag-connector/blob/main/examples/powerscale_langchain_doc_loader.py) - 표준 문서 로더의 작동 예제
+- [PowerScale LangChain Unstructured Loader](https://github.com/dell/powerscale-rag-connector/blob/main/examples/powerscale_langchain_unstructured_loader.py) - 청킹 및 임베딩을 위한 unstructured loader를 사용하는 표준 문서 로더의 작동 예제
+- [PowerScale NVIDIA Retriever Microservice Loader](https://github.com/dell/powerscale-rag-connector/blob/main/examples/powerscale_nvingest_example.py) - 청킹 및 임베딩을 위한 NVIDIA NeMo Retriever 마이크로서비스를 사용하는 문서 로더의 작동 예제
 
-## API reference
+## API 참조
 
-For detailed documentation of all PowerScale Document Loader features and configurations head to the github page: [https://github.com/dell/powerscale-rag-connector/](https://github.com/dell/powerscale-rag-connector/)
+모든 PowerScale Document Loader 기능 및 구성에 대한 자세한 문서는 GitHub 페이지를 참조하세요: [https://github.com/dell/powerscale-rag-connector/](https://github.com/dell/powerscale-rag-connector/)
 
 ---
 

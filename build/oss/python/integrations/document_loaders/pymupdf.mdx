@@ -2,11 +2,11 @@
 title: PyMuPDFLoader
 ---
 
-This notebook provides a quick overview for getting started with `PyMuPDF` [document loader](https://python.langchain.com/docs/concepts/document_loaders). For detailed documentation of all __ModuleName__Loader features and configurations head to the [API reference](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyMuPDFLoader.html).
+이 노트북은 `PyMuPDF` [문서 로더](https://python.langchain.com/docs/concepts/document_loaders)를 시작하기 위한 빠른 개요를 제공합니다. 모든 __ModuleName__Loader 기능 및 구성에 대한 자세한 문서는 [API 레퍼런스](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyMuPDFLoader.html)를 참조하세요.
 
-## Overview
+## 개요
 
-### Integration details
+### 통합 세부 정보
 
 | Class | Package | Local | Serializable | JS support|
 | :--- | :--- | :---: | :---: |  :---: |
@@ -14,28 +14,28 @@ This notebook provides a quick overview for getting started with `PyMuPDF` [docu
 
 ---------
 
-### Loader features
+### 로더 기능
 
 | Source | Document Lazy Loading | Native Async Support | Extract Images | Extract Tables |
 | :---: | :---: | :---: | :---: |:---: |
 | PyMuPDFLoader | ✅ | ❌ | ✅ | ✅ |
 
-## Setup
+## 설정
 
-### Credentials
+### 자격 증명
 
-No credentials are required to use PyMuPDFLoader
+PyMuPDFLoader를 사용하는 데 자격 증명은 필요하지 않습니다.
 
-If you want to get automated best in-class tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
+모델 호출에 대한 자동화된 최고 수준의 추적을 원하시면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
 
 ```python
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 # os.environ["LANGSMITH_TRACING"] = "true"
 ```
 
-### Installation
+### 설치
 
-Install **langchain-community** and **pymupdf**.
+**langchain-community**와 **pymupdf**를 설치합니다.
 
 ```python
 %pip install -qU langchain-community pymupdf
@@ -45,9 +45,9 @@ Install **langchain-community** and **pymupdf**.
 Note: you may need to restart the kernel to use updated packages.
 ```
 
-## Initialization
+## 초기화
 
-Now we can instantiate our model object and load documents:
+이제 모델 객체를 인스턴스화하고 문서를 로드할 수 있습니다:
 
 ```python
 from langchain_community.document_loaders import PyMuPDFLoader
@@ -56,7 +56,7 @@ file_path = "./example_data/layout-parser-paper.pdf"
 loader = PyMuPDFLoader(file_path)
 ```
 
-## Load
+## 로드
 
 ```python
 docs = loader.load()
@@ -90,14 +90,14 @@ pprint.pp(docs[0].metadata)
  'page': 0}
 ```
 
-## Lazy Load
+## 지연 로드
 
 ```python
 pages = []
 for doc in loader.lazy_load():
     pages.append(doc)
     if len(pages) >= 10:
-        # do some paged operation, e.g.
+        # 페이지 단위 작업을 수행합니다. 예:
         # index.upsert(page)
 
         pages = []
@@ -114,7 +114,7 @@ pprint.pp(pages[0].metadata)
 ```
 
 ```output
-LayoutParser: A Uniﬁed Toolkit for DL-Based DIA
+ LayoutParser: A Uniﬁed Toolkit for DL-Based DIA
 11
 focuses on precision, eﬃciency, and robustness. T
 {'producer': 'pdfTeX-1.40.21',
@@ -133,28 +133,28 @@ focuses on precision, eﬃciency, and robustness. T
  'page': 10}
 ```
 
-The metadata attribute contains at least the following keys:
+메타데이터 속성에는 최소한 다음 키가 포함됩니다:
 
 - source
-- page (if in mode *page*)
+- page (*page* 모드인 경우)
 - total_page
 - creationdate
 - creator
 - producer
 
-Additional metadata are specific to each parser.
-These pieces of information can be helpful (to categorize your PDFs for example).
+추가 메타데이터는 각 파서에 따라 다릅니다.
+이러한 정보는 PDF를 분류하는 데 유용할 수 있습니다.
 
-## Splitting mode & custom pages delimiter
+## 분할 모드 및 사용자 정의 페이지 구분자
 
-When loading the PDF file you can split it in two different ways:
+PDF 파일을 로드할 때 두 가지 방법으로 분할할 수 있습니다:
 
-- By page
-- As a single text flow
+- 페이지별
+- 단일 텍스트 흐름
 
-By default PyMuPDFLoader will split the PDF by page.
+기본적으로 PyMuPDFLoader는 PDF를 페이지별로 분할합니다.
 
-### Extract the PDF by page. Each page is extracted as a langchain Document object
+### PDF를 페이지별로 추출합니다. 각 페이지는 langchain Document 객체로 추출됩니다
 
 ```python
 loader = PyMuPDFLoader(
@@ -184,9 +184,9 @@ pprint.pp(docs[0].metadata)
  'page': 0}
 ```
 
-In this mode the pdf is split by pages and the resulting Documents metadata contains the page number. But in some cases we could want to process the pdf as a single text flow (so we don't cut some paragraphs in half). In this case you can use the *single* mode :
+이 모드에서는 PDF가 페이지별로 분할되고 결과 Documents 메타데이터에 페이지 번호가 포함됩니다. 하지만 일부 경우에는 PDF를 단일 텍스트 흐름으로 처리하고 싶을 수 있습니다(단락을 반으로 자르지 않기 위해). 이 경우 *single* 모드를 사용할 수 있습니다:
 
-### Extract the whole PDF as a single langchain Document object
+### 전체 PDF를 단일 langchain Document 객체로 추출합니다
 
 ```python
 loader = PyMuPDFLoader(
@@ -215,9 +215,9 @@ pprint.pp(docs[0].metadata)
  'trapped': ''}
 ```
 
-Logically, in this mode, the ‘page_number’ metadata disappears. Here's how to clearly identify where pages end in the text flow :
+논리적으로 이 모드에서는 'page_number' 메타데이터가 사라집니다. 다음은 텍스트 흐름에서 페이지가 끝나는 위치를 명확하게 식별하는 방법입니다:
 
-### Add a custom *pages_delimiter* to identify where are ends of pages in *single* mode
+### *single* 모드에서 페이지 끝 위치를 식별하기 위해 사용자 정의 *pages_delimiter*를 추가합니다
 
 ```python
 loader = PyMuPDFLoader(
@@ -229,21 +229,21 @@ docs = loader.load()
 print(docs[0].page_content[:5780])
 ```
 
-This could simply be \n, or \f to clearly indicate a page change, or \<!-- PAGE BREAK --> for seamless injection in a Markdown viewer without a visual effect.
+단순히 \n이나 \f를 사용하여 페이지 변경을 명확하게 표시하거나, \<!-- PAGE BREAK -->를 사용하여 Markdown 뷰어에 시각적 효과 없이 원활하게 삽입할 수 있습니다.
 
-# Extract images from the PDF
+# PDF에서 이미지 추출
 
-You can extract images from your PDFs with a choice of three different solutions:
+세 가지 솔루션 중 하나를 선택하여 PDF에서 이미지를 추출할 수 있습니다:
 
-- rapidOCR (lightweight Optical Character Recognition tool)
-- Tesseract (OCR tool with high precision)
-- Multimodal language model
+- rapidOCR (경량 광학 문자 인식 도구)
+- Tesseract (높은 정밀도의 OCR 도구)
+- 멀티모달 언어 모델
 
-You can tune these functions to choose the output format of the extracted images among *html*, *markdown* or *text*
+이러한 함수를 조정하여 추출된 이미지의 출력 형식을 *html*, *markdown* 또는 *text* 중에서 선택할 수 있습니다.
 
-The result is inserted between the last and the second-to-last paragraphs of text of the page.
+결과는 페이지의 마지막 단락과 마지막에서 두 번째 단락 사이에 삽입됩니다.
 
-### Extract images from the PDF with rapidOCR
+### rapidOCR로 PDF에서 이미지 추출
 
 ```python
 %pip install -qU rapidocr-onnxruntime
@@ -267,9 +267,9 @@ docs = loader.load()
 print(docs[5].page_content)
 ```
 
-Be careful, RapidOCR is designed to work with Chinese and English, not other languages.
+주의하세요, RapidOCR은 중국어와 영어로 작동하도록 설계되었으며 다른 언어는 지원하지 않습니다.
 
-### Extract images from the PDF with Tesseract
+### Tesseract로 PDF에서 이미지 추출
 
 ```python
 %pip install -qU pytesseract
@@ -292,7 +292,7 @@ docs = loader.load()
 print(docs[5].page_content)
 ```
 
-### Extract images from the PDF with multimodal model
+### 멀티모달 모델로 PDF에서 이미지 추출
 
 ```python
 %pip install -qU langchain-openai
@@ -335,9 +335,9 @@ docs = loader.load()
 print(docs[5].page_content)
 ```
 
-# Extract tables from the PDF
+# PDF에서 표 추출
 
-With PyMUPDF you can extract tables from your PDFs in *html*, *markdown* or *csv* format :
+PyMUPDF를 사용하면 PDF에서 *html*, *markdown* 또는 *csv* 형식으로 표를 추출할 수 있습니다:
 
 ```python
 loader = PyMuPDFLoader(
@@ -350,7 +350,7 @@ print(docs[4].page_content)
 ```
 
 ```output
-LayoutParser: A Uniﬁed Toolkit for DL-Based DIA
+ LayoutParser: A Uniﬁed Toolkit for DL-Based DIA
 5
 Table 1: Current layout detection models in the LayoutParser model zoo
 Dataset
@@ -377,7 +377,7 @@ F / M
 -
 Layouts of history Japanese documents
 1 For each dataset, we train several models of diﬀerent sizes for diﬀerent needs (the trade-oﬀbetween accuracy
-vs. computational cost). For “base model” and “large model”, we refer to using the ResNet 50 or ResNet 101
+vs. computational cost). For "base model" and "large model", we refer to using the ResNet 50 or ResNet 101
 backbones [13], respectively. One can train models of diﬀerent architectures, like Faster R-CNN [28] (F) and Mask
 R-CNN [12] (M). For example, an F in the Large Model column indicates it has a Faster R-CNN model trained
 using the ResNet 101 backbone. The platform is maintained and a number of additions will be made to the model
@@ -398,7 +398,7 @@ than manually curated rules to identify content regions. It is formulated as an
 object detection problem and state-of-the-art models like Faster R-CNN [28] and
 Mask R-CNN [12] are used. This yields prediction results of high accuracy and
 makes it possible to build a concise, generalized interface for layout detection.
-LayoutParser, built upon Detectron2 [35], provides a minimal API that can
+ LayoutParser, built upon Detectron2 [35], provides a minimal API that can
 perform layout detection with only four lines of code in Python:
 1 import
 layoutparser as lp
@@ -408,7 +408,7 @@ images
 4
 "lp:// PubLayNet/ faster_rcnn_R_50_FPN_3x /config")
 5 layout = model.detect(image)
-LayoutParser provides a wealth of pre-trained model weights using various
+ LayoutParser provides a wealth of pre-trained model weights using various
 datasets covering diﬀerent languages, time periods, and document types. Due to
 domain shift [7], the prediction performance can notably drop when models are ap-
 plied to target samples that are signiﬁcantly diﬀerent from the training dataset. As
@@ -423,12 +423,12 @@ name and model name lp://<dataset-name>/<model-architecture-name>.
 |PubLayNet [38] PRImA [3] Newspaper [17] TableBank [18] HJDataset [31]|F / M M F F F / M|M &amp;#45; &amp;#45; F &amp;#45;|Layouts of modern scientific documents Layouts of scanned modern magazines and scientific reports Layouts of scanned US newspapers from the 20th century Table region on modern scientific and business document Layouts of history Japanese documents|
 ```
 
-## Working with Files
+## 파일 작업
 
-Many document loaders involve parsing files. The difference between such loaders usually stems from how the file is parsed, rather than how the file is loaded. For example, you can use `open` to read the binary content of either a PDF or a markdown file, but you need different parsing logic to convert that binary data into text.
+많은 문서 로더는 파일 파싱을 포함합니다. 이러한 로더 간의 차이는 일반적으로 파일이 로드되는 방식이 아니라 파일이 파싱되는 방식에서 비롯됩니다. 예를 들어, `open`을 사용하여 PDF나 마크다운 파일의 바이너리 콘텐츠를 읽을 수 있지만, 해당 바이너리 데이터를 텍스트로 변환하려면 다른 파싱 로직이 필요합니다.
 
-As a result, it can be helpful to decouple the parsing logic from the loading logic, which makes it easier to re-use a given parser regardless of how the data was loaded.
-You can use this strategy to analyze different files, with the same parsing parameters.
+결과적으로 파싱 로직과 로딩 로직을 분리하는 것이 도움이 될 수 있으며, 이를 통해 데이터가 로드되는 방식에 관계없이 주어진 파서를 더 쉽게 재사용할 수 있습니다.
+이 전략을 사용하여 동일한 파싱 매개변수로 다른 파일을 분석할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders import FileSystemBlobLoader
@@ -448,9 +448,9 @@ pprint.pp(docs[0].metadata)
 ```
 
 ```output
-LayoutParser: A Uniﬁed Toolkit for Deep
+ LayoutParser: A Uniﬁed Toolkit for Deep
 Learning Based Document Image Analysis
-Zejiang Shen1 ( ), Ruochen Zhang2, Melissa Dell3, Benjamin Charles Germain
+Zejiang Shen1 ( ), Ruochen Zhang2, Melissa Dell3, Benjamin Charles Germain
 Lee4, Jacob Carlson3, and Weining Li5
 1 Allen Institute for AI
 shannons@allenai.org
@@ -506,7 +506,7 @@ arXiv:2103.15348v2  [cs.CV]  21 Jun 2021
  'page': 0}
 ```
 
-It is possible to work with files from cloud storage.
+클라우드 스토리지의 파일을 사용하는 것도 가능합니다.
 
 ```python
 from langchain_community.document_loaders import CloudBlobLoader
@@ -524,9 +524,9 @@ print(docs[0].page_content)
 pprint.pp(docs[0].metadata)
 ```
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all `PyMuPDFLoader` features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyMuPDFLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyMuPDFLoader.html)
+모든 `PyMuPDFLoader` 기능 및 구성에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyMuPDFLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.PyMuPDFLoader.html)
 
 ---
 
