@@ -1,6 +1,6 @@
 ---
-title: Philosophy
-description: LangChain exists to be the easiest place to start building with LLMs, while also being flexible and production-ready.
+title: 철학
+description: LangChain은 LLM으로 구축을 시작하기 가장 쉬운 곳이면서 동시에 유연하고 프로덕션 환경에 적합하도록 만들어졌습니다.
 mode: wide
 ---
 
@@ -8,121 +8,121 @@ import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
 <AlphaCallout />
 
-LangChain is driven by a few core beliefs:
+LangChain은 몇 가지 핵심 믿음을 바탕으로 합니다:
 
-- LLMs are great, powerful new technology.
-- LLMs are even better when you combine them with external sources of data.
-- LLMs will transform what the applications of the future look like. Specifically, the applications of the future will look more and more agentic.
-- It is still very early on in that transformation.
-- While it's easy to build a prototype of those agentic applications, it's still really hard to build agents that are reliable enough to put into production.
+- LLM은 훌륭하고 강력한 새로운 기술입니다.
+- LLM은 외부 데이터 소스와 결합할 때 더욱 강력해집니다.
+- LLM은 미래의 애플리케이션이 어떤 모습일지 변화시킬 것입니다. 특히, 미래의 애플리케이션은 점점 더 에이전트적인 형태를 띨 것입니다.
+- 아직 그 변화는 매우 초기 단계에 있습니다.
+- 에이전트 애플리케이션의 프로토타입을 만드는 것은 쉽지만, 프로덕션 환경에 투입할 수 있을 만큼 신뢰할 수 있는 에이전트를 구축하는 것은 여전히 매우 어렵습니다.
 
-With LangChain, we have two core focuses:
+LangChain은 두 가지 핵심 목표에 집중합니다:
 
 <Steps>
-    <Step title="We want to enable developers to build with the best models.">
-        Different providers expose different APIs, with different model parameters and different message formats.
-        Standardizing these model inputs and outputs is a core focus, making it easy for developer to easily change to the most recent state-of-the-art model, avoiding lock-in.
+    <Step title="개발자가 최고의 모델로 구축할 수 있도록 지원하고자 합니다.">
+        각 제공자는 서로 다른 모델 매개변수와 메시지 형식을 가진 서로 다른 API를 제공합니다.
+        이러한 모델 입력과 출력을 표준화하는 것이 핵심 목표로, 개발자가 종속성을 피하면서 최신 최고 성능 모델로 쉽게 전환할 수 있도록 합니다.
     </Step>
-    <Step title="We want to make it easy to use models to orchestrate more complex flows that interact with other data and computation.">
-        Models should be used for more than just *text generation* - they should also be used to orchestrate more complex flows that interact with other data. LangChain makes it easy to define [tools](/oss/javascript/langchain/tools) that LLMs can use dynamically, as well as help with parsing of and access to unstructured data.
+    <Step title="모델을 사용하여 다른 데이터 및 계산과 상호작용하는 더 복잡한 흐름을 쉽게 오케스트레이션할 수 있도록 하고자 합니다.">
+        모델은 단순한 *텍스트 생성* 이상의 용도로 사용되어야 합니다 - 다른 데이터와 상호작용하는 더 복잡한 흐름을 오케스트레이션하는 데에도 사용되어야 합니다. LangChain은 LLM이 동적으로 사용할 수 있는 [도구](/oss/javascript/langchain/tools)를 정의하고, 비정형 데이터의 파싱 및 접근을 쉽게 지원합니다.
     </Step>
 </Steps>
 
-## History
+## 역사
 
-Given the constant rate of change in the field, LangChain has also evolved over time. Below is a brief timeline of how LangChain has changed over the years, evolving alongside what it means to build with LLMs:
+분야의 지속적인 변화 속도를 고려할 때, LangChain도 시간이 지나면서 진화해 왔습니다. 아래는 LangChain이 수년간 어떻게 변화해 왔는지, LLM으로 구축한다는 것의 의미가 진화하는 것과 함께 발전해 온 과정을 간략히 정리한 타임라인입니다:
 
 <Update label="2022-10-24" description="v0.0.1">
-    A month before ChatGPT, **LangChain was launched as a Python package**. It consisted of two main components:
+    ChatGPT가 출시되기 한 달 전, **LangChain이 Python 패키지로 출시되었습니다**. 두 가지 주요 구성 요소로 이루어져 있었습니다:
 
-    - LLM abstractions
-    - "Chains", or predetermined steps of computation to run, for common use cases. For example - RAG: run a retrieval step, then run a generation step.
+    - LLM 추상화
+    - 일반적인 사용 사례를 위한 사전 정의된 계산 단계인 "체인". 예를 들어 - RAG: 검색 단계를 실행한 다음 생성 단계를 실행합니다.
 
-    The name LangChain comes from "Language" (like Language models) and "Chains".
+    LangChain이라는 이름은 "Language"(언어 모델과 같은)와 "Chains"에서 유래했습니다.
 </Update>
 
 <Update label="2022-12">
-    The first general purpose agents were added to LangChain.
+    최초의 범용 에이전트가 LangChain에 추가되었습니다.
 
-    These general purpose agents were based on the [ReAct paper](https://arxiv.org/abs/2210.03629) (ReAct standing for Reasoning and Acting). They used LLMs to generate JSON that represented tool calls, and then parsed that JSON to determine what tools to call.
+    이러한 범용 에이전트는 [ReAct 논문](https://arxiv.org/abs/2210.03629)(ReAct는 추론과 행동의 약자)을 기반으로 했습니다. LLM을 사용하여 도구 호출을 나타내는 JSON을 생성한 다음, 해당 JSON을 파싱하여 어떤 도구를 호출할지 결정했습니다.
 </Update>
 
 <Update label="2023-01">
-    OpenAI releases a 'Chat Completion' API.
+    OpenAI가 'Chat Completion' API를 출시했습니다.
 
-    Previously, models took in strings and returned a string. In the ChatCompletions API, they evolved to take in a list of messages and return a message. Other model providers followed suit, and LangChain updated to work with lists of messages.
+    이전에는 모델이 문자열을 입력받아 문자열을 반환했습니다. ChatCompletions API에서는 메시지 목록을 입력받아 메시지를 반환하도록 진화했습니다. 다른 모델 제공자도 이를 따라했고, LangChain은 메시지 목록과 작동하도록 업데이트되었습니다.
 </Update>
 
 <Update label="2023-01">
-    LangChain releases a JavaScript version.
+    LangChain이 JavaScript 버전을 출시했습니다.
 
-    LLMs and agents will change how applications are built and JavaScript is the language of application developers.
+    LLM과 에이전트는 애플리케이션 구축 방식을 변화시킬 것이며, JavaScript는 애플리케이션 개발자의 언어입니다.
 </Update>
 
 <Update label="2023-02">
-    **LangChain Inc. was formed as a company** around the open source LangChain project.
+    **LangChain Inc.가 오픈 소스 LangChain 프로젝트를 중심으로 회사로 설립되었습니다**.
 
-    The main goal was to "make intelligent agents ubiquitous". The team recognized that while LangChain was a key part (LangChain made it simple to get started with LLMs), there was also a need for other components.
+    주요 목표는 "지능형 에이전트를 어디에나 보급하는 것"이었습니다. 팀은 LangChain이 핵심 부분(LangChain은 LLM을 간단하게 시작할 수 있게 만들었음)이긴 하지만, 다른 구성 요소도 필요하다는 것을 인식했습니다.
 </Update>
 
 <Update label="2023-03">
-    OpenAI releases 'function calling' in their API.
+    OpenAI가 API에서 '함수 호출'을 출시했습니다.
 
-    This allowed the API to explicitly generate payloads that represented tool calls. Other model providers followed suit, and LangChain was updated to use this as the preferred method for tool calling (rather than parsing JSON).
+    이를 통해 API가 도구 호출을 나타내는 페이로드를 명시적으로 생성할 수 있게 되었습니다. 다른 모델 제공자도 이를 따라했고, LangChain은 JSON 파싱 대신 이를 도구 호출의 선호 방법으로 사용하도록 업데이트되었습니다.
 </Update>
 
 <Update label="2023-06">
-    **LangSmith is released** as closed source platform by LangChain Inc., providing observability and evals
+    **LangSmith가 LangChain Inc.의 비공개 플랫폼으로 출시되어** 관찰성과 평가 기능을 제공합니다
 
-    The main issue with building agents is getting them to be reliable, and LangSmith, which provides observability and evals, was built to solve that need. LangChain was updated to integrate seamlessly with LangSmith.
+    에이전트 구축의 주요 문제는 신뢰성을 확보하는 것이며, 관찰성과 평가를 제공하는 LangSmith는 그 필요를 해결하기 위해 구축되었습니다. LangChain은 LangSmith와 원활하게 통합되도록 업데이트되었습니다.
 </Update>
 
 <Update label="2024-01" description="v0.1.0">
-    **LangChain releases 0.1.0**, its first non-0.0.x.
+    **LangChain이 0.1.0을 출시했습니다**, 최초의 비 0.0.x 버전입니다.
 
-    The industry matured from prototypes to production, and as such, LangChain increased its focus on stability.
+    업계가 프로토타입에서 프로덕션으로 성숙해짐에 따라, LangChain은 안정성에 대한 초점을 강화했습니다.
 </Update>
 
 <Update label="2024-02">
-    **LangGraph is released** as an open-source library.
+    **LangGraph가 오픈 소스 라이브러리로 출시되었습니다**.
 
-    The original LangChain had two focuses: LLM abstractions, and high-level interfaces for getting started with common applications; however, it was missing a low-level orchestration layer that allowed developers to control the exact flow of their agent. Enter: LangGraph.
+    원래의 LangChain은 두 가지 목표를 가지고 있었습니다: LLM 추상화와 일반적인 애플리케이션을 시작하기 위한 고수준 인터페이스. 그러나 개발자가 에이전트의 정확한 흐름을 제어할 수 있는 저수준 오케스트레이션 계층이 부족했습니다. 그래서 LangGraph가 등장했습니다.
 
-    When building LangGraph, we learned from lessons when building LangChain and added functionality we discovered was needed: streaming, durable execution, short-term memory, human-in-the-loop, and more.
+    LangGraph를 구축하면서, LangChain을 구축할 때 얻은 교훈을 바탕으로 필요한 것으로 발견된 기능을 추가했습니다: 스트리밍, 지속 가능한 실행, 단기 메모리, 사람 개입 등.
 </Update>
 
 <Update label="2024-06">
-    **LangChain has over 700 integrations.**
+    **LangChain이 700개 이상의 통합을 보유하게 되었습니다.**
 
 
-    Integrations were split out of the core LangChain package, and either moved into their own standalone packages (for the core integrations) or `@langchain/community`.
+    통합은 핵심 LangChain 패키지에서 분리되어, 핵심 통합의 경우 자체 독립 패키지로 이동되거나 `@langchain/community`로 이동되었습니다.
 
 </Update>
 
 <Update label="2024-10">
-    LangGraph becomes the preferred way to build any AI application that is more than a single LLM call.
+    LangGraph가 단일 LLM 호출 이상의 AI 애플리케이션을 구축하는 선호 방식이 되었습니다.
 
-    As developers tried to improve the reliability of their applications, they needed more control than the high-level interfaces provided. LangGraph provided that low-level flexibility. Most chains and agents were marked as deprecated in LangChain with guides on how to migrate them to LangGraph. There is still one high-level abstraction created in LangGraph: an agent abstraction. It is built on top of low-level LangGraph and has the same interface as the ReAct agents from LangChain.
+    개발자가 애플리케이션의 신뢰성을 개선하려고 시도하면서, 고수준 인터페이스가 제공하는 것보다 더 많은 제어가 필요했습니다. LangGraph는 그 저수준 유연성을 제공했습니다. 대부분의 체인과 에이전트는 LangChain에서 더 이상 사용되지 않는 것으로 표시되었으며 LangGraph로 마이그레이션하는 방법에 대한 가이드가 제공되었습니다. 여전히 LangGraph에서 생성된 하나의 고수준 추상화가 있습니다: 에이전트 추상화입니다. 이는 저수준 LangGraph 위에 구축되었으며 LangChain의 ReAct 에이전트와 동일한 인터페이스를 가지고 있습니다.
 </Update>
 
 <Update label="2025-04">
-    Model APIs become more multimodal.
+    모델 API가 더욱 멀티모달해졌습니다.
 
 
-    Models started to accept files, images, videos, and more. We updated the `@langchain/core` message format accordingly to allow developers to specify these multimodal inputs in a standard way.
+    모델이 파일, 이미지, 비디오 등을 받아들이기 시작했습니다. 개발자가 이러한 멀티모달 입력을 표준 방식으로 지정할 수 있도록 `@langchain/core` 메시지 형식을 이에 맞게 업데이트했습니다.
 
 </Update>
 
 <Update label="2025-10" description="v1.0.0">
-    **LangChain releases 1.0** with two major changes:
+    **LangChain이 1.0을 출시하면서** 두 가지 주요 변경 사항이 있었습니다:
 
-    1. Complete revamp of all chains and agents in `langchain`. All chains and agents are now replaced with only one high level abstraction: an agent abstraction built on top of LangGraph. This was the high-level abstraction that was originally created in LangGraph, but just moved to LangChain.
-
-
-        For users still using old LangChain chains/agents who do NOT want to upgrade (note: we recommend you do), you can continue using old LangChain by installing the `@langchain/classic` package.
+    1. `langchain`의 모든 체인과 에이전트를 완전히 개편했습니다. 모든 체인과 에이전트는 이제 하나의 고수준 추상화로만 대체됩니다: LangGraph 위에 구축된 에이전트 추상화입니다. 이것은 원래 LangGraph에서 생성된 고수준 추상화였지만, LangChain으로 이동한 것입니다.
 
 
-    2. A standard message content format: Model APIs evolved from returning messages with a simple content string to more complex output types - reasoning blocks, citations, server-side tool calls, etc. LangChain evolved its message formats to standardize these across providers.
+        업그레이드를 원하지 않는 기존 LangChain 체인/에이전트를 여전히 사용하는 사용자(참고: 업그레이드를 권장합니다)는 `@langchain/classic` 패키지를 설치하여 기존 LangChain을 계속 사용할 수 있습니다.
+
+
+    2. 표준 메시지 콘텐츠 형식: 모델 API는 단순한 콘텐츠 문자열이 있는 메시지를 반환하는 것에서 더 복잡한 출력 유형(추론 블록, 인용, 서버 측 도구 호출 등)으로 진화했습니다. LangChain은 이러한 메시지 형식을 제공자 간에 표준화하도록 진화했습니다.
 </Update>
 
 ---

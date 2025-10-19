@@ -1,22 +1,22 @@
 ---
 title: Guardrails
-description: Implement safety checks and content filtering for your agents
+description: agent에 대한 안전 검사 및 콘텐츠 필터링 구현하기
 ---
 
 import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
 <AlphaCallout />
 
-Guardrails help you build safe, compliant AI applications by validating and filtering content at key points in your agent's execution. They can detect sensitive information, enforce content policies, validate outputs, and prevent unsafe behaviors before they cause problems.
+Guardrails는 agent 실행의 주요 지점에서 콘텐츠를 검증하고 필터링하여 안전하고 규정을 준수하는 AI 애플리케이션을 구축하는 데 도움을 줍니다. 민감한 정보를 탐지하고, 콘텐츠 정책을 시행하며, 출력을 검증하고, 문제를 일으키기 전에 안전하지 않은 동작을 방지할 수 있습니다.
 
-Common use cases include:
-- Preventing PII leakage
-- Detecting and blocking prompt injection attacks
-- Blocking inappropriate or harmful content
-- Enforcing business rules and compliance requirements
-- Validating output quality and accuracy
+일반적인 사용 사례는 다음과 같습니다:
+- PII 유출 방지
+- 프롬프트 인젝션 공격 탐지 및 차단
+- 부적절하거나 유해한 콘텐츠 차단
+- 비즈니스 규칙 및 규정 준수 요구사항 시행
+- 출력 품질 및 정확성 검증
 
-You can implement guardrails using [middleware](/oss/javascript/langchain/middleware) to intercept execution at strategic points - before the agent starts, after it completes, or around model and tool calls.
+[middleware](/oss/javascript/langchain/middleware)를 사용하여 agent가 시작하기 전, 완료된 후 또는 model 및 tool 호출 전후와 같은 전략적 지점에서 실행을 가로채는 방식으로 guardrails를 구현할 수 있습니다.
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <img
@@ -27,35 +27,35 @@ You can implement guardrails using [middleware](/oss/javascript/langchain/middle
   />
 </div>
 
-Guardrails can be implemented using two complementary approaches:
+Guardrails는 두 가지 보완적인 접근 방식으로 구현할 수 있습니다:
 
 <CardGroup cols={2}>
-  <Card title="Deterministic guardrails" icon="list-check">
-    Use rule-based logic like regex patterns, keyword matching, or explicit checks. Fast, predictable, and cost-effective, but may miss nuanced violations.
+  <Card title="결정론적 guardrails" icon="list-check">
+    정규 표현식 패턴, 키워드 매칭 또는 명시적 검사와 같은 규칙 기반 로직을 사용합니다. 빠르고 예측 가능하며 비용 효율적이지만 미묘한 위반을 놓칠 수 있습니다.
   </Card>
-  <Card title="Model-based guardrails" icon="brain">
-    Use LLMs or classifiers to evaluate content with semantic understanding. Catch subtle issues that rules miss, but are slower and more expensive.
+  <Card title="Model 기반 guardrails" icon="brain">
+    LLM이나 분류기를 사용하여 의미적 이해를 바탕으로 콘텐츠를 평가합니다. 규칙이 놓치는 미묘한 문제를 포착하지만 더 느리고 비용이 많이 듭니다.
   </Card>
 </CardGroup>
 
-LangChain provides both built-in guardrails (e.g., [PII detection](#pii-detection), [human-in-the-loop](#human-in-the-loop)) and a flexible middleware system for building custom guardrails using either approach.
+LangChain은 내장 guardrails(예: [PII 탐지](#pii-detection), [human-in-the-loop](#human-in-the-loop))와 두 접근 방식 모두를 사용하여 커스텀 guardrails를 구축할 수 있는 유연한 middleware 시스템을 모두 제공합니다.
 
-## Built-in guardrails
+## 내장 guardrails
 
-### PII detection
+### PII 탐지
 
-LangChain provides built-in middleware for detecting and handling Personally Identifiable Information (PII) in conversations. This middleware can detect common PII types like emails, credit cards, IP addresses, and more.
+LangChain은 대화에서 개인 식별 정보(PII)를 탐지하고 처리하기 위한 내장 middleware를 제공합니다. 이 middleware는 이메일, 신용카드, IP 주소 등과 같은 일반적인 PII 유형을 탐지할 수 있습니다.
 
-PII detection middleware is helpful for cases such as health care and financial applications with compliance requirements, customer service agents that need to sanitize logs, and generally any application handling sensitive user data.
+PII 탐지 middleware는 규정 준수 요구사항이 있는 의료 및 금융 애플리케이션, 로그를 정제해야 하는 고객 서비스 agent, 그리고 일반적으로 민감한 사용자 데이터를 처리하는 모든 애플리케이션에 유용합니다.
 
-The PII middleware supports multiple strategies for handling detected PII:
+PII middleware는 탐지된 PII를 처리하기 위한 여러 전략을 지원합니다:
 
-| Strategy | Description | Example |
+| 전략 | 설명 | 예시 |
 |----------|-------------|---------|
-| `redact` | Replace with `[REDACTED_TYPE]` | `[REDACTED_EMAIL]` |
-| `mask` | Partially obscure (e.g., last 4 digits) | `****-****-****-1234` |
-| `hash` | Replace with deterministic hash | `a8f5f167...` |
-| `block` | Raise exception when detected | Error thrown |
+| `redact` | `[REDACTED_TYPE]`으로 교체 | `[REDACTED_EMAIL]` |
+| `mask` | 부분적으로 가림 (예: 마지막 4자리) | `****-****-****-1234` |
+| `hash` | 결정론적 해시로 교체 | `a8f5f167...` |
+| `block` | 탐지 시 예외 발생 | 오류 발생 |
 
 
 
@@ -100,36 +100,36 @@ const result = await agent.invoke({
 
 <Accordion title="Built-in PII types and configuration">
 
-**Built-in PII types:**
-- `email` - Email addresses
-- `credit_card` - Credit card numbers (Luhn validated)
-- `ip` - IP addresses
-- `mac_address` - MAC addresses
-- `url` - URLs
+**내장 PII 유형:**
+- `email` - 이메일 주소
+- `credit_card` - 신용카드 번호 (Luhn 검증됨)
+- `ip` - IP 주소
+- `mac_address` - MAC 주소
+- `url` - URL
 
-**Configuration options:**
+**구성 옵션:**
 
 
 
-Parameter | Description | Default
+파라미터 | 설명 | 기본값
 -----------|-------------|---------
-`piiType` | Type of PII to detect (built-in or custom) | Required
-`strategy` | How to handle detected PII (`"block"`, `"redact"`, `"mask"`, `"hash"`) | `"redact"`
-`detector` | Custom detector regex pattern | `undefined` (uses built-in)
-`applyToInput` | Check user messages before model call | `true`
-`applyToOutput` | Check AI messages after model call | `false`
-`applyToToolResults` | Check tool result messages after execution | `false`
+`piiType` | 탐지할 PII 유형 (내장 또는 커스텀) | 필수
+`strategy` | 탐지된 PII 처리 방법 (`"block"`, `"redact"`, `"mask"`, `"hash"`) | `"redact"`
+`detector` | 커스텀 탐지기 정규식 패턴 | `undefined` (내장 사용)
+`applyToInput` | model 호출 전 사용자 메시지 검사 | `true`
+`applyToOutput` | model 호출 후 AI 메시지 검사 | `false`
+`applyToToolResults` | tool 실행 후 결과 메시지 검사 | `false`
 
 
 </Accordion>
 
-See the [middleware documentation](/oss/javascript/langchain/middleware#pii-detection) for complete details on PII detection capabilities.
+PII 탐지 기능에 대한 자세한 내용은 [middleware 문서](/oss/javascript/langchain/middleware#pii-detection)를 참조하세요.
 
 ### Human-in-the-loop
 
-LangChain provides built-in middleware for requiring human approval before executing sensitive operations. This is one of the most effective guardrails for high-stakes decisions.
+LangChain은 민감한 작업을 실행하기 전에 사람의 승인을 요구하는 내장 middleware를 제공합니다. 이는 중요한 의사결정에 가장 효과적인 guardrails 중 하나입니다.
 
-Human-in-the-loop middleware is helpful for cases such as financial transactions and transfers, deleting or modifying production data, sending communications to external parties, and any operation with significant business impact.
+Human-in-the-loop middleware는 금융 거래 및 이체, 프로덕션 데이터 삭제 또는 수정, 외부 당사자에게 통신 전송, 그리고 비즈니스에 큰 영향을 미치는 모든 작업과 같은 경우에 유용합니다.
 
 
 
@@ -170,15 +170,15 @@ result = await agent.invoke(
 ```
 
 
-See the [human-in-the-loop documentation](/oss/javascript/langchain/human-in-the-loop) for complete details on implementing approval workflows.
+승인 워크플로우 구현에 대한 자세한 내용은 [human-in-the-loop 문서](/oss/javascript/langchain/human-in-the-loop)를 참조하세요.
 
-## Custom guardrails
+## 커스텀 guardrails
 
-For more sophisticated guardrails, you can create custom middleware that runs before or after the agent executes. This gives you full control over validation logic, content filtering, and safety checks.
+더 정교한 guardrails를 위해 agent 실행 전후에 실행되는 커스텀 middleware를 생성할 수 있습니다. 이를 통해 검증 로직, 콘텐츠 필터링 및 안전 검사를 완전히 제어할 수 있습니다.
 
-### Before agent guardrails
+### agent 이전 guardrails
 
-Use "before agent" hooks to validate requests once at the start of each invocation. This is useful for session-level checks like authentication, rate limiting, or blocking inappropriate requests before any processing begins.
+"before agent" hook을 사용하여 각 호출 시작 시 요청을 한 번 검증합니다. 이는 인증, 속도 제한 또는 처리가 시작되기 전에 부적절한 요청을 차단하는 것과 같은 세션 수준 검사에 유용합니다.
 
 
 
@@ -241,9 +241,9 @@ const result = await agent.invoke({
 ```
 
 
-### After agent guardrails
+### agent 이후 guardrails
 
-Use "after agent" hooks to validate final outputs once before returning to the user. This is useful for model-based safety checks, quality validation, or final compliance scans on the complete agent response.
+"after agent" hook을 사용하여 사용자에게 반환하기 전에 최종 출력을 한 번 검증합니다. 이는 model 기반 안전 검사, 품질 검증 또는 완전한 agent 응답에 대한 최종 규정 준수 스캔에 유용합니다.
 
 
 
@@ -307,9 +307,9 @@ const result = await agent.invoke({
 ```
 
 
-### Combine multiple guardrails
+### 여러 guardrails 결합하기
 
-You can stack multiple guardrails by adding them to the middleware array. They execute in order, allowing you to build layered protection:
+middleware 배열에 추가하여 여러 guardrails를 쌓을 수 있습니다. 순서대로 실행되어 계층화된 보호를 구축할 수 있습니다:
 
 
 
@@ -349,12 +349,12 @@ const agent = createAgent({
 ```
 
 
-## Additional resources
+## 추가 리소스
 
-- [Middleware documentation](/oss/javascript/langchain/middleware) - Complete guide to custom middleware
-- [Middleware API reference](https://reference.langchain.com/python/langchain/middleware/) - Complete guide to custom middleware
-- [Human-in-the-loop](/oss/javascript/langchain/human-in-the-loop) - Add human review for sensitive operations
-- [Testing agents](/oss/javascript/langchain/test) - Strategies for testing safety mechanisms
+- [Middleware 문서](/oss/javascript/langchain/middleware) - 커스텀 middleware에 대한 전체 가이드
+- [Middleware API 참조](https://reference.langchain.com/python/langchain/middleware/) - 커스텀 middleware에 대한 전체 가이드
+- [Human-in-the-loop](/oss/javascript/langchain/human-in-the-loop) - 민감한 작업에 대한 사람의 검토 추가
+- [Testing agents](/oss/javascript/langchain/test) - 안전 메커니즘 테스트 전략
 
 ---
 

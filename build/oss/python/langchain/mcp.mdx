@@ -2,17 +2,20 @@
 title: Model Context Protocol (MCP)
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
-
-[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) is an open protocol that standardizes how applications provide tools and context to LLMs. LangChain agents can use tools defined on MCP servers using the [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchain-mcp-adapters) library.
-
+<AlphaCalloutPy />
 
 
-## Install
 
-Install the `langchain-mcp-adapters` library to use MCP tools in LangGraph:
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction)은 애플리케이션이 LLM에 도구와 컨텍스트를 제공하는 방법을 표준화하는 오픈 프로토콜입니다. LangChain 에이전트는 [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchain-mcp-adapters) 라이브러리를 사용하여 MCP 서버에 정의된 도구를 사용할 수 있습니다.
+
+
+
+## 설치
+
+LangGraph에서 MCP 도구를 사용하려면 `langchain-mcp-adapters` 라이브러리를 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -27,17 +30,17 @@ uv add langchain-mcp-adapters
 
 
 
-## Transport types
+## 전송 타입
 
-MCP supports different transport mechanisms for client-server communication:
+MCP는 클라이언트-서버 통신을 위한 다양한 전송 메커니즘을 지원합니다:
 
-- stdio: Client launches server as a subprocess and communicates via standard input/output. Best for local tools and simple setups.
-- Streamable HTTP: Server runs as an independent process handling HTTP requests. Supports remote connections and multiple clients.
-- Server-Sent Events (SSE): a variant of streamable HTTP optimized for real-time streaming communication.
+- stdio: 클라이언트가 서버를 서브프로세스로 실행하고 표준 입출력을 통해 통신합니다. 로컬 도구와 간단한 설정에 가장 적합합니다.
+- Streamable HTTP: 서버가 HTTP 요청을 처리하는 독립 프로세스로 실행됩니다. 원격 연결과 다중 클라이언트를 지원합니다.
+- Server-Sent Events (SSE): 실시간 스트리밍 통신에 최적화된 streamable HTTP의 변형입니다.
 
-## Use MCP tools
+## MCP 도구 사용
 
-`langchain-mcp-adapters` enables agents to use tools defined across one or more MCP server.
+`langchain-mcp-adapters`는 에이전트가 하나 이상의 MCP 서버에 정의된 도구를 사용할 수 있게 합니다.
 
 ```python Accessing multiple MCP servers icon="server"
 from langchain_mcp_adapters.client import MultiServerMCPClient  # [!code highlight]
@@ -61,7 +64,7 @@ client = MultiServerMCPClient(  # [!code highlight]
 
 tools = await client.get_tools()  # [!code highlight]
 agent = create_agent(
-    "anthropic:claude-3-7-sonnet-latest",
+    "anthropic:claude-sonnet-4-5-20250929",
     tools  # [!code highlight]
 )
 math_response = await agent.ainvoke(
@@ -77,12 +80,12 @@ weather_response = await agent.ainvoke(
 
 
 <Note>
-    `MultiServerMCPClient` is **stateless by default**. Each tool invocation creates a fresh MCP `ClientSession`, executes the tool, and then cleans up.
+    `MultiServerMCPClient`는 **기본적으로 상태를 유지하지 않습니다**. 각 도구 호출은 새로운 MCP `ClientSession`을 생성하고, 도구를 실행한 후 정리합니다.
 </Note>
 
-## Custom MCP servers
+## 커스텀 MCP 서버
 
-To create your own MCP servers, you can use the `mcp` library. This library provides a simple way to define [tools](https://modelcontextprotocol.io/docs/learn/server-concepts#tools-ai-actions) and run them as servers.
+자체 MCP 서버를 만들려면 `mcp` 라이브러리를 사용할 수 있습니다. 이 라이브러리는 [도구](https://modelcontextprotocol.io/docs/learn/server-concepts#tools-ai-actions)를 정의하고 서버로 실행하는 간단한 방법을 제공합니다.
 
 <CodeGroup>
 ```bash pip
@@ -97,7 +100,7 @@ uv add mcp
 
 
 
-Use the following reference implementations to test your agent with MCP tool servers.
+다음 참조 구현을 사용하여 MCP 도구 서버로 에이전트를 테스트하세요.
 
 ```python title="Math server (stdio transport)" icon="floppy-disk"
 from mcp.server.fastmcp import FastMCP
@@ -135,9 +138,9 @@ if __name__ == "__main__":
 
 
 
-## Stateful tool usage
+## 상태 유지 도구 사용
 
-For stateful servers that maintain context between tool calls, use `client.session()` to create a persistent `ClientSession`.
+도구 호출 간에 컨텍스트를 유지하는 상태 유지 서버의 경우, `client.session()`을 사용하여 영구적인 `ClientSession`을 생성하세요.
 
 ```python Using MCP ClientSession for stateful tool usage
 from langchain_mcp_adapters.tools import load_mcp_tools
@@ -150,10 +153,10 @@ async with client.session("math") as session:
 
 
 
-## Additional resources
+## 추가 자료
 
-* [MCP documentation](https://modelcontextprotocol.io/introduction)
-* [MCP Transport documentation](https://modelcontextprotocol.io/docs/concepts/transports)
+* [MCP 문서](https://modelcontextprotocol.io/introduction)
+* [MCP Transport 문서](https://modelcontextprotocol.io/docs/concepts/transports)
 * [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchain-mcp-adapters)
 
 ---

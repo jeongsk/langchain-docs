@@ -2,30 +2,33 @@
 title: Runtime
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
-
-## Overview
-
-LangChain's `create_agent` runs on LangGraph's runtime under the hood.
-
-
-LangGraph exposes a [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) object with the following information:
-
-1. **Context**: static information like user id, db connections, or other dependencies for an agent invocation
-2. **Store**: a [BaseStore](https://langchain-ai.github.io/langgraph/reference/store/#langgraph.store.base.BaseStore) instance used for [long-term memory](/oss/python/langchain/long-term-memory)
-3. **Stream writer**: an object used for streaming information via the `"custom"` stream mode
-
-You can access the runtime information within [tools](#inside-tools) and [middleware](#inside-middleware).
-
-## Access
-
-When creating an agent with `create_agent`, you can specify a `context_schema` to define the structure of the `context` stored in the agent [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime).
+<AlphaCalloutPy />
 
 
 
-When invoking the agent, pass the `context` argument with the relevant configuration for the run:
+## 개요
+
+LangChain의 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 내부적으로 LangGraph의 런타임 위에서 실행됩니다.
+
+
+LangGraph는 다음 정보를 포함하는 [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) 객체를 제공합니다:
+
+1. **Context**: 에이전트 호출에 대한 사용자 ID, 데이터베이스 연결 또는 기타 종속성과 같은 정적 정보
+2. **Store**: [장기 메모리](/oss/python/langchain/long-term-memory)에 사용되는 [BaseStore](https://langchain-ai.github.io/langgraph/reference/store/#langgraph.store.base.BaseStore) 인스턴스
+3. **Stream writer**: `"custom"` 스트림 모드를 통해 정보를 스트리밍하는 데 사용되는 객체
+
+런타임 정보는 [툴](#inside-tools) 및 [미들웨어](#inside-middleware) 내에서 액세스할 수 있습니다.
+
+## 액세스
+
+[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)로 에이전트를 생성할 때, `context_schema`를 지정하여 에이전트 [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime)에 저장되는 `context`의 구조를 정의할 수 있습니다.
+
+
+
+에이전트를 호출할 때 실행에 대한 관련 구성과 함께 `context` 인수를 전달합니다:
 
 ```python
 from dataclasses import dataclass
@@ -50,27 +53,30 @@ agent.invoke(
 
 
 
-### Inside tools
+### 툴 내부
 
-You can access the runtime information inside tools to:
+툴 내부에서 런타임 정보에 액세스하여 다음을 수행할 수 있습니다:
 
-* Access the context
-* Read or write long-term memory
-* Write to the [custom stream](/oss/python/langchain/streaming#custom-updates) (ex, tool progress / updates)
+* 컨텍스트 액세스
+* 장기 메모리 읽기 또는 쓰기
+* [커스텀 스트림](/oss/python/langchain/streaming#custom-updates)에 쓰기 (예: 툴 진행 상황/업데이트)
 
-Use the [get_runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.get_runtime) function from `langgraph.runtime` to access the [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) object inside a tool.
+`ToolRuntime` 매개변수를 사용하여 툴 내부에서 [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) 객체에 액세스합니다.
 
 ```python
-from langchain.tools import tool
-from langgraph.runtime import get_runtime  # [!code highlight]
+from dataclasses import dataclass
+from langchain.tools import tool, ToolRuntime  # [!code highlight]
+
+@dataclass
+class Context:
+    user_id: str
 
 @tool
-def fetch_user_email_preferences() -> str:
-    """Fetch the user's email preferences from the store."""
-    runtime = get_runtime(Context)  # [!code highlight]
+def fetch_user_email_preferences(runtime: ToolRuntime[Context]) -> str:  # [!code highlight]
+    """스토어에서 사용자의 이메일 기본 설정을 가져옵니다."""
     user_id = runtime.context.user_id  # [!code highlight]
 
-    preferences: str = "The user prefers you to write a brief and polite email."
+    preferences: str = "사용자는 간단하고 정중한 이메일을 선호합니다."
     if runtime.store:  # [!code highlight]
         if memory := runtime.store.get(("users",), user_id):  # [!code highlight]
             preferences = memory.value["preferences"]
@@ -80,11 +86,11 @@ def fetch_user_email_preferences() -> str:
 
 
 
-### Inside middleware
+### 미들웨어 내부
 
-You can access runtime information in middleware to create dynamic prompts, modify messages, or control agent behavior based on user context.
+미들웨어에서 런타임 정보에 액세스하여 사용자 컨텍스트를 기반으로 동적 프롬프트를 생성하거나, 메시지를 수정하거나, 에이전트 동작을 제어할 수 있습니다.
 
-Use `request.runtime` to access the [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) object inside middleware decorators. The runtime object is available in the `ModelRequest` parameter passed to middleware functions.
+미들웨어 데코레이터 내부에서 [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) 객체에 액세스하려면 `request.runtime`을 사용합니다. 런타임 객체는 미들웨어 함수에 전달되는 [`ModelRequest`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.ModelRequest) 매개변수에서 사용할 수 있습니다.
 
 ```python
 from dataclasses import dataclass
@@ -98,23 +104,23 @@ from langgraph.runtime import Runtime
 class Context:
     user_name: str
 
-# Dynamic prompts
+# 동적 프롬프트
 @dynamic_prompt
 def dynamic_system_prompt(request: ModelRequest) -> str:
     user_name = request.runtime.context.user_name  # [!code highlight]
-    system_prompt = f"You are a helpful assistant. Address the user as {user_name}."
+    system_prompt = f"당신은 도움이 되는 어시스턴트입니다. 사용자를 {user_name}로 호칭하세요."
     return system_prompt
 
-# Before model hook
+# Before model 훅
 @before_model
 def log_before_model(state: AgentState, runtime: Runtime[Context]) -> dict | None:  # [!code highlight]
-    print(f"Processing request for user: {runtime.context.user_name}")  # [!code highlight]
+    print(f"사용자에 대한 요청 처리 중: {runtime.context.user_name}")  # [!code highlight]
     return None
 
-# After model hook
+# After model 훅
 @after_model
 def log_after_model(state: AgentState, runtime: Runtime[Context]) -> dict | None:  # [!code highlight]
-    print(f"Completed request for user: {runtime.context.user_name}")  # [!code highlight]
+    print(f"사용자에 대한 요청 완료: {runtime.context.user_name}")  # [!code highlight]
     return None
 
 agent = create_agent(

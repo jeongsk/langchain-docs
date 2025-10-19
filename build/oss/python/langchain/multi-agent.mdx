@@ -1,5 +1,5 @@
 ---
-title: Multi-agent
+title: 멀티 에이전트
 ---
 
 
@@ -7,90 +7,90 @@ import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
 <AlphaCallout />
 
-**Multi-agent systems** break a complex application into multiple specialized agents that work together to solve problems.
-Instead of relying on a single agent to handle every step, **multi-agent architectures** allow you to compose smaller, focused agents into a coordinated workflow.
+**멀티 에이전트 시스템**은 복잡한 애플리케이션을 함께 작동하여 문제를 해결하는 여러 특화된 에이전트로 분할합니다.
+모든 단계를 처리하는 단일 에이전트에 의존하는 대신, **멀티 에이전트 아키텍처**를 사용하면 더 작고 집중된 에이전트를 조정된 워크플로로 구성할 수 있습니다.
 
-Multi-agent systems are useful when:
+멀티 에이전트 시스템은 다음과 같은 경우에 유용합니다:
 
-* A single agent has too many tools and makes poor decisions about which to use.
-* Context or memory grows too large for one agent to track effectively.
-* Tasks require **specialization** (e.g., a planner, researcher, math expert).
+* 단일 에이전트가 너무 많은 도구를 가지고 있어 어떤 것을 사용할지 잘못된 결정을 내리는 경우.
+* 컨텍스트나 메모리가 하나의 에이전트가 효과적으로 추적하기에 너무 큰 경우.
+* 작업에 **전문화**가 필요한 경우(예: 플래너, 연구원, 수학 전문가).
 
-## Multi-agent patterns
+## 멀티 에이전트 패턴
 
-| Pattern                           | How it works                                                                                                                                                     | Control flow                                               | Example use case                                 |
+| 패턴                           | 작동 방식                                                                                                                                                     | 제어 흐름                                               | 사용 사례 예시                                 |
 |-----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------|
-| [**Tool Calling**](#tool-calling) | A **supervisor** agent calls other agents as *tools*. The “tool” agents don’t talk to the user directly — they just run their task and return results.                  | Centralized: all routing passes through the calling agent. | Task orchestration, structured workflows.        |
-| [**Handoffs**](#handoffs)         | The current agent decides to **transfer control** to another agent. The active agent changes, and the user may continue interacting directly with the new agent. | Decentralized: agents can change who is active.            | Multi-domain conversations, specialist takeover. |
+| [**도구 호출**](#tool-calling) | **슈퍼바이저** 에이전트가 다른 에이전트를 *도구*로 호출합니다. "도구" 에이전트는 사용자와 직접 대화하지 않고 작업을 실행하고 결과를 반환하기만 합니다.                  | 중앙집중식: 모든 라우팅이 호출 에이전트를 거칩니다. | 작업 오케스트레이션, 구조화된 워크플로.        |
+| [**핸드오프**](#handoffs)         | 현재 에이전트가 다른 에이전트로 **제어를 전달**하기로 결정합니다. 활성 에이전트가 변경되며, 사용자는 새 에이전트와 직접 계속 상호작용할 수 있습니다. | 분산형: 에이전트가 활성 상태인 에이전트를 변경할 수 있습니다.            | 멀티 도메인 대화, 전문가 인수인계. |
 
 <Card
-    title="Tutorial: Build a supervisor agent"
+    title="튜토리얼: 슈퍼바이저 에이전트 구축하기"
     icon="sitemap"
     href="/oss/python/langchain/supervisor"
-    arrow cta="Learn more"
+    arrow cta="자세히 알아보기"
 >
-    Learn how to build a personal assistant using the supervisor pattern, where a central supervisor agent coordinates specialized worker agents.
-    This tutorial demonstrates:
-    * Creating specialized sub-agents for different domains (calendar and email)
-    * Wrapping sub-agents as tools for centralized orchestration
-    * Adding human-in-the-loop review for sensitive actions
+    중앙 슈퍼바이저 에이전트가 특화된 워커 에이전트를 조정하는 슈퍼바이저 패턴을 사용하여 개인 비서를 구축하는 방법을 배워보세요.
+    이 튜토리얼에서 다루는 내용:
+    * 다양한 도메인(캘린더 및 이메일)을 위한 특화된 하위 에이전트 생성
+    * 중앙집중식 오케스트레이션을 위한 도구로 하위 에이전트 래핑
+    * 민감한 작업에 대한 사람 개입 검토 추가
 </Card>
 
 
-## Choosing a pattern
+## 패턴 선택하기
 
-| Question                                              | Tool Calling | Handoffs |
+| 질문                                              | 도구 호출 | 핸드오프 |
 |-------------------------------------------------------|--------------|----------|
-| Need centralized control over workflow?               | ✅ Yes        | ❌ No     |
-| Want agents to interact directly with the user?       | ❌ No         | ✅ Yes    |
-| Complex, human-like conversation between specialists? | ❌ Limited    | ✅ Strong |
+| 워크플로에 대한 중앙집중식 제어가 필요한가?               | ✅ 예        | ❌ 아니오     |
+| 에이전트가 사용자와 직접 상호작용하기를 원하는가?       | ❌ 아니오         | ✅ 예    |
+| 전문가 간의 복잡하고 인간적인 대화?               | ❌ 제한적    | ✅ 강력함 |
 
 <Tip>
-    You can mix both patterns — use **handoffs** for agent switching, and have each agent **call subagents as tools** for specialized tasks.
+    두 패턴을 혼합할 수 있습니다 - 에이전트 전환에는 **핸드오프**를 사용하고, 각 에이전트가 특화된 작업을 위해 **하위 에이전트를 도구로 호출**하도록 할 수 있습니다.
 </Tip>
 
-## Customizing agent context
+## 에이전트 컨텍스트 커스터마이징
 
-At the heart of multi-agent design is **context engineering** - deciding what information each agent sees. LangChain gives you fine-grained control over:
+멀티 에이전트 설계의 핵심은 **컨텍스트 엔지니어링**입니다 - 각 에이전트가 어떤 정보를 보는지 결정하는 것입니다. LangChain은 다음에 대한 세밀한 제어를 제공합니다:
 
-* Which parts of the conversation or state are passed to each agent.
-* Specialized prompts tailored to subagents.
-* Inclusion/exclusion of intermediate reasoning.
-* Customizing input/output formats per agent.
+* 대화 또는 상태의 어떤 부분이 각 에이전트에 전달되는지.
+* 하위 에이전트에 맞춤화된 특화된 프롬프트.
+* 중간 추론의 포함/제외.
+* 에이전트별 입력/출력 형식 커스터마이징.
 
-The quality of your system **heavily depends** on context engineering. The goal is to ensure that each agent has access to the correct data it needs to perform its task, whether it’s acting as a tool or as an active agent.
+시스템의 품질은 컨텍스트 엔지니어링에 **크게 의존**합니다. 목표는 각 에이전트가 도구로 작동하든 활성 에이전트로 작동하든 작업을 수행하는 데 필요한 올바른 데이터에 접근할 수 있도록 하는 것입니다.
 
-## Tool calling
+## 도구 호출
 
-In **tool calling**, one agent (the “**controller**”) treats other agents as *tools* to be invoked when needed. The controller manages orchestration, while tool agents perform specific tasks and return results.
+**도구 호출**에서는 하나의 에이전트("**컨트롤러**")가 다른 에이전트를 필요할 때 호출할 *도구*로 취급합니다. 컨트롤러는 오케스트레이션을 관리하고, 도구 에이전트는 특정 작업을 수행하고 결과를 반환합니다.
 
-Flow:
+흐름:
 
-1. The **controller** receives input and decides which tool (subagent) to call.
-2. The **tool agent** runs its task based on the controller’s instructions.
-3. The **tool agent** returns results to the controller.
-4. The **controller** decides the next step or finishes.
+1. **컨트롤러**가 입력을 받고 어떤 도구(하위 에이전트)를 호출할지 결정합니다.
+2. **도구 에이전트**가 컨트롤러의 지시에 따라 작업을 실행합니다.
+3. **도구 에이전트**가 컨트롤러에 결과를 반환합니다.
+4. **컨트롤러**가 다음 단계를 결정하거나 종료합니다.
 
 
 ```mermaid
 graph LR
-    A[User] --> B[Controller Agent]
-    B --> C[Tool Agent 1]
-    B --> D[Tool Agent 2]
+    A[사용자] --> B[컨트롤러 에이전트]
+    B --> C[도구 에이전트 1]
+    B --> D[도구 에이전트 2]
     C --> B
     D --> B
-    B --> E[User Response]
+    B --> E[사용자 응답]
 ````
 
 <Tip>
-    Agents used as tools are generally **not expected** to continue conversation with the user.
-    Their role is to perform a task and return results to the controller agent.
-    If you need subagents to be able to converse with the user, use **handoffs** instead.
+    도구로 사용되는 에이전트는 일반적으로 사용자와 대화를 계속하는 것이 **예상되지 않습니다**.
+    그들의 역할은 작업을 수행하고 컨트롤러 에이전트에 결과를 반환하는 것입니다.
+    하위 에이전트가 사용자와 대화할 수 있어야 하는 경우 대신 **핸드오프**를 사용하세요.
 </Tip>
 
-### Implementation
+### 구현
 
-Below is a minimal example where the main agent is given access to a single subagent via a tool definition:
+아래는 메인 에이전트에 도구 정의를 통해 단일 하위 에이전트에 대한 접근 권한이 부여되는 최소한의 예시입니다:
 
 ```python
 from langchain.tools import tool
@@ -113,26 +113,26 @@ agent = create_agent(..., tools=[call_subagent1])
 
 
 
-In this pattern:
-1. The main agent invokes `call_subagent1` when it decides the task matches the subagent’s description.
-2. The subagent runs independently and returns its result.
-3. The main agent receives the result and continues orchestration.
+이 패턴에서:
+1. 메인 에이전트는 작업이 하위 에이전트의 설명과 일치한다고 판단할 때 `call_subagent1`을 호출합니다.
+2. 하위 에이전트가 독립적으로 실행되고 결과를 반환합니다.
+3. 메인 에이전트가 결과를 받고 오케스트레이션을 계속합니다.
 
-### Where to customize
+### 커스터마이징 위치
 
-There are several points where you can control how context is passed between the main agent and its subagents:
+메인 에이전트와 하위 에이전트 간에 컨텍스트가 전달되는 방식을 제어할 수 있는 여러 지점이 있습니다:
 
-1. **Subagent name** (`"subagent1_name"`): This is how the main agent refers to the subagent. Since it influences prompting, choose it carefully.
-2. **Subagent description** (`"subagent1_description"`): This is what the main agent “knows” about the subagent. It directly shapes how the main agent decides when to call it.
-3. **Input to the subagent**: You can customize this input to better shape how the subagent interprets tasks. In the example above, we pass the agent-generated `query` directly.
-4. **Output from the subagent**: This is the **response** passed back to the main agent. You can adjust what is returned to control how the main agent interprets results. In the example above, we return the final message text, but you could return additional state or metadata.
+1. **하위 에이전트 이름** (`"subagent1_name"`): 메인 에이전트가 하위 에이전트를 참조하는 방식입니다. 프롬프팅에 영향을 미치므로 신중하게 선택하세요.
+2. **하위 에이전트 설명** (`"subagent1_description"`): 메인 에이전트가 하위 에이전트에 대해 "아는" 것입니다. 메인 에이전트가 언제 호출할지 결정하는 방식을 직접적으로 형성합니다.
+3. **하위 에이전트에 대한 입력**: 이 입력을 커스터마이징하여 하위 에이전트가 작업을 해석하는 방식을 더 잘 형성할 수 있습니다. 위의 예시에서는 에이전트가 생성한 `query`를 직접 전달합니다.
+4. **하위 에이전트로부터의 출력**: 메인 에이전트에 다시 전달되는 **응답**입니다. 메인 에이전트가 결과를 해석하는 방식을 제어하기 위해 반환되는 내용을 조정할 수 있습니다. 위의 예시에서는 최종 메시지 텍스트를 반환하지만, 추가 상태나 메타데이터를 반환할 수도 있습니다.
 
-### Control the input to the subagent
+### 하위 에이전트에 대한 입력 제어
 
-There are two main levers to control the input that the main agent passes to a subagent:
+메인 에이전트가 하위 에이전트에 전달하는 입력을 제어하는 두 가지 주요 레버가 있습니다:
 
-* **Modify the prompt** – Adjust the main agent's prompt or the tool metadata (i.e., sub-agent's name and description) to better guide when and how it calls the subagent.
-* **Context injection** – Add input that isn’t practical to capture in a static prompt (e.g., full message history, prior results, task metadata) by adjusting the tool call to pull from the agent’s state.
+* **프롬프트 수정** – 메인 에이전트의 프롬프트 또는 도구 메타데이터(즉, 하위 에이전트의 이름 및 설명)를 조정하여 하위 에이전트를 언제 어떻게 호출할지 더 잘 안내합니다.
+* **컨텍스트 주입** – 정적 프롬프트로 캡처하기에는 실용적이지 않은 입력(예: 전체 메시지 기록, 이전 결과, 작업 메타데이터)을 에이전트의 상태에서 가져오도록 도구 호출을 조정하여 추가합니다.
 
 ```python
 from typing import Annotated
@@ -147,13 +147,12 @@ class CustomState(AgentState):
     description="subagent1_description"
 )
 def call_subagent1(query: str, state: Annotated[AgentState, InjectedState]):
-    # Apply any logic needed to transform the messages into a suitable input
+    # 메시지를 적절한 입력으로 변환하는 데 필요한 로직을 적용합니다
     subagent_input = some_logic(query, state["messages"])
     result = subagent1.invoke({
         "messages": subagent_input,
-        # You could also pass other state keys here as needed.
-        # Make sure to define these in both the main and subagent's
-        # state schemas.
+        # 필요에 따라 다른 상태 키를 여기에 전달할 수도 있습니다.
+        # 메인 및 하위 에이전트의 상태 스키마 모두에 정의해야 합니다.
         "example_state_key": state["example_state_key"]
     })
     return result["messages"][-1].content
@@ -161,16 +160,16 @@ def call_subagent1(query: str, state: Annotated[AgentState, InjectedState]):
 
 
 
-### Control the output from the subagent
+### 하위 에이전트로부터의 출력 제어
 
-Two common strategies for shaping what the main agent receives back from a subagent:
+메인 에이전트가 하위 에이전트로부터 받는 내용을 형성하는 두 가지 일반적인 전략:
 
-* **Modify the prompt** – Refine the subagent’s prompt to specify exactly what should be returned.
-  * Useful when outputs are incomplete, too verbose, or missing key details.
-  * A common failure mode is that the subagent performs tool calls or reasoning but does **not include the results** in its final message. Remind it that the controller (and user) only see the final output, so all relevant info must be included there.
-* **Custom output formatting** – adjust or enrich the subagent's response in code before handing it back to the main agent.
-  * Example: pass specific state keys back to the main agent in addition to the final text.
-  * This requires wrapping the result in a `Command` (or equivalent structure) so you can merge custom state with the subagent’s response.
+* **프롬프트 수정** – 하위 에이전트의 프롬프트를 개선하여 정확히 무엇을 반환해야 하는지 지정합니다.
+  * 출력이 불완전하거나, 너무 장황하거나, 핵심 세부 정보가 누락된 경우에 유용합니다.
+  * 일반적인 실패 모드는 하위 에이전트가 도구 호출이나 추론을 수행하지만 최종 메시지에 **결과를 포함하지 않는** 것입니다. 컨트롤러(및 사용자)는 최종 출력만 보므로 모든 관련 정보가 거기에 포함되어야 한다는 것을 상기시켜주세요.
+* **커스텀 출력 형식** – 메인 에이전트에 다시 전달하기 전에 코드에서 하위 에이전트의 응답을 조정하거나 강화합니다.
+  * 예시: 최종 텍스트 외에 특정 상태 키를 메인 에이전트에 다시 전달합니다.
+  * 이를 위해서는 결과를 `Command`(또는 동등한 구조)로 래핑하여 커스텀 상태를 하위 에이전트의 응답과 병합할 수 있어야 합니다.
 
 ```python
 from typing import Annotated
@@ -183,22 +182,22 @@ from langgraph.types import Command
     name="subagent1_name",
     description="subagent1_description"
 )
-# We need to pass the `tool_call_id` to the sub agent so it can use it to respond with the tool call result
+# 하위 에이전트가 도구 호출 결과로 응답하는 데 사용할 수 있도록 `tool_call_id`를 전달해야 합니다
 def call_subagent1(
     query: str,
     tool_call_id: Annotated[str, InjectedToolCallId],
-# You need to return a `Command` object to include more than just a final tool call
+# 최종 도구 호출 이상의 것을 포함하려면 `Command` 객체를 반환해야 합니다
 ) -> Command:
     result = subagent1.invoke({
         "messages": [{"role": "user", "content": query}]
     })
     return Command(update={
-        # This is the example state key we are passing back
+        # 다시 전달하는 예시 상태 키입니다
         "example_state_key": result["example_state_key"],
         "messages": [
             ToolMessage(
                 content=result["messages"][-1].content,
-                # We need to include the tool call id so it matches up with the right tool call
+                # 올바른 도구 호출과 일치하도록 도구 호출 ID를 포함해야 합니다
                 tool_call_id=tool_call_id
             )
         ]
@@ -208,25 +207,25 @@ def call_subagent1(
 
 
 
-## Handoffs
+## 핸드오프
 
-In **handoffs**, agents can directly pass control to each other. The “active” agent changes, and the user interacts with whichever agent currently has control.
+**핸드오프**에서는 에이전트가 서로 직접 제어를 전달할 수 있습니다. "활성" 에이전트가 변경되며, 사용자는 현재 제어권을 가진 에이전트와 상호작용합니다.
 
-Flow:
+흐름:
 
-1. The **current agent** decides it needs help from another agent.
-2. It passes control (and state) to the **next agent**.
-3. The **new agent** interacts directly with the user until it decides to hand off again or finish.
+1. **현재 에이전트**가 다른 에이전트의 도움이 필요하다고 결정합니다.
+2. 제어(및 상태)를 **다음 에이전트**로 전달합니다.
+3. **새 에이전트**가 다시 핸드오프하거나 종료하기로 결정할 때까지 사용자와 직접 상호작용합니다.
 
 ```mermaid
 graph LR
-    A[User] --> B[Agent A]
-    B --> C[Agent B]
+    A[사용자] --> B[에이전트 A]
+    B --> C[에이전트 B]
     C --> A
 ```
 
 
-### Implementation (Coming soon)
+### 구현 (곧 제공 예정)
 
 ---
 

@@ -2,41 +2,44 @@
 title: Human-in-the-loop
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
+<AlphaCalloutPy />
 
-The Human-in-the-Loop (HITL) middleware lets you add human oversight to agent tool calls.
-When a model proposes an action that might require review — for example, writing to a file or executing SQL — the middleware can pause execution and wait for a decision.
 
-It does this by checking each tool call against a configurable policy. If intervention is needed, the middleware issues an [interrupt](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.interrupt) that halts execution. The graph state is saved using LangGraph’s [persistence layer](/oss/python/langgraph/persistence), so execution can pause safely and resume later.
 
-A human decision then determines what happens next: the action can be approved as-is (`approve`), modified before running (`edit`), or rejected with feedback (`reject`).
+Human-in-the-Loop(HITL) middleware를 사용하면 agent 도구 호출에 사람의 감독을 추가할 수 있습니다.
+모델이 검토가 필요할 수 있는 작업(예: 파일 작성 또는 SQL 실행)을 제안할 때 middleware는 실행을 일시 중지하고 결정을 기다릴 수 있습니다.
 
-## Interrupt decision types
+이것은 구성 가능한 정책에 대해 각 도구 호출을 확인하여 수행됩니다. 개입이 필요한 경우 middleware는 실행을 중단하는 [interrupt](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.interrupt)를 발생시킵니다. 그래프 state는 LangGraph의 [지속성 계층](/oss/python/langgraph/persistence)을 사용하여 저장되므로 실행을 안전하게 일시 중지하고 나중에 재개할 수 있습니다.
 
-The middleware defines three built-in ways a human can respond to an interrupt:
+그런 다음 사람의 결정이 다음에 발생할 일을 결정합니다: 작업을 그대로 승인(`approve`)하거나, 실행 전에 수정(`edit`)하거나, 피드백과 함께 거부(`reject`)할 수 있습니다.
 
-| Decision Type | Description                                                               | Example Use Case                                    |
+## Interrupt 결정 유형
+
+Middleware는 사람이 interrupt에 응답할 수 있는 세 가지 내장 방법을 정의합니다:
+
+| 결정 유형 | 설명                                                               | 사용 사례 예                                    |
 |---------------|---------------------------------------------------------------------------|-----------------------------------------------------|
-| ✅ `approve`   | The action is approved as-is and executed without changes.                | Send an email draft exactly as written              |
-| ✏️ `edit`     | The tool call is executed with modifications.                             | Change the recipient before sending an email        |
-| ❌ `reject`    | The tool call is rejected, with an explanation added to the conversation. | Reject an email draft and explain how to rewrite it |
+| ✅ `approve`   | 작업이 그대로 승인되고 변경 없이 실행됩니다.                | 작성된 대로 정확히 이메일 전송              |
+| ✏️ `edit`     | 도구 호출이 수정과 함께 실행됩니다.                             | 이메일을 보내기 전에 수신자 변경        |
+| ❌ `reject`    | 도구 호출이 거부되고 설명이 대화에 추가됩니다. | 이메일 초안을 거부하고 다시 작성하는 방법 설명 |
 
-The available decision types for each tool depend on the policy you configure in `interrupt_on`.
-When multiple tool calls are paused at the same time, each action requires a separate decision.
-Decisions must be provided in the same order as the actions appear in the interrupt request.
+각 도구에 사용 가능한 결정 유형은 `interrupt_on`에서 구성하는 정책에 따라 다릅니다.
+여러 도구 호출이 동시에 일시 중지되면 각 작업에는 별도의 결정이 필요합니다.
+결정은 interrupt 요청에 나타나는 작업과 동일한 순서로 제공되어야 합니다.
 
 <Tip>
-When **editing** tool arguments, make changes conservatively. Significant modifications to the original arguments may cause the model to re-evaluate its approach and potentially execute the tool multiple times or take unexpected actions.
+도구 인수를 **편집**할 때는 신중하게 변경하세요. 원래 인수를 크게 수정하면 모델이 접근 방식을 재평가하여 도구를 여러 번 실행하거나 예상치 못한 작업을 수행할 수 있습니다.
 </Tip>
 
 
-## Configuring interrupts
+## Interrupt 구성
 
-To use HITL, add the middleware to the agent’s `middleware` list when creating the agent.
+HITL을 사용하려면 agent를 생성할 때 agent의 `middleware` 목록에 middleware를 추가하세요.
 
-You configure it with a mapping of tool actions to the decision types that are allowed for each action. The middleware will interrupt execution when a tool call matches an action in the mapping.
+각 작업에 허용되는 결정 유형에 대한 도구 작업 매핑으로 구성합니다. Middleware는 도구 호출이 매핑의 작업과 일치할 때 실행을 중단합니다.
 
 ```python
 from langchain.agents import create_agent
@@ -49,19 +52,19 @@ agent = create_agent(
     middleware=[
         HumanInTheLoopMiddleware( # [!code highlight]
             interrupt_on={
-                "write_file": True,  # All decisions (approve, edit, reject) allowed
-                "execute_sql": {"allowed_decisions": ["approve", "reject"]},  # No editing allowed
-                # Safe operation, no approval needed
+                "write_file": True,  # 모든 결정 (승인, 편집, 거부) 허용
+                "execute_sql": {"allowed_decisions": ["approve", "reject"]},  # 편집 불가
+                # 안전한 작업, 승인 불필요
                 "read_data": False,
             },
-            # Prefix for interrupt messages - combined with tool name and args to form the full message
-            # e.g., "Tool execution pending approval: execute_sql with query='DELETE FROM...'"
-            # Individual tools can override this by specifying a "description" in their interrupt config
+            # Interrupt 메시지의 접두사 - 도구 이름 및 인수와 결합하여 전체 메시지 생성
+            # 예: "Tool execution pending approval: execute_sql with query='DELETE FROM...'"
+            # 개별 도구는 interrupt 구성에서 "description"을 지정하여 이를 재정의할 수 있습니다
             description_prefix="Tool execution pending approval",
         ),
     ],
-    # Human-in-the-loop requires checkpointing to handle interrupts.
-    # In production, use a persistent checkpointer like AsyncPostgresSaver.
+    # Human-in-the-loop은 interrupt를 처리하기 위해 체크포인팅이 필요합니다.
+    # 프로덕션에서는 AsyncPostgresSaver와 같은 영구 checkpointer를 사용하세요.
     checkpointer=InMemorySaver(),  # [!code highlight]
 )
 ```
@@ -71,27 +74,27 @@ agent = create_agent(
 
 
 <Info>
-    You must configure a checkpointer to persist the graph state across interrupts.
-    In production, use a persistent checkpointer like [AsyncPostgresSaver](https://langchain-ai.github.io/langgraph/reference/checkpoints/#langgraph.checkpoint.postgres.aio.AsyncPostgresSaver). For testing or prototyping, use [InMemorySaver](https://langchain-ai.github.io/langgraph/reference/checkpoints/#langgraph.checkpoint.memory.InMemorySaver).
+    Interrupt 간에 그래프 state를 유지하려면 checkpointer를 구성해야 합니다.
+    프로덕션에서는 [`AsyncPostgresSaver`](https://langchain-ai.github.io/langgraph/reference/checkpoints/#langgraph.checkpoint.postgres.aio.AsyncPostgresSaver)와 같은 영구 checkpointer를 사용하세요. 테스트 또는 프로토타이핑의 경우 [`InMemorySaver`](https://langchain-ai.github.io/langgraph/reference/checkpoints/#langgraph.checkpoint.memory.InMemorySaver)를 사용하세요.
 
-    When invoking the agent, pass a `config` that includes the **thread ID** to associate execution with a conversation thread.
-    See the [LangGraph interrupts documentation](/oss/python/langgraph/interrupts) for details.
+    Agent를 호출할 때 대화 스레드와 실행을 연결하는 **스레드 ID**를 포함하는 `config`를 전달하세요.
+    자세한 내용은 [LangGraph interrupt 문서](/oss/python/langgraph/interrupts)를 참조하세요.
 </Info>
 
 
-## Responding to interrupts
+## Interrupt에 응답
 
-When you invoke the agent, it runs until it either completes or an interrupt is raised. An interrupt is triggered when a tool call matches the policy you configured in `interrupt_on`. In that case, the invocation result will include an `__interrupt__` field with the actions that require review. You can then present those actions to a reviewer and resume execution once decisions are provided.
+Agent를 호출하면 완료되거나 interrupt가 발생할 때까지 실행됩니다. Interrupt는 도구 호출이 `interrupt_on`에서 구성한 정책과 일치할 때 트리거됩니다. 이 경우 호출 결과에는 검토가 필요한 작업과 함께 `__interrupt__` 필드가 포함됩니다. 그런 다음 해당 작업을 검토자에게 제시하고 결정이 제공되면 실행을 재개할 수 있습니다.
 
 
 ```python
 from langgraph.types import Command
 
-# Human-in-the-loop leverages LangGraph's persistence layer.
-# You must provide a thread ID to associate the execution with a conversation thread,
-# so the conversation can be paused and resumed (as is needed for human review).
+# Human-in-the-loop은 LangGraph의 지속성 계층을 활용합니다.
+# 대화 스레드와 실행을 연결하기 위해 스레드 ID를 제공해야 합니다.
+# 이렇게 하면 대화를 일시 중지하고 재개할 수 있습니다 (사람의 검토에 필요함).
 config = {"configurable": {"thread_id": "some_id"}} # [!code highlight]
-# Run the graph until the interrupt is hit.
+# Interrupt가 발생할 때까지 그래프를 실행합니다.
 result = agent.invoke(
     {
         "messages": [
@@ -104,7 +107,7 @@ result = agent.invoke(
     config=config # [!code highlight]
 )
 
-# The interrupt contains the full HITL request with action_requests and review_configs
+# Interrupt에는 action_requests 및 review_configs가 포함된 전체 HITL 요청이 포함됩니다
 print(result['__interrupt__'])
 # > [
 # >    Interrupt(
@@ -127,30 +130,29 @@ print(result['__interrupt__'])
 # > ]
 
 
-# Resume with approval decision
+# 승인 결정으로 재개
 agent.invoke(
     Command( # [!code highlight]
-        resume={"decisions": [{"type": "approve"}]}  # or "edit", "reject" [!code highlight]
+        resume={"decisions": [{"type": "approve"}]}  # 또는 "edit", "reject" [!code highlight]
     ), # [!code highlight]
-    config=config # Same thread ID to resume the paused conversation
+    config=config # 일시 중지된 대화를 재개하려면 동일한 스레드 ID
 )
 ```
 
 
 
 
-### Decision types
+### 결정 유형
 
 <Tabs>
 <Tab title="✅ approve">
-Use `approve` to approve the tool call as-is and execute it without changes.
+도구 호출을 그대로 승인하고 변경 없이 실행하려면 `approve`를 사용하세요.
 
 ```python
 agent.invoke(
     Command(
-        # Decisions are provided as a list, one per action under review.
-        # The order of decisions must match the order of actions
-        # listed in the `__interrupt__` request.
+        # 결정은 목록으로 제공되며, 검토 중인 작업당 하나입니다.
+        # 결정의 순서는 `__interrupt__` 요청에 나열된 작업의 순서와 일치해야 합니다.
         resume={
             "decisions": [
                 {
@@ -159,7 +161,7 @@ agent.invoke(
             ]
         }
     ),
-    config=config  # Same thread ID to resume the paused conversation
+    config=config  # 일시 중지된 대화를 재개하려면 동일한 스레드 ID
 )
 ```
 
@@ -167,32 +169,31 @@ agent.invoke(
 
 </Tab>
 <Tab title="✏️ edit">
-    Use `edit` to modify the tool call before execution.
-    Provide the edited action with the new tool name and arguments.
+    실행 전에 도구 호출을 수정하려면 `edit`를 사용하세요.
+    새 도구 이름과 인수로 편집된 작업을 제공하세요.
 
     ```python
     agent.invoke(
         Command(
-            # Decisions are provided as a list, one per action under review.
-            # The order of decisions must match the order of actions
-            # listed in the `__interrupt__` request.
+            # 결정은 목록으로 제공되며, 검토 중인 작업당 하나입니다.
+            # 결정의 순서는 `__interrupt__` 요청에 나열된 작업의 순서와 일치해야 합니다.
             resume={
                 "decisions": [
                     {
                         "type": "edit",
-                        # Edited action with tool name and args
+                        # 도구 이름과 인수가 포함된 편집된 작업
                         "edited_action": {
-                            # Tool name to call.
-                            # Will usually be the same as the original action.
+                            # 호출할 도구 이름.
+                            # 일반적으로 원래 작업과 동일합니다.
                             "name": "new_tool_name",
-                            # Arguments to pass to the tool.
+                            # 도구에 전달할 인수.
                             "args": {"key1": "new_value", "key2": "original_value"},
                         }
                     }
                 ]
             }
         ),
-        config=config  # Same thread ID to resume the paused conversation
+        config=config  # 일시 중지된 대화를 재개하려면 동일한 스레드 ID
     )
     ```
 
@@ -200,44 +201,43 @@ agent.invoke(
 
 
     <Tip>
-        When **editing** tool arguments, make changes conservatively. Significant modifications to the original arguments may cause the model to re-evaluate its approach and potentially execute the tool multiple times or take unexpected actions.
+        도구 인수를 **편집**할 때는 신중하게 변경하세요. 원래 인수를 크게 수정하면 모델이 접근 방식을 재평가하여 도구를 여러 번 실행하거나 예상치 못한 작업을 수행할 수 있습니다.
     </Tip>
 
 </Tab>
 
 <Tab title="❌ reject">
-    Use `reject` to reject the tool call and provide feedback instead of execution.
+    도구 호출을 거부하고 실행 대신 피드백을 제공하려면 `reject`를 사용하세요.
 
     ```python
     agent.invoke(
         Command(
-            # Decisions are provided as a list, one per action under review.
-            # The order of decisions must match the order of actions
-            # listed in the `__interrupt__` request.
+            # 결정은 목록으로 제공되며, 검토 중인 작업당 하나입니다.
+            # 결정의 순서는 `__interrupt__` 요청에 나열된 작업의 순서와 일치해야 합니다.
             resume={
                 "decisions": [
                     {
                         "type": "reject",
-                        # An explanation about why the action was rejected
+                        # 작업이 거부된 이유에 대한 설명
                         "message": "No, this is wrong because ..., instead do this ...",
                     }
                 ]
             }
         ),
-        config=config  # Same thread ID to resume the paused conversation
+        config=config  # 일시 중지된 대화를 재개하려면 동일한 스레드 ID
     )
     ```
 
 
 
 
-The `message` is added to the conversation as feedback to help the agent understand why the action was rejected and what it should do instead.
+`message`는 agent가 작업이 거부된 이유와 대신 무엇을 해야 하는지 이해하는 데 도움이 되도록 대화에 피드백으로 추가됩니다.
 
 ---
 
-### Multiple decisions
+### 여러 결정
 
-When multiple actions are under review, provide a decision for each action in the same order as they appear in the interrupt:
+여러 작업이 검토 중일 때 interrupt에 나타나는 순서와 동일한 순서로 각 작업에 대한 결정을 제공하세요:
 
 ```python
 {
@@ -265,23 +265,23 @@ When multiple actions are under review, provide a decision for each action in th
 </Tabs>
 
 
-## Execution lifecycle
+## 실행 생명주기
 
-The middleware defines an `after_model` hook that runs after the model generates a response but before any tool calls are executed:
+Middleware는 모델이 응답을 생성한 후 도구 호출이 실행되기 전에 실행되는 `after_model` 훅을 정의합니다:
 
-1. The agent invokes the model to generate a response.
-2. The middleware inspects the response for tool calls.
-3. If any calls require human input, the middleware builds a `HITLRequest` with `action_requests` and `review_configs` and calls [interrupt](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.interrupt).
-4. The agent waits for human decisions.
-5. Based on the `HITLResponse` decisions, the middleware executes approved or edited calls, synthesizes [ToolMessage](https://reference.langchain.com/python/langchain/messages/#langchain.messages.ToolMessage)'s for rejected calls, and resumes execution.
+1. Agent가 모델을 호출하여 응답을 생성합니다.
+2. Middleware가 응답에서 도구 호출을 검사합니다.
+3. 호출 중 사람의 입력이 필요한 경우 middleware는 `action_requests` 및 `review_configs`가 포함된 `HITLRequest`를 구축하고 [interrupt](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.interrupt)를 호출합니다.
+4. Agent는 사람의 결정을 기다립니다.
+5. `HITLResponse` 결정에 따라 middleware는 승인되거나 편집된 호출을 실행하고, 거부된 호출에 대한 [ToolMessage](https://reference.langchain.com/python/langchain/messages/#langchain.messages.ToolMessage)를 합성하고, 실행을 재개합니다.
 
 
 
-## Custom HITL logic
+## 사용자 정의 HITL 로직
 
-For more specialized workflows, you can build custom HITL logic directly using the [interrupt](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.interrupt) primitive and [middleware](/oss/python/langchain/middleware) abstraction.
+더 전문화된 워크플로우의 경우 [interrupt](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.interrupt) primitive와 [middleware](/oss/python/langchain/middleware) 추상화를 직접 사용하여 사용자 정의 HITL 로직을 구축할 수 있습니다.
 
-Review the [execution lifecycle](#execution-lifecycle) above to understand how to integrate interrupts into the agent's operation.
+Interrupt를 agent의 작업에 통합하는 방법을 이해하려면 위의 [실행 생명주기](#실행-생명주기)를 검토하세요.
 
 ---
 

@@ -1,101 +1,104 @@
 ---
-title: Context engineering in agents
+title: Agent의 Context Engineering
 sidebarTitle: Context engineering
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
-
-The hard part of building agents (or any LLM application) is making them reliable enough.
-While they may work for a prototype, they often mess up in more real world and widespread use cases.
-
-Why do they mess up?
-
-When agents mess up, it is because the LLM call inside the agent messes up.
-When LLMs mess up, they mess up for one of two reasons:
-
-1. The underlying LLM is just not good enough
-2. The "right" context was not passed to the LLM
-
-More often than not - it is actually the second reason that causes agents to not be reliable.
-
-Context engineering is building dynamic systems to provide the right information and tools in the right format such that the LLM can plausibly accomplish the task.
-This is the number one job of AI Engineers (or anyone working on AI systems).
-This lack of "right" context is the number one blocker for more reliable agents, and as such LangChain's agent abstractions are uniquely designed to facilitate context engineering.
-
-## The core agent loop
-
-It's important to understand the core agent loop to understand where context should be accessed and/or updated from.
-
-The core agent loop is quite simple:
-1. Get user input
-2. Call LLM, asking it to either respond or call tools
-3. If it decides to call tools - then go and execute those tools
-4. Repeat steps 2 and 3 until it decides to finish
-
-The agent may have access to a lot of different context throughout this loop.
-What ultimately matters is the context that is ultimately passed to the LLM.
-This consists of the final prompt (or list of messages) and the tools it has access to.
-
-## The model
-
-The model (including specific model parameters) that you use is a key part of the agent loop.
-It drives the whole agent's reasoning logic.
-
-One reason the agent could mess up is the model you are using is just not good enough.
-In order to build reliable agents, you have to have access to all the possible models.
-LangChain, with its standard model interfaces, supports this - we have over 50 different provider integrations.
-
-Model choice is also related to context engineering, in two ways.
-
-First, the way you pass the context to the LLM may depend on what LLM you are using.
-Some model providers are better at JSON, some at XML.
-The context engineering you do may be specific to the model choice.
-
-Second, the right model to use in the agent loop may depend on the context you want to pass it.
-As an obvious example - some models have different context windows.
-If the context in an agent builds up, you may want to use one model provider while the context is small, and then once it gets too large for that model's context window you may want to switch to another model.
-
-## Types of context
-
-There are a few different types of context that can be used to construct the context that is ultimately passed to the LLM.
-
-**Instructions:** Base instructions from the developer, commonly referred to as the system prompt.
-This may be static or dynamic.
-
-**Tools:** What tools the agent has access to.
-The names and descriptions and arguments of these are just as important as the text in the prompt.
-
-**Structured output:** What format the agent should respond in.
-The name and description and arguments of these are just as important as the text in the prompt.
+<AlphaCalloutPy />
 
 
-**Session context:** We also call this "short term memory" in the docs.
-In the context of a conversation, this is most easily thought of the list of messages that make up the conversation.
-But there can often be other, more structured information that you may want the agent to access or update throughout the session.
-The agent can read and write this context.
-This context is often put directly into the context that is passed to the LLM.
-Examples include: messages, files.
 
-**Long term memory:** This is information that should persist across sessions (conversations).
-Examples include: extracted preferences
+Agent(또는 모든 LLM 애플리케이션)를 구축할 때 어려운 부분은 충분히 신뢰할 수 있게 만드는 것입니다.
+프로토타입에서는 작동할 수 있지만 더 실제 세계와 광범위한 사용 사례에서는 종종 실패합니다.
 
-**Runtime configuration context:** This is context that is not the "state" or "memory" of the agent, but rather configuration for a given agent run.
-This is not modified by the agent, and typically isn't passed into the LLM, but is used to guide the agent's behavior or look up other context.
-Examples include: user ID, DB connections
+왜 실패할까요?
+
+Agent가 실패하는 것은 agent 내부의 LLM 호출이 실패하기 때문입니다.
+LLM이 실패할 때 다음 두 가지 이유 중 하나 때문에 실패합니다:
+
+1. 기본 LLM이 충분히 좋지 않음
+2. "올바른" 컨텍스트가 LLM에 전달되지 않음
+
+더 자주 발생하는 것은 실제로 agent가 신뢰할 수 없게 만드는 두 번째 이유입니다.
+
+Context engineering은 LLM이 작업을 그럴듯하게 수행할 수 있도록 올바른 정보와 도구를 올바른 형식으로 제공하는 동적 시스템을 구축하는 것입니다.
+이것은 AI 엔지니어(또는 AI 시스템 작업을 하는 모든 사람)의 가장 중요한 일입니다.
+이러한 "올바른" 컨텍스트의 부족이 더 신뢰할 수 있는 agent의 가장 큰 장애물이며, 따라서 LangChain의 agent 추상화는 context engineering을 촉진하도록 고유하게 설계되었습니다.
+
+## 핵심 agent 루프
+
+컨텍스트가 어디에서 액세스되거나 업데이트되어야 하는지 이해하려면 핵심 agent 루프를 이해하는 것이 중요합니다.
+
+핵심 agent 루프는 매우 간단합니다:
+1. 사용자 입력 받기
+2. LLM을 호출하여 응답하거나 도구를 호출하도록 요청
+3. 도구를 호출하기로 결정하면 해당 도구를 실행
+4. 완료하기로 결정할 때까지 2단계와 3단계를 반복
+
+Agent는 이 루프 전체에서 많은 다양한 컨텍스트에 액세스할 수 있습니다.
+궁극적으로 중요한 것은 LLM에 최종적으로 전달되는 컨텍스트입니다.
+이것은 최종 프롬프트(또는 메시지 목록)와 액세스할 수 있는 도구로 구성됩니다.
+
+## Model
+
+Model(특정 모델 매개변수 포함)은 agent 루프의 핵심 부분입니다.
+전체 agent의 추론 로직을 구동합니다.
+
+Agent가 실패할 수 있는 한 가지 이유는 사용하는 모델이 충분히 좋지 않기 때문입니다.
+신뢰할 수 있는 agent를 구축하려면 모든 가능한 모델에 액세스할 수 있어야 합니다.
+LangChain은 표준 모델 인터페이스를 통해 이를 지원합니다. 50개 이상의 다양한 provider 통합이 있습니다.
+
+모델 선택은 또한 두 가지 방식으로 context engineering과 관련이 있습니다.
+
+첫째, LLM에 컨텍스트를 전달하는 방식은 사용 중인 LLM에 따라 달라질 수 있습니다.
+일부 모델 provider는 JSON에 더 능숙하고 일부는 XML에 더 능숙합니다.
+수행하는 context engineering은 모델 선택에 따라 다를 수 있습니다.
+
+둘째, agent 루프에서 사용할 올바른 모델은 전달하려는 컨텍스트에 따라 달라질 수 있습니다.
+명백한 예로 일부 모델은 다른 컨텍스트 윈도우를 가지고 있습니다.
+Agent의 컨텍스트가 증가하는 경우 컨텍스트가 작을 때는 한 모델 provider를 사용하다가 해당 모델의 컨텍스트 윈도우에 비해 너무 커지면 다른 모델로 전환할 수 있습니다.
+
+## 컨텍스트 유형
+
+궁극적으로 LLM에 전달되는 컨텍스트를 구성하는 데 사용할 수 있는 몇 가지 다른 유형의 컨텍스트가 있습니다.
+
+**지시사항(Instructions):** 개발자의 기본 지시사항으로, 일반적으로 시스템 프롬프트라고 합니다.
+이것은 정적이거나 동적일 수 있습니다.
+
+**도구(Tools):** Agent가 액세스할 수 있는 도구입니다.
+이것들의 이름, 설명 및 인수는 프롬프트의 텍스트만큼이나 중요합니다.
+
+**구조화된 출력(Structured output):** Agent가 응답해야 하는 형식입니다.
+이것들의 이름, 설명 및 인수는 프롬프트의 텍스트만큼이나 중요합니다.
 
 
-## Context engineering with LangChain
+**세션 컨텍스트(Session context):** 문서에서는 이것을 "단기 메모리"라고도 합니다.
+대화의 컨텍스트에서 이것은 대화를 구성하는 메시지 목록으로 가장 쉽게 생각할 수 있습니다.
+그러나 세션 전반에 걸쳐 agent가 액세스하거나 업데이트하려는 다른 더 구조화된 정보가 종종 있을 수 있습니다.
+Agent는 이 컨텍스트를 읽고 쓸 수 있습니다.
+이 컨텍스트는 종종 LLM에 전달되는 컨텍스트에 직접 포함됩니다.
+예: 메시지, 파일.
 
-Now we understand the basic agent loop, the importance of the model you use, and the different types of context that exist.
-Let's explore the concrete patterns LangChain provides for context engineering.
+**장기 메모리(Long term memory):** 세션(대화) 간에 지속되어야 하는 정보입니다.
+예: 추출된 기본 설정
 
-### Managing instructions (system prompts)
+**런타임 구성 컨텍스트(Runtime configuration context):** Agent의 "state" 또는 "memory"가 아니라 주어진 agent 실행에 대한 구성인 컨텍스트입니다.
+이것은 agent에 의해 수정되지 않으며 일반적으로 LLM에 전달되지 않지만 agent의 동작을 안내하거나 다른 컨텍스트를 조회하는 데 사용됩니다.
+예: 사용자 ID, DB 연결
 
-#### Static instructions
 
-For fixed instructions that don't change, use the `system_prompt` parameter:
+## LangChain을 사용한 Context engineering
+
+이제 기본 agent 루프, 사용하는 모델의 중요성 및 존재하는 다양한 유형의 컨텍스트를 이해했습니다.
+LangChain이 context engineering을 위해 제공하는 구체적인 패턴을 살펴보겠습니다.
+
+### 지시사항(시스템 프롬프트) 관리
+
+#### 정적 지시사항
+
+변경되지 않는 고정 지시사항의 경우 [`system_prompt`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent(system_prompt)) 매개변수를 사용하세요:
 
 ```python
 from langchain.agents import create_agent
@@ -110,9 +113,9 @@ agent = create_agent(
 
 
 
-#### Dynamic instructions
+#### 동적 지시사항
 
-For instructions that depend on context (user profile, preferences, session data), use the `@dynamic_prompt` middleware:
+컨텍스트(사용자 프로필, 기본 설정, 세션 데이터)에 따라 달라지는 지시사항의 경우 [`@dynamic_prompt`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.dynamic_prompt) middleware를 사용하세요:
 
 ```python
 from dataclasses import dataclass
@@ -125,14 +128,14 @@ class Context:
 
 @dynamic_prompt
 def personalized_prompt(request: ModelRequest) -> str:
-    # Access runtime context
+    # 런타임 컨텍스트 액세스
     user_id = request.runtime.context.user_id
 
-    # Look up user preferences from long-term memory
+    # 장기 메모리에서 사용자 기본 설정 조회
     store = request.runtime.store
     user_prefs = store.get(("users",), user_id)
 
-    # Access session state
+    # 세션 state 액세스
     message_count = len(request.state["messages"])
 
     base = "You are a helpful assistant."
@@ -153,7 +156,7 @@ agent = create_agent(
     context_schema=Context
 )
 
-# Use the agent with context
+# 컨텍스트와 함께 agent 사용
 result = agent.invoke(
     {"messages": [{"role": "user", "content": "Help me debug this code"}]},
     context=Context(user_id="user_123")
@@ -164,16 +167,16 @@ result = agent.invoke(
 
 
 <Tip>
-**When to use each:**
-- **Static prompts**: Base instructions that never change
-- **Dynamic prompts**: Personalization, A/B testing, context-dependent behavior
+**각각 사용할 시기:**
+- **정적 프롬프트**: 절대 변경되지 않는 기본 지시사항
+- **동적 프롬프트**: 개인화, A/B 테스트, 컨텍스트 종속 동작
 </Tip>
 
-### Managing conversation context (messages)
+### 대화 컨텍스트(메시지) 관리
 
-Long conversations can exceed context windows or degrade model performance. Use middleware to manage conversation history:
+긴 대화는 컨텍스트 윈도우를 초과하거나 모델 성능을 저하시킬 수 있습니다. Middleware를 사용하여 대화 히스토리를 관리하세요:
 
-#### Trimming messages
+#### 메시지 트리밍
 
 ```python
 from langchain.agents import create_agent
@@ -184,18 +187,18 @@ from langgraph.runtime import Runtime
 
 @before_model
 def trim_messages(state: AgentState, runtime: Runtime) -> dict | None:
-    """Keep only the most recent messages to stay within context window."""
+    """컨텍스트 윈도우 내에 유지하기 위해 가장 최근 메시지만 유지합니다."""
     messages = state["messages"]
 
     if len(messages) <= 10:
-        return None  # No trimming needed
+        return None  # 트리밍 불필요
 
-    # Keep system message + last 8 messages
+    # 시스템 메시지 + 마지막 8개 메시지 유지
     return {
         "messages": [
             RemoveMessage(id=REMOVE_ALL_MESSAGES),
-            messages[0],  # System message
-            *messages[-8:]  # Recent messages
+            messages[0],  # 시스템 메시지
+            *messages[-8:]  # 최근 메시지
         ]
     }
 
@@ -209,22 +212,18 @@ agent = create_agent(
 
 
 
-For more sophisticated message management, use the built-in [SummarizationMiddleware](/oss/python/langchain/middleware#summarization) which automatically summarizes old messages when approaching token limits.
+더 정교한 메시지 관리를 위해 토큰 제한에 접근할 때 오래된 메시지를 자동으로 요약하는 내장 [`SummarizationMiddleware`](/oss/python/langchain/middleware#summarization)를 사용하세요.
 
-See [Before model hook](/oss/python/langchain/agents#before-model-hook) for more examples.
+더 많은 예제는 [Before model hook](/oss/python/langchain/agents#before-model-hook)을 참조하세요.
 
-### Contextual tool execution
+### 컨텍스트 인식 도구 실행
 
-Tools can access runtime context, session state, and long-term memory to make context-aware decisions:
+도구는 런타임 컨텍스트, 세션 state 및 장기 메모리에 액세스하여 컨텍스트 인식 결정을 내릴 수 있습니다:
 
 ```python
 from dataclasses import dataclass
-from langchain.tools import tool
+from langchain.tools import tool, ToolRuntime
 from langchain.agents import create_agent
-from langgraph.runtime import get_runtime
-from langgraph.config import get_store
-from typing_extensions import Annotated
-from langchain.tools import InjectedState
 
 @dataclass
 class Context:
@@ -234,21 +233,20 @@ class Context:
 @tool
 def search_documents(
     query: str,
-    state: Annotated[dict, InjectedState]
+    runtime: ToolRuntime[Context]
 ) -> str:
-    """Search through documents."""
-    # Access runtime context for user-specific configuration
-    runtime = get_runtime(Context)
+    """문서를 검색합니다."""
+    # 사용자별 구성을 위한 런타임 컨텍스트 액세스
     user_id = runtime.context.user_id
 
-    # Access long-term memory for user preferences
+    # 사용자 기본 설정을 위한 장기 메모리 액세스
     store = runtime.store
     search_prefs = store.get(("preferences", user_id), "search")
 
-    # Access session state
-    conversation_history = state["messages"]
+    # 세션 state 액세스
+    conversation_history = runtime.state["messages"]
 
-    # Use all context to perform a better search
+    # 모든 컨텍스트를 사용하여 더 나은 검색 수행
     results = perform_search(query, user_id, search_prefs, conversation_history)
     return f"Found {len(results)} results: {results}"
 
@@ -260,11 +258,11 @@ agent = create_agent(
 ```
 
 
-See [Tools](/oss/python/langchain/tools) for comprehensive examples of accessing state, context, and memory in tools.
+도구에서 state, 컨텍스트 및 메모리에 액세스하는 포괄적인 예제는 [도구](/oss/python/langchain/tools)를 참조하세요.
 
-### Dynamic tool selection
+### 동적 도구 선택
 
-Control which tools the agent can access based on context, state, or user permissions:
+컨텍스트, state 또는 사용자 권한에 따라 agent가 액세스할 수 있는 도구를 제어하세요:
 
 ```python
 from langchain.agents import create_agent
@@ -276,17 +274,17 @@ def permission_based_tools(
     request: ModelRequest,
     handler: Callable[[ModelRequest], ModelResponse]
 ) -> ModelResponse:
-    """Filter tools based on user permissions."""
+    """사용자 권한에 따라 도구를 필터링합니다."""
     user_role = request.runtime.context.get("user_role", "viewer")
 
     if user_role == "admin":
-        # Admins get all tools
+        # 관리자는 모든 도구 사용 가능
         pass
     elif user_role == "editor":
-        # Editors can't delete
+        # 편집자는 삭제 불가
         request.tools = [t for t in request.tools if t.name != "delete_data"]
     else:
-        # Viewers get read-only tools
+        # 뷰어는 읽기 전용 도구만 사용 가능
         request.tools = [t for t in request.tools if t.name.startswith("read_")]
 
     return handler(request)
@@ -301,11 +299,11 @@ agent = create_agent(
 
 
 
-See [Dynamically selecting tools](/oss/python/langchain/middleware#dynamically-selecting-tools) for more examples.
+더 많은 예제는 [동적으로 도구 선택](/oss/python/langchain/middleware#dynamically-selecting-tools)을 참조하세요.
 
-### Dynamic model selection
+### 동적 모델 선택
 
-Switch models based on conversation complexity, context window needs, or cost optimization:
+대화 복잡도, 컨텍스트 윈도우 요구사항 또는 비용 최적화를 기반으로 모델을 전환하세요:
 
 ```python
 from langchain.agents import create_agent
@@ -318,23 +316,23 @@ def adaptive_model(
     request: ModelRequest,
     handler: Callable[[ModelRequest], ModelResponse]
 ) -> ModelResponse:
-    """Use different models based on conversation length."""
+    """대화 길이에 따라 다른 모델을 사용합니다."""
     message_count = len(request.messages)
 
     if message_count > 20:
-        # Long conversation - use model with larger context window
+        # 긴 대화 - 더 큰 컨텍스트 윈도우를 가진 모델 사용
         request.model = init_chat_model("anthropic:claude-sonnet-4-5-20250929")
     elif message_count > 10:
-        # Medium conversation - use mid-tier model
+        # 중간 대화 - 중급 모델 사용
         request.model = init_chat_model("openai:gpt-4o")
     else:
-        # Short conversation - use efficient model
+        # 짧은 대화 - 효율적인 모델 사용
         request.model = init_chat_model("openai:gpt-4o-mini")
 
     return handler(request)
 
 agent = create_agent(
-    model="openai:gpt-4o-mini",  # Default model
+    model="openai:gpt-4o-mini",  # 기본 모델
     tools=[...],
     middleware=[adaptive_model]
 )
@@ -343,22 +341,22 @@ agent = create_agent(
 
 
 
-See [Dynamic model](/oss/python/langchain/agents#dynamic-model) for more examples.
+더 많은 예제는 [동적 모델](/oss/python/langchain/agents#dynamic-model)을 참조하세요.
 
-## Best practices
+## 모범 사례
 
-1. **Start simple** - Begin with static prompts and tools, add dynamics only when needed
-2. **Test incrementally** - Add one context engineering feature at a time
-3. **Monitor performance** - Track model calls, token usage, and latency
-4. **Use built-in middleware** - Leverage [SummarizationMiddleware](/oss/python/langchain/middleware#summarization), [LLMToolSelectorMiddleware](/oss/python/langchain/middleware#llm-tool-selector), etc.
-5. **Document your context strategy** - Make it clear what context is being passed and why
+1. **간단하게 시작** - 정적 프롬프트와 도구로 시작하고 필요할 때만 동적 기능을 추가하세요
+2. **점진적으로 테스트** - 한 번에 하나의 context engineering 기능을 추가하세요
+3. **성능 모니터링** - 모델 호출, 토큰 사용량 및 지연 시간을 추적하세요
+4. **내장 middleware 사용** - [`SummarizationMiddleware`](/oss/python/langchain/middleware#summarization), [`LLMToolSelectorMiddleware`](/oss/python/langchain/middleware#llm-tool-selector) 등을 활용하세요
+5. **컨텍스트 전략 문서화** - 어떤 컨텍스트가 전달되고 있는지 그리고 왜 그런지 명확하게 하세요
 
-## Related resources
+## 관련 리소스
 
-- [Middleware](/oss/python/langchain/middleware) - Complete middleware guide
-- [Tools](/oss/python/langchain/tools) - Tool creation and context access
-- [Memory](/oss/python/concepts/memory) - Short-term and long-term memory patterns
-- [Agents](/oss/python/langchain/agents) - Core agent concepts
+- [Middleware](/oss/python/langchain/middleware) - 완전한 middleware 가이드
+- [도구](/oss/python/langchain/tools) - 도구 생성 및 컨텍스트 액세스
+- [Memory](/oss/python/concepts/memory) - 단기 및 장기 메모리 패턴
+- [Agent](/oss/python/langchain/agents) - 핵심 agent 개념
 
 ---
 

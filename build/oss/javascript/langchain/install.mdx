@@ -1,14 +1,17 @@
 ---
-title: Install LangChain
-sidebarTitle: Install
+title: LangChain 설치하기
+sidebarTitle: 설치
 mode: wide
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
 
-To install the LangChain package:
+<AlphaCalloutJS />
+
+
+LangChain 패키지를 설치하려면:
 
 
 
@@ -31,43 +34,43 @@ To install the LangChain package:
     </CodeGroup>
 
 
-LangChain provides integrations to hundreds of LLMs and thousands of other integrations. These live in independent provider packages. For example:
+LangChain은 수백 개의 LLM과 수천 개의 다른 통합을 제공합니다. 이러한 통합은 독립적인 프로바이더 패키지로 제공됩니다. 예를 들어:
 
 
 
 <CodeGroup>
     ```bash npm
-    # Installing the OpenAI integration
+    # OpenAI 통합 설치
     npm install @langchain/openai@next
-    # Installing the Anthropic integration
+    # Anthropic 통합 설치
     npm install @langchain/anthropic@next
     ```
 
     ```bash pnpm
-    # Installing the OpenAI integration
+    # OpenAI 통합 설치
     pnpm install @langchain/openai@next
-    # Installing the Anthropic integration
+    # Anthropic 통합 설치
     pnpm install @langchain/anthropic@next
     ```
 
     ```bash yarn
-    # Installing the OpenAI integration
+    # OpenAI 통합 설치
     yarn add @langchain/openai@next
-    # Installing the Anthropic integration
+    # Anthropic 통합 설치
     yarn add @langchain/anthropic@next
     ```
 
     ```bash bun
-    # Installing the OpenAI integration
+    # OpenAI 통합 설치
     bun add @langchain/openai@next
-    # Installing the Anthropic integration
+    # Anthropic 통합 설치
     bun add @langchain/anthropic@next
     ```
 </CodeGroup>
 
 
 <Tip>
-See the [Integrations tab](/oss/javascript/integrations/providers) for a full list of available integrations.
+사용 가능한 통합의 전체 목록은 [통합 탭](/oss/javascript/integrations/providers/overview)을 참조하세요.
 </Tip>
 
 ---

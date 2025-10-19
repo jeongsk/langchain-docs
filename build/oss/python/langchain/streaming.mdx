@@ -1,44 +1,47 @@
 ---
-title: Streaming
+title: 스트리밍
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
-
-LangChain implements a streaming system to surface real-time updates.
-
-Streaming is crucial for enhancing the responsiveness of applications built on LLMs. By displaying output progressively, even before a complete response is ready, streaming significantly improves user experience (UX), particularly when dealing with the latency of LLMs.
-
-## Overview
-
-LangChain's streaming system lets you surface live feedback from agent runs to your application.
-
-What's possible with LangChain streaming:
-
-* <Icon icon="brain" size={16} /> [**Stream agent progress**](#agent-progress) — get state updates after each agent step.
-* <Icon icon="square-binary" size={16} /> [**Stream LLM tokens**](#llm-tokens) — stream language model tokens as they're generated.
-* <Icon icon="table" size={16} /> [**Stream custom updates**](#custom-updates) — emit user-defined signals (e.g., `"Fetched 10/100 records"`).
-* <Icon icon="layer-plus" size={16} /> [**Stream multiple modes**](#stream-multiple-modes) — choose from `updates` (agent progress), `messages` (LLM tokens + metadata), or `custom` (arbitrary user data).
-
-## Agent progress
-
-To stream agent progress, use the [`stream()`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.stream) or [`astream()`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.astream) methods with `stream_mode="updates"`. This emits an event after every agent step.
+<AlphaCalloutPy />
 
 
 
+LangChain은 실시간 업데이트를 표시하기 위한 스트리밍 시스템을 구현합니다.
 
-For example, if you have an agent that calls a tool once, you should see the following updates:
+스트리밍은 LLM 기반 애플리케이션의 응답성을 향상시키는 데 필수적입니다. 완전한 응답이 준비되기 전에도 출력을 점진적으로 표시함으로써, 스트리밍은 특히 LLM의 지연 시간을 처리할 때 사용자 경험(UX)을 크게 개선합니다.
 
-* **LLM node**: AI message with tool call requests
-* **Tool node**: Tool message with execution result
-* **LLM node**: Final AI response
+## 개요
 
-```python title="Streaming agent progress"
+LangChain의 스트리밍 시스템을 사용하면 에이전트 실행으로부터 실시간 피드백을 애플리케이션에 표시할 수 있습니다.
+
+LangChain 스트리밍으로 가능한 작업:
+
+* <Icon icon="brain" size={16} /> [**에이전트 진행 상황 스트리밍**](#agent-progress) — 각 에이전트 단계 후 상태 업데이트를 받습니다.
+* <Icon icon="square-binary" size={16} /> [**LLM 토큰 스트리밍**](#llm-tokens) — 언어 모델 토큰이 생성되는 대로 스트리밍합니다.
+* <Icon icon="table" size={16} /> [**사용자 정의 업데이트 스트리밍**](#custom-updates) — 사용자 정의 신호를 방출합니다 (예: \`"100개 중 10개 레코드 가져옴"\`).
+* <Icon icon="layer-plus" size={16} /> [**여러 모드 스트리밍**](#stream-multiple-modes) — \`updates\`(에이전트 진행 상황), \`messages\`(LLM 토큰 + 메타데이터), 또는 \`custom\`(임의의 사용자 데이터) 중에서 선택합니다.
+
+## 에이전트 진행 상황
+
+에이전트 진행 상황을 스트리밍하려면 \`stream_mode="updates"\`와 함께 [\`stream()\`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.stream) 또는 [\`astream()\`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.astream) 메서드를 사용하십시오. 이렇게 하면 모든 에이전트 단계 후에 이벤트가 방출됩니다.
+
+
+
+
+예를 들어, 도구를 한 번 호출하는 에이전트가 있다면 다음 업데이트를 볼 수 있습니다:
+
+* **LLM 노드**: 도구 호출 요청이 포함된 @[\`AIMessage\`]
+* **도구 노드**: 실행 결과가 포함된 @[\`ToolMessage\`]
+* **LLM 노드**: 최종 AI 응답
+
+\`\`\`python title="에이전트 진행 상황 스트리밍"
 from langchain.agents import create_agent
 
 def get_weather(city: str) -> str:
-    """Get weather for a given city."""
+    """주어진 도시의 날씨를 가져옵니다."""
 
     return f"It's always sunny in {city}!"
 
@@ -53,9 +56,9 @@ for chunk in agent.stream(  # [!code highlight]
     for step, data in chunk.items():
         print(f"step: {step}")
         print(f"content: {data['messages'][-1].content_blocks}")
-```
+\`\`\`
 
-```shell title="Output"
+\`\`\`shell title="출력"
 step: model
 content: [{'type': 'tool_call', 'name': 'get_weather', 'args': {'city': 'San Francisco'}, 'id': 'call_OW2NYNsNSKhRZpjW0wm2Aszd'}]
 
@@ -64,20 +67,20 @@ content: [{'type': 'text', 'text': "It's always sunny in San Francisco!"}]
 
 step: model
 content: [{'type': 'text', 'text': 'It's always sunny in San Francisco!'}]
-```
+\`\`\`
 
 
 
 
-## LLM tokens
+## LLM 토큰
 
-To stream tokens as they are produced by the LLM, use `stream_mode="messages"`. Below you can see the output of the agent streaming tool calls and the final response.
+LLM이 생성하는 토큰을 스트리밍하려면 \`stream_mode="messages"\`를 사용하십시오. 아래에서 에이전트가 도구 호출과 최종 응답을 스트리밍하는 출력을 볼 수 있습니다.
 
-```python title="Streaming LLM tokens"
+\`\`\`python title="LLM 토큰 스트리밍"
 from langchain.agents import create_agent
 
 def get_weather(city: str) -> str:
-    """Get weather for a given city."""
+    """주어진 도시의 날씨를 가져옵니다."""
 
     return f"It's always sunny in {city}!"
 
@@ -92,9 +95,9 @@ for token, metadata in agent.stream(  # [!code highlight]
     print(f"node: {metadata['langgraph_node']}")
     print(f"content: {token.content_blocks}")
     print("\n")
-```
+\`\`\`
 
-```shell title="Output" expandable
+\`\`\`shell title="출력" expandable
 node: model
 content: [{'type': 'tool_call_chunk', 'id': 'call_vbCyBcP8VuneUzyYlSBZZsVa', 'name': 'get_weather', 'args': '', 'index': 0}]
 
@@ -189,29 +192,29 @@ content: [{'type': 'text', 'text': ' Francisco'}]
 
 node: model
 content: [{'type': 'text', 'text': '!"\n\n'}]
-```
+\`\`\`
 
 
 
 
-## Custom updates
+## 사용자 정의 업데이트
 
-To stream updates from tools as they are executed, you can use [get_stream_writer](https://reference.langchain.com/python/langgraph/config/#langgraph.config.get_stream_writer).
+도구가 실행될 때 도구로부터 업데이트를 스트리밍하려면 @[\`get_stream_writer\`]를 사용할 수 있습니다.
 
-```python title="Streaming custom updates"
+\`\`\`python title="사용자 정의 업데이트 스트리밍"
 from langchain.agents import create_agent
 from langgraph.config import get_stream_writer  # [!code highlight]
 
 def get_weather(city: str) -> str:
-    """Get weather for a given city."""
+    """주어진 도시의 날씨를 가져옵니다."""
     writer = get_stream_writer()  # [!code highlight]
-    # stream any arbitrary data
+    # 임의의 데이터를 스트리밍
     writer(f"Looking up data for city: {city}")
     writer(f"Acquired data for city: {city}")
     return f"It's always sunny in {city}!"
 
 agent = create_agent(
-    model="anthropic:claude-3-7-sonnet-latest",
+    model="anthropic:claude-sonnet-4-5-20250929",
     tools=[get_weather],
 )
 
@@ -220,30 +223,30 @@ for chunk in agent.stream(
     stream_mode="custom"  # [!code highlight]
 ):
     print(chunk)
-```
+\`\`\`
 
-```shell title="Output"
+\`\`\`shell title="출력"
 Looking up data for city: San Francisco
 Acquired data for city: San Francisco
-```
+\`\`\`
 
 <Note>
-    If you add `get_stream_writer` inside your tool, you won't be able to invoke the tool outside of a LangGraph execution context.
+    도구 내부에 @[\`get_stream_writer\`]를 추가하면 LangGraph 실행 컨텍스트 외부에서 도구를 호출할 수 없습니다.
 </Note>
 
 
 
 
-## Stream multiple modes
+## 여러 모드 스트리밍
 
-You can specify multiple streaming modes by passing stream mode as a list: `stream_mode=["updates", "custom"]`:
+스트림 모드를 목록으로 전달하여 여러 스트리밍 모드를 지정할 수 있습니다: \`stream_mode=["updates", "custom"]\`:
 
-```python title="Streaming multiple modes"
+\`\`\`python title="여러 모드 스트리밍"
 from langchain.agents import create_agent
 from langgraph.config import get_stream_writer
 
 def get_weather(city: str) -> str:
-    """Get weather for a given city."""
+    """주어진 도시의 날씨를 가져옵니다."""
     writer = get_stream_writer()
     writer(f"Looking up data for city: {city}")
     writer(f"Acquired data for city: {city}")
@@ -261,9 +264,9 @@ for stream_mode, chunk in agent.stream(  # [!code highlight]
     print(f"stream_mode: {stream_mode}")
     print(f"content: {chunk}")
     print("\n")
-```
+\`\`\`
 
-```shell title="Output"
+\`\`\`shell title="출력"
 stream_mode: updates
 content: {'model': {'messages': [AIMessage(content='', response_metadata={'token_usage': {'completion_tokens': 280, 'prompt_tokens': 132, 'total_tokens': 412, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 256, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_provider': 'openai', 'model_name': 'gpt-5-nano-2025-08-07', 'system_fingerprint': None, 'id': 'chatcmpl-C9tlgBzGEbedGYxZ0rTCz5F7OXpL7', 'service_tier': 'default', 'finish_reason': 'tool_calls', 'logprobs': None}, id='lc_run--480c07cb-e405-4411-aa7f-0520fddeed66-0', tool_calls=[{'name': 'get_weather', 'args': {'city': 'San Francisco'}, 'id': 'call_KTNQIftMrl9vgNwEfAJMVu7r', 'type': 'tool_call'}], usage_metadata={'input_tokens': 132, 'output_tokens': 280, 'total_tokens': 412, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 256}})]}}
 
@@ -282,18 +285,18 @@ content: {'tools': {'messages': [ToolMessage(content="It's always sunny in San F
 
 stream_mode: updates
 content: {'model': {'messages': [AIMessage(content='San Francisco weather: It's always sunny in San Francisco!\n\n', response_metadata={'token_usage': {'completion_tokens': 764, 'prompt_tokens': 168, 'total_tokens': 932, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 704, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_provider': 'openai', 'model_name': 'gpt-5-nano-2025-08-07', 'system_fingerprint': None, 'id': 'chatcmpl-C9tljDFVki1e1haCyikBptAuXuHYG', 'service_tier': 'default', 'finish_reason': 'stop', 'logprobs': None}, id='lc_run--acbc740a-18fe-4a14-8619-da92a0d0ee90-0', usage_metadata={'input_tokens': 168, 'output_tokens': 764, 'total_tokens': 932, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 704}})]}}
-```
+\`\`\`
 
 
 
 
-## Disable streaming
+## 스트리밍 비활성화
 
-In some applications you might need to disable streaming of individual tokens for a given model.
+일부 애플리케이션에서는 특정 모델에 대해 개별 토큰의 스트리밍을 비활성화해야 할 수 있습니다.
 
-This is useful in [multi-agent](/oss/python/langchain/multi-agent) systems to control which agents stream their output.
+이는 [멀티 에이전트](/oss/python/langchain/multi-agent) 시스템에서 어떤 에이전트가 출력을 스트리밍할지 제어하는 데 유용합니다.
 
-See the [Models](/oss/python/langchain/models#disable-streaming) guide to learn how to disable streaming.
+스트리밍을 비활성화하는 방법은 [모델](/oss/python/langchain/models#disable-streaming) 가이드를 참조하십시오.
 
 ---
 

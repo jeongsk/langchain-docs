@@ -1,44 +1,44 @@
 ---
-title: Build a SQL agent
-sidebarTitle: SQL agent
+title: SQL 에이전트 구축하기
+sidebarTitle: SQL 에이전트
 ---
 
 import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
 import ChatModelTabsJS from '/snippets/chat-model-tabs-js.mdx';
 
-## Overview
+## 개요
 
-In this tutorial, you will learn how to build an agent that can answer questions about a SQL database using LangChain [agents](/oss/javascript/langchain/agents).
+이 튜토리얼에서는 LangChain [에이전트](/oss/javascript/langchain/agents)를 사용하여 SQL 데이터베이스에 대한 질문에 답변할 수 있는 에이전트를 구축하는 방법을 배웁니다.
 
-At a high level, the agent will:
+높은 수준에서 에이전트는 다음을 수행합니다:
 
 <Steps>
-<Step title="Fetch the available tables and schemas from the database" />
-<Step title="Decide which tables are relevant to the question" />
-<Step title="Fetch the schemas for the relevant tables" />
-<Step title="Generate a query based on the question and information from the schemas" />
-<Step title="Double-check the query for common mistakes using an LLM" />
-<Step title="Execute the query and return the results" />
-<Step title="Correct mistakes surfaced by the database engine until the query is successful" />
-<Step title="Formulate a response based on the results" />
+<Step title="데이터베이스에서 사용 가능한 테이블과 스키마 가져오기" />
+<Step title="질문과 관련된 테이블 결정하기" />
+<Step title="관련 테이블의 스키마 가져오기" />
+<Step title="질문과 스키마 정보를 기반으로 쿼리 생성하기" />
+<Step title="LLM을 사용하여 일반적인 실수가 있는지 쿼리 재확인하기" />
+<Step title="쿼리 실행 및 결과 반환하기" />
+<Step title="쿼리가 성공할 때까지 데이터베이스 엔진에서 발생한 오류 수정하기" />
+<Step title="결과를 바탕으로 응답 작성하기" />
 </Steps>
 
 <Warning>
-Building Q&A systems of SQL databases requires executing model-generated SQL queries. There are inherent risks in doing this. Make sure that your database connection permissions are always scoped as narrowly as possible for your agent's needs. This will mitigate, though not eliminate, the risks of building a model-driven system.
+SQL 데이터베이스의 Q&A 시스템을 구축하려면 모델이 생성한 SQL 쿼리를 실행해야 합니다. 이에는 본질적인 위험이 있습니다. 데이터베이스 연결 권한이 항상 에이전트의 필요에 맞게 가능한 한 좁게 범위가 지정되어 있는지 확인하세요. 이는 모델 기반 시스템 구축의 위험을 완화하지만 제거하지는 못합니다.
 </Warning>
 
-### Concepts
+### 개념
 
-We will cover the following concepts:
+다음 개념을 다룰 것입니다:
 
-- [Tools](/oss/javascript/langchain/tools) for reading from SQL databases
-- LangChain [agents](/oss/javascript/langchain/agents)
-- [Human-in-the-loop](/oss/javascript/langchain/human-in-the-loop) processes
+- SQL 데이터베이스에서 읽기 위한 [도구](/oss/javascript/langchain/tools)
+- LangChain [에이전트](/oss/javascript/langchain/agents)
+- [휴먼 인 더 루프](/oss/javascript/langchain/human-in-the-loop) 프로세스
 
 
-## Setup
+## 설정
 
-### Installation
+### 설치
 
 
     <CodeGroup>
@@ -55,27 +55,27 @@ We will cover the following concepts:
 
 
 ### LangSmith
-Set up [LangSmith](https://smith.langchain.com) to inspect what is happening inside your chain or agent. Then set the following environment variables:
+체인이나 에이전트 내부에서 발생하는 일을 검사하려면 [LangSmith](https://smith.langchain.com)를 설정하세요. 그런 다음 다음 환경 변수를 설정하세요:
 
     ```shell
     export LANGSMITH_TRACING="true"
     export LANGSMITH_API_KEY="..."
     ```
 
-## 1. Select an LLM
+## 1. LLM 선택
 
 
-Select a model that supports [tool-calling](/oss/javascript/integrations/providers):
+[도구 호출](/oss/javascript/integrations/providers/overview)을 지원하는 모델을 선택하세요:
 <ChatModelTabsJS />
 
 
-The output shown in the examples below used OpenAI.
+아래 예제에 표시된 출력은 OpenAI를 사용했습니다.
 
-## 2. Configure the database
+## 2. 데이터베이스 구성
 
-You will be creating a [SQLite database](https://www.sqlitetutorial.net/sqlite-sample-database/) for this tutorial. SQLite is a lightweight database that is easy to set up and use. We will be loading the `chinook` database, which is a sample database that represents a digital media store.
+이 튜토리얼에서는 [SQLite 데이터베이스](https://www.sqlitetutorial.net/sqlite-sample-database/)를 생성할 것입니다. SQLite는 설정하고 사용하기 쉬운 경량 데이터베이스입니다. 디지털 미디어 스토어를 나타내는 샘플 데이터베이스인 `chinook` 데이터베이스를 로드할 것입니다.
 
-For convenience, we have hosted the database (`Chinook.db`) on a public GCS bucket.
+편의를 위해 공개 GCS 버킷에 데이터베이스(`Chinook.db`)를 호스팅했습니다.
 
 
 ```typescript
@@ -99,9 +99,9 @@ async function resolveDbPath() {
 
 
 
-## 3. Add tools for database interactions
+## 3. 데이터베이스 상호작용을 위한 도구 추가
 
-Use the `SqlDatabase` wrapper available in the `langchain/sql_db` to interact with the database. The wrapper provides a simple interface to execute SQL queries and fetch results:
+`langchain/sql_db`에서 제공하는 `SqlDatabase` 래퍼를 사용하여 데이터베이스와 상호작용합니다. 이 래퍼는 SQL 쿼리를 실행하고 결과를 가져오는 간단한 인터페이스를 제공합니다:
 ```typescript
 import { SqlDatabase } from "langchain/sql_db";
 import { DataSource } from "typeorm";

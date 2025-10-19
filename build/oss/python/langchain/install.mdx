@@ -1,14 +1,17 @@
 ---
-title: Install LangChain
-sidebarTitle: Install
+title: LangChain 설치하기
+sidebarTitle: 설치
 mode: wide
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
+<AlphaCalloutPy />
 
-To install the LangChain package:
+
+
+LangChain 패키지를 설치하려면:
 
 <CodeGroup>
     ```bash pip
@@ -23,21 +26,21 @@ To install the LangChain package:
 
 
 
-LangChain provides integrations to hundreds of LLMs and thousands of other integrations. These live in independent provider packages. For example:
+LangChain은 수백 개의 LLM과 수천 개의 다른 통합을 제공합니다. 이러한 통합은 독립적인 프로바이더 패키지로 제공됩니다. 예를 들어:
 
 <CodeGroup>
     ```bash pip
-    # Installing the OpenAI integration
+    # OpenAI 통합 설치
     pip install --pre -U langchain-openai
 
-    # Installing the Anthropic integration
+    # Anthropic 통합 설치
     pip install --pre -U langchain-anthropic
     ```
     ```bash uv
-    # Installing the OpenAI integration
+    # OpenAI 통합 설치
     uv add --prerelease=allow langchain-openai
 
-    # Installing the Anthropic integration
+    # Anthropic 통합 설치
     uv add --prerelease=allow langchain-anthropic
     ```
 </CodeGroup>
@@ -47,7 +50,7 @@ LangChain provides integrations to hundreds of LLMs and thousands of other integ
 
 
 <Tip>
-See the [Integrations tab](/oss/python/integrations/providers) for a full list of available integrations.
+사용 가능한 통합의 전체 목록은 [통합 탭](/oss/python/integrations/providers/overview)을 참조하세요.
 </Tip>
 
 ---

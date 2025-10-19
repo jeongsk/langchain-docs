@@ -1,34 +1,34 @@
 ---
-title: Long-term memory
+title: 장기 메모리
 ---
 
 import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
 <AlphaCallout />
 
-## Overview
+## 개요
 
-LangChain agents use [LangGraph persistence](/oss/python/langgraph/persistence#memory-store) to enable long-term memory. This is a more advanced topic and requires knowledge of LangGraph to use.
+LangChain 에이전트는 장기 메모리를 활성화하기 위해 [LangGraph 영속성](/oss/python/langgraph/persistence#memory-store)을 사용합니다. 이는 고급 주제이며 사용하려면 LangGraph에 대한 지식이 필요합니다.
 
 
-## Memory storage
+## 메모리 저장
 
-LangGraph stores long-term memories as JSON documents in a [store](/oss/python/langgraph/persistence#memory-store).
+LangGraph는 장기 메모리를 [스토어](/oss/python/langgraph/persistence#memory-store)에 JSON 문서로 저장합니다.
 
-Each memory is organized under a custom `namespace` (similar to a folder) and a distinct `key` (like a file name). Namespaces often include user or org IDs or other labels that makes it easier to organize information.
+각 메모리는 커스텀 `namespace`(폴더와 유사) 및 고유한 `key`(파일 이름과 유사) 아래에 구성됩니다. 네임스페이스는 종종 사용자 또는 조직 ID 또는 정보를 쉽게 구성할 수 있게 하는 다른 레이블을 포함합니다.
 
-This structure enables hierarchical organization of memories. Cross-namespace searching is then supported through content filters.
+이 구조는 메모리의 계층적 구성을 가능하게 합니다. 그런 다음 콘텐츠 필터를 통해 네임스페이스 간 검색이 지원됩니다.
 
 ```python
 from langgraph.store.memory import InMemoryStore
 
 
 def embed(texts: list[str]) -> list[list[float]]:
-    # Replace with an actual embedding function or LangChain embeddings object
+    # 실제 임베딩 함수 또는 LangChain 임베딩 객체로 교체하세요
     return [[1.0, 2.0] * len(texts)]
 
 
-# InMemoryStore saves data to an in-memory dictionary. Use a DB-backed store in production use.
+# InMemoryStore는 데이터를 인메모리 딕셔너리에 저장합니다. 프로덕션에서는 DB 기반 스토어를 사용하세요.
 store = InMemoryStore(index={"embed": embed, "dims": 2}) # [!code highlight]
 user_id = "my-user"
 application_context = "chitchat"
@@ -44,9 +44,9 @@ store.put( # [!code highlight]
         "my-key": "my-value",
     },
 )
-# get the "memory" by ID
+# ID로 "메모리" 가져오기
 item = store.get(namespace, "a-memory") # [!code highlight]
-# search for "memories" within this namespace, filtering on content equivalence, sorted by vector similarity
+# 이 네임스페이스 내에서 "메모리" 검색, 콘텐츠 동등성으로 필터링, 벡터 유사도로 정렬
 items = store.search( # [!code highlight]
     namespace, filter={"my-key": "my-value"}, query="language preferences"
 )
@@ -55,11 +55,11 @@ items = store.search( # [!code highlight]
 
 
 
-For more information about the memory store, see the [Persistence](/oss/python/langgraph/persistence#memory-store) guide.
+메모리 스토어에 대한 자세한 내용은 [영속성](/oss/python/langgraph/persistence#memory-store) 가이드를 참조하세요.
 
-## Read long-term memory in tools
+## 도구에서 장기 메모리 읽기
 
-```python A tool the agent can use to look up user information
+```python 에이전트가 사용자 정보를 조회하는 데 사용할 수 있는 도구
 from dataclasses import dataclass
 
 from langchain_core.runnables import RunnableConfig
@@ -71,38 +71,38 @@ from langgraph.store.memory import InMemoryStore
 class Context:
     user_id: str
 
-# InMemoryStore saves data to an in-memory dictionary. Use a DB-backed store in production.
+# InMemoryStore는 데이터를 인메모리 딕셔너리에 저장합니다. 프로덕션에서는 DB 기반 스토어를 사용하세요.
 store = InMemoryStore() # [!code highlight]
 
-# Write sample data to the store using the put method
+# put 메서드를 사용하여 스토어에 샘플 데이터 쓰기
 store.put( # [!code highlight]
-    ("users",),  # Namespace to group related data together (users namespace for user data)
-    "user_123",  # Key within the namespace (user ID as key)
+    ("users",),  # 관련 데이터를 그룹화하는 네임스페이스(사용자 데이터를 위한 users 네임스페이스)
+    "user_123",  # 네임스페이스 내의 키(사용자 ID를 키로 사용)
     {
         "name": "John Smith",
         "language": "English",
-    }  # Data to store for the given user
+    }  # 주어진 사용자에 대해 저장할 데이터
 )
 
 def get_user_info() -> str:
-    """Look up user info."""
-    # Access the store - same as that provided to `create_agent`
+    """사용자 정보를 조회합니다."""
+    # 스토어에 접근 - `create_agent`에 제공된 것과 동일
     runtime = get_runtime(Context)
     store = runtime.store # [!code highlight]
     user_id = runtime.context.user_id
-    # Retrieve data from store - returns StoreValue object with value and metadata
+    # 스토어에서 데이터 검색 - 값과 메타데이터가 있는 StoreValue 객체 반환
     user_info = store.get(("users",), user_id) # [!code highlight]
     return str(user_info.value) if user_info else "Unknown user"
 
 agent = create_agent(
     model="anthropic:claude-3-7-sonnet-latest",
     tools=[get_user_info],
-    # Pass store to agent - enables agent to access store when running tools
+    # 에이전트에 스토어 전달 - 도구 실행 시 에이전트가 스토어에 접근할 수 있도록 함
     store=store, # [!code highlight]
     context_schema=Context
 )
 
-# Run the agent
+# 에이전트 실행
 agent.invoke(
     {"messages": [{"role": "user", "content": "look up user information"}]},
     context=Context(user_id="user_123") # [!code highlight]
@@ -114,9 +114,9 @@ agent.invoke(
 
 
 <a id="write-long-term"></a>
-## Write long-term memory from tools
+## 도구에서 장기 메모리 쓰기
 
-```python Example of a tool that updates user information
+```python 사용자 정보를 업데이트하는 도구의 예시
 from dataclasses import dataclass
 from typing_extensions import TypedDict
 
@@ -124,25 +124,25 @@ from langchain.agents import create_agent
 from langgraph.runtime import get_runtime
 from langgraph.store.memory import InMemoryStore
 
-# InMemoryStore saves data to an in-memory dictionary. Use a DB-backed store in production.
+# InMemoryStore는 데이터를 인메모리 딕셔너리에 저장합니다. 프로덕션에서는 DB 기반 스토어를 사용하세요.
 store = InMemoryStore() # [!code highlight]
 
 @dataclass
 class Context:
     user_id: str
 
-# TypedDict defines the structure of user information for the LLM
+# TypedDict는 LLM을 위한 사용자 정보의 구조를 정의합니다
 class UserInfo(TypedDict):
     name: str
 
-# Tool that allows agent to update user information (useful for chat applications)
+# 에이전트가 사용자 정보를 업데이트할 수 있도록 하는 도구(채팅 애플리케이션에 유용)
 def save_user_info(user_info: UserInfo) -> str:
-    """Save user info."""
-    # Access the store - same as that provided to `create_agent`
+    """사용자 정보를 저장합니다."""
+    # 스토어에 접근 - `create_agent`에 제공된 것과 동일
     runtime = get_runtime(Context)
     store = runtime.store # [!code highlight]
     user_id = runtime.context.user_id # [!code highlight]
-    # Store data in the store (namespace, key, data)
+    # 스토어에 데이터 저장(네임스페이스, 키, 데이터)
     store.put(("users",), user_id, user_info) # [!code highlight]
     return "Successfully saved user info."
 
@@ -153,14 +153,14 @@ agent = create_agent(
     context_schema=Context
 )
 
-# Run the agent
+# 에이전트 실행
 agent.invoke(
     {"messages": [{"role": "user", "content": "My name is John Smith"}]},
-    # user_id passed in context to identify whose information is being updated
+    # 어떤 사용자의 정보를 업데이트하는지 식별하기 위해 컨텍스트에 user_id 전달
     context=Context(user_id="user_123") # [!code highlight]
 )
 
-# You can access the store directly to get the value
+# 스토어에 직접 접근하여 값을 가져올 수 있습니다
 store.get(("users",), "user_123").value
 ```
 
