@@ -2,17 +2,17 @@
 title: ScrapFly
 ---
 
-[ScrapFly](https://scrapfly.io/) is a web scraping API with headless browser capabilities, proxies, and anti-bot bypass. It allows for extracting web page data into accessible LLM markdown or text.
+[ScrapFly](https://scrapfly.io/)는 헤드리스 브라우저 기능, 프록시 및 안티봇 우회 기능을 갖춘 웹 스크레이핑 API입니다. 웹 페이지 데이터를 LLM에서 접근 가능한 Markdown 또는 텍스트로 추출할 수 있습니다.
 
-#### Installation
+#### 설치
 
-Install ScrapFly Python SDK and he required LangChain packages using pip:
+pip을 사용하여 ScrapFly Python SDK 및 필요한 LangChain 패키지를 설치하세요:
 
 ```shell
 pip install scrapfly-sdk langchain langchain-community
 ```
 
-#### Usage
+#### 사용법
 
 ```python
 from langchain_community.document_loaders import ScrapflyLoader
@@ -28,7 +28,7 @@ documents = scrapfly_loader.load()
 print(documents)
 ```
 
-The ScrapflyLoader also allows passing ScrapeConfig object for customizing the scrape request. See the documentation for the full feature details and their API params: [scrapfly.io/docs/scrape-api/getting-started](https://scrapfly.io/docs/scrape-api/getting-started)
+ScrapflyLoader는 스크래핑 요청을 사용자 정의하기 위해 ScrapeConfig 객체를 전달할 수도 있습니다. 전체 기능 세부 정보 및 API 파라미터는 문서를 참조하세요: [scrapfly.io/docs/scrape-api/getting-started](https://scrapfly.io/docs/scrape-api/getting-started)
 
 ```python
 from langchain_community.document_loaders import ScrapflyLoader

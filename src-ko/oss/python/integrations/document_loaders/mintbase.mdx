@@ -2,28 +2,28 @@
 title: Near Blockchain
 ---
 
-The intention of this notebook is to provide a means of testing functionality in the LangChain Document Loader for Near Blockchain.
+이 노트북의 목적은 Near Blockchain용 LangChain Document Loader의 기능을 테스트하는 수단을 제공하는 것입니다.
 
-Initially this Loader supports:
+초기에 이 로더는 다음을 지원합니다:
 
-* Loading NFTs as Documents from NFT Smart Contracts (NEP-171 and NEP-177)
-* Near Mainnnet, Near Testnet (default is mainnet)
-* Mintbase's Graph API
+* NFT 스마트 계약(NEP-171 및 NEP-177)에서 NFT를 문서로 로드
+* Near Mainnnet, Near Testnet(기본값은 mainnet)
+* Mintbase의 Graph API
 
-It can be extended if the community finds value in this loader.  Specifically:
+커뮤니티가 이 로더에 가치를 찾으면 확장할 수 있습니다. 구체적으로:
 
-* Additional APIs can be added (e.g. Tranction-related APIs)
+* 추가 API를 추가할 수 있습니다(예: 거래 관련 API)
 
-This Document Loader Requires:
+이 Document Loader는 다음이 필요합니다:
 
-* A free [Mintbase API Key](https://docs.mintbase.xyz/dev/mintbase-graph/)
+* 무료 [Mintbase API Key](https://docs.mintbase.xyz/dev/mintbase-graph/)
 
-The output takes the following format:
+출력은 다음 형식을 따릅니다:
 
-* pageContent= Individual NFT
+* pageContent= 개별 NFT
 * metadata=\{'source': 'nft.yearofchef.near', 'blockchain': 'mainnet', 'tokenId': '1846'\}
 
-## Load NFTs into Document Loader
+## Document Loader에 NFT 로드
 
 ```python
 # get MINTBASE_API_KEY from https://docs.mintbase.xyz/dev/mintbase-graph/
@@ -31,7 +31,7 @@ The output takes the following format:
 mintbaseApiKey = "..."
 ```
 
-### Option 1: Ethereum Mainnet (default BlockchainType)
+### 옵션 1: Ethereum Mainnet(기본 BlockchainType)
 
 ```python
 from MintbaseLoader import MintbaseDocumentLoader

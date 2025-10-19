@@ -2,14 +2,13 @@
 title: Obsidian
 ---
 
->[Obsidian](https://obsidian.md/) is a powerful and extensible knowledge base
-that works on top of your local folder of plain text files.
+>[Obsidian](https://obsidian.md/)은 로컬 폴더의 일반 텍스트 파일 위에서 작동하는 강력하고 확장 가능한 지식 베이스입니다.
 
-This notebook covers how to load documents from an `Obsidian` database.
+이 노트북은 `Obsidian` 데이터베이스에서 문서를 로드하는 방법을 다룹니다.
 
-Since `Obsidian` is just stored on disk as a folder of Markdown files, the loader just takes a path to this directory.
+`Obsidian`은 디스크에 Markdown 파일 폴더로 저장되기 때문에, 로더는 이 디렉토리의 경로만 필요합니다.
 
-`Obsidian` files also sometimes contain [metadata](https://help.obsidian.md/Editing+and+formatting/Metadata) which is a YAML block at the top of the file. These values will be added to the document's metadata. (`ObsidianLoader` can also be passed a `collect_metadata=False` argument to disable this behavior.)
+`Obsidian` 파일은 때때로 파일 상단에 YAML 블록인 [메타데이터](https://help.obsidian.md/Editing+and+formatting/Metadata)를 포함할 수 있습니다. 이러한 값은 문서의 메타데이터에 추가됩니다. (`ObsidianLoader`에 `collect_metadata=False` 인수를 전달하여 이 동작을 비활성화할 수도 있습니다.)
 
 ```python
 from langchain_community.document_loaders import ObsidianLoader

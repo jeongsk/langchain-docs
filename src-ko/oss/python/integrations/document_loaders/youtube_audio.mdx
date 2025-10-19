@@ -1,15 +1,14 @@
 ---
-title: YouTube audio
+title: YouTube 오디오
 ---
 
-Building chat or QA applications on YouTube videos is a topic of high interest.
+YouTube 동영상에 대한 채팅 또는 QA 애플리케이션 구축은 높은 관심을 받고 있는 주제입니다.
 
-Below we show how to easily go from a `YouTube url` to `audio of the video` to `text` to `chat`!
+아래에서는 `YouTube url`에서 `동영상 오디오`, `텍스트`를 거쳐 `채팅`까지 쉽게 진행하는 방법을 보여줍니다!
 
-We wil use the `OpenAIWhisperParser`, which will use the OpenAI Whisper API to transcribe audio to text,
-and the  `OpenAIWhisperParserLocal` for local support and running on private clouds or on premise.
+OpenAI Whisper API를 사용하여 오디오를 텍스트로 변환하는 `OpenAIWhisperParser`와 로컬 지원 및 프라이빗 클라우드 또는 온프레미스에서 실행하기 위한 `OpenAIWhisperParserLocal`을 사용합니다.
 
-Note: You will need to have an `OPENAI_API_KEY` supplied.
+참고: `OPENAI_API_KEY`를 제공해야 합니다.
 
 ```python
 from langchain_community.document_loaders.blob_loaders.youtube_audio import (
@@ -22,9 +21,9 @@ from langchain_community.document_loaders.parsers.audio import (
 )
 ```
 
-We will use `yt_dlp` to download audio for YouTube urls.
+YouTube URL의 오디오를 가져오기/다운로드하기 위해 `yt_dlp`를 사용합니다.
 
-We will use `pydub` to split downloaded audio files (such that we adhere to Whisper API's 25MB file size limit).
+다운로드한 오디오 파일을 분할하기 위해 `pydub`을 사용합니다(Whisper API의 25MB 파일 크기 제한을 준수하기 위해).
 
 ```python
 %pip install -qU  yt_dlp
@@ -32,28 +31,28 @@ We will use `pydub` to split downloaded audio files (such that we adhere to Whis
 %pip install -qU  librosa
 ```
 
-### YouTube url to text
+### YouTube URL을 텍스트로
 
-Use `YoutubeAudioLoader` to fetch / download the audio files.
+`YoutubeAudioLoader`를 사용하여 오디오 파일을 가져오기/다운로드합니다.
 
-Then, ues `OpenAIWhisperParser()` to transcribe them to text.
+그런 다음 `OpenAIWhisperParser()`를 사용하여 텍스트로 변환합니다.
 
-Let's take the first lecture of Andrej Karpathy's YouTube course as an example!
+Andrej Karpathy의 YouTube 강좌의 첫 번째 강의를 예로 들어보겠습니다!
 
 ```python
-# set a flag to switch between local and remote parsing
-# change this to True if you want to use local parsing
+# 로컬 파싱과 원격 파싱 간 전환하기 위한 플래그 설정
+# 로컬 파싱을 사용하려면 이 값을 True로 변경하세요
 local = False
 ```
 
 ```python
-# Two Karpathy lecture videos
+# Karpathy 강의 동영상 2개
 urls = ["https://youtu.be/kCc8FmEb1nY", "https://youtu.be/VMj-3S1tku0"]
 
-# Directory to save audio files
+# 오디오 파일을 저장할 디렉토리
 save_dir = "~/Downloads/YouTube"
 
-# Transcribe the videos to text
+# 동영상을 텍스트로 변환
 if local:
     loader = GenericLoader(
         YoutubeAudioLoader(urls, save_dir), OpenAIWhisperParserLocal()
@@ -69,21 +68,21 @@ docs = loader.load()
 [youtube] kCc8FmEb1nY: Downloading android player API JSON
 [info] kCc8FmEb1nY: Downloading 1 format(s): 140
 [dashsegments] Total fragments: 11
-[download] Destination: /Users/31treehaus/Desktop/AI/langchain-fork/docs/modules/indexes/document_loaders/examples/Let's build GPT： from scratch, in code, spelled out..m4a
+[download] Destination: /Users/31treehaus/Desktop/AI/langchain-fork/docs/modules/indexes/document_loaders/examples/Let's build GPT: from scratch, in code, spelled out..m4a
 [download] 100% of  107.73MiB in 00:00:18 at 5.92MiB/s
-[FixupM4a] Correcting container of "/Users/31treehaus/Desktop/AI/langchain-fork/docs/modules/indexes/document_loaders/examples/Let's build GPT： from scratch, in code, spelled out..m4a"
-[ExtractAudio] Not converting audio /Users/31treehaus/Desktop/AI/langchain-fork/docs/modules/indexes/document_loaders/examples/Let's build GPT： from scratch, in code, spelled out..m4a; file is already in target format m4a
+[FixupM4a] Correcting container of "/Users/31treehaus/Desktop/AI/langchain-fork/docs/modules/indexes/document_loaders/examples/Let's build GPT: from scratch, in code, spelled out..m4a"
+[ExtractAudio] Not converting audio /Users/31treehaus/Desktop/AI/langchain-fork/docs/modules/indexes/document_loaders/examples/Let's build GPT: from scratch, in code, spelled out..m4a; file is already in target format m4a
 [youtube] Extracting URL: https://youtu.be/VMj-3S1tku0
 [youtube] VMj-3S1tku0: Downloading webpage
 [youtube] VMj-3S1tku0: Downloading android player API JSON
 [info] VMj-3S1tku0: Downloading 1 format(s): 140
-[download] /Users/31treehaus/Desktop/AI/langchain-fork/docs/modules/indexes/document_loaders/examples/The spelled-out intro to neural networks and backpropagation： building micrograd.m4a has already been downloaded
+[download] /Users/31treehaus/Desktop/AI/langchain-fork/docs/modules/indexes/document_loaders/examples/The spelled-out intro to neural networks and backpropagation: building micrograd.m4a has already been downloaded
 [download] 100% of  134.98MiB
-[ExtractAudio] Not converting audio /Users/31treehaus/Desktop/AI/langchain-fork/docs/modules/indexes/document_loaders/examples/The spelled-out intro to neural networks and backpropagation： building micrograd.m4a; file is already in target format m4a
+[ExtractAudio] Not converting audio /Users/31treehaus/Desktop/AI/langchain-fork/docs/modules/indexes/document_loaders/examples/The spelled-out intro to neural networks and backpropagation: building micrograd.m4a; file is already in target format m4a
 ```
 
 ```python
-# Returns a list of Documents, which can be easily viewed or parsed
+# 문서 목록을 반환하며 쉽게 보거나 파싱할 수 있습니다
 docs[0].page_content[0:500]
 ```
 
@@ -91,9 +90,9 @@ docs[0].page_content[0:500]
 "Hello, my name is Andrej and I've been training deep neural networks for a bit more than a decade. And in this lecture I'd like to show you what neural network training looks like under the hood. So in particular we are going to start with a blank Jupyter notebook and by the end of this lecture we will define and train a neural net and you'll get to see everything that goes on under the hood and exactly sort of how that works on an intuitive level. Now specifically what I would like to do is I w"
 ```
 
-### Building a chat app from YouTube video
+### YouTube 동영상에서 채팅 앱 구축
 
-Given `Documents`, we can easily enable chat / question+answering.
+`Documents`가 주어지면 채팅/질문 답변을 쉽게 활성화할 수 있습니다.
 
 ```python
 from langchain.chains import RetrievalQA
@@ -103,25 +102,25 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 ```
 
 ```python
-# Combine doc
+# 문서 결합
 combined_docs = [doc.page_content for doc in docs]
 text = " ".join(combined_docs)
 ```
 
 ```python
-# Split them
+# 분할
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=150)
 splits = text_splitter.split_text(text)
 ```
 
 ```python
-# Build an index
+# 인덱스 구축
 embeddings = OpenAIEmbeddings()
 vectordb = FAISS.from_texts(splits, embeddings)
 ```
 
 ```python
-# Build a QA chain
+# QA 체인 구축
 qa_chain = RetrievalQA.from_chain_type(
     llm=ChatOpenAI(model="gpt-3.5-turbo", temperature=0),
     chain_type="stuff",
@@ -130,7 +129,7 @@ qa_chain = RetrievalQA.from_chain_type(
 ```
 
 ```python
-# Ask a question!
+# 질문하기!
 query = "Why do we need to zero out the gradient before backprop at each step?"
 qa_chain.run(query)
 ```

@@ -2,29 +2,29 @@
 title: Wikipedia
 ---
 
->[Wikipedia](https://wikipedia.org/) is a multilingual free online encyclopedia written and maintained by a community of volunteers, known as Wikipedians, through open collaboration and using a wiki-based editing system called MediaWiki. `Wikipedia` is the largest and most-read reference work in history.
+>[Wikipedia](https://wikipedia.org/)는 Wikipedia인이라고 알려진 자원봉사자 커뮤니티에 의해 작성되고 유지되는 다국어 무료 온라인 백과사전으로, MediaWiki라는 위키 기반 편집 시스템을 통한 오픈 협업을 사용합니다. `Wikipedia`는 역사상 가장 크고 가장 많이 읽히는 참고 자료입니다.
 
-This notebook shows how to load wiki pages from `wikipedia.org` into the Document format that we use downstream.
+이 노트북은 `wikipedia.org`에서 위키 페이지를 다운스트림에서 사용하는 Document 형식으로 로드하는 방법을 보여줍니다.
 
-## Installation
+## 설치
 
-First, you need to install the `langchain_community` and `wikipedia` packages.
+먼저, `langchain_community` 및 `wikipedia` 패키지를 설치해야 합니다.
 
 ```python
 %pip install -qU langchain_community wikipedia
 ```
 
-## Parameters
+## 파라미터
 
-`WikipediaLoader` has the following arguments:
+`WikipediaLoader`는 다음과 같은 인자를 가집니다:
 
-- `query`: the free text which used to find documents in Wikipedia
-- `lang` (optional): default="en". Use it to search in a specific language part of Wikipedia
-- `load_max_docs` (optional): default=100. Use it to limit number of downloaded documents. It takes time to download all 100 documents, so use a small number for experiments. There is a hard limit of 300 for now.
-- `load_all_available_meta` (optional): default=False. By default only the most important fields downloaded: `title` and `summary`. If `True` then all available fields will be downloaded.
-- `doc_content_chars_max` (optional): default=4000. The maximum number of characters for the document content.
+- `query`: Wikipedia에서 문서를 찾는 데 사용되는 자유 텍스트
+- `lang` (선택사항): 기본값="en". Wikipedia의 특정 언어 부분에서 검색하는 데 사용합니다
+- `load_max_docs` (선택사항): 기본값=100. 다운로드할 문서 수를 제한하는 데 사용합니다. 100개의 문서를 모두 다운로드하는 데 시간이 걸리므로 실험을 위해 작은 숫자를 사용하세요. 현재 300개의 하드 리밋이 있습니다.
+- `load_all_available_meta` (선택사항): 기본값=False. 기본적으로 가장 중요한 필드인 `title`과 `summary`만 다운로드됩니다. `True`인 경우 사용 가능한 모든 필드가 다운로드됩니다.
+- `doc_content_chars_max` (선택사항): 기본값=4000. 문서 콘텐츠의 최대 문자 수입니다.
 
-## Example
+## 예제
 
 ```python
 from langchain_community.document_loaders import WikipediaLoader

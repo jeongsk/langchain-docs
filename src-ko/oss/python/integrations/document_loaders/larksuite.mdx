@@ -2,11 +2,11 @@
 title: LarkSuite (FeiShu)
 ---
 
->[LarkSuite](https://www.larksuite.com/) is an enterprise collaboration platform developed by ByteDance.
+>[LarkSuite](https://www.larksuite.com/)는 ByteDance에서 개발한 엔터프라이즈 협업 플랫폼입니다.
 
-This notebook covers how to load data from the `LarkSuite` REST API into a format that can be ingested into LangChain, along with example usage for text summarization.
+이 노트북은 `LarkSuite` REST API에서 LangChain에 수집할 수 있는 형식으로 데이터를 로드하는 방법과 텍스트 요약을 위한 사용 예제를 다룹니다.
 
-The LarkSuite API requires an access token (tenant_access_token or user_access_token), checkout [LarkSuite open platform document](https://open.larksuite.com/document) for API details.
+LarkSuite API는 액세스 토큰(tenant_access_token 또는 user_access_token)이 필요합니다. API 세부 정보는 [LarkSuite 오픈 플랫폼 문서](https://open.larksuite.com/document)를 확인하세요.
 
 ```python
 from getpass import getpass
@@ -21,7 +21,7 @@ ACCESS_TOKEN = getpass("larksuite tenant_access_token or user_access_token")
 DOCUMENT_ID = input("larksuite document id")
 ```
 
-## Load From Document
+## 문서에서 로드
 
 ```python
 from pprint import pprint
@@ -36,7 +36,7 @@ pprint(docs)
 [Document(page_content='Test Doc\nThis is a Test Doc\n\n1\n2\n3\n\n', metadata={'document_id': 'V76kdbd2HoBbYJxdiNNccajunPf', 'revision_id': 11, 'title': 'Test Doc'})]
 ```
 
-## Load From Wiki
+## Wiki에서 로드
 
 ```python
 from pprint import pprint

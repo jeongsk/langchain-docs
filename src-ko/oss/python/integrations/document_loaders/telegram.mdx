@@ -2,9 +2,9 @@
 title: Telegram
 ---
 
->[Telegram Messenger](https://web.telegram.org/a/) is a globally accessible freemium, cross-platform, encrypted, cloud-based and centralized instant messaging service. The application also provides optional end-to-end encrypted chats and video calling, VoIP, file sharing and several other features.
+>[Telegram Messenger](https://web.telegram.org/a/)는 전 세계적으로 접근 가능한 프리미엄, 크로스 플랫폼, 암호화된 클라우드 기반 중앙 집중식 인스턴트 메시징 서비스입니다. 이 애플리케이션은 선택적 엔드투엔드 암호화 채팅 및 화상 통화, VoIP, 파일 공유 및 여러 기타 기능도 제공합니다.
 
-This notebook covers how to load data from `Telegram` into a format that can be ingested into LangChain.
+이 노트북은 `Telegram`으로부터 데이터를 로드하여 LangChain에 수집할 수 있는 형식으로 변환하는 방법을 다룹니다.
 
 ```python
 from langchain_community.document_loaders import (
@@ -25,11 +25,11 @@ loader.load()
 [Document(page_content="Henry on 2020-01-01T00:00:02: It's 2020...\n\nHenry on 2020-01-01T00:00:04: Fireworks!\n\nGrace ðŸ§¤ ðŸ\x8d’ on 2020-01-01T00:00:05: You're a minute late!\n\n", metadata={'source': 'example_data/telegram.json'})]
 ```
 
-`TelegramChatApiLoader` loads data directly from any specified chat from Telegram. In order to export the data, you will need to authenticate your Telegram account.
+`TelegramChatApiLoader`는 Telegram의 지정된 채팅에서 직접 데이터를 로드합니다. 데이터를 내보내려면 Telegram 계정을 인증해야 합니다.
 
-You can get the API_HASH and API_ID from [my.telegram.org/auth?to=apps](https://my.telegram.org/auth?to=apps)
+[my.telegram.org/auth?to=apps](https://my.telegram.org/auth?to=apps)에서 API_HASH 및 API_ID를 얻을 수 있습니다.
 
-chat_entity – recommended to be the [entity](https://docs.telethon.dev/en/stable/concepts/entities.html?highlight=Entity#what-is-an-entity) of a channel.
+chat_entity – 채널의 [엔티티](https://docs.telethon.dev/en/stable/concepts/entities.html?highlight=Entity#what-is-an-entity)를 사용하는 것이 권장됩니다.
 
 ```python
 loader = TelegramChatApiLoader(

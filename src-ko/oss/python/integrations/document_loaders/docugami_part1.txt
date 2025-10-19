@@ -1,0 +1,75 @@
+---
+title: Docugami
+---
+
+이 노트북은 `Docugami`에서 문서를 로드하는 방법을 다룹니다. 이 시스템을 대체 데이터 로더보다 사용하는 이점을 제공합니다.
+
+## 사전 요구 사항
+
+1. 필요한 Python 패키지를 설치합니다.
+2. 작업 공간에 대한 액세스 토큰을 가져와서 `DOCUGAMI_API_KEY` 환경 변수로 설정되어 있는지 확인하십시오.
+3. [help.docugami.com/home/docugami-api](https://help.docugami.com/home/docugami-api)에 설명된 대로 처리된 문서에 대한 일부 docset 및 문서 ID를 가져옵니다.
+
+```python
+# You need the dgml-utils package to use the DocugamiLoader (run pip install directly without "poetry run" if you are not using poetry)
+!poetry run pip install docugami-langchain dgml-utils==0.3.0 --upgrade --quiet
+```
+
+## 빠른 시작
+
+1. [Docugami 작업 공간](http://www.docugami.com)을 생성합니다(무료 평가판 사용 가능)
+2. 문서(PDF, DOCX 또는 DOC)를 추가하고 Docugami가 이를 수집하여 유사한 문서 세트로 클러스터링하도록 합니다. 예: NDA, 임대 계약 및 서비스 계약. 시스템에서 지원하는 고정된 문서 유형 세트는 없으며, 생성된 클러스터는 특정 문서에 따라 달라지며 나중에 [docset 할당을 변경](https://help.docugami.com/home/working-with-the-doc-sets-view)할 수 있습니다.
+3. Developer Playground를 통해 작업 공간에 대한 액세스 토큰을 생성합니다. [자세한 지침](https://help.docugami.com/home/docugami-api)
+4. [Docugami API](https://api-docs.docugami.com)를 탐색하여 처리된 docset ID 목록 또는 특정 docset에 대한 문서 ID만 가져옵니다.
+6. 아래에 자세히 설명된 대로 DocugamiLoader를 사용하여 문서에 대한 풍부한 의미 청크를 가져옵니다.
+7. 선택적으로 하나 이상의 [보고서 또는 초록](https://help.docugami.com/home/reports)을 작성하고 게시합니다. 이는 Docugami가 기본 설정에 따라 더 나은 태그로 의미론적 XML을 개선하는 데 도움이 되며, 그런 다음 메타데이터로 DocugamiLoader 출력에 추가됩니다. 자체 쿼리 검색기와 같은 기술을 사용하여 높은 정확도의 문서 QA를 수행합니다.
+
+## 다른 청킹 기술과 비교한 장점
+
+문서의 적절한 청킹은 문서에서 검색하는 데 중요합니다. 공백 및 문자 길이 기반 재귀 청크 분할을 포함한 단순한 청킹 기술을 포함하여 많은 청킹 기술이 존재합니다. Docugami는 다른 접근 방식을 제공합니다:
+
+1. **지능적인 청킹:** Docugami는 모든 문서를 단일 단어 또는 숫자 값에서 전체 섹션에 이르기까지 다양한 크기의 청크의 계층적 의미 XML 트리로 분해합니다. 이러한 청크는 문서의 의미적 윤곽을 따르므로 임의의 길이 또는 단순한 공백 기반 청킹보다 더 의미 있는 표현을 제공합니다.
+2. **의미 주석:** 청크에는 문서 세트 전체에서 일관된 의미 태그가 주석으로 추가되어 다르게 작성되고 형식화된 경우에도 여러 문서에 걸쳐 일관된 계층적 쿼리를 용이하게 합니다. 예를 들어 임대 계약 세트에서 임대인, 임차인 또는 갱신 날짜와 같은 주요 조항을 쉽게 식별할 수 있을 뿐만 아니라 전대 조항의 표현이나 종료 조항 내 예외 섹션에 특정 관할권이 있는지 여부와 같은 더 복잡한 정보를 식별할 수 있습니다.
+3. **구조화된 표현:** 또한 XML 트리는 제목, 단락, 목록, 표 및 기타 일반 요소를 나타내는 속성을 사용하여 모든 문서의 구조적 윤곽을 나타내며 스캔된 PDF 또는 DOCX 파일과 같은 지원되는 모든 문서 형식에 걸쳐 일관되게 수행합니다. 깨끗한 텍스트 추출을 위해 페이지 머리글/바닥글 또는 다중 열 흐름과 같은 긴 형식 문서 특성을 적절하게 처리합니다.
+4. **추가 메타데이터:** 사용자가 Docugami를 사용하고 있는 경우 청크에 추가 메타데이터로 주석이 추가됩니다. 이 추가 메타데이터는 컨텍스트 창 제한 없이 높은 정확도의 문서 QA에 사용할 수 있습니다. 아래의 자세한 코드 연습을 참조하십시오.
+
+```python
+import os
+
+from docugami_langchain.document_loaders import DocugamiLoader
+```
+
+## 문서 로드
+
+DOCUGAMI_API_KEY 환경 변수가 설정되어 있으면 로더에 명시적으로 전달할 필요가 없으며 그렇지 않으면 `access_token` 매개변수로 전달할 수 있습니다.
+
+```python
+DOCUGAMI_API_KEY = os.environ.get("DOCUGAMI_API_KEY")
+```
+
+```python
+docset_id = "26xpy3aes7xp"
+document_ids = ["d7jqdzcj50sj", "cgd1eacfkchw"]
+
+# To load all docs in the given docset ID, just don't provide document_ids
+loader = DocugamiLoader(docset_id=docset_id, document_ids=document_ids)
+chunks = loader.load()
+len(chunks)
+```
+
+```output
+120
+```
+
+각 @[`Document`](실제로는 실제 PDF, DOC 또는 DOCX의 청크)에 대한 `metadata`에는 유용한 추가 정보가 포함되어 있습니다:
+
+1. **id and source:** Docugami 내에서 청크가 소싱된 파일(PDF, DOC 또는 DOCX)의 ID 및 이름.
+2. **xpath:** 문서의 XML 표현 내의 청크에 대한 XPath. 문서 XML 내의 실제 청크에 대한 소스 인용에 유용합니다.
+3. **structure:** 청크의 구조적 속성, 예: h1, h2, div, table, td 등. 필요한 경우 호출자가 특정 종류의 청크를 필터링하는 데 유용합니다.
+4. **tag:** 다양한 생성 및 추출 기술을 사용한 청크의 의미 태그. 자세한 내용은 [github.com/docugami/DFM-benchmarks](https://github.com/docugami/DFM-benchmarks)를 참조하십시오.
+
+DocugamiLoader 인스턴스에서 다음 속성을 설정하여 청킹 동작을 제어할 수 있습니다:
+
+1. 시스템이 최소한의 잘림으로 준수하려고 시도하는 최소 및 최대 청크 크기를 설정할 수 있습니다. loader.min_text_length 및 loader.max_text_length를 설정하여 이를 제어할 수 있습니다.
+2. 기본적으로 청크의 텍스트만 반환됩니다. 그러나 Docugami의 XML 지식 그래프에는 청크 내부의 엔티티에 대한 의미 태그를 포함한 추가 풍부한 정보가 있습니다. 반환된 청크에 추가 xml 메타데이터를 원하면 loader.include_xml_tags = True를 설정하십시오.
+3. 또한 Docugami가 반환하는 청크에 부모 청크를 반환하도록 하려면 loader.parent_hierarchy_levels를 설정할 수 있습니다. 하위 청크는 loader.parent_id_key 값을 통해 부모 청크를 가리킵니다. 이는 예를 들어 small-to-big 검색을 위한 MultiVector Retriever에 유용합니다. 이 노트북 뒷부분의 자세한 예제를 참조하십시오.

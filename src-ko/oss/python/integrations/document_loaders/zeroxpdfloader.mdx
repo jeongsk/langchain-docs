@@ -2,39 +2,39 @@
 title: ZeroxPDFLoader
 ---
 
-`ZeroxPDFLoader` is a document loader that leverages the [Zerox](https://github.com/getomni-ai/zerox) library. Zerox converts PDF documents into images, processes them using a vision-capable language model, and generates a structured Markdown representation. This loader allows for asynchronous operations and provides page-level document extraction.
+`ZeroxPDFLoader`는 [Zerox](https://github.com/getomni-ai/zerox) 라이브러리를 활용하는 문서 로더입니다. Zerox는 PDF 문서를 이미지로 변환하고 비전 기능이 있는 언어 모델을 사용하여 처리한 다음 구조화된 Markdown 표현을 생성합니다. 이 로더는 비동기 작업을 허용하고 페이지 수준 문서 추출을 제공합니다.
 
-### Integration details
+### 통합 세부 정보
 
-| Class | Package | Local | Serializable | JS support|
+| 클래스 | 패키지 | 로컬 | 직렬화 가능 | JS 지원|
 | :--- | :--- | :---: | :---: |  :---: |
 | [ZeroxPDFLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.ZeroxPDFLoader.html) | [langchain_community](https://python.langchain.com/api_reference/community/index.html) | ❌ | ❌ | ❌ |
 
-### Loader features
+### 로더 기능
 
-| Source | Document Lazy Loading | Native Async Support
+| 소스 | 문서 지연 로딩 | 네이티브 비동기 지원
 | :---: | :---: | :---: |
 | ZeroxPDFLoader | ✅ | ❌ |
 
-## Setup
+## 설정
 
-### Credentials
+### 자격 증명
 
-Appropriate credentials need to be set up in environment variables. The loader supports number of different models and model providers. See _Usage_ header below to see few examples or [Zerox documentation](https://github.com/getomni-ai/zerox) for a full list of supported models.
+환경 변수에 적절한 자격 증명을 설정해야 합니다. 로더는 다양한 모델 및 모델 공급자를 지원합니다. 몇 가지 예제를 보려면 아래의 _사용법_ 헤더를 참조하거나 지원되는 모델의 전체 목록을 보려면 [Zerox 문서](https://github.com/getomni-ai/zerox)를 참조하세요.
 
-### Installation
+### 설치
 
-To use `ZeroxPDFLoader`, you need to install the `zerox` package. Also make sure to have `langchain-community` installed.
+`ZeroxPDFLoader`를 사용하려면 `zerox` 패키지를 설치해야 합니다. `langchain-community`도 설치되어 있는지 확인하세요.
 
 ```bash
 pip install zerox langchain-community
 ```
 
-## Initialization
+## 초기화
 
-`ZeroxPDFLoader` enables PDF text extraction using vision-capable language models by converting each page into an image and processing it asynchronously. To use this loader, you need to specify a model and configure any necessary environment variables for Zerox, such as API keys.
+`ZeroxPDFLoader`는 각 페이지를 이미지로 변환하고 비동기적으로 처리하여 비전 기능이 있는 언어 모델을 사용한 PDF 텍스트 추출을 가능하게 합니다. 이 로더를 사용하려면 모델을 지정하고 API 키와 같은 Zerox에 필요한 환경 변수를 구성해야 합니다.
 
-If you're working in an environment like Jupyter Notebook, you may need to handle asynchronous code by using `nest_asyncio`. You can set this up as follows:
+Jupyter Notebook과 같은 환경에서 작업하는 경우 `nest_asyncio`를 사용하여 비동기 코드를 처리해야 할 수 있습니다. 다음과 같이 설정할 수 있습니다:
 
 ```python
 import nest_asyncio
@@ -44,39 +44,39 @@ nest_asyncio.apply()
 ```python
 import os
 
-# use nest_asyncio (only necessary inside of jupyter notebook)
+# nest_asyncio 사용 (jupyter notebook 내부에서만 필요)
 import nest_asyncio
 from langchain_community.document_loaders.pdf import ZeroxPDFLoader
 
 nest_asyncio.apply()
 
-# Specify the url or file path for the PDF you want to process
-# In this case let's use pdf from web
+# 처리하려는 PDF의 URL 또는 파일 경로 지정
+# 이 경우 웹의 PDF를 사용하겠습니다
 file_path = "https://assets.ctfassets.net/f1df9zr7wr1a/soP1fjvG1Wu66HJhu3FBS/034d6ca48edb119ae77dec5ce01a8612/OpenAI_Sacra_Teardown.pdf"
 
-# Set up necessary env vars for a vision model
+# 비전 모델에 필요한 환경 변수 설정
 os.environ["OPENAI_API_KEY"] = (
     "zK3BAhQUmbwZNoHoOcscBwQdwi3oc3hzwJmbgdZ"  ## your-api-key
 )
 
-# Initialize ZeroxPDFLoader with the desired model
+# 원하는 모델로 ZeroxPDFLoader 초기화
 loader = ZeroxPDFLoader(file_path=file_path, model="azure/gpt-4o-mini")
 ```
 
-## Load
+## 로드
 
 ```python
-# Load the document and look at the first page:
+# 문서를 로드하고 첫 페이지를 확인합니다:
 documents = loader.load()
 documents[0]
 ```
 
 ```output
-Document(metadata={'source': 'https://assets.ctfassets.net/f1df9zr7wr1a/soP1fjvG1Wu66HJhu3FBS/034d6ca48edb119ae77dec5ce01a8612/OpenAI_Sacra_Teardown.pdf', 'page': 1, 'num_pages': 5}, page_content='# OpenAI\n\nOpenAI is an AI research laboratory.\n\n#ai-models #ai\n\n## Revenue\n- **$1,000,000,000**  \n  2023\n\n## Valuation\n- **$28,000,000,000**  \n  2023\n\n## Growth Rate (Y/Y)\n- **400%**  \n  2023\n\n## Funding\n- **$11,300,000,000**  \n  2023\n\n---\n\n## Details\n- **Headquarters:** San Francisco, CA\n- **CEO:** Sam Altman\n\n[Visit Website](#)\n\n---\n\n## Revenue\n### ARR ($M)  | Growth\n--- | ---\n$1000M  | 456%\n$750M   | \n$500M   | \n$250M   | $36M\n$0     | $200M\n\nis on track to hit $1B in annual recurring revenue by the end of 2023, up about 400% from an estimated $200M at the end of 2022.\n\nOpenAI overall lost about $540M last year while developing ChatGPT, and those losses are expected to increase dramatically in 2023 with the growth in popularity of their consumer tools, with CEO Sam Altman remarking that OpenAI is likely to be "the most capital-intensive startup in Silicon Valley history."\n\nThe reason for that is operating ChatGPT is massively expensive. One analysis of ChatGPT put the running cost at about $700,000 per day taking into account the underlying costs of GPU hours and hardware. That amount—derived from the 175 billion parameter-large architecture of GPT-3—would be even higher with the 100 trillion parameters of GPT-4.\n\n---\n\n## Valuation\nIn April 2023, OpenAI raised its latest round of $300M at a roughly $29B valuation from Sequoia Capital, Andreessen Horowitz, Thrive and K2 Global.\n\nAssuming OpenAI was at roughly $300M in ARR at the time, that would have given them a 96x forward revenue multiple.\n\n---\n\n## Product\n\n### ChatGPT\n| Examples                       | Capabilities                        | Limitations                        |\n|---------------------------------|-------------------------------------|------------------------------------|\n| "Explain quantum computing in simple terms" | "Remember what users said earlier in the conversation" | May occasionally generate incorrect information |\n| "What can you give me for my dad\'s birthday?" | "Allows users to follow-up questions" | Limited knowledge of world events after 2021 |\n| "How do I make an HTTP request in JavaScript?" | "Trained to provide harmless requests" |                                    |')
+Document(metadata={'source': 'https://assets.ctfassets.net/f1df9zr7wr1a/soP1fjvG1Wu66HJhu3FBS/034d6ca48edb119ae77dec5ce01a8612/OpenAI_Sacra_Teardown.pdf', 'page': 1, 'num_pages': 5}, page_content='# OpenAI\n\nOpenAI is an AI research laboratory.\n\n#ai-models #ai\n\n## Revenue\n- **$1,000,000,000**  \n  2023\n\n## Valuation\n- **$28,000,000,000**  \n  2023\n\n## Growth Rate (Y/Y)\n- **400%**  \n  2023\n\n## Funding\n- **$11,300,000,000**  \n  2023...')
 ```
 
 ```python
-# Let's look at parsed first page
+# 파싱된 첫 페이지를 확인합니다
 print(documents[0].page_content)
 ```
 
@@ -102,94 +102,52 @@ OpenAI is an AI research laboratory.
 ## Funding
 - **$11,300,000,000**
   2023
-
----
-
-## Details
-- **Headquarters:** San Francisco, CA
-- **CEO:** Sam Altman
-
-[Visit Website](#)
-
----
-
-## Revenue
-### ARR ($M)  | Growth
---- | ---
-$1000M  | 456%
-$750M   |
-$500M   |
-$250M   | $36M
-$0     | $200M
-
-is on track to hit $1B in annual recurring revenue by the end of 2023, up about 400% from an estimated $200M at the end of 2022.
-
-OpenAI overall lost about $540M last year while developing ChatGPT, and those losses are expected to increase dramatically in 2023 with the growth in popularity of their consumer tools, with CEO Sam Altman remarking that OpenAI is likely to be "the most capital-intensive startup in Silicon Valley history."
-
-The reason for that is operating ChatGPT is massively expensive. One analysis of ChatGPT put the running cost at about $700,000 per day taking into account the underlying costs of GPU hours and hardware. That amount—derived from the 175 billion parameter-large architecture of GPT-3—would be even higher with the 100 trillion parameters of GPT-4.
-
----
-
-## Valuation
-In April 2023, OpenAI raised its latest round of $300M at a roughly $29B valuation from Sequoia Capital, Andreessen Horowitz, Thrive and K2 Global.
-
-Assuming OpenAI was at roughly $300M in ARR at the time, that would have given them a 96x forward revenue multiple.
-
----
-
-## Product
-
-### ChatGPT
-| Examples                       | Capabilities                        | Limitations                        |
-|---------------------------------|-------------------------------------|------------------------------------|
-| "Explain quantum computing in simple terms" | "Remember what users said earlier in the conversation" | May occasionally generate incorrect information |
-| "What can you give me for my dad's birthday?" | "Allows users to follow-up questions" | Limited knowledge of world events after 2021 |
-| "How do I make an HTTP request in JavaScript?" | "Trained to provide harmless requests" |                                    |
+...
 ```
 
-## Lazy Load
+## 지연 로드
 
-The loader always fetches results lazily. `.load()` method is equivalent to `.lazy_load()`
+로더는 항상 결과를 지연 로딩합니다. `.load()` 메서드는 `.lazy_load()`와 동등합니다
 
-## API reference
+## API 레퍼런스
 
 ### `ZeroxPDFLoader`
 
-This loader class initializes with a file path and model type, and supports custom configurations via `zerox_kwargs` for handling Zerox-specific parameters.
+이 로더 클래스는 파일 경로와 모델 유형으로 초기화되며 Zerox 관련 매개변수를 처리하기 위한 `zerox_kwargs`를 통한 사용자 정의 구성을 지원합니다.
 
-**Arguments**:
+**인수**:
 
-- `file_path` (Union[str, Path]): Path to the PDF file.
-- `model` (str): Vision-capable model to use for processing in format `<provider>/<model>`.
-Some examples of valid values are:
+- `file_path` (Union[str, Path]): PDF 파일 경로.
+- `model` (str): `<provider>/<model>` 형식으로 처리에 사용할 비전 기능이 있는 모델.
+유효한 값의 몇 가지 예:
   - `model = "gpt-4o-mini" ## openai model`
   - `model = "azure/gpt-4o-mini"`
   - `model = "gemini/gpt-4o-mini"`
   - `model="claude-3-opus-20240229"`
   - `model = "vertex_ai/gemini-1.5-flash-001"`
-  - See more details in [Zerox documentation](https://github.com/getomni-ai/zerox)
-  - Defaults to `"gpt-4o-mini".`
-- `**zerox_kwargs` (dict): Additional Zerox-specific parameters such as API key, endpoint, etc.
-  - See [Zerox documentation](https://github.com/getomni-ai/zerox)
+  - 자세한 내용은 [Zerox 문서](https://github.com/getomni-ai/zerox) 참조
+  - 기본값은 `"gpt-4o-mini"`입니다.
+- `**zerox_kwargs` (dict): API 키, 엔드포인트 등과 같은 추가 Zerox 관련 매개변수.
+  - [Zerox 문서](https://github.com/getomni-ai/zerox) 참조
 
-**Methods**:
+**메서드**:
 
-- `lazy_load`: Generates an iterator of `Document` instances, each representing a page of the PDF, along with metadata including page number and source.
+- `lazy_load`: 각 페이지 번호 및 소스를 포함한 메타데이터와 함께 PDF의 각 페이지를 나타내는 @[`Document`] 인스턴스의 반복자를 생성합니다.
 
-See full API documentaton [here](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.ZeroxPDFLoader.html)
+전체 API 문서는 [여기](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.pdf.ZeroxPDFLoader.html)를 참조하세요
 
-## Notes
+## 참고
 
-- **Model Compatibility**: Zerox supports a range of vision-capable models. Refer to [Zerox's GitHub documentation](https://github.com/getomni-ai/zerox) for a list of supported models and configuration details.
-- **Environment Variables**: Make sure to set required environment variables, such as `API_KEY` or endpoint details, as specified in the Zerox documentation.
-- **Asynchronous Processing**: If you encounter errors related to event loops in Jupyter Notebooks, you may need to apply `nest_asyncio` as shown in the setup section.
+- **모델 호환성**: Zerox는 다양한 비전 기능이 있는 모델을 지원합니다. 지원되는 모델 목록 및 구성 세부 정보는 [Zerox의 GitHub 문서](https://github.com/getomni-ai/zerox)를 참조하세요.
+- **환경 변수**: Zerox 문서에 지정된 대로 `API_KEY` 또는 엔드포인트 세부 정보와 같은 필수 환경 변수를 설정해야 합니다.
+- **비동기 처리**: Jupyter Notebook에서 이벤트 루프와 관련된 오류가 발생하면 설정 섹션에 표시된 대로 `nest_asyncio`를 적용해야 할 수 있습니다.
 
-## Troubleshooting
+## 문제 해결
 
-- **RuntimeError: This event loop is already running**: Use `nest_asyncio.apply()` to prevent asynchronous loop conflicts in environments like Jupyter.
-- **Configuration Errors**: Verify that the `zerox_kwargs` match the expected arguments for your chosen model and that all necessary environment variables are set.
+- **RuntimeError: This event loop is already running**: Jupyter와 같은 환경에서 비동기 루프 충돌을 방지하려면 `nest_asyncio.apply()`를 사용하세요.
+- **구성 오류**: `zerox_kwargs`가 선택한 모델에 대해 예상되는 인수와 일치하고 필요한 모든 환경 변수가 설정되어 있는지 확인하세요.
 
-## Additional Resources
+## 추가 리소스
 
-- **Zerox Documentation**: [Zerox GitHub Repository](https://github.com/getomni-ai/zerox)
-- **LangChain Document Loaders**: [LangChain Documentation](https://python.langchain.com/docs/integrations/document_loaders/)
+- **Zerox 문서**: [Zerox GitHub 저장소](https://github.com/getomni-ai/zerox)
+- **LangChain 문서 로더**: [LangChain 문서](https://python.langchain.com/docs/integrations/document_loaders/)

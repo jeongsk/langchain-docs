@@ -2,13 +2,13 @@
 title: Geopandas
 ---
 
-[Geopandas](https://geopandas.org/en/stable/index.html) is an open-source project to make working with geospatial data in python easier.
+[Geopandas](https://geopandas.org/en/stable/index.html)는 Python에서 지리공간 데이터 작업을 더 쉽게 수행할 수 있도록 하는 오픈 소스 프로젝트입니다.
 
-GeoPandas extends the datatypes used by pandas to allow spatial operations on geometric types.
+GeoPandas는 pandas에서 사용하는 데이터 타입을 확장하여 기하학적 타입에 대한 공간 연산을 가능하게 합니다.
 
-Geometric operations are performed by shapely. Geopandas further depends on fiona for file access and matplotlib for plotting.
+기하학적 연산은 shapely에서 수행합니다. Geopandas는 파일 액세스를 위해 fiona에 의존하고 플로팅을 위해 matplotlib에 의존합니다.
 
-LLM applications (chat, QA) that utilize geospatial data are an interesting area for exploration.
+지리공간 데이터를 활용하는 LLM 애플리케이션(채팅, QA)은 흥미로운 탐색 영역입니다.
 
 ```python
 %pip install -qU  sodapy
@@ -24,29 +24,29 @@ import pandas as pd
 from langchain_community.document_loaders import OpenCityDataLoader
 ```
 
-Create a GeoPandas dataframe from [`Open City Data`](/oss/integrations/document_loaders/open_city_data) as an example input.
+[`Open City Data`](/oss/integrations/document_loaders/open_city_data)에서 GeoPandas 데이터프레임을 예제 입력으로 생성합니다.
 
 ```python
-# Load Open City Data
-dataset = "tmnf-yvry"  # San Francisco crime data
+# Open City Data 로드
+dataset = "tmnf-yvry"  # San Francisco 범죄 데이터
 loader = OpenCityDataLoader(city_id="data.sfgov.org", dataset_id=dataset, limit=5000)
 docs = loader.load()
 ```
 
 ```python
-# Convert list of dictionaries to DataFrame
+# 사전 목록을 DataFrame으로 변환
 df = pd.DataFrame([ast.literal_eval(d.page_content) for d in docs])
 
-# Extract latitude and longitude
+# 위도와 경도 추출
 df["Latitude"] = df["location"].apply(lambda loc: loc["coordinates"][1])
 df["Longitude"] = df["location"].apply(lambda loc: loc["coordinates"][0])
 
-# Create geopandas DF
+# geopandas DF 생성
 gdf = gpd.GeoDataFrame(
     df, geometry=gpd.points_from_xy(df.Longitude, df.Latitude), crs="EPSG:4326"
 )
 
-# Only keep valid longitudes and latitudes for San Francisco
+# San Francisco의 유효한 경도와 위도만 유지
 gdf = gdf[
     (gdf["Longitude"] >= -123.173825)
     & (gdf["Longitude"] <= -122.281780)
@@ -55,26 +55,26 @@ gdf = gdf[
 ]
 ```
 
-Visualization of the sample of SF crime data.
+SF 범죄 데이터 샘플의 시각화입니다.
 
 ```python
 import matplotlib.pyplot as plt
 
-# Load San Francisco map data
+# San Francisco 지도 데이터 로드
 sf = gpd.read_file("https://data.sfgov.org/resource/3psu-pn9h.geojson")
 
-# Plot the San Francisco map and the points
+# San Francisco 지도와 포인트 플롯
 fig, ax = plt.subplots(figsize=(10, 10))
 sf.plot(ax=ax, color="white", edgecolor="black")
 gdf.plot(ax=ax, color="red", markersize=5)
 plt.show()
 ```
 
-Load GeoPandas dataframe as a `Document` for downstream processing (embedding, chat, etc).
+다운스트림 처리(임베딩, 채팅 등)를 위해 GeoPandas 데이터프레임을 @[`Document`]로 로드합니다.
 
-The `geometry` will be the default `page_content` columns, and all other columns are placed in `metadata`.
+`geometry`가 기본 `page_content` 열이 되고, 다른 모든 열은 `metadata`에 배치됩니다.
 
-But, we can specify the `page_content_column`.
+그러나 `page_content_column`을 지정할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders import GeoDataFrameLoader

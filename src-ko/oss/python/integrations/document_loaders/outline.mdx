@@ -2,24 +2,24 @@
 title: Outline Document Loader
 ---
 
->[Outline](https://www.getoutline.com/) is an open-source collaborative knowledge base platform designed for team information sharing.
+>[Outline](https://www.getoutline.com/)은 팀 정보 공유를 위해 설계된 오픈 소스 협업 지식 베이스 플랫폼입니다.
 
-This notebook shows how to obtain langchain Documents from your Outline collections.
+이 노트북은 Outline 컬렉션에서 langchain Documents를 가져오는 방법을 보여줍니다.
 
-## Overview
+## 개요
 
-The [Outline Document Loader](https://github.com/10Pines/langchain-outline) can be used to load Outline collections as LangChain Documents for integration into Retrieval-Augmented Generation (RAG) workflows.
+[Outline Document Loader](https://github.com/10Pines/langchain-outline)는 Outline 컬렉션을 LangChain Documents로 로드하여 검색 증강 생성(RAG) 워크플로우에 통합하는 데 사용할 수 있습니다.
 
-This example demonstrates:
+이 예제에서는 다음을 보여줍니다:
 
-* Setting up a Document Loader to load all documents from an Outline instance.
+* Outline 인스턴스에서 모든 문서를 로드하기 위한 Document Loader 설정.
 
-### Setup
+### 설정
 
-Before starting, ensure you have the following environment variables set:
+시작하기 전에 다음 환경 변수가 설정되어 있는지 확인하세요:
 
-* OUTLINE_API_KEY: Your API key for authenticating with your Outline instance ([www.getoutline.com/developers#section/Authentication](https://www.getoutline.com/developers#section/Authentication)).
-* OUTLINE_INSTANCE_URL: The URL (including protocol) of your Outline instance.
+* OUTLINE_API_KEY: Outline 인스턴스로 인증하기 위한 API 키 ([www.getoutline.com/developers#section/Authentication](https://www.getoutline.com/developers#section/Authentication)).
+* OUTLINE_INSTANCE_URL: Outline 인스턴스의 URL(프로토콜 포함).
 
 ```python
 import os
@@ -28,16 +28,16 @@ os.environ["OUTLINE_API_KEY"] = "ol_api_xyz123"
 os.environ["OUTLINE_INSTANCE_URL"] = "https://app.getoutline.com"
 ```
 
-## Initialization
+## 초기화
 
-To initialize the OutlineLoader, you need the following parameters:
+OutlineLoader를 초기화하려면 다음 매개변수가 필요합니다:
 
-* outline_base_url: The URL of your outline instance (or it will be taken from the environment variable).
-* outline_api_key: Your API key for authenticating with your Outline instance (or it will be taken from the environment variable).
-* outline_collection_id_list: List of collection ids to be retrieved. If None all will be retrieved.
-* page_size: Because the Outline API uses paginated results you can configure how many results (documents) per page will be retrieved per API request.  If this is not specified a default will be used.
+* outline_base_url: outline 인스턴스의 URL(또는 환경 변수에서 가져옴).
+* outline_api_key: Outline 인스턴스로 인증하기 위한 API 키(또는 환경 변수에서 가져옴).
+* outline_collection_id_list: 검색할 컬렉션 ID 목록. None인 경우 모두 검색됩니다.
+* page_size: Outline API는 페이지네이션된 결과를 사용하므로 API 요청당 페이지당 검색할 결과(문서) 수를 구성할 수 있습니다. 지정하지 않으면 기본값이 사용됩니다.
 
-## Instantiation
+## 인스턴스화
 
 ```python
 # Option 1: Using environment variables (ensure they are set)
@@ -51,22 +51,22 @@ loader = OutlineLoader(
 )
 ```
 
-## Load
+## 로드
 
-To load and return all documents available in the Outline instance
+Outline 인스턴스에서 사용 가능한 모든 문서를 로드하고 반환합니다.
 
 ```python
 loader.load()
 ```
 
-## Lazy Load
+## 지연 로드
 
-The lazy_load method allows you to iteratively load documents from the Outline collection, yielding each document as it is fetched:
+lazy_load 메서드를 사용하면 Outline 컬렉션에서 문서를 반복적으로 로드하여 가져온 각 문서를 생성할 수 있습니다:
 
 ```python
 loader.lazy_load()
 ```
 
-## API reference
+## API 레퍼런스
 
-For detailed documentation of all `Outline` features and configurations head to the API reference: [www.getoutline.com/developers](https://www.getoutline.com/developers)
+모든 `Outline` 기능 및 구성에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [www.getoutline.com/developers](https://www.getoutline.com/developers)

@@ -2,11 +2,11 @@
 title: Vsdx
 ---
 
-> A [visio file](https://fr.wikipedia.org/wiki/Microsoft_Visio) (with extension .vsdx) is associated with Microsoft Visio, a diagram creation software. It stores information about the structure, layout, and graphical elements of a diagram. This format facilitates the creation and sharing of visualizations in areas such as business, engineering, and computer science.
+> [visio 파일](https://fr.wikipedia.org/wiki/Microsoft_Visio)(.vsdx 확장자)은 다이어그램 생성 소프트웨어인 Microsoft Visio와 연결됩니다. 다이어그램의 구조, 레이아웃 및 그래픽 요소에 대한 정보를 저장합니다. 이 형식은 비즈니스, 엔지니어링, 컴퓨터 과학과 같은 분야에서 시각화를 생성하고 공유하는 것을 용이하게 합니다.
 
-A Visio file can contain multiple pages. Some of them may serve as the background for others, and this can occur across multiple layers. This **loader** extracts the textual content from each page and its associated pages, enabling the extraction of all visible text from each page, similar to what an OCR algorithm would do.
+Visio 파일에는 여러 페이지가 포함될 수 있습니다. 일부는 다른 페이지의 배경으로 사용될 수 있으며 이는 여러 레이어에 걸쳐 발생할 수 있습니다. 이 **로더**는 각 페이지와 관련 페이지에서 텍스트 콘텐츠를 추출하여 OCR 알고리즘이 수행하는 것과 유사하게 각 페이지에서 모든 표시 텍스트를 추출할 수 있습니다.
 
-**WARNING** : Only Visio files with the **.vsdx** extension are compatible with this loader. Files with extensions such as .vsd, ... are not compatible because they cannot be converted to compressed XML.
+**경고** : **.vsdx** 확장자를 가진 Visio 파일만 이 로더와 호환됩니다. .vsd 등과 같은 확장자를 가진 파일은 압축된 XML로 변환할 수 없기 때문에 호환되지 않습니다.
 
 ```python
 from langchain_community.document_loaders import VsdxLoader
@@ -17,23 +17,23 @@ loader = VsdxLoader(file_path="./example_data/fake.vsdx")
 documents = loader.load()
 ```
 
-**Display loaded documents**
+**로드된 문서 표시**
 
 ```python
 for i, doc in enumerate(documents):
-    print(f"\n------ Page {doc.metadata['page']} ------")
-    print(f"Title page : {doc.metadata['page_name']}")
-    print(f"Source : {doc.metadata['source']}")
-    print("\n==> CONTENT <== ")
+    print(f"\n------ 페이지 {doc.metadata['page']} ------")
+    print(f"제목 페이지 : {doc.metadata['page_name']}")
+    print(f"소스 : {doc.metadata['source']}")
+    print("\n==> 콘텐츠 <== ")
     print(doc.page_content)
 ```
 
 ```output
------- Page 0 ------
-Title page : Summary
-Source : ./example_data/fake.vsdx
+------ 페이지 0 ------
+제목 페이지 : Summary
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -51,11 +51,11 @@ This is an arrow
 This is Earth
 This is a bounded arrow
 
------- Page 1 ------
-Title page : Glossary
-Source : ./example_data/fake.vsdx
+------ 페이지 1 ------
+제목 페이지 : Glossary
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -69,11 +69,11 @@ Today
 0.0.0.0.0.1
 This is a title
 
------- Page 2 ------
-Title page : blanket page
-Source : ./example_data/fake.vsdx
+------ 페이지 2 ------
+제목 페이지 : blanket page
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -91,11 +91,11 @@ First text
 Second text
 Third text
 
------- Page 3 ------
-Title page : BLABLABLA
-Source : ./example_data/fake.vsdx
+------ 페이지 3 ------
+제목 페이지 : BLABLABLA
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -119,7 +119,7 @@ Something Red
 This a completely useless diagram, cool !!
 
 But this is for example !
-This diagram is a base of many pages in this file. But it is editable in file \"BG WITH CONTENT\"
+This diagram is a base of many pages in this file. But it is editable in file "BG WITH CONTENT"
 This is a page with something...
 
 WAW I have learned something !
@@ -129,11 +129,11 @@ WAW I have learned something !
 
 X2
 
------- Page 4 ------
-Title page : What a page !!
-Source : ./example_data/fake.vsdx
+------ 페이지 4 ------
+제목 페이지 : What a page !!
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -151,7 +151,7 @@ Something Red
 This a completely useless diagram, cool !!
 
 But this is for example !
-This diagram is a base of many pages in this file. But it is editable in file \"BG WITH CONTENT\"
+This diagram is a base of many pages in this file. But it is editable in file "BG WITH CONTENT"
 Another RED arrow wow
 Arrow with point but red
 Green line
@@ -159,11 +159,11 @@ User
 Captions
 Red arrow magic !
 
------- Page 5 ------
-Title page : next page after previous one
-Source : ./example_data/fake.vsdx
+------ 페이지 5 ------
+제목 페이지 : next page after previous one
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -187,9 +187,9 @@ Something Red
 This a completely useless diagram, cool !!
 
 But this is for example !
-This diagram is a base of many pages in this file. But it is editable in file \"BG WITH CONTENT\"
+This diagram is a base of many pages in this file. But it is editable in file "BG WITH CONTENT"
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0\u00a0-\u00a0incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
+                    -  incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
 
 
 voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa
@@ -198,11 +198,11 @@ voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occa
 
 qui officia deserunt mollit anim id est laborum.
 
------- Page 6 ------
-Title page : Connector Page
-Source : ./example_data/fake.vsdx
+------ 페이지 6 ------
+제목 페이지 : Connector Page
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -220,13 +220,13 @@ Something Red
 This a completely useless diagram, cool !!
 
 But this is for example !
-This diagram is a base of many pages in this file. But it is editable in file \"BG WITH CONTENT\"
+This diagram is a base of many pages in this file. But it is editable in file "BG WITH CONTENT"
 
------- Page 7 ------
-Title page : Useful ↔ Useless page
-Source : ./example_data/fake.vsdx
+------ 페이지 7 ------
+제목 페이지 : Useful ↔ Useless page
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -244,14 +244,14 @@ Something Red
 This a completely useless diagram, cool !!
 
 But this is for example !
-This diagram is a base of many pages in this file. But it is editable in file \"BG WITH CONTENT\"
+This diagram is a base of many pages in this file. But it is editable in file "BG WITH CONTENT"
 Title of this document : BLABLABLA
 
------- Page 8 ------
-Title page : Alone page
-Source : ./example_data/fake.vsdx
+------ 페이지 8 ------
+제목 페이지 : Alone page
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Black cloud
 Unidirectional traffic primary path
 Unidirectional traffic backup path
@@ -261,14 +261,14 @@ Captions
 Bidirectional traffic
 Alone, sad
 Test of another page
-This is a \"bannier\"
-Tests of some exotics characters :\u00a0\u00e3\u00e4\u00e5\u0101\u0103 \u00fc\u2554\u00a0 \u00a0\u00bc \u00c7 \u25d8\u25cb\u2642\u266b\u2640\u00ee\u2665
+This is a "bannier"
+Tests of some exotics characters : ãäåāă ü╔  ¼ Ç ◘○♂♫♀î♥
 This is ethernet
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 This is an empty case
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-\u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0 \u00a0-\u00a0 incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
+                    -  incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
 
 
  voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa
@@ -277,11 +277,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
 
 qui officia deserunt mollit anim id est laborum.
 
------- Page 9 ------
-Title page : BG
-Source : ./example_data/fake.vsdx
+------ 페이지 9 ------
+제목 페이지 : BG
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Best Caption of the worl
 This is an arrow
 This is Earth
@@ -299,11 +299,11 @@ Today
 0.0.0.0.0.1
 This is a title
 
------- Page 10 ------
-Title page : BG  + caption1
-Source : ./example_data/fake.vsdx
+------ 페이지 10 ------
+제목 페이지 : BG  + caption1
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -327,16 +327,16 @@ Something Red
 This a completely useless diagram, cool !!
 
 But this is for example !
-This diagram is a base of many pages in this file. But it is editable in file \"BG WITH CONTENT\"
-Useful\u2194 Useless page\u00a0
+This diagram is a base of many pages in this file. But it is editable in file "BG WITH CONTENT"
+Useful↔ Useless page 
 
-Tests of some exotics characters :\u00a0\u00e3\u00e4\u00e5\u0101\u0103 \u00fc\u2554\u00a0\u00a0\u00bc \u00c7 \u25d8\u25cb\u2642\u266b\u2640\u00ee\u2665
+Tests of some exotics characters : ãäåāă ü╔ ¼ Ç ◘○♂♫♀î♥
 
------- Page 11 ------
-Title page : BG+
-Source : ./example_data/fake.vsdx
+------ 페이지 11 ------
+제목 페이지 : BG+
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -350,11 +350,11 @@ Today
 0.0.0.0.0.1
 This is a title
 
------- Page 12 ------
-Title page : BG WITH CONTENT
-Source : ./example_data/fake.vsdx
+------ 페이지 12 ------
+제목 페이지 : BG WITH CONTENT
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -384,11 +384,11 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 This is a page with a lot of text
 
------- Page 13 ------
-Title page : 2nd caption with ____________________________________________________________________ content
-Source : ./example_data/fake.vsdx
+------ 페이지 13 ------
+제목 페이지 : 2nd caption with ____________________________________________________________________ content
+소스 : ./example_data/fake.vsdx
 
-==> CONTENT <==
+==> 콘텐츠 <==
 Created by
 Created the
 Modified by
@@ -412,6 +412,6 @@ Something Red
 This a completely useless diagram, cool !!
 
 But this is for example !
-This diagram is a base of many pages in this file. But it is editable in file \"BG WITH CONTENT\"
+This diagram is a base of many pages in this file. But it is editable in file "BG WITH CONTENT"
 Only connectors on this page. This is the CoNNeCtor page
 ```

@@ -2,16 +2,16 @@
 title: Oracle Autonomous Database
 ---
 
-Oracle Autonomous Database is a cloud database that uses machine learning to automate database tuning, security, backups, updates, and other routine management tasks traditionally performed by DBAs.
+Oracle Autonomous Database는 머신러닝을 사용하여 데이터베이스 튜닝, 보안, 백업, 업데이트 및 DBA가 전통적으로 수행하던 기타 일상적인 관리 작업을 자동화하는 클라우드 데이터베이스입니다.
 
-This notebook covers how to load documents from Oracle Autonomous Database, the loader supports connection with connection string or tns configuration.
+이 노트북에서는 Oracle Autonomous Database에서 문서를 로드하는 방법을 다룹니다. 로더는 연결 문자열 또는 tns 구성을 통한 연결을 지원합니다.
 
-## Prerequisites
+## 사전 요구 사항
 
-1. Install `python-oracledb`: `pip install oracledb`
-   1. See [Installing `python-oracledb`](https://python-oracledb.readthedocs.io/en/latest/user_guide/installation.html).
+1. `python-oracledb` 설치: `pip install oracledb`
+   1. [`python-oracledb` 설치하기](https://python-oracledb.readthedocs.io/en/latest/user_guide/installation.html)를 참조하세요.
 
-## Instructions
+## 사용 방법
 
 ```python
 pip install oracledb
@@ -22,7 +22,7 @@ from langchain_community.document_loaders import OracleAutonomousDatabaseLoader
 from settings import s
 ```
 
-With mutual TLS authentication (mTLS), wallet_location and wallet_password parameters are required to create the connection. See python-oracledb documentation [Connecting to Oracle Cloud Autonomous Databases](https://python-oracledb.readthedocs.io/en/latest/user_guide/connection_handling.html#connecting-to-oracle-cloud-autonomous-databases).
+상호 TLS 인증(mTLS)을 사용하는 경우, 연결을 생성하려면 wallet_location과 wallet_password 매개변수가 필요합니다. python-oracledb 문서의 [Oracle Cloud Autonomous Databases에 연결하기](https://python-oracledb.readthedocs.io/en/latest/user_guide/connection_handling.html#connecting-to-oracle-cloud-autonomous-databases)를 참조하세요.
 
 ```python
 SQL_QUERY = "select prod_id, time_id from sh.costs fetch first 5 rows only"
@@ -51,7 +51,7 @@ doc_loader_2 = OracleAutonomousDatabaseLoader(
 doc_2 = doc_loader_2.load()
 ```
 
-With 1-way TLS authentication, only the database credentials and connection string are required to establish a connection. The example below also shows passing bind variable values with the argument `parameters`.
+단방향 TLS 인증을 사용하는 경우, 연결을 설정하려면 데이터베이스 자격 증명과 연결 문자열만 필요합니다. 아래 예제는 `parameters` 인수로 바인드 변수 값을 전달하는 방법도 보여줍니다.
 
 ```python
 SQL_QUERY = "select channel_id, channel_desc from sh.channels where channel_desc = :1 fetch first 5 rows only"

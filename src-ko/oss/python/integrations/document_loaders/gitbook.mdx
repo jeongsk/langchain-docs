@@ -2,15 +2,15 @@
 title: GitBook
 ---
 
->[GitBook](https://docs.gitbook.com/) is a modern documentation platform where teams can document everything from products to internal knowledge bases and APIs.
+>[GitBook](https://docs.gitbook.com/)은 팀이 제품부터 내부 지식 베이스 및 API까지 모든 것을 문서화할 수 있는 현대적인 문서화 플랫폼입니다.
 
-This notebook shows how to pull page data from any `GitBook`.
+이 노트북은 모든 `GitBook`에서 페이지 데이터를 가져오는 방법을 보여줍니다.
 
 ```python
 from langchain_community.document_loaders import GitbookLoader
 ```
 
-### Load from single GitBook page
+### 단일 GitBook 페이지에서 로드
 
 ```python
 loader = GitbookLoader("https://docs.gitbook.com")
@@ -28,9 +28,9 @@ page_data
 [Document(page_content='Introduction to GitBook\nGitBook is a modern documentation platform where teams can document everything from products to internal knowledge bases and APIs.\nWe want to help \nteams to work more efficiently\n by creating a simple yet powerful platform for them to \nshare their knowledge\n.\nOur mission is to make a \nuser-friendly\n and \ncollaborative\n product for everyone to create, edit and share knowledge through documentation.\nPublish your documentation in 5 easy steps\nImport\n\nMove your existing content to GitBook with ease.\nGit Sync\n\nBenefit from our bi-directional synchronisation with GitHub and GitLab.\nOrganise your content\n\nCreate pages and spaces and organize them into collections\nCollaborate\n\nInvite other users and collaborate asynchronously with ease.\nPublish your docs\n\nShare your documentation with selected users or with everyone.\nNext\n - Getting started\nOverview\nLast modified \n3mo ago', lookup_str='', metadata={'source': 'https://docs.gitbook.com', 'title': 'Introduction to GitBook'}, lookup_index=0)]
 ```
 
-### Load from all paths in a given GitBook
+### 주어진 GitBook의 모든 경로에서 로드
 
-For this to work, the GitbookLoader needs to be initialized with the root path (`https://docs.gitbook.com` in this example) and have `load_all_paths` set to `True`.
+이 작업이 작동하려면, GitbookLoader가 루트 경로(이 예시에서는 `https://docs.gitbook.com`)로 초기화되어야 하고 `load_all_paths`가 `True`로 설정되어야 합니다.
 
 ```python
 loader = GitbookLoader("https://docs.gitbook.com", load_all_paths=True)
@@ -70,7 +70,7 @@ Fetching text from https://docs.gitbook.com/troubleshooting/support
 
 ```python
 print(f"fetched {len(all_pages_data)} documents.")
-# show second document
+# 두 번째 문서 표시
 all_pages_data[2]
 ```
 
