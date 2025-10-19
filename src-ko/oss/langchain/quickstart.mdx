@@ -1,16 +1,22 @@
 ---
-title: Quickstart
+title: 빠른 시작
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
+:::python
+<AlphaCalloutPy />
+:::
+:::js
+<AlphaCalloutJS />
+:::
 
-This quickstart takes you from a simple setup to a fully functional AI agent in just a few minutes.
+이 빠른 시작 가이드는 간단한 설정에서 완전히 기능하는 AI 에이전트를 단 몇 분 만에 구축하는 방법을 안내합니다.
 
-## Build a basic agent
+## 기본 에이전트 구축하기
 
-Start by creating a simple agent that can answer questions and call tools. The agent will use Claude Sonnet 4.5 as its language model, a basic weather function as a tool, and a simple prompt to guide its behavior.
+질문에 답변하고 도구를 호출할 수 있는 간단한 에이전트를 만드는 것부터 시작하세요. 이 에이전트는 Claude Sonnet 4.5를 언어 모델로 사용하고, 기본 날씨 함수를 도구로 사용하며, 간단한 프롬프트로 동작을 안내합니다.
 
 :::python
 ```python
@@ -63,25 +69,25 @@ console.log(
 :::
 
 <Info>
-    For this example, you will need to set up a [Claude (Anthropic)](https://www.anthropic.com/) account and get an API key. Then, set the `ANTHROPIC_API_KEY` environment variable in your terminal.
+    이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
 </Info>
 
-## Build a real-world agent
+## 실전 에이전트 구축하기
 
-Next, build a practical weather forecasting agent that demonstrates key production concepts:
+다음으로, 주요 프로덕션 개념을 보여주는 실용적인 날씨 예보 에이전트를 구축해 보겠습니다:
 
-1. **Detailed system prompts** for better agent behavior
-2. **Create tools** that integrate with external data
-3. **Model configuration** for consistent responses
-4. **Structured output** for predictable results
-5. **Conversational memory** for chat-like interactions
-6. **Create and run the agent** create a fully functional agent
+1. **상세한 시스템 프롬프트**로 더 나은 에이전트 동작 구현
+2. 외부 데이터와 통합하는 **도구 생성**
+3. 일관된 응답을 위한 **모델 구성**
+4. 예측 가능한 결과를 위한 **구조화된 출력**
+5. 대화형 상호작용을 위한 **대화 메모리**
+6. 완전히 기능하는 에이전트 **생성 및 실행**
 
-Let's walk through each step:
+각 단계를 자세히 살펴보겠습니다:
 
 <Steps>
-    <Step title="Define the system prompt">
-        The system prompt defines your agent’s role and behavior. Keep it specific and actionable:
+    <Step title="시스템 프롬프트 정의">
+        시스템 프롬프트는 에이전트의 역할과 동작을 정의합니다. 구체적이고 실행 가능하게 작성하세요:
 
         :::python
         ```python wrap
@@ -109,17 +115,18 @@ Let's walk through each step:
         ```
         :::
     </Step>
-    <Step title="Create tools">
+    <Step title="도구 생성">
         :::python
-        [Tools](/oss/langchain/tools) let a model interact with external systems by calling functions you define.
-        Tools can depend on [runtime context](/oss/langchain/runtime) and also interact with [agent memory](/oss/langchain/short-term-memory).
+        [도구](/oss/langchain/tools)를 사용하면 모델이 정의한 함수를 호출하여 외부 시스템과 상호작용할 수 있습니다.
+        도구는 [런타임 컨텍스트](/oss/langchain/runtime)에 의존할 수 있으며 [에이전트 메모리](/oss/langchain/short-term-memory)와도 상호작용할 수 있습니다.
 
-        Notice below how the `get_user_location` tool uses runtime context:
+        아래에서 `get_user_location` 도구가 런타임 컨텍스트를 사용하는 방법을 확인하세요:
 
         ```python
         from dataclasses import dataclass
-        from langgraph.runtime import get_runtime
+        from langchain.tools import tool, ToolRuntime
 
+        @tool
         def get_weather_for_location(city: str) -> str:
             """Get weather for a given city."""
             return f"It's always sunny in {city}!"
@@ -129,21 +136,21 @@ Let's walk through each step:
             """Custom runtime context schema."""
             user_id: str
 
-        def get_user_location() -> str:
+        @tool
+        def get_user_location(runtime: ToolRuntime[Context]) -> str:
             """Retrieve user information based on user ID."""
-            runtime = get_runtime(Context)
             user_id = runtime.context.user_id
             return "Florida" if user_id == "1" else "SF"
         ```
 
         <Tip>
-            Tools should be well-documented: their name, description, and argument names become part of the model's prompt.
-            We've defined them here as plain Python functions, but LangChain's @[@tool decorator][@tool] decorator is often used to add extra metadata.
+            도구는 잘 문서화되어야 합니다: 도구의 이름, 설명, 인자 이름이 모델의 프롬프트의 일부가 됩니다.
+            LangChain의 @[`@tool` 데코레이터][@tool]는 메타데이터를 추가하고 `ToolRuntime` 매개변수를 통해 런타임 주입을 활성화합니다.
         </Tip>
         :::
 
         :::js
-        [Tools](/oss/langchain/tools) are functions your agent can call. Oftentimes tools will want to connect to external systems, and will rely on runtime configuration to do so. Notice here how the `getUserLocation` tool does exactly that:
+        [도구](/oss/langchain/tools)는 에이전트가 호출할 수 있는 함수입니다. 도구는 종종 외부 시스템에 연결하려고 하며, 이를 위해 런타임 구성에 의존합니다. 여기서 `getUserLocation` 도구가 정확히 그렇게 하는 방법을 확인하세요:
 
         ```ts
         import { type Runtime } from "@langchain/langgraph";
@@ -176,11 +183,11 @@ Let's walk through each step:
         ```
 
         <Note>
-            [Zod](https://zod.dev/) is a library for validating and parsing pre-defined schemas. You can use it to define the input schema for your tools to make sure the agent only calls the tool with the correct arguments.
+            [Zod](https://zod.dev/)는 미리 정의된 스키마를 검증하고 파싱하는 라이브러리입니다. 도구의 입력 스키마를 정의하여 에이전트가 올바른 인자로만 도구를 호출하도록 할 수 있습니다.
 
-            Alternatively, you can define the `schema` property as a [JSON schema](https://json-schema.org/overview/what-is-jsonschema) object. Keep in mind that JSON schemas **won't** be validated at runtime.
+            또는 `schema` 속성을 [JSON 스키마](https://json-schema.org/overview/what-is-jsonschema) 객체로 정의할 수 있습니다. JSON 스키마는 런타임에 검증되지 **않는다**는 점을 유의하세요.
 
-            <Accordion title="Example: Using JSON schema for tool input">
+            <Accordion title="예제: 도구 입력에 JSON 스키마 사용하기">
                 ```ts
                 const getWeather = tool(
                   ({ city }) => `It's always sunny in ${city}!`,
@@ -204,8 +211,8 @@ Let's walk through each step:
         </Note>
         :::
     </Step>
-    <Step title="Configure your model">
-        Set up your [language model](/oss/langchain/models) with the right [parameters](/oss/langchain/models#parameters) for your use case:
+    <Step title="모델 구성">
+        사용 사례에 적합한 [매개변수](/oss/langchain/models#parameters)로 [언어 모델](/oss/langchain/models)을 설정하세요:
 
         :::python
         ```python
@@ -231,10 +238,9 @@ Let's walk through each step:
         ```
         :::
     </Step>
-    <Step title="Define response format">
+    <Step title="응답 형식 정의">
         :::python
-        Optionally, define a structured response format if you need the agent responses to match
-        a specific schema.
+        에이전트 응답이 특정 스키마와 일치해야 하는 경우, 선택적으로 구조화된 응답 형식을 정의할 수 있습니다.
 
         ```python
         from dataclasses import dataclass
@@ -251,8 +257,7 @@ Let's walk through each step:
         :::
 
         :::js
-        Optionally, define a structured response format if you need the agent responses to match
-        a specific schema.
+        에이전트 응답이 특정 스키마와 일치해야 하는 경우, 선택적으로 구조화된 응답 형식을 정의할 수 있습니다.
 
         ```ts
         const responseFormat = z.object({
@@ -262,9 +267,8 @@ Let's walk through each step:
         ```
         :::
     </Step>
-    <Step title="Add memory">
-        Add [memory](/oss/langchain/short-term-memory) to your agent to maintain state across interactions. This allows
-        the agent to remember previous conversations and context.
+    <Step title="메모리 추가">
+        에이전트에 [메모리](/oss/langchain/short-term-memory)를 추가하여 상호작용 간 상태를 유지하세요. 이를 통해 에이전트가 이전 대화와 컨텍스트를 기억할 수 있습니다.
 
         :::python
         ```python
@@ -283,12 +287,12 @@ Let's walk through each step:
         :::
 
         <Info>
-            In production, use a persistent checkpointer that saves to a database.
-            See [Add and manage memory](/oss/langgraph/add-memory#manage-short-term-memory) for more details.
+            프로덕션 환경에서는 데이터베이스에 저장하는 영구 체크포인터를 사용하세요.
+            자세한 내용은 [메모리 추가 및 관리](/oss/langgraph/add-memory#manage-short-term-memory)를 참조하세요.
         </Info>
     </Step>
-    <Step title="Create and run the agent">
-        Now assemble your agent with all the components and run it!
+    <Step title="에이전트 생성 및 실행">
+        이제 모든 구성 요소로 에이전트를 조립하고 실행하세요!
 
         :::python
 
@@ -375,15 +379,15 @@ Let's walk through each step:
     </Step>
 </Steps>
 
-<Expandable title="Full example code">
+<Expandable title="전체 예제 코드">
 :::python
 ```python
 from dataclasses import dataclass
 
 from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
+from langchain.tools import tool, ToolRuntime
 from langgraph.checkpoint.memory import InMemorySaver
-from langgraph.runtime import get_runtime
 
 # Define system prompt
 system_prompt = """You are an expert weather forecaster, who speaks in puns.
@@ -402,13 +406,14 @@ class Context:
     user_id: str
 
 # Define tools
+@tool
 def get_weather_for_location(city: str) -> str:
     """Get weather for a given city."""
     return f"It's always sunny in {city}!"
 
-def get_user_location() -> str:
+@tool
+def get_user_location(runtime: ToolRuntime[Context]) -> str:
     """Retrieve user information based on user ID."""
-    runtime = get_runtime(Context)
     user_id = runtime.context.user_id
     return "Florida" if user_id == "1" else "SF"
 
@@ -475,8 +480,7 @@ print(response['structured_response'])
 
 :::js
 ```ts
-import { createAgent, tool } from "langchain";
-import { initChatModel } from "langchain/chat_models";
+import { createAgent, tool, initChatModel } from "langchain";
 import { MemorySaver, type Runtime } from "@langchain/langgraph";
 import * as z from "zod";
 
@@ -569,10 +573,10 @@ console.log(thankYouResponse.structuredResponse);
 :::
 </Expandable>
 
-Congratulations! You now have an AI agent that can:
+축하합니다! 이제 다음 기능을 갖춘 AI 에이전트를 보유하게 되었습니다:
 
-- **Understand context** and remember conversations
-- **Use multiple tools** intelligently
-- **Provide structured responses** in a consistent format
-- **Handle user-specific information** through context
-- **Maintain conversation state** across interactions
+- **컨텍스트 이해**와 대화 기억
+- **여러 도구를 지능적으로 사용**
+- **일관된 형식의 구조화된 응답** 제공
+- 컨텍스트를 통한 **사용자별 정보 처리**
+- 상호작용 간 **대화 상태 유지**
