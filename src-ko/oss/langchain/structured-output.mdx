@@ -1,16 +1,22 @@
 ---
-title: Structured output
+title: 구조화된 출력
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
+:::python
+<AlphaCalloutPy />
+:::
+:::js
+<AlphaCalloutJS />
+:::
 
 :::python
 
-Structured output allows agents to return data in a specific, predictable format. Instead of parsing natural language responses, you get structured data in the form of JSON objects, Pydantic models, or dataclasses that your application can directly use.
+구조화된 출력을 사용하면 에이전트가 특정하고 예측 가능한 형식으로 데이터를 반환할 수 있습니다. 자연어 응답을 파싱하는 대신 애플리케이션에서 직접 사용할 수 있는 JSON 객체, Pydantic 모델 또는 dataclass 형태의 구조화된 데이터를 얻을 수 있습니다.
 
-LangChain's `create_agent()` handles structured output automatically. The user sets their desired structured output schema, and when the model generates the structured data, it's captured, validated, and returned in the `'structured_response'` key of the agent's state.
+LangChain의 @[`create_agent`]는 구조화된 출력을 자동으로 처리합니다. 사용자가 원하는 구조화된 출력 스키마를 설정하면 모델이 구조화된 데이터를 생성할 때 이를 캡처하고 검증하여 에이전트 상태의 `'structured_response'` 키에 반환합니다.
 
 ```python
 def create_agent(
@@ -23,23 +29,23 @@ def create_agent(
 ```
 
 ## Response Format
-Controls how the agent returns structured data:
+에이전트가 구조화된 데이터를 반환하는 방법을 제어합니다:
 
-- **`ToolStrategy[StructuredResponseT]`**: Uses tool calling for structured output
-- **`ProviderStrategy[StructuredResponseT]`**: Uses provider-native structured output
-- **`type[StructuredResponseT]`**: Schema type - automatically selects best strategy based on model capabilities
-- **`None`**: No structured output
+- **`ToolStrategy[StructuredResponseT]`**: 구조화된 출력에 도구 호출 사용
+- **`ProviderStrategy[StructuredResponseT]`**: 프로바이더 네이티브 구조화된 출력 사용
+- **`type[StructuredResponseT]`**: 스키마 타입 - 모델 기능을 기반으로 최적의 전략을 자동으로 선택
+- **`None`**: 구조화된 출력 없음
 
-When a schema type is provided directly, LangChain automatically chooses:
-- `ProviderStrategy` for models supporting native structured output (OpenAI, Grok)
-- `ToolStrategy` for all other models
+스키마 타입이 직접 제공되면 LangChain은 자동으로 다음을 선택합니다:
+- 네이티브 구조화된 출력을 지원하는 모델(OpenAI, Grok)에 대해 `ProviderStrategy`
+- 다른 모든 모델에 대해 `ToolStrategy`
 
-The structured response is returned in the `structured_response` key of the agent's final state.
+구조화된 응답은 에이전트 최종 상태의 `structured_response` 키에 반환됩니다.
 :::
 :::js
-Structured output allows agents to return data in a specific, predictable format. Instead of parsing natural language responses, you get typed structured data.
+구조화된 출력을 사용하면 에이전트가 특정하고 예측 가능한 형식으로 데이터를 반환할 수 있습니다. 자연어 응답을 파싱하는 대신 타입이 지정된 구조화된 데이터를 얻을 수 있습니다.
 
-LangChain's prebuilt ReAct agent `createAgent` handles structured output automatically. The user sets their desired structured output schema, and when the model generates the structured data, it's captured, validated, and returned in the `structuredResponse` key of the agent's state.
+LangChain의 사전 구축된 ReAct 에이전트 `createAgent`는 구조화된 출력을 자동으로 처리합니다. 사용자가 원하는 구조화된 출력 스키마를 설정하면 모델이 구조화된 데이터를 생성할 때 이를 캡처하고 검증하여 에이전트 상태의 `structuredResponse` 키에 반환합니다.
 
 ```ts
 type ResponseFormat = (
@@ -54,29 +60,29 @@ const agent = createAgent({
 ```
 
 ## Response Format
-    Controls how the agent returns structured data. You can provide either a Zod object or JSON schema. By default, the agent uses a tool calling strategy, in which the output is created by an additional tool call. Certain models support native structured output, in which case the agent will use that strategy instead.
+에이전트가 구조화된 데이터를 반환하는 방법을 제어합니다. Zod 객체 또는 JSON 스키마를 제공할 수 있습니다. 기본적으로 에이전트는 추가 도구 호출로 출력이 생성되는 도구 호출 전략을 사용합니다. 특정 모델은 네이티브 구조화된 출력을 지원하며, 이 경우 에이전트는 대신 해당 전략을 사용합니다.
 
-    You can control the behavior by wrapping `ResponseFormat` in a `toolStrategy` or `providerStrategy` function call:
+`ResponseFormat`을 `toolStrategy` 또는 `providerStrategy` 함수 호출로 래핑하여 동작을 제어할 수 있습니다:
 
-    ```ts
-    import { toolStrategy, providerStrategy } from "langchain";
+```ts
+import { toolStrategy, providerStrategy } from "langchain";
 
-    const agent = createAgent({
-        // use a provider strategy if supported by the model
-        responseFormat: providerStrategy(z.object({ ... }))
-        // or enforce a tool strategy
-        responseFormat: toolStrategy(z.object({ ... }))
-    })
-    ```
+const agent = createAgent({
+    // use a provider strategy if supported by the model
+    responseFormat: providerStrategy(z.object({ ... }))
+    // or enforce a tool strategy
+    responseFormat: toolStrategy(z.object({ ... }))
+})
+```
 
-    The structured response is returned in the `structuredResponse` key of the agent's final state.
+구조화된 응답은 에이전트 최종 상태의 `structuredResponse` 키에 반환됩니다.
 :::
 
 ## Provider strategy
 
-Some model providers support structured output natively through their APIs (currently only OpenAI and Grok). This is the most reliable method when available.
+일부 모델 프로바이더는 API를 통해 네이티브로 구조화된 출력을 지원합니다(현재 OpenAI와 Grok만 지원). 이는 사용 가능할 때 가장 신뢰할 수 있는 방법입니다.
 
-To use this strategy, configure a `ProviderStrategy`:
+이 전략을 사용하려면 `ProviderStrategy`를 구성하세요:
 
 :::python
 ```python
@@ -85,14 +91,14 @@ class ProviderStrategy(Generic[SchemaT]):
 ```
 
 <ParamField path="schema" required>
-    The schema defining the structured output format. Supports:
-    - **Pydantic models**: `BaseModel` subclasses with field validation
-    - **Dataclasses**: Python dataclasses with type annotations
-    - **TypedDict**: Typed dictionary classes
-    - **JSON Schema**: Dictionary with JSON schema specification
+    구조화된 출력 형식을 정의하는 스키마. 지원하는 것:
+    - **Pydantic models**: 필드 검증이 있는 `BaseModel` 서브클래스
+    - **Dataclasses**: 타입 주석이 있는 Python dataclass
+    - **TypedDict**: 타입이 지정된 딕셔너리 클래스
+    - **JSON Schema**: JSON 스키마 사양이 있는 딕셔너리
 </ParamField>
 
-LangChain automatically uses `ProviderStrategy` when you pass a schema type directly to `create_agent.response_format` and the model supports native structured output:
+LangChain은 스키마 타입을 @[`create_agent.response_format`][create_agent(response_format)]에 직접 전달하고 모델이 네이티브 구조화된 출력을 지원할 때 자동으로 `ProviderStrategy`를 사용합니다:
 
 <CodeGroup>
     ```python Pydantic Model
@@ -205,12 +211,12 @@ function providerStrategy<StructuredResponseT>(
 ```
 
 <ParamField path="schema" required>
-    The schema defining the structured output format. Supports:
-    - **Zod Schema**: A zod schema
-    - **JSON Schema**: A JSON schema object
+    구조화된 출력 형식을 정의하는 스키마. 지원하는 것:
+    - **Zod Schema**: Zod 스키마
+    - **JSON Schema**: JSON 스키마 객체
 </ParamField>
 
-LangChain automatically uses `ProviderStrategy` when you pass a schema type directly to `createAgent.responseFormat` and the model supports native structured output:
+LangChain은 스키마 타입을 `createAgent.responseFormat`에 직접 전달하고 모델이 네이티브 구조화된 출력을 지원할 때 자동으로 `ProviderStrategy`를 사용합니다:
 
 <CodeGroup>
     ```ts Zod Schema
@@ -267,24 +273,24 @@ LangChain automatically uses `ProviderStrategy` when you pass a schema type dire
 </CodeGroup>
 :::
 
-Provider-native structured output provides high reliability and strict validation because the model provider enforces the schema. Use it when available.
+프로바이더 네이티브 구조화된 출력은 모델 프로바이더가 스키마를 시행하므로 높은 신뢰성과 엄격한 검증을 제공합니다. 사용 가능할 때 이를 사용하세요.
 
 :::python
 <Note>
-    If the provider natively supports structured output for your model choice, it is functionally equivalent to write `response_format=ProductReview` instead of `response_format=ToolStrategy(ProductReview)`. In either case, if structured output is not supported, the agent will fall back to a tool calling strategy.
+    프로바이더가 모델 선택에 대해 네이티브로 구조화된 출력을 지원하는 경우 `response_format=ProductReview` 대신 `response_format=ToolStrategy(ProductReview)`를 작성하는 것과 기능적으로 동일합니다. 어느 경우든 구조화된 출력이 지원되지 않으면 에이전트는 도구 호출 전략으로 대체됩니다.
 </Note>
 :::
 :::js
 <Note>
-    If the provider natively supports structured output for your model choice, it is functionally equivalent to write `responseFormat: contactInfoSchema` instead of `responseFormat: toolStrategy(contactInfoSchema)`. In either case, if structured output is not supported, the agent will fall back to a tool calling strategy.
+    프로바이더가 모델 선택에 대해 네이티브로 구조화된 출력을 지원하는 경우 `responseFormat: contactInfoSchema` 대신 `responseFormat: toolStrategy(contactInfoSchema)`를 작성하는 것과 기능적으로 동일합니다. 어느 경우든 구조화된 출력이 지원되지 않으면 에이전트는 도구 호출 전략으로 대체됩니다.
 </Note>
 :::
 
 ## Tool calling strategy
 
-For models that don't support native structured output, LangChain uses tool calling to achieve the same result. This works with all models that support tool calling, which is most modern models.
+네이티브 구조화된 출력을 지원하지 않는 모델의 경우 LangChain은 도구 호출을 사용하여 동일한 결과를 얻습니다. 이는 대부분의 최신 모델인 도구 호출을 지원하는 모든 모델에서 작동합니다.
 
-To use this strategy, configure a `ToolStrategy`:
+이 전략을 사용하려면 `ToolStrategy`를 구성하세요:
 
 :::python
 ```python
@@ -301,28 +307,28 @@ class ToolStrategy(Generic[SchemaT]):
 ```
 
 <ParamField path="schema" required>
-    The schema defining the structured output format. Supports:
-    - **Pydantic models**: `BaseModel` subclasses with field validation
-    - **Dataclasses**: Python dataclasses with type annotations
-    - **TypedDict**: Typed dictionary classes
-    - **JSON Schema**: Dictionary with JSON schema specification
-    - **Union types**: Multiple schema options. The model will choose the most appropriate schema based on the context.
+    구조화된 출력 형식을 정의하는 스키마. 지원하는 것:
+    - **Pydantic models**: 필드 검증이 있는 `BaseModel` 서브클래스
+    - **Dataclasses**: 타입 주석이 있는 Python dataclass
+    - **TypedDict**: 타입이 지정된 딕셔너리 클래스
+    - **JSON Schema**: JSON 스키마 사양이 있는 딕셔너리
+    - **Union types**: 여러 스키마 옵션. 모델은 컨텍스트를 기반으로 가장 적절한 스키마를 선택합니다.
 </ParamField>
 
 <ParamField path="tool_message_content">
-    Custom content for the tool message returned when structured output is generated.
-    If not provided, defaults to a message showing the structured response data.
+    구조화된 출력이 생성될 때 반환되는 도구 메시지의 사용자 정의 콘텐츠.
+    제공되지 않으면 구조화된 응답 데이터를 보여주는 메시지가 기본값입니다.
 </ParamField>
 
 <ParamField path="handle_errors">
-    Error handling strategy for structured output validation failures. Defaults to `True`.
+    구조화된 출력 검증 실패에 대한 오류 처리 전략. 기본값은 `True`입니다.
 
-    - **`True`**: Catch all errors with default error template
-    - **`str`**: Catch all errors with this custom message
-    - **`type[Exception]`**: Only catch this exception type with default message
-    - **`tuple[type[Exception], ...]`**: Only catch these exception types with default message
-    - **`Callable[[Exception], str]`**: Custom function that returns error message
-    - **`False`**: No retry, let exceptions propagate
+    - **`True`**: 기본 오류 템플릿으로 모든 오류 포착
+    - **`str`**: 이 사용자 정의 메시지로 모든 오류 포착
+    - **`type[Exception]`**: 기본 메시지로 이 예외 타입만 포착
+    - **`tuple[type[Exception], ...]`**: 기본 메시지로 이러한 예외 타입만 포착
+    - **`Callable[[Exception], str]`**: 오류 메시지를 반환하는 사용자 정의 함수
+    - **`False`**: 재시도 없음, 예외를 전파
 </ParamField>
 
 <CodeGroup>
@@ -477,7 +483,7 @@ class ToolStrategy(Generic[SchemaT]):
 
 ### Custom tool message content
 
-The `tool_message_content` parameter allows you to customize the message that appears in the conversation history when structured output is generated:
+`tool_message_content` 매개변수를 사용하면 구조화된 출력이 생성될 때 대화 기록에 나타나는 메시지를 사용자 정의할 수 있습니다:
 
 ```python
 from pydantic import BaseModel, Field
@@ -523,7 +529,7 @@ Name: MeetingAction
 Action item captured and added to meeting notes!
 ```
 
-Without `tool_message_content`, our final `ToolMessage` would be:
+`tool_message_content`가 없으면 최종 @[`ToolMessage`]는 다음과 같습니다:
 ```
 ================================= Tool Message =================================
 Name: MeetingAction
@@ -543,22 +549,22 @@ function toolStrategy<StructuredResponseT>(
 ```
 
 <ParamField path="schema" required>
-    The schema defining the structured output format. Supports:
-    - **Zod Schema**: A zod schema
-    - **JSON Schema**: A JSON schema object
+    구조화된 출력 형식을 정의하는 스키마. 지원하는 것:
+    - **Zod Schema**: Zod 스키마
+    - **JSON Schema**: JSON 스키마 객체
 </ParamField>
 
 <ParamField path="options.toolMessageContent">
-    Custom content for the tool message returned when structured output is generated.
-    If not provided, defaults to a message showing the structured response data.
+    구조화된 출력이 생성될 때 반환되는 도구 메시지의 사용자 정의 콘텐츠.
+    제공되지 않으면 구조화된 응답 데이터를 보여주는 메시지가 기본값입니다.
 </ParamField>
 
 <ParamField path="options.handleError">
-    Options parameter containing an optional `handleError` parameter for customizing the error handling strategy.
+    오류 처리 전략을 사용자 정의하기 위한 선택적 `handleError` 매개변수를 포함하는 옵션 매개변수.
 
-    - **`true`**: Catch all errors with default error template (default)
-    - **`False`**: No retry, let exceptions propagate
-    - **`(error: ToolStrategyError) => string | Promise<string>`**: retry with the provided message or throw the error
+    - **`true`**: 기본 오류 템플릿으로 모든 오류 포착 (기본값)
+    - **`False`**: 재시도 없음, 예외를 전파
+    - **`(error: ToolStrategyError) => string | Promise<string>`**: 제공된 메시지로 재시도하거나 오류를 발생
 </ParamField>
 
 <CodeGroup>
@@ -660,7 +666,7 @@ function toolStrategy<StructuredResponseT>(
 
 ### Custom tool message content
 
-The `toolMessageContent` parameter allows you to customize the message that appears in the conversation history when structured output is generated:
+`toolMessageContent` 매개변수를 사용하면 구조화된 출력이 생성될 때 대화 기록에 나타나는 메시지를 사용자 정의할 수 있습니다:
 
 ```ts
 import * as z from "zod";
@@ -697,7 +703,7 @@ console.log(result);
  */
 ```
 
-Without `toolMessageContent`, we'd see:
+`toolMessageContent`가 없으면 다음과 같이 표시됩니다:
 
 ```ts
 # console.log(result);
@@ -715,11 +721,11 @@ Without `toolMessageContent`, we'd see:
 
 ### Error handling
 
-Models can make mistakes when generating structured output via tool calling. LangChain provides intelligent retry mechanisms to handle these errors automatically.
+모델은 도구 호출을 통해 구조화된 출력을 생성할 때 실수를 할 수 있습니다. LangChain은 이러한 오류를 자동으로 처리하기 위한 지능형 재시도 메커니즘을 제공합니다.
 
 #### Multiple structured outputs error
 
-When a model incorrectly calls multiple structured output tools, the agent provides error feedback in a `ToolMessage` and prompts the model to retry:
+모델이 여러 구조화된 출력 도구를 잘못 호출하면 에이전트는 @[`ToolMessage`]에서 오류 피드백을 제공하고 모델에 재시도를 요청합니다:
 
 :::python
 ```python
@@ -838,7 +844,7 @@ console.log(result);
 
 #### Schema validation error
 
-When structured output doesn't match the expected schema, the agent provides specific error feedback:
+구조화된 출력이 예상 스키마와 일치하지 않으면 에이전트는 특정 오류 피드백을 제공합니다:
 
 :::python
 ```python
@@ -894,16 +900,16 @@ Returning structured response: {'rating': 5, 'comment': 'Amazing product'}
 
 #### Error handling strategies
 
-You can customize how errors are handled using the `handle_errors` parameter:
+`handle_errors` 매개변수를 사용하여 오류 처리 방법을 사용자 정의할 수 있습니다:
 
-**Custom error message:**
+**사용자 정의 오류 메시지:**
 ```python
 ToolStrategy(
     schema=ProductRating,
     handle_errors="Please provide a valid rating between 1-5 and include a comment."
 )
 ```
-If `handle_errors` is a string, the agent will *always* prompt the model to re-try with a fixed tool message:
+`handle_errors`가 문자열인 경우 에이전트는 *항상* 고정된 도구 메시지로 모델에 재시도를 요청합니다:
 ```
 ================================= Tool Message =================================
 Name: ProductRating
@@ -911,7 +917,7 @@ Name: ProductRating
 Please provide a valid rating between 1-5 and include a comment.
 ```
 
-**Handle specific exceptions only:**
+**특정 예외만 처리:**
 ```python
 ToolStrategy(
     schema=ProductRating,
@@ -919,9 +925,9 @@ ToolStrategy(
 )
 ```
 
-If `handle_errors` is an exception type, the agent will only retry (using the default error message) if the exception raised is the specified type. In all other cases, the exception will be raised.
+`handle_errors`가 예외 타입인 경우 에이전트는 발생한 예외가 지정된 타입인 경우에만 (기본 오류 메시지 사용) 재시도합니다. 다른 모든 경우에는 예외가 발생합니다.
 
-**Handle multiple exception types:**
+**여러 예외 타입 처리:**
 ```python
 ToolStrategy(
     schema=ProductRating,
@@ -929,9 +935,9 @@ ToolStrategy(
 )
 ```
 
-If `handle_errors` is a tuple of exceptions, the agent will only retry (using the default error message) if the exception raised is one of the specified types. In all other cases, the exception will be raised.
+`handle_errors`가 예외 튜플인 경우 에이전트는 발생한 예외가 지정된 타입 중 하나인 경우에만 (기본 오류 메시지 사용) 재시도합니다. 다른 모든 경우에는 예외가 발생합니다.
 
-**Custom error handler function:**
+**사용자 정의 오류 핸들러 함수:**
 ```python
 def custom_error_handler(error: Exception) -> str:
     if isinstance(error, StructuredOutputValidationError):
@@ -947,7 +953,7 @@ ToolStrategy(
 )
 ```
 
-On `StructuredOutputValidationError`:
+`StructuredOutputValidationError`에서:
 ```
 ================================= Tool Message =================================
 Name: ToolStrategy
@@ -955,7 +961,7 @@ Name: ToolStrategy
 There was an issue with the format. Try again.
 ```
 
-On `MultipleStructuredOutputsError`:
+`MultipleStructuredOutputsError`에서:
 
 ```
 ================================= Tool Message =================================
@@ -964,7 +970,7 @@ Name: ToolStrategy
 Multiple structured outputs were returned. Pick the most relevant one.
 ```
 
-On other errors:
+다른 오류에서:
 
 ```
 ================================= Tool Message =================================
@@ -973,7 +979,7 @@ Name: ToolStrategy
 Error: <error message>
 ```
 
-**No error handling:**
+**오류 처리 없음:**
 ```python
 response_format = ToolStrategy(
     schema=ProductRating,
@@ -1024,9 +1030,9 @@ console.log(result);
 
 #### Error handling strategies
 
-You can customize how errors are handled using the `handleErrors` parameter:
+`handleErrors` 매개변수를 사용하여 오류 처리 방법을 사용자 정의할 수 있습니다:
 
-**Custom error message:**
+**사용자 정의 오류 메시지:**
 ```ts
 const responseFormat = toolStrategy(ProductRating, {
     handleError: "Please provide a valid rating between 1-5 and include a comment."
@@ -1036,7 +1042,7 @@ const responseFormat = toolStrategy(ProductRating, {
 // { role: "tool", content: "Please provide a valid rating between 1-5 and include a comment." }
 ```
 
-**Handle specific exceptions only:**
+**특정 예외만 처리:**
 ```ts
 import { ToolInputParsingException } from "@langchain/core/tools";
 
@@ -1053,7 +1059,7 @@ const responseFormat = toolStrategy(ProductRating, {
 // { role: "tool", content: "Error: Failed to parse structured output for tool 'ProductRating': ...\n Please fix your mistakes." }
 ```
 
-**Handle multiple exception types:**
+**여러 예외 타입 처리:**
 ```ts
 const responseFormat = toolStrategy(ProductRating, {
     handleError: (error: ToolStrategyError) => {
@@ -1068,7 +1074,7 @@ const responseFormat = toolStrategy(ProductRating, {
 )
 ```
 
-**No error handling:**
+**오류 처리 없음:**
 ```ts
 const responseFormat = toolStrategy(ProductRating, {
     handleError: false  // All errors raised

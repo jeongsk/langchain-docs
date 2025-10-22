@@ -1,37 +1,37 @@
 ---
-title: Build a supervisor agent
-sidebarTitle: Supervisor agent
+title: Supervisor 에이전트 구축하기
+sidebarTitle: Supervisor 에이전트
 ---
 
 import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
 
-## Overview
+## 개요
 
-The **supervisor pattern** is a [multi-agent](/oss/langchain/multi-agent) architecture where a central supervisor agent coordinates specialized worker agents. This approach excels when tasks require different types of expertise. Rather than building one agent that manages tool selection across domains, you create focused specialists coordinated by a supervisor who understands the overall workflow.
+**supervisor 패턴**은 중앙 supervisor 에이전트가 전문화된 worker 에이전트들을 조정하는 [멀티 에이전트](/oss/langchain/multi-agent) 아키텍처입니다. 이 접근 방식은 작업에 서로 다른 유형의 전문 지식이 필요할 때 뛰어납니다. 여러 도메인에 걸쳐 도구 선택을 관리하는 하나의 에이전트를 구축하는 대신, supervisor가 전체 워크플로우를 이해하고 조정하는 집중된 전문가들을 만듭니다.
 
-In this tutorial, you'll build a personal assistant system that demonstrates these benefits through a realistic workflow. The system will coordinate two specialists with fundamentally different responsibilities:
+이 튜토리얼에서는 현실적인 워크플로우를 통해 이러한 이점을 보여주는 개인 비서 시스템을 구축합니다. 시스템은 근본적으로 다른 책임을 가진 두 전문가를 조정합니다:
 
-- A **calendar agent** that handles scheduling, availability checking, and event management.
-- An **email agent** that manages communication, drafts messages, and sends notifications.
+- 일정 관리, 가용성 확인 및 이벤트 관리를 처리하는 **캘린더 에이전트**.
+- 커뮤니케이션, 메시지 초안 작성 및 알림 전송을 관리하는 **이메일 에이전트**.
 
-We will also incorporate [human-in-the-loop review](/oss/langchain/human-in-the-loop) to allow users to approve, edit, and reject actions (such as outbound emails) as desired.
+또한 사용자가 원하는 대로 작업(예: 발신 이메일)을 승인, 편집 및 거부할 수 있도록 [human-in-the-loop 검토](/oss/langchain/human-in-the-loop)를 통합합니다.
 
-### Why use a supervisor?
+### Supervisor를 사용하는 이유
 
-Multi-agent architectures allow you to partition [tools](/oss/langchain/tools) across workers, each with their own individual prompts or instructions. Consider an agent with direct access to all calendar and email APIs: it must choose from many similar tools, understand exact formats for each API, and handle multiple domains simultaneously. If performance degrades, it may be helpful to separate related tools and associated prompts into logical groups (in part to manage iterative improvements).
+멀티 에이전트 아키텍처를 사용하면 [도구](/oss/langchain/tools)를 worker들에 분산하여 각각 자체 프롬프트 또는 지시사항을 가질 수 있습니다. 모든 캘린더 및 이메일 API에 직접 액세스할 수 있는 에이전트를 고려해 보세요: 이 에이전트는 많은 유사한 도구 중에서 선택하고, 각 API의 정확한 형식을 이해하며, 여러 도메인을 동시에 처리해야 합니다. 성능이 저하되면 관련 도구와 관련 프롬프트를 논리적 그룹으로 분리하는 것이 도움이 될 수 있습니다(부분적으로 반복적인 개선을 관리하기 위해).
 
-### Concepts
+### 개념
 
-We will cover the following concepts:
+다음 개념을 다룹니다:
 
-- [Multi-agent systems](/oss/langchain/multi-agent)
-- [Human-in-the-loop review](/oss/langchain/human-in-the-loop)
+- [멀티 에이전트 시스템](/oss/langchain/multi-agent)
+- [Human-in-the-loop 검토](/oss/langchain/human-in-the-loop)
 
-## Setup
+## 설정
 
-### Installation
+### 설치
 
-This tutorial requires the `langchain` package:
+이 튜토리얼에는 `langchain` 패키지가 필요합니다:
 
 <CodeGroup>
 ```bash pip
@@ -42,11 +42,11 @@ conda install langchain -c conda-forge
 ```
 </CodeGroup>
 
-For more details, see our [Installation guide](/oss/langchain/install).
+자세한 내용은 [설치 가이드](/oss/langchain/install)를 참조하세요.
 
 ### LangSmith
 
-Set up [LangSmith](https://smith.langchain.com) to inspect what is happening inside your agent. Then set the following environment variables:
+에이전트 내부에서 무슨 일이 일어나는지 검사하려면 [LangSmith](https://smith.langchain.com)를 설정하세요. 그런 다음 다음 환경 변수를 설정합니다:
 
 <CodeGroup>
 ```bash bash
@@ -62,15 +62,15 @@ os.environ["LANGSMITH_API_KEY"] = getpass.getpass()
 ```
 </CodeGroup>
 
-### Components
+### 컴포넌트
 
-We will need to select a chat model from LangChain's suite of integrations:
+LangChain의 통합 제품군에서 chat model을 선택해야 합니다:
 
 <ChatModelTabsPy />
 
-## 1. Define tools
+## 1. 도구 정의
 
-Start by defining the tools that require structured inputs. In real applications, these would call actual APIs (Google Calendar, SendGrid, etc.). For this tutorial, you'll use stubs to demonstrate the pattern.
+구조화된 입력이 필요한 도구를 정의하는 것부터 시작하세요. 실제 애플리케이션에서는 실제 API(Google Calendar, SendGrid 등)를 호출할 것입니다. 이 튜토리얼에서는 스텁을 사용하여 패턴을 시연합니다.
 
 ```python
 from langchain_core.tools import tool
@@ -78,46 +78,46 @@ from langchain_core.tools import tool
 @tool
 def create_calendar_event(
     title: str,
-    start_time: str,       # ISO format: "2024-01-15T14:00:00"
-    end_time: str,         # ISO format: "2024-01-15T15:00:00"
-    attendees: list[str],  # email addresses
+    start_time: str,       # ISO 형식: "2024-01-15T14:00:00"
+    end_time: str,         # ISO 형식: "2024-01-15T15:00:00"
+    attendees: list[str],  # 이메일 주소
     location: str = ""
 ) -> str:
-    """Create a calendar event. Requires exact ISO datetime format."""
-    # Stub: In practice, this would call Google Calendar API, Outlook API, etc.
+    """캘린더 이벤트를 생성합니다. 정확한 ISO datetime 형식이 필요합니다."""
+    # 스텁: 실제로는 Google Calendar API, Outlook API 등을 호출합니다.
     return f"Event created: {title} from {start_time} to {end_time} with {len(attendees)} attendees"
 
 
 @tool
 def send_email(
-    to: list[str],  # email addresses
+    to: list[str],  # 이메일 주소
     subject: str,
     body: str,
     cc: list[str] = []
 ) -> str:
-    """Send an email via email API. Requires properly formatted addresses."""
-    # Stub: In practice, this would call SendGrid, Gmail API, etc.
+    """이메일 API를 통해 이메일을 전송합니다. 올바른 형식의 주소가 필요합니다."""
+    # 스텁: 실제로는 SendGrid, Gmail API 등을 호출합니다.
     return f"Email sent to {', '.join(to)} - Subject: {subject}"
 
 
 @tool
 def get_available_time_slots(
     attendees: list[str],
-    date: str,  # ISO format: "2024-01-15"
+    date: str,  # ISO 형식: "2024-01-15"
     duration_minutes: int
 ) -> list[str]:
-    """Check calendar availability for given attendees on a specific date."""
-    # Stub: In practice, this would query calendar APIs
+    """특정 날짜에 주어진 참석자의 캘린더 가용성을 확인합니다."""
+    # 스텁: 실제로는 캘린더 API를 쿼리합니다.
     return ["09:00", "14:00", "16:00"]
 ```
 
-## 2. Create specialized sub-agents
+## 2. 전문화된 서브 에이전트 생성
 
-Next, we'll create specialized sub-agents that handle each domain.
+다음으로 각 도메인을 처리하는 전문화된 서브 에이전트를 생성합니다.
 
-### Create a calendar agent
+### 캘린더 에이전트 생성
 
-The calendar agent understands natural language scheduling requests and translates them into precise API calls. It handles date parsing, availability checking, and event creation.
+캘린더 에이전트는 자연어 일정 요청을 이해하고 정확한 API 호출로 변환합니다. 날짜 파싱, 가용성 확인 및 이벤트 생성을 처리합니다.
 
 ```python
 from langchain.agents import create_agent
@@ -138,7 +138,7 @@ calendar_agent = create_agent(
 )
 ```
 
-Test the calendar agent to see how it handles natural language scheduling:
+캘린더 에이전트를 테스트하여 자연어 일정을 어떻게 처리하는지 확인하세요:
 
 ```python
 query = "Schedule a team meeting next Tuesday at 2pm for 1 hour"
@@ -181,11 +181,11 @@ Event created: Team Meeting from 2024-06-18T14:00:00 to 2024-06-18T15:00:00 with
 The team meeting has been scheduled for next Tuesday, June 18th, at 2:00 PM and will last for 1 hour. If you need to add attendees or a location, please let me know!
 ```
 
-The agent parses "next Tuesday at 2pm" into ISO format ("2024-01-16T14:00:00"), calculates the end time, calls `create_calendar_event`, and returns a natural language confirmation.
+에이전트는 "next Tuesday at 2pm"을 ISO 형식("2024-01-16T14:00:00")으로 파싱하고, 종료 시간을 계산하며, `create_calendar_event`를 호출하고, 자연어 확인을 반환합니다.
 
-### Create an email agent
+### 이메일 에이전트 생성
 
-The email agent handles message composition and sending. It focuses on extracting recipient information, crafting appropriate subject lines and body text, and managing email communication.
+이메일 에이전트는 메시지 작성 및 전송을 처리합니다. 수신자 정보 추출, 적절한 제목 및 본문 텍스트 작성, 이메일 커뮤니케이션 관리에 중점을 둡니다.
 
 ```python
 EMAIL_AGENT_PROMPT = (
@@ -203,7 +203,7 @@ email_agent = create_agent(
 )
 ```
 
-Test the email agent with a natural language request:
+자연어 요청으로 이메일 에이전트를 테스트하세요:
 
 ```python
 query = "Send the design team a reminder about reviewing the new mockups"
@@ -241,21 +241,21 @@ Email sent to design-team@example.com - Subject: Reminder: Please Review the New
 I've sent a reminder to the design team asking them to review the new mockups. If you need any further communication on this topic, just let me know!
 ```
 
-The agent infers the recipient from the informal request, crafts a professional subject line and body, calls `send_email`, and returns a confirmation. Each sub-agent has a narrow focus with domain-specific tools and prompts, allowing it to excel at its specific task.
+에이전트는 비공식적인 요청에서 수신자를 추론하고, 전문적인 제목과 본문을 작성하며, `send_email`을 호출하고, 확인을 반환합니다. 각 서브 에이전트는 도메인별 도구와 프롬프트를 사용하여 특정 작업에 집중하므로 탁월한 성능을 발휘할 수 있습니다.
 
-## 3. Wrap sub-agents as tools
+## 3. 서브 에이전트를 도구로 래핑
 
-Now wrap each sub-agent as a tool that the supervisor can invoke. This is the key architectural step that creates the layered system. The supervisor will see high-level tools like "schedule_event", not low-level tools like "create_calendar_event".
+이제 각 서브 에이전트를 supervisor가 호출할 수 있는 도구로 래핑합니다. 이것이 계층화된 시스템을 만드는 핵심 아키텍처 단계입니다. Supervisor는 "create_calendar_event"와 같은 낮은 수준의 도구가 아니라 "schedule_event"와 같은 높은 수준의 도구를 보게 됩니다.
 
 ```python
 @tool
 def schedule_event(request: str) -> str:
-    """Schedule calendar events using natural language.
+    """자연어를 사용하여 캘린더 이벤트를 예약합니다.
 
-    Use this when the user wants to create, modify, or check calendar appointments.
-    Handles date/time parsing, availability checking, and event creation.
+    사용자가 캘린더 약속을 생성, 수정 또는 확인하려는 경우 사용합니다.
+    날짜/시간 파싱, 가용성 확인 및 이벤트 생성을 처리합니다.
 
-    Input: Natural language scheduling request (e.g., 'meeting with design team
+    입력: 자연어 일정 요청(예: 'meeting with design team
     next Tuesday at 2pm')
     """
     result = calendar_agent.invoke({
@@ -266,13 +266,12 @@ def schedule_event(request: str) -> str:
 
 @tool
 def manage_email(request: str) -> str:
-    """Send emails using natural language.
+    """자연어를 사용하여 이메일을 전송합니다.
 
-    Use this when the user wants to send notifications, reminders, or any email
-    communication. Handles recipient extraction, subject generation, and email
-    composition.
+    사용자가 알림, 리마인더 또는 이메일 커뮤니케이션을 전송하려는 경우 사용합니다.
+    수신자 추출, 제목 생성 및 이메일 작성을 처리합니다.
 
-    Input: Natural language email request (e.g., 'send them a reminder about
+    입력: 자연어 이메일 요청(예: 'send them a reminder about
     the meeting')
     """
     result = email_agent.invoke({
@@ -281,11 +280,11 @@ def manage_email(request: str) -> str:
     return result["messages"][-1].text
 ```
 
-The tool descriptions help the supervisor decide when to use each tool, so make them clear and specific. We return only the sub-agent's final response, as the supervisor doesn't need to see intermediate reasoning or tool calls.
+도구 설명은 supervisor가 각 도구를 언제 사용할지 결정하는 데 도움이 되므로 명확하고 구체적으로 작성하세요. supervisor는 중간 추론이나 도구 호출을 볼 필요가 없으므로 서브 에이전트의 최종 응답만 반환합니다.
 
-## 4. Create the supervisor agent
+## 4. Supervisor 에이전트 생성
 
-Now create the supervisor that orchestrates the sub-agents. The supervisor only sees high-level tools and makes routing decisions at the domain level, not the individual API level.
+이제 서브 에이전트를 조정하는 supervisor를 생성합니다. Supervisor는 높은 수준의 도구만 보고 개별 API 수준이 아닌 도메인 수준에서 라우팅 결정을 내립니다.
 
 ```python
 SUPERVISOR_PROMPT = (
@@ -302,11 +301,11 @@ supervisor_agent = create_agent(
 )
 ```
 
-## 5. Use the supervisor
+## 5. Supervisor 사용
 
-Now test your complete system with complex requests that require coordination across multiple domains:
+이제 여러 도메인에 걸쳐 조정이 필요한 복잡한 요청으로 전체 시스템을 테스트하세요:
 
-### Example 1: Simple single-domain request
+### 예제 1: 간단한 단일 도메인 요청
 
 ```python
 query = "Schedule a team standup for tomorrow at 9am"
@@ -334,13 +333,13 @@ The team standup has been scheduled for tomorrow at 9:00 AM with Alice and Bob. 
 The team standup with Alice and Bob is scheduled for tomorrow at 9:00 AM. If you need any further arrangements or adjustments, please let me know!
 ```
 
-The supervisor identifies this as a calendar task, calls `schedule_event`, and the calendar agent handles date parsing and event creation.
+Supervisor는 이것을 캘린더 작업으로 식별하고 `schedule_event`를 호출하며, 캘린더 에이전트가 날짜 파싱 및 이벤트 생성을 처리합니다.
 
 <Tip>
-For full transparency into the information flow, including prompts and responses for each chat model call, check out the [LangSmith trace](https://smith.langchain.com/public/91a9a95f-fba9-4e84-aff0-371861ad2f4a/r) for the above run.
+각 chat model 호출에 대한 프롬프트 및 응답을 포함한 정보 흐름에 대한 완전한 투명성을 보려면 위 실행의 [LangSmith trace](https://smith.langchain.com/public/91a9a95f-fba9-4e84-aff0-371861ad2f4a/r)를 확인하세요.
 </Tip>
 
-### Example 2: Complex multi-domain request
+### 예제 2: 복잡한 멀티 도메인 요청
 
 ```python
 query = (
@@ -383,25 +382,25 @@ I've also sent an email reminder to the design team, asking them to review the n
 Let me know if you'd like to add more details to the meeting or include additional information in the email!
 ```
 
-The supervisor recognizes this requires both calendar and email actions, calls `schedule_event` for the meeting, then calls `manage_email` for the reminder. Each sub-agent completes its task, and the supervisor synthesizes both results into a coherent response.
+Supervisor는 이것이 캘린더와 이메일 작업을 모두 필요로 한다는 것을 인식하고, 회의를 위해 `schedule_event`를 호출한 다음 리마인더를 위해 `manage_email`을 호출합니다. 각 서브 에이전트가 작업을 완료하면 supervisor가 두 결과를 일관된 응답으로 합성합니다.
 
 <Tip>
-Refer to the [LangSmith trace](https://smith.langchain.com/public/95cd00a3-d1f9-4dba-9731-7bf733fb6a3c/r) to see the detailed information flow for the above run, including individual chat model prompts and responses.
+개별 chat model 프롬프트 및 응답을 포함하여 위 실행의 자세한 정보 흐름을 보려면 [LangSmith trace](https://smith.langchain.com/public/95cd00a3-d1f9-4dba-9731-7bf733fb6a3c/r)를 참조하세요.
 </Tip>
 
-### Complete working example
+### 완전한 작동 예제
 
-Here's everything together in a runnable script:
+다음은 실행 가능한 스크립트로 모든 것을 함께 정리한 것입니다:
 
-<Expandable title="View complete code" defaultOpen={false}>
+<Expandable title="전체 코드 보기" defaultOpen={false}>
 
 ```python
 """
-Personal Assistant Supervisor Example
+개인 비서 Supervisor 예제
 
-This example demonstrates the tool calling pattern for multi-agent systems.
-A supervisor agent coordinates specialized sub-agents (calendar and email)
-that are wrapped as tools.
+이 예제는 멀티 에이전트 시스템을 위한 도구 호출 패턴을 보여줍니다.
+Supervisor 에이전트가 도구로 래핑된 전문화된 서브 에이전트(캘린더 및 이메일)를
+조정합니다.
 """
 
 from langchain_core.tools import tool
@@ -409,47 +408,47 @@ from langchain.agents import create_agent
 from langchain.chat_models import init_chat_model
 
 # ============================================================================
-# Step 1: Define low-level API tools (stubbed)
+# 단계 1: 낮은 수준의 API 도구 정의(스텁)
 # ============================================================================
 
 @tool
 def create_calendar_event(
     title: str,
-    start_time: str,  # ISO format: "2024-01-15T14:00:00"
-    end_time: str,    # ISO format: "2024-01-15T15:00:00"
-    attendees: list[str],  # email addresses
+    start_time: str,  # ISO 형식: "2024-01-15T14:00:00"
+    end_time: str,    # ISO 형식: "2024-01-15T15:00:00"
+    attendees: list[str],  # 이메일 주소
     location: str = ""
 ) -> str:
-    """Create a calendar event. Requires exact ISO datetime format."""
+    """캘린더 이벤트를 생성합니다. 정확한 ISO datetime 형식이 필요합니다."""
     return f"Event created: {title} from {start_time} to {end_time} with {len(attendees)} attendees"
 
 
 @tool
 def send_email(
-    to: list[str],      # email addresses
+    to: list[str],      # 이메일 주소
     subject: str,
     body: str,
     cc: list[str] = []
 ) -> str:
-    """Send an email via email API. Requires properly formatted addresses."""
+    """이메일 API를 통해 이메일을 전송합니다. 올바른 형식의 주소가 필요합니다."""
     return f"Email sent to {', '.join(to)} - Subject: {subject}"
 
 
 @tool
 def get_available_time_slots(
     attendees: list[str],
-    date: str,  # ISO format: "2024-01-15"
+    date: str,  # ISO 형식: "2024-01-15"
     duration_minutes: int
 ) -> list[str]:
-    """Check calendar availability for given attendees on a specific date."""
+    """특정 날짜에 주어진 참석자의 캘린더 가용성을 확인합니다."""
     return ["09:00", "14:00", "16:00"]
 
 
 # ============================================================================
-# Step 2: Create specialized sub-agents
+# 단계 2: 전문화된 서브 에이전트 생성
 # ============================================================================
 
-llm = init_chat_model("anthropic:claude-3-5-haiku-latest")  # for example
+llm = init_chat_model("anthropic:claude-3-5-haiku-latest")  # 예시
 
 calendar_agent = create_agent(
     llm,
@@ -477,17 +476,17 @@ email_agent = create_agent(
 )
 
 # ============================================================================
-# Step 3: Wrap sub-agents as tools for the supervisor
+# 단계 3: Supervisor를 위한 도구로 서브 에이전트 래핑
 # ============================================================================
 
 @tool
 def schedule_event(request: str) -> str:
-    """Schedule calendar events using natural language.
+    """자연어를 사용하여 캘린더 이벤트를 예약합니다.
 
-    Use this when the user wants to create, modify, or check calendar appointments.
-    Handles date/time parsing, availability checking, and event creation.
+    사용자가 캘린더 약속을 생성, 수정 또는 확인하려는 경우 사용합니다.
+    날짜/시간 파싱, 가용성 확인 및 이벤트 생성을 처리합니다.
 
-    Input: Natural language scheduling request (e.g., 'meeting with design team
+    입력: 자연어 일정 요청(예: 'meeting with design team
     next Tuesday at 2pm')
     """
     result = calendar_agent.invoke({
@@ -498,13 +497,12 @@ def schedule_event(request: str) -> str:
 
 @tool
 def manage_email(request: str) -> str:
-    """Send emails using natural language.
+    """자연어를 사용하여 이메일을 전송합니다.
 
-    Use this when the user wants to send notifications, reminders, or any email
-    communication. Handles recipient extraction, subject generation, and email
-    composition.
+    사용자가 알림, 리마인더 또는 이메일 커뮤니케이션을 전송하려는 경우 사용합니다.
+    수신자 추출, 제목 생성 및 이메일 작성을 처리합니다.
 
-    Input: Natural language email request (e.g., 'send them a reminder about
+    입력: 자연어 이메일 요청(예: 'send them a reminder about
     the meeting')
     """
     result = email_agent.invoke({
@@ -514,7 +512,7 @@ def manage_email(request: str) -> str:
 
 
 # ============================================================================
-# Step 4: Create the supervisor agent
+# 단계 4: Supervisor 에이전트 생성
 # ============================================================================
 
 supervisor_agent = create_agent(
@@ -529,11 +527,11 @@ supervisor_agent = create_agent(
 )
 
 # ============================================================================
-# Step 5: Use the supervisor
+# 단계 5: Supervisor 사용
 # ============================================================================
 
 if __name__ == "__main__":
-    # Example: User request requiring both calendar and email coordination
+    # 예제: 캘린더 및 이메일 조정이 필요한 사용자 요청
     user_request = (
         "Schedule a meeting with the design team next Tuesday at 2pm for 1 hour, "
         "and send them an email reminder about reviewing the new mockups."
@@ -552,19 +550,19 @@ if __name__ == "__main__":
 
 </Expandable>
 
-### Understanding the architecture
+### 아키텍처 이해하기
 
-Your system has three layers. The bottom layer contains rigid API tools that require exact formats. The middle layer contains sub-agents that accept natural language, translate it to structured API calls, and return natural language confirmations. The top layer contains the supervisor that routes to high-level capabilities and synthesizes results.
+시스템에는 세 개의 레이어가 있습니다. 하단 레이어에는 정확한 형식이 필요한 엄격한 API 도구가 포함되어 있습니다. 중간 레이어에는 자연어를 받아 구조화된 API 호출로 변환하고 자연어 확인을 반환하는 서브 에이전트가 포함되어 있습니다. 상단 레이어에는 높은 수준의 기능으로 라우팅하고 결과를 합성하는 supervisor가 포함되어 있습니다.
 
-This separation of concerns provides several benefits: each layer has a focused responsibility, you can add new domains without affecting existing ones, and you can test and iterate on each layer independently.
+이러한 관심사의 분리는 여러 이점을 제공합니다: 각 레이어는 집중된 책임을 가지며, 기존 도메인에 영향을 주지 않고 새 도메인을 추가할 수 있으며, 각 레이어를 독립적으로 테스트하고 반복할 수 있습니다.
 
-## 6. Add human-in-the-loop review
+## 6. Human-in-the-loop 검토 추가
 
-It can be prudent to incorporate [human-in-the-loop review](/oss/langchain/human-in-the-loop) of sensitive actions. LangChain includes [built-in middleware](/oss/langchain/human-in-the-loop#configuring-interrupts) to review tool calls, in this case the tools invoked by sub-agents.
+민감한 작업에 대해 [human-in-the-loop 검토](/oss/langchain/human-in-the-loop)를 통합하는 것이 현명할 수 있습니다. LangChain에는 도구 호출을 검토하기 위한 [내장 미들웨어](/oss/langchain/human-in-the-loop#configuring-interrupts)가 포함되어 있으며, 이 경우 서브 에이전트가 호출하는 도구입니다.
 
-Let's add human-in-the-loop review to both sub-agents:
-- We configure the `create_calendar_event` and `send_email` tools to interrupt, permitting all [response types](/oss/langchain/human-in-the-loop) (`approve`, `edit`, `reject`)
-- We add a [checkpointer](/oss/langchain/short-term-memory) **only to the top-level agent**. This is required to pause and resume execution.
+두 서브 에이전트에 human-in-the-loop 검토를 추가해 봅시다:
+- 모든 [응답 유형](/oss/langchain/human-in-the-loop)(`approve`, `edit`, `reject`)을 허용하여 `create_calendar_event` 및 `send_email` 도구가 중단되도록 구성합니다
+- 실행을 일시 중지하고 재개하는 데 필요한 **최상위 에이전트에만** [checkpointer](/oss/langchain/short-term-memory)를 추가합니다.
 
 ```python
 from langchain.agents import create_agent
@@ -603,7 +601,7 @@ supervisor_agent = create_agent(
 )
 ```
 
-Let's repeat the query. Note that we gather interrupt events into a list to access downstream:
+쿼리를 반복해 봅시다. 나중에 액세스하기 위해 interrupt 이벤트를 리스트에 수집합니다:
 ```python
 query = (
     "Schedule a meeting with the design team next Tuesday at 2pm for 1 hour, "
@@ -642,7 +640,7 @@ INTERRUPTED: 4f994c9721682a292af303ec1a46abb7
 
 INTERRUPTED: 2b56f299be313ad8bc689eff02973f16
 ```
-This time we've interrupted execution. Let's inspect the interrupt events:
+이번에는 실행을 중단했습니다. interrupt 이벤트를 검사해 봅시다:
 ```python
 for interrupt_ in interrupts:
     for request in interrupt_.value["action_requests"]:
@@ -663,14 +661,14 @@ Tool: send_email
 Args: {'to': ['designteam@example.com'], 'subject': 'Reminder: Review New Mockups Before Meeting Next Tuesday at 2pm', 'body': "Hello Team,\n\nThis is a reminder to review the new mockups ahead of our meeting scheduled for next Tuesday at 2pm. Your feedback and insights will be valuable for our discussion and next steps.\n\nPlease ensure you've gone through the designs and are ready to share your thoughts during the meeting.\n\nThank you!\n\nBest regards,\n[Your Name]"}
 ```
 
-We can specify decisions for each interrupt by referring to its ID using a `Command`. Refer to the [human-in-the-loop guide](/oss/langchain/human-in-the-loop) for additional details. For demonstration purposes, here we will accept the calendar event, but edit the subject of the outbound email:
+`Command`를 사용하여 ID를 참조하여 각 interrupt에 대한 결정을 지정할 수 있습니다. 자세한 내용은 [human-in-the-loop 가이드](/oss/langchain/human-in-the-loop)를 참조하세요. 시연 목적으로 여기서는 캘린더 이벤트를 수락하되 발신 이메일의 제목을 편집합니다:
 ```python
 from langgraph.types import Command # [!code highlight]
 
 resume = {}
 for interrupt_ in interrupts:
     if interrupt_.id == "2b56f299be313ad8bc689eff02973f16":
-        # Edit email
+        # 이메일 편집
         edited_action = interrupt_.value["action_requests"][0].copy()
         edited_action["arguments"]["subject"] = "Mockups reminder"
         resume[interrupt_.id] = {
@@ -701,7 +699,7 @@ Your meeting with the design team has been scheduled for next Tuesday, June 18th
 ================================= Tool Message =================================
 Name: manage_email
 
-Your email reminder to the design team has been sent. Here’s what was sent:
+Your email reminder to the design team has been sent. Here's what was sent:
 
 - Recipient: designteam@example.com
 - Subject: Mockups reminder
@@ -715,13 +713,13 @@ Let me know if you need any further assistance!
 
 Let me know if you need any further assistance!
 ```
-The run proceeds with our input.
+실행이 우리의 입력으로 진행됩니다.
 
-## 7. Advanced: Control information flow
+## 7. 고급: 정보 흐름 제어
 
-By default, sub-agents receive only the request string from the supervisor. You might want to pass additional context, such as conversation history or user preferences.
+기본적으로 서브 에이전트는 supervisor로부터 요청 문자열만 받습니다. 대화 기록이나 사용자 기본 설정과 같은 추가 컨텍스트를 전달할 수 있습니다.
 
-### Pass additional conversational context to sub-agents
+### 서브 에이전트에 추가 대화 컨텍스트 전달
 
 ```python
 from typing import Annotated
@@ -732,8 +730,8 @@ def schedule_event(
     request: str,
     state: Annotated[dict, InjectedState]
 ) -> str:
-    """Schedule calendar events using natural language."""
-    # Customize context received by sub-agent
+    """자연어를 사용하여 캘린더 이벤트를 예약합니다."""
+    # 서브 에이전트가 받는 컨텍스트 커스터마이징
     original_user_message = next(
         message for message in state["messages"]
         if message.type == "human"
@@ -750,30 +748,30 @@ def schedule_event(
     return result["messages"][-1].text
 ```
 
-This allows sub-agents to see the full conversation context, which can be useful for resolving ambiguities like "schedule it for the same time tomorrow" (referencing a previous conversation).
+이를 통해 서브 에이전트가 전체 대화 컨텍스트를 볼 수 있으므로 "내일 같은 시간에 일정 잡아줘"(이전 대화 참조)와 같은 모호성을 해결하는 데 유용할 수 있습니다.
 
 <Tip>
-You can see the full context received by the sub agent in the [chat model call](https://smith.langchain.com/public/c7d54882-afb8-4039-9c5a-4112d0f458b0/r/6803571e-af78-4c68-904a-ecf55771084d) of the LangSmith trace.
+서브 에이전트가 받는 전체 컨텍스트는 LangSmith trace의 [chat model 호출](https://smith.langchain.com/public/c7d54882-afb8-4039-9c5a-4112d0f458b0/r/6803571e-af78-4c68-904a-ecf55771084d)에서 확인할 수 있습니다.
 </Tip>
 
-### Control what supervisor receives
+### Supervisor가 받는 것 제어
 
-You can also customize what information flows back to the supervisor:
+supervisor로 다시 흐르는 정보를 커스터마이징할 수도 있습니다:
 
 ```python
 import json
 
 @tool
 def schedule_event(request: str) -> str:
-    """Schedule calendar events using natural language."""
+    """자연어를 사용하여 캘린더 이벤트를 예약합니다."""
     result = calendar_agent.invoke({
         "messages": [{"role": "user", "content": request}]
     })
 
-    # Option 1: Return just the confirmation message
+    # 옵션 1: 확인 메시지만 반환
     return result["messages"][-1].text
 
-    # Option 2: Return structured data
+    # 옵션 2: 구조화된 데이터 반환
     # return json.dumps({
     #     "status": "success",
     #     "event_id": "evt_123",
@@ -781,20 +779,20 @@ def schedule_event(request: str) -> str:
     # })
 ```
 
-**Important:** Make sure sub-agent prompts emphasize that their final message should contain all relevant information. A common failure mode is sub-agents that perform tool calls but don't include the results in their final response.
+**중요:** 서브 에이전트 프롬프트가 최종 메시지에 모든 관련 정보를 포함해야 한다는 것을 강조하세요. 일반적인 실패 모드는 도구 호출을 수행하지만 최종 응답에 결과를 포함하지 않는 서브 에이전트입니다.
 
-## 8. Key takeaways
+## 8. 핵심 요점
 
-The supervisor pattern creates layers of abstraction where each layer has a clear responsibility. When designing a supervisor system, start with clear domain boundaries and give each sub-agent focused tools and prompts. Write clear tool descriptions for the supervisor, test each layer independently before integration, and control information flow based on your specific needs.
+Supervisor 패턴은 각 레이어가 명확한 책임을 가진 추상화 레이어를 만듭니다. Supervisor 시스템을 설계할 때 명확한 도메인 경계로 시작하고 각 서브 에이전트에 집중된 도구와 프롬프트를 제공하세요. Supervisor를 위한 명확한 도구 설명을 작성하고, 통합 전에 각 레이어를 독립적으로 테스트하며, 특정 요구 사항에 따라 정보 흐름을 제어하세요.
 
 <Tip>
-**When to use the supervisor pattern**
+**Supervisor 패턴을 사용해야 하는 경우**
 
-Use the supervisor pattern when you have multiple distinct domains (calendar, email, CRM, database), each domain has multiple tools or complex logic, you want centralized workflow control, and sub-agents don't need to converse directly with users.
+여러 개의 뚜렷한 도메인(캘린더, 이메일, CRM, 데이터베이스)이 있고, 각 도메인에 여러 도구 또는 복잡한 로직이 있으며, 중앙 집중식 워크플로우 제어를 원하고, 서브 에이전트가 사용자와 직접 대화할 필요가 없는 경우 supervisor 패턴을 사용하세요.
 
-For simpler cases with just a few tools, use a single agent. When agents need to have conversations with users, use [handoffs](/oss/python/langchain/multi-agent#handoffs) instead. For peer-to-peer collaboration between agents, consider other multi-agent patterns.
+몇 가지 도구만 있는 간단한 경우에는 단일 에이전트를 사용하세요. 에이전트가 사용자와 대화해야 하는 경우 대신 [handoff](/oss/langchain/multi-agent#handoffs)를 사용하세요. 에이전트 간의 피어 투 피어 협업의 경우 다른 멀티 에이전트 패턴을 고려하세요.
 </Tip>
 
-## Next steps
+## 다음 단계
 
-Learn about [handoffs](/oss/python/langchain/multi-agent#handoffs) for agent-to-agent conversations, explore [context engineering](/oss/python/langchain/context-engineering) to fine-tune information flow, read the [multi-agent overview](/oss/python/langchain/multi-agent) to compare different patterns, and use [LangSmith](https://smith.langchain.com) to debug and monitor your multi-agent system.
+에이전트 간 대화를 위한 [handoff](/oss/langchain/multi-agent#handoffs)에 대해 알아보고, 정보 흐름을 미세 조정하기 위한 [컨텍스트 엔지니어링](/oss/langchain/context-engineering)을 탐색하며, 다양한 패턴을 비교하기 위해 [멀티 에이전트 개요](/oss/langchain/multi-agent)를 읽고, 멀티 에이전트 시스템을 디버그하고 모니터링하기 위해 [LangSmith](https://smith.langchain.com)를 사용하세요.

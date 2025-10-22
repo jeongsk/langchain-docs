@@ -1,33 +1,39 @@
 ---
-title: Test
+title: 테스트
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
+import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
+import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 
-<AlphaCallout />
-
-Agentic applications let an LLM decide its own next steps to solve a problem. That flexibility is powerful, but the model's black-box nature makes it hard to predict how a tweak in one part of your agent will affect the rest. To build production-ready agents, thorough testing is essential.
-
-There are a few approaches to testing your agents:
 :::python
-- [Unit tests](#unit-testing) exercise small, deterministic pieces of your agent in isolation using in-memory fakes so you can assert exact behavior quickly and deterministically.
+<AlphaCalloutPy />
 :::
 :::js
-- Unit tests exercise small, deterministic pieces of your agent in isolation using in-memory fakes so you can assert exact behavior quickly and deterministically.
+<AlphaCalloutJS />
 :::
-- [Integration tests](#integration-testing) test the agent using real network calls to confirm that components work together, credentials and schemas line up, and latency is acceptable.
 
-Agentic applications tend to lean more on integration because they chain multiple components together and must deal with flakiness due to the nondeterministic nature of LLMs.
+에이전트 애플리케이션은 LLM이 문제를 해결하기 위한 다음 단계를 스스로 결정하도록 합니다. 이러한 유연성은 강력하지만, 모델의 블랙박스 특성으로 인해 에이전트의 한 부분에서 수정한 내용이 나머지 부분에 어떤 영향을 미칠지 예측하기 어렵습니다. 프로덕션 준비가 된 에이전트를 구축하려면 철저한 테스트가 필수적입니다.
+
+에이전트를 테스트하는 몇 가지 접근 방식이 있습니다:
+:::python
+- [유닛 테스트](#unit-testing)는 에이전트의 작고 결정론적인 부분을 인메모리 페이크를 사용하여 격리된 환경에서 테스트하므로 정확한 동작을 빠르고 결정론적으로 단언할 수 있습니다.
+:::
+:::js
+- 유닛 테스트는 에이전트의 작고 결정론적인 부분을 인메모리 페이크를 사용하여 격리된 환경에서 테스트하므로 정확한 동작을 빠르고 결정론적으로 단언할 수 있습니다.
+:::
+- [통합 테스트](#integration-testing)는 실제 네트워크 호출을 사용하여 에이전트를 테스트함으로써 컴포넌트가 함께 작동하고, 자격 증명과 스키마가 일치하며, 지연 시간이 허용 가능한지 확인합니다.
+
+에이전트 애플리케이션은 여러 컴포넌트를 연결하고 LLM의 비결정론적 특성으로 인한 불안정성을 다루어야 하므로 통합 테스트에 더 의존하는 경향이 있습니다.
 
 :::python
 
-## Unit Testing
+## 유닛 테스트
 
-### Mocking Chat Model
+### Chat Model 모킹
 
-For logic not requiring API calls, you can use an in-memory stub for mocking responses.
+API 호출이 필요하지 않은 로직의 경우, 응답을 모킹하기 위해 인메모리 스텁을 사용할 수 있습니다.
 
-LangChain provides [`GenericFakeChatModel`](https://python.langchain.com/api_reference/core/language_models/langchain_core.language_models.fake_chat_models.GenericFakeChatModel.html) for mocking text responses. It accepts an iterator of responses (AIMessages or strings) and returns one per invocation. It supports both regular and streaming usage.
+LangChain은 텍스트 응답을 모킹하기 위한 [`GenericFakeChatModel`](https://python.langchain.com/api_reference/core/language_models/langchain_core.language_models.fake_chat_models.GenericFakeChatModel.html)을 제공합니다. 이 모델은 응답(AIMessage 또는 문자열)의 이터레이터를 받아 호출마다 하나씩 반환합니다. 일반 사용과 스트리밍 사용을 모두 지원합니다.
 
 ```python
 from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
@@ -41,7 +47,7 @@ model.invoke("hello")
 # AIMessage(content='', ..., tool_calls=[{'name': 'foo', 'args': {'bar': 'baz'}, 'id': 'call_1', 'type': 'tool_call'}])
 ```
 
-If we invoke the model again, it will return the next item in the iterator:
+모델을 다시 호출하면 이터레이터의 다음 항목을 반환합니다:
 
 ```python
 model.invoke("hello, again!")
@@ -50,7 +56,7 @@ model.invoke("hello, again!")
 
 ### InMemorySaver Checkpointer
 
-To enable persistence during testing, you can use the `InMemorySaver` checkpointer. This allows you to simulate multiple turns to test state-dependent behavior:
+테스트 중에 지속성을 활성화하려면 `InMemorySaver` checkpointer를 사용할 수 있습니다. 이를 통해 여러 턴을 시뮬레이션하여 상태 의존적 동작을 테스트할 수 있습니다:
 
 ```python
 from langgraph.checkpoint.memory import InMemorySaver
@@ -61,33 +67,33 @@ agent = create_agent(
     checkpointer=InMemorySaver()
 )
 
-# First invocation
+# 첫 번째 호출
 agent.invoke(HumanMessage(content="I live in Sydney, Australia."))
 
-# Second invocation: the first message is persisted (Sydney location), so the model returns GMT+10 time
+# 두 번째 호출: 첫 번째 메시지가 유지되므로(Sydney 위치), 모델이 GMT+10 시간을 반환합니다
 agent.invoke(HumanMessage(content="What's my local time?"))
 ```
 :::
 
-## Integration Testing
+## 통합 테스트
 
-Many agent behaviors only emerge when using a real LLM, such as which tool the agent decides to call, how it formats responses, or whether a prompt modification affects the entire execution trajectory. LangChain's [`agentevals`](https://github.com/langchain-ai/agentevals) package provides evaluators specifically designed for testing agent trajectories with live models.
+많은 에이전트 동작은 실제 LLM을 사용할 때만 나타납니다. 예를 들어 에이전트가 어떤 도구를 호출하기로 결정하는지, 응답을 어떻게 포맷하는지, 프롬프트 수정이 전체 실행 경로에 영향을 미치는지 등입니다. LangChain의 [`agentevals`](https://github.com/langchain-ai/agentevals) 패키지는 라이브 모델로 에이전트 경로를 테스트하기 위해 특별히 설계된 평가자를 제공합니다.
 
-AgentEvals lets you easily evaluate the trajectory of your agent (the exact sequence of messages, including tool calls) by performing a **trajectory match** or by using an **LLM judge**:
+AgentEvals를 사용하면 **경로 매칭** 또는 **LLM 심판**을 수행하여 에이전트의 경로(도구 호출을 포함한 정확한 메시지 시퀀스)를 쉽게 평가할 수 있습니다:
 
-<Card title="Trajectory match" icon="equals" arrow="true" href="#trajectory-match-evaluator">
-Hard-code a reference trajectory for a given input and validate the run via a step-by-step comparison.
+<Card title="경로 매칭" icon="equals" arrow="true" href="#trajectory-match-evaluator">
+주어진 입력에 대한 참조 경로를 하드코딩하고 단계별 비교를 통해 실행을 검증합니다.
 
-Ideal for testing well-defined workflows where you know the expected behavior. Use when you have specific expectations about which tools should be called and in what order. This approach is deterministic, fast, and cost-effective since it doesn't require additional LLM calls.
+잘 정의된 워크플로우를 테스트하는 데 이상적이며, 예상되는 동작을 알고 있을 때 사용합니다. 어떤 도구가 어떤 순서로 호출되어야 하는지에 대한 구체적인 기대가 있을 때 사용하세요. 이 접근 방식은 결정론적이고 빠르며 추가 LLM 호출이 필요하지 않아 비용 효율적입니다.
 </Card>
 
-<Card title="LLM-as-judge" icon="gavel" arrow="true" href="#llm-as-judge-evaluator">
-Use a LLM to qualitatively validate your agent's execution trajectory. The "judge" LLM reviews the agent's decisions against a prompt rubric (which can include a reference trajectory).
+<Card title="LLM 심판" icon="gavel" arrow="true" href="#llm-as-judge-evaluator">
+LLM을 사용하여 에이전트의 실행 경로를 정성적으로 검증합니다. "심판" LLM은 프롬프트 루브릭(참조 경로를 포함할 수 있음)에 대해 에이전트의 결정을 검토합니다.
 
-More flexible and can assess nuanced aspects like efficiency and appropriateness, but requires an LLM call and is less deterministic. Use when you want to evaluate the overall quality and reasonableness of the agent's trajectory without strict tool call or ordering requirements.
+더 유연하며 효율성 및 적절성과 같은 미묘한 측면을 평가할 수 있지만 LLM 호출이 필요하고 결정론적이지 않습니다. 엄격한 도구 호출이나 순서 요구 사항 없이 에이전트 경로의 전반적인 품질과 합리성을 평가하고자 할 때 사용하세요.
 </Card>
 
-### Installing AgentEvals
+### AgentEvals 설치
 
 :::python
 ```bash
@@ -101,27 +107,27 @@ npm install agentevals @langchain/core
 ```
 :::
 
-Or, clone the [AgentEvals repository](https://github.com/langchain-ai/agentevals) directly.
+또는 [AgentEvals 저장소](https://github.com/langchain-ai/agentevals)를 직접 클론하세요.
 
-### Trajectory Match Evaluator
+### 경로 매칭 평가자
 
 :::python
-AgentEvals offers the `create_trajectory_match_evaluator` function to match your agent's trajectory against a reference trajectory. There are four modes to choose from:
+AgentEvals는 참조 경로와 에이전트의 경로를 매칭하기 위한 `create_trajectory_match_evaluator` 함수를 제공합니다. 선택할 수 있는 네 가지 모드가 있습니다:
 :::
 :::js
-AgentEvals offers the `createTrajectoryMatchEvaluator` function to match your agent's trajectory against a reference trajectory. There are four modes to choose from:
+AgentEvals는 참조 경로와 에이전트의 경로를 매칭하기 위한 `createTrajectoryMatchEvaluator` 함수를 제공합니다. 선택할 수 있는 네 가지 모드가 있습니다:
 :::
 
-| Mode | Description | Use Case |
+| 모드 | 설명 | 사용 사례 |
 |------|-------------|----------|
-| `strict` | Exact match of messages and tool calls in the same order | Testing specific sequences (e.g., policy lookup before authorization) |
-| `unordered` | Same tool calls allowed in any order | Verifying information retrieval when order doesn't matter |
-| `subset` | Agent calls only tools from reference (no extras) | Ensuring agent doesn't exceed expected scope |
-| `superset` | Agent calls at least the reference tools (extras allowed) | Verifying minimum required actions are taken |
+| `strict` | 메시지와 도구 호출이 동일한 순서로 정확히 일치 | 특정 시퀀스 테스트(예: 인증 전 정책 조회) |
+| `unordered` | 동일한 도구 호출이 순서에 관계없이 허용됨 | 순서가 중요하지 않은 정보 검색 확인 |
+| `subset` | 에이전트가 참조의 도구만 호출(추가 호출 없음) | 에이전트가 예상 범위를 초과하지 않도록 보장 |
+| `superset` | 에이전트가 최소한 참조 도구를 호출(추가 허용) | 최소 필수 작업이 수행되었는지 확인 |
 
-<Accordion title="Strict match">
+<Accordion title="엄격한 매칭">
 
-The `strict` mode ensures trajectories contain identical messages in the same order with the same tool calls, though it allows for differences in message content. This is useful when you need to enforce a specific sequence of operations, such as requiring a policy lookup before authorizing an action.
+`strict` 모드는 경로에 동일한 도구 호출과 함께 동일한 순서로 동일한 메시지가 포함되어 있는지 확인하지만, 메시지 내용의 차이는 허용합니다. 이는 작업을 승인하기 전에 정책 조회를 요구하는 것과 같이 특정 작업 시퀀스를 강제해야 할 때 유용합니다.
 
 :::python
 ```python
@@ -232,9 +238,9 @@ async function testWeatherToolCalledStrict() {
 
 </Accordion>
 
-<Accordion title="Unordered match">
+<Accordion title="순서 무관 매칭">
 
-The `unordered` mode allows the same tool calls in any order, which is helpful when you want to verify that specific information was retrieved but don't care about the sequence. For example, an agent might need to check both weather and events for a city, but the order doesn't matter.
+`unordered` 모드는 동일한 도구 호출을 순서에 관계없이 허용하므로, 특정 정보를 검색했는지 확인하되 시퀀스는 중요하지 않을 때 유용합니다. 예를 들어, 에이전트가 도시의 날씨와 이벤트를 모두 확인해야 할 수 있지만 순서는 중요하지 않습니다.
 
 :::python
 ```python
@@ -264,7 +270,7 @@ def test_multiple_tools_any_order():
         "messages": [HumanMessage(content="What's happening in SF today?")]
     })
 
-    # Reference shows tools called in different order than actual execution
+    # 참조는 실제 실행과 다른 순서로 호출된 도구를 보여줍니다
     reference_trajectory = [
         HumanMessage(content="What's happening in SF today?"),
         AIMessage(content="", tool_calls=[
@@ -330,7 +336,7 @@ async function testMultipleToolsAnyOrder() {
     messages: [new HumanMessage("What's happening in SF today?")]
   });
 
-  // Reference shows tools called in different order than actual execution
+  // 참조는 실제 실행과 다른 순서로 호출된 도구를 보여줍니다
   const referenceTrajectory = [
     new HumanMessage("What's happening in SF today?"),
     new AIMessage({
@@ -366,9 +372,9 @@ async function testMultipleToolsAnyOrder() {
 
 </Accordion>
 
-<Accordion title="Subset and superset match">
+<Accordion title="부분집합 및 상위집합 매칭">
 
-The `superset` and `subset` modes match partial trajectories. The `superset` mode verifies that the agent called at least the tools in the reference trajectory, allowing additional tool calls. The `subset` mode ensures the agent did not call any tools beyond those in the reference.
+`superset`과 `subset` 모드는 부분 경로를 매칭합니다. `superset` 모드는 에이전트가 참조 경로의 도구를 최소한 호출했는지 확인하며 추가 도구 호출을 허용합니다. `subset` 모드는 에이전트가 참조 이외의 도구를 호출하지 않았는지 확인합니다.
 
 :::python
 ```python
@@ -398,7 +404,7 @@ def test_agent_calls_required_tools_plus_extra():
         "messages": [HumanMessage(content="What's the weather in Boston?")]
     })
 
-    # Reference only requires get_weather, but agent may call additional tools
+    # 참조는 get_weather만 필요하지만 에이전트는 추가 도구를 호출할 수 있습니다
     reference_trajectory = [
         HumanMessage(content="What's the weather in Boston?"),
         AIMessage(content="", tool_calls=[
@@ -465,7 +471,7 @@ async function testAgentCallsRequiredToolsPlusExtra() {
     messages: [new HumanMessage("What's the weather in Boston?")]
   });
 
-  // Reference only requires getWeather, but agent may call additional tools
+  // 참조는 getWeather만 필요하지만 에이전트는 추가 도구를 호출할 수 있습니다
   const referenceTrajectory = [
     new HumanMessage("What's the weather in Boston?"),
     new AIMessage({
@@ -499,23 +505,23 @@ async function testAgentCallsRequiredToolsPlusExtra() {
 
 <Info>
 :::python
-You can also set the `tool_args_match_mode` property and/or `tool_args_match_overrides` to customize how the evaluator considers equality between tool calls in the actual trajectory vs. the reference. By default, only tool calls with the same arguments to the same tool are considered equal. Visit the [repository](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#tool-args-match-modes) for more details.
+`tool_args_match_mode` 속성 및/또는 `tool_args_match_overrides`를 설정하여 평가자가 실제 경로와 참조 간의 도구 호출 동등성을 고려하는 방식을 커스터마이징할 수도 있습니다. 기본적으로 동일한 도구에 대한 동일한 인수를 가진 도구 호출만 동등한 것으로 간주됩니다. 자세한 내용은 [저장소](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#tool-args-match-modes)를 참조하세요.
 :::
 :::js
-You can also set the `toolArgsMatchMode` property and/or `toolArgsMatchOverrides` to customize how the evaluator considers equality between tool calls in the actual trajectory vs. the reference. By default, only tool calls with the same arguments to the same tool are considered equal. Visit the [repository](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#tool-args-match-modes) for more details.
+`toolArgsMatchMode` 속성 및/또는 `toolArgsMatchOverrides`를 설정하여 평가자가 실제 경로와 참조 간의 도구 호출 동등성을 고려하는 방식을 커스터마이징할 수도 있습니다. 기본적으로 동일한 도구에 대한 동일한 인수를 가진 도구 호출만 동등한 것으로 간주됩니다. 자세한 내용은 [저장소](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#tool-args-match-modes)를 참조하세요.
 :::
 </Info>
 
-### LLM-as-Judge Evaluator
+### LLM 심판 평가자
 
 :::python
-You can also use an LLM to evaluate the agent's execution path with the `create_trajectory_llm_as_judge` function. Unlike the trajectory match evaluators, it doesn't require a reference trajectory, but one can be provided if available.
+`create_trajectory_llm_as_judge` 함수를 사용하여 LLM으로 에이전트의 실행 경로를 평가할 수도 있습니다. 경로 매칭 평가자와 달리 참조 경로가 필요하지 않지만, 사용 가능한 경우 제공할 수 있습니다.
 :::
 :::js
-You can also use an LLM to evaluate the agent's execution path with the `createTrajectoryLLMAsJudge` function. Unlike the trajectory match evaluators, it doesn't require a reference trajectory, but one can be provided if available.
+`createTrajectoryLLMAsJudge` 함수를 사용하여 LLM으로 에이전트의 실행 경로를 평가할 수도 있습니다. 경로 매칭 평가자와 달리 참조 경로가 필요하지 않지만, 사용 가능한 경우 제공할 수 있습니다.
 :::
 
-<Accordion title="Without reference trajectory">
+<Accordion title="참조 경로 없이">
 :::python
 ```python
 from langchain.agents import create_agent
@@ -599,9 +605,9 @@ async function testTrajectoryQuality() {
 :::
 </Accordion>
 
-<Accordion title="With reference trajectory">
+<Accordion title="참조 경로와 함께">
 
-If you have a reference trajectory, you can add an extra variable to your prompt and pass in the reference trajectory. Below, we use the prebuilt `TRAJECTORY_ACCURACY_PROMPT_WITH_REFERENCE` prompt and configure the `reference_outputs` variable:
+참조 경로가 있는 경우 프롬프트에 추가 변수를 추가하고 참조 경로를 전달할 수 있습니다. 아래에서는 사전 빌드된 `TRAJECTORY_ACCURACY_PROMPT_WITH_REFERENCE` 프롬프트를 사용하고 `reference_outputs` 변수를 구성합니다:
 
 :::python
 ```python
@@ -635,15 +641,15 @@ const evaluation = await evaluator({
 </Accordion>
 
 <Info>
-For more configurability over how the LLM evaluates the trajectory, visit the [repository](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#trajectory-llm-as-judge).
+LLM이 경로를 평가하는 방식에 대한 더 많은 구성 옵션을 보려면 [저장소](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#trajectory-llm-as-judge)를 참조하세요.
 </Info>
 
 :::python
-### Async Support
+### 비동기 지원
 
-All `agentevals` evaluators support Python asyncio. For evaluators that use factory functions, async versions are available by adding `async` after `create_` in the function name.
+모든 `agentevals` 평가자는 Python asyncio를 지원합니다. 팩토리 함수를 사용하는 평가자의 경우 함수 이름에서 `create_` 뒤에 `async`를 추가하여 비동기 버전을 사용할 수 있습니다.
 
-<Accordion title="Async judge and evaluator example">
+<Accordion title="비동기 심판 및 평가자 예제">
 
 ```python
 from agentevals.trajectory.llm import create_async_trajectory_llm_as_judge, TRAJECTORY_ACCURACY_PROMPT
@@ -671,11 +677,11 @@ async def test_async_evaluation():
 
 :::
 
-## LangSmith Integration
+## LangSmith 통합
 
-For tracking experiments over time, you can log evaluator results to [LangSmith](https://smith.langchain.com/), a platform for building production-grade LLM applications that includes tracing, evaluation, and experimentation tools.
+시간 경과에 따른 실험을 추적하려면 평가자 결과를 [LangSmith](https://smith.langchain.com/)에 로그할 수 있습니다. LangSmith는 추적, 평가 및 실험 도구를 포함하는 프로덕션급 LLM 애플리케이션 구축을 위한 플랫폼입니다.
 
-First, set up LangSmith by setting the required environment variables:
+먼저 필요한 환경 변수를 설정하여 LangSmith를 설정합니다:
 
 ```bash
 export LANGSMITH_API_KEY="your_langsmith_api_key"
@@ -683,9 +689,9 @@ export LANGSMITH_TRACING="true"
 ```
 
 :::python
-LangSmith offers two main approaches for running evaluations: [pytest](/langsmith/pytest) integration and the `evaluate` function.
+LangSmith는 평가를 실행하기 위한 두 가지 주요 접근 방식을 제공합니다: [pytest](/langsmith/pytest) 통합과 `evaluate` 함수입니다.
 
-<Accordion title="Using pytest integration">
+<Accordion title="pytest 통합 사용">
 
 ```python
 import pytest
@@ -712,7 +718,7 @@ def test_trajectory_accuracy():
         AIMessage(content="The weather in SF is 75 degrees and sunny."),
     ]
 
-    # Log inputs, outputs, and reference outputs to LangSmith
+    # 입력, 출력 및 참조 출력을 LangSmith에 로그합니다
     t.log_inputs({})
     t.log_outputs({"messages": result["messages"]})
     t.log_reference_outputs({"messages": reference_trajectory})
@@ -723,19 +729,19 @@ def test_trajectory_accuracy():
     )
 ```
 
-Run the evaluation with pytest:
+pytest로 평가를 실행합니다:
 
 ```bash
 pytest test_trajectory.py --langsmith-output
 ```
 
-Results will be automatically logged to LangSmith.
+결과가 자동으로 LangSmith에 로그됩니다.
 
 </Accordion>
 
-<Accordion title="Using the evaluate function">
+<Accordion title="evaluate 함수 사용">
 
-Alternatively, you can create a dataset in LangSmith and use the `evaluate` function:
+또는 LangSmith에서 데이터셋을 생성하고 `evaluate` 함수를 사용할 수 있습니다:
 
 ```python
 from langsmith import Client
@@ -749,7 +755,7 @@ trajectory_evaluator = create_trajectory_llm_as_judge(
 )
 
 def run_agent(inputs):
-    """Your agent function that returns trajectory messages."""
+    """경로 메시지를 반환하는 에이전트 함수."""
     return agent.invoke(inputs)["messages"]
 
 experiment_results = client.evaluate(
@@ -759,20 +765,20 @@ experiment_results = client.evaluate(
 )
 ```
 
-Results will be automatically logged to LangSmith.
+결과가 자동으로 LangSmith에 로그됩니다.
 
 
 </Accordion>
 
 <Tip>
-To learn more about evaluating your agent, see the [LangSmith docs](/langsmith/pytest).
+에이전트 평가에 대해 자세히 알아보려면 [LangSmith 문서](/langsmith/pytest)를 참조하세요.
 </Tip>
 :::
 
 :::js
-LangSmith offers two main approaches for running evaluations: [Vitest/Jest](/langsmith/vitest-jest) integration and the `evaluate` function.
+LangSmith는 평가를 실행하기 위한 두 가지 주요 접근 방식을 제공합니다: [Vitest/Jest](/langsmith/vitest-jest) 통합과 `evaluate` 함수입니다.
 
-<Accordion title="Using vitest/jest integration">
+<Accordion title="vitest/jest 통합 사용">
 
 ```ts
 import * as ls from "langsmith/vitest";
@@ -827,19 +833,19 @@ ls.describe("trajectory accuracy", () => {
 });
 ```
 
-Run the evaluation with your test runner:
+테스트 러너로 평가를 실행합니다:
 
 ```bash
 vitest run test_trajectory.eval.ts
-# or
+# 또는
 jest test_trajectory.eval.ts
 ```
 
 </Accordion>
 
-<Accordion title="Using the evaluate function">
+<Accordion title="evaluate 함수 사용">
 
-Alternatively, you can create a dataset in LangSmith and use the `evaluate` function:
+또는 LangSmith에서 데이터셋을 생성하고 `evaluate` 함수를 사용할 수 있습니다:
 
 ```ts
 import { evaluate } from "langsmith/evaluation";
@@ -864,23 +870,23 @@ await evaluate(
 );
 ```
 
-Results will be automatically logged to LangSmith.
+결과가 자동으로 LangSmith에 로그됩니다.
 
 </Accordion>
 
 <Tip>
-To learn more about evaluating your agent, see the [LangSmith docs](/langsmith/vitest-jest).
+에이전트 평가에 대해 자세히 알아보려면 [LangSmith 문서](/langsmith/vitest-jest)를 참조하세요.
 </Tip>
 :::
 
 :::python
-## Recording & Replaying HTTP Calls
+## HTTP 호출 기록 및 재생
 
-Integration tests that call real LLM APIs can be slow and expensive, especially when run frequently in CI/CD pipelines. We recommend using a library for recording HTTP requests and responses, then replaying them in subsequent runs without making actual network calls.
+실제 LLM API를 호출하는 통합 테스트는 느리고 비용이 많이 들 수 있으며, 특히 CI/CD 파이프라인에서 자주 실행될 때 더욱 그렇습니다. HTTP 요청과 응답을 기록한 다음 실제 네트워크 호출을 하지 않고 후속 실행에서 재생하는 라이브러리를 사용하는 것이 좋습니다.
 
-You can use [`vcrpy`](https://pypi.org/project/vcrpy/1.5.2/) to achieve this. If you're using `pytest`, the [`pytest-recording` plugin](https://pypi.org/project/pytest-recording/) provides a simple way to enable this with minimal configuration. Request/responses are recorded in cassettes, which are then used to mock the real network calls in subsequent runs.
+[`vcrpy`](https://pypi.org/project/vcrpy/1.5.2/)를 사용하여 이를 달성할 수 있습니다. `pytest`를 사용하는 경우 [`pytest-recording` 플러그인](https://pypi.org/project/pytest-recording/)은 최소한의 구성으로 이를 활성화하는 간단한 방법을 제공합니다. 요청/응답은 카세트에 기록되며, 그 다음 실행에서 실제 네트워크 호출을 모킹하는 데 사용됩니다.
 
-Set up your `conftest.py` file to filter out sensitive information from the cassettes:
+카세트에서 민감한 정보를 필터링하도록 `conftest.py` 파일을 설정합니다:
 
 ```py conftest.py
 import pytest
@@ -891,7 +897,7 @@ def vcr_config():
         "filter_headers": [
             ("authorization", "XXXX"),
             ("x-api-key", "XXXX"),
-            # ... other headers you want to mask
+            # ... 마스킹하려는 다른 헤더
         ],
         "filter_query_parameters": [
             ("api_key", "XXXX"),
@@ -900,7 +906,7 @@ def vcr_config():
     }
 ```
 
-Then configure your project to recognise the `vcr` marker:
+그런 다음 `vcr` 마커를 인식하도록 프로젝트를 구성합니다:
 
 <CodeGroup>
 ```ini pytest.ini
@@ -919,10 +925,10 @@ addopts = "--record-mode=once"
 </CodeGroup>
 
 <Info>
-The `--record-mode=once` option records HTTP interactions on the first run and replays them on subsequent runs.
+`--record-mode=once` 옵션은 첫 번째 실행에서 HTTP 상호 작용을 기록하고 후속 실행에서 재생합니다.
 </Info>
 
-Now, simply decorate your tests with the `vcr` marker:
+이제 `vcr` 마커로 테스트를 장식하기만 하면 됩니다:
 
 ```python
 @pytest.mark.vcr()
@@ -930,9 +936,9 @@ def test_agent_trajectory():
     # ...
 ```
 
-The first time you run this test, your agent will make real network calls and pytest will generate a cassette file `test_agent_trajectory.yaml` in the `tests/cassettes` directory. Subsequent runs will use that cassette to mock the real network calls, granted the agent's requests don't change from the previous run. If they do, the test will fail and you'll need to delete the cassette and rerun the test to record fresh interactions.
+이 테스트를 처음 실행하면 에이전트가 실제 네트워크 호출을 하고 pytest는 `tests/cassettes` 디렉터리에 카세트 파일 `test_agent_trajectory.yaml`을 생성합니다. 에이전트의 요청이 이전 실행과 변경되지 않는 한 후속 실행에서는 해당 카세트를 사용하여 실제 네트워크 호출을 모킹합니다. 변경되면 테스트가 실패하고 카세트를 삭제하고 테스트를 다시 실행하여 새로운 상호 작용을 기록해야 합니다.
 
 <Warning>
-When you modify prompts, add new tools, or change expected trajectories, your saved cassettes will become outdated and your existing tests **will fail**. You should delete the corresponding cassette files and rerun the tests to record fresh interactions.
+프롬프트를 수정하거나, 새 도구를 추가하거나, 예상 경로를 변경하면 저장된 카세트가 오래되고 기존 테스트가 **실패**합니다. 해당 카세트 파일을 삭제하고 테스트를 다시 실행하여 새로운 상호 작용을 기록해야 합니다.
 </Warning>
 :::
