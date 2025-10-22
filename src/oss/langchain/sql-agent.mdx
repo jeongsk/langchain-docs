@@ -6,6 +6,7 @@ sidebarTitle: SQL agent
 import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
 import ChatModelTabsJS from '/snippets/chat-model-tabs-js.mdx';
 
+
 ## Overview
 
 In this tutorial, you will learn how to build an agent that can answer questions about a SQL database using LangChain [agents](/oss/langchain/agents).
@@ -154,7 +155,7 @@ Use the `SQLDatabase` wrapper available in the `langchain_community` package to 
 ```python
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 
-toolkit = SQLDatabaseToolkit(db=db, llm=llm)
+toolkit = SQLDatabaseToolkit(db=db, llm=model)
 
 tools = toolkit.get_tools()
 
@@ -235,8 +236,9 @@ Now, create an agent with the model, tools, and prompt:
 ```python
 from langchain.agents import create_agent
 
+
 agent = create_agent(
-    llm,
+    model,
     tools,
     system_prompt=system_prompt,
 )
@@ -385,8 +387,8 @@ from langchain_community.utilities import SQLDatabase
 import requests
 
 
-# initialize an LLM
-llm = init_chat_model("openai:gpt-4.1")
+# Initialize an LLM
+model = init_chat_model("openai:gpt-4.1")
 
 # Get the database, store it locally
 url = "https://storage.googleapis.com/benchmarks-artifacts/chinook/Chinook.db"
@@ -405,7 +407,7 @@ else:
 db = SQLDatabase.from_uri("sqlite:///Chinook.db")
 
 # Create the tools
-toolkit = SQLDatabaseToolkit(db=db, llm=llm)
+toolkit = SQLDatabaseToolkit(db=db, llm=model)
 
 tools = toolkit.get_tools()
 
@@ -440,7 +442,7 @@ Then you should query the schema of the most relevant tables.
 )
 
 agent = create_agent(
-    llm,
+    model,
     tools,
     system_prompt=system_prompt,
 )
@@ -460,8 +462,9 @@ from langchain.agents import create_agent
 from langchain.agents.middleware import HumanInTheLoopMiddleware # [!code highlight]
 from langgraph.checkpoint.memory import InMemorySaver # [!code highlight]
 
+
 agent = create_agent(
-    llm,
+    model,
     tools,
     system_prompt=system_prompt,
     middleware=[ # [!code highlight]
