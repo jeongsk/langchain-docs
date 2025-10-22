@@ -3,9 +3,26 @@ title: LangGraph 개요
 sidebarTitle: 개요
 ---
 
-import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
+:::python
+<Callout icon="bullhorn" color="#DFC5FE" iconType="regular">
+    **LangGraph v1.0을 사용할 수 있습니다!**
 
-<AlphaCallout />
+    전체 변경 사항 목록과 코드 업그레이드 방법에 대해서는 [릴리스 노트](/oss/releases/langgraph-v1) 및 [마이그레이션 가이드](/oss/migrate/langgraph-v1)를 참조하세요.
+
+    문제가 발생하거나 피드백이 있으시면 [이슈를 등록](https://github.com/langchain-ai/docs/issues/new?template=02-langgraph.yml&labels=langgraph,python)해 주시면 개선하겠습니다. v0.x 문서를 보려면 [보관된 사이트로 이동](https://langchain-ai.github.io/langgraph/)하세요.
+</Callout>
+:::
+
+:::js
+<Callout icon="bullhorn" color="#DFC5FE" iconType="regular">
+
+    **LangGraph v1.0을 사용할 수 있습니다!**
+
+    전체 변경 사항 목록과 코드 업그레이드 방법에 대해서는 [릴리스 노트](/oss/releases/langgraph-v1) 및 [마이그레이션 가이드](/oss/migrate/langgraph-v1)를 참조하세요.
+
+    문제가 발생하거나 피드백이 있으시면 [이슈를 등록](https://github.com/langchain-ai/docs/issues/new?template=02-langgraph.yml&labels=langgraph,js/ts)해 주시면 개선하겠습니다. v0.x 문서를 보려면 [보관된 사이트로 이동](https://langchain-ai.github.io/langgraphjs/)하세요.
+</Callout>
+:::
 
 Klarna, Replit, Elastic 등 에이전트의 미래를 만들어가는 기업들의 신뢰를 받는 LangGraph는 장기 실행 상태 기반 에이전트를 구축, 관리, 배포하기 위한 저수준 오케스트레이션 프레임워크이자 런타임입니다.
 
@@ -20,11 +37,11 @@ LangGraph는 에이전트 오케스트레이션에 중요한 기본 기능에 �
 :::python
 <CodeGroup>
 ```bash pip
-pip install --pre -U langgraph
+pip install -U langgraph
 ```
 
 ```bash uv
-uv add --prerelease=allow langgraph
+uv add langgraph
 ```
 </CodeGroup>
 :::
@@ -32,19 +49,19 @@ uv add --prerelease=allow langgraph
 :::js
 <CodeGroup>
 ```bash npm
-npm install @langchain/langgraph@next @langchain/core@next
+npm install @langchain/langgraph @langchain/core
 ```
 
 ```bash pnpm
-pnpm add @langchain/langgraph@next @langchain/core@next
+pnpm add @langchain/langgraph @langchain/core
 ```
 
 ```bash yarn
-yarn add @langchain/langgraph@next @langchain/core@next
+yarn add @langchain/langgraph @langchain/core
 ```
 
 ```bash bun
-bun add @langchain/langgraph@next @langchain/core@next
+bun add @langchain/langgraph @langchain/core
 ```
 </CodeGroup>
 :::
