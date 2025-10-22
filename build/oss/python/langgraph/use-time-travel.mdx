@@ -17,10 +17,10 @@ LangGraph는 이러한 사용 사례를 지원하기 위해 [타임 트래블](/
 
 LangGraph에서 [타임 트래블](/oss/python/langgraph/use-time-travel)을 사용하려면:
 
-1. [`invoke`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.invoke) 또는 [`stream`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.stream) 메서드를 사용하여 초기 입력으로 [그래프를 실행](#1-run-the-graph)합니다.
-2. [기존 스레드에서 체크포인트를 식별](#2-identify-a-checkpoint): [`get_state_history()`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.get_state_history) 메서드를 사용하여 특정 `thread_id`에 대한 실행 히스토리를 검색하고 원하는 `checkpoint_id`를 찾습니다.
+1. [`invoke`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.CompiledStateGraph.invoke) 또는 [`stream`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.CompiledStateGraph.stream) 메서드를 사용하여 초기 입력으로 [그래프를 실행](#1-run-the-graph)합니다.
+2. [기존 스레드에서 체크포인트를 식별](#2-identify-a-checkpoint): [`get_state_history()`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.CompiledStateGraph.get_state_history) 메서드를 사용하여 특정 `thread_id`에 대한 실행 히스토리를 검색하고 원하는 `checkpoint_id`를 찾습니다.
   또는 실행을 일시 중지하려는 노드 앞에 [인터럽트](/oss/python/langgraph/interrupts)를 설정합니다. 그런 다음 해당 인터럽트까지 기록된 가장 최근 체크포인트를 찾을 수 있습니다.
-3. [그래프 상태 업데이트(선택 사항)](#3-update-the-state-optional): [`update_state`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.update_state) 메서드를 사용하여 체크포인트에서 그래프의 상태를 수정하고 대체 상태에서 실행을 재개합니다.
+3. [그래프 상태 업데이트(선택 사항)](#3-update-the-state-optional): [`update_state`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.CompiledStateGraph.update_state) 메서드를 사용하여 체크포인트에서 그래프의 상태를 수정하고 대체 상태에서 실행을 재개합니다.
 4. [체크포인트에서 실행 재개](#4-resume-execution-from-the-checkpoint): 입력을 `None`으로, 적절한 `thread_id`와 `checkpoint_id`를 포함하는 구성으로 `invoke` 또는 `stream` 메서드를 사용합니다.
 
 
@@ -234,5 +234,8 @@ graph.invoke(None, new_config)
 ---
 
 <Callout icon="pen-to-square" iconType="regular">
-  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/use-time-travel.mdx)
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/use-time-travel.mdx)
 </Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

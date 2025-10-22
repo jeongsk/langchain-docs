@@ -241,7 +241,7 @@ LangGraph에서 노드는 다음 인자를 받는 Python 함수(동기 또는 �
 2. `config`: `thread_id`와 같은 구성 정보 및 `tags`와 같은 추적 정보를 포함하는 `RunnableConfig` 객체
 3. `runtime`: [런타임 `context`](#runtime-context) 및 `store`, `stream_writer`와 같은 기타 정보를 포함하는 `Runtime` 객체
 
-`NetworkX`와 유사하게, [add_node](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.StateGraph.add_node) 메서드를 사용하여 그래프에 이러한 노드를 추가합니다:
+`NetworkX`와 유사하게, [add_node](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph.add_node) 메서드를 사용하여 그래프에 이러한 노드를 추가합니다:
 
 ```python
 from dataclasses import dataclass
@@ -388,7 +388,7 @@ print(graph.invoke({"x": 5}, stream_mode='updates'))  # (2)!
 
 ### Normal Edges
 
-노드 A에서 노드 B로 **항상** 이동하려면 [add_edge](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.StateGraph.add_edge) 메서드를 직접 사용할 수 있습니다.
+노드 A에서 노드 B로 **항상** 이동하려면 [add_edge](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph.add_edge) 메서드를 직접 사용할 수 있습니다.
 
 ```python
 graph.add_edge("node_a", "node_b")
@@ -400,7 +400,7 @@ graph.add_edge("node_a", "node_b")
 
 ### Conditional Edges
 
-**선택적으로** 하나 이상의 엣지로 라우팅하거나(또는 선택적으로 종료하려면) [add_conditional_edges](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.StateGraph.add_conditional_edges) 메서드를 사용할 수 있습니다. 이 메서드는 노드의 이름과 해당 노드가 실행된 후 호출할 "라우팅 함수"를 받습니다:
+**선택적으로** 하나 이상의 엣지로 라우팅하거나(또는 선택적으로 종료하려면) [add_conditional_edges](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph.add_conditional_edges) 메서드를 사용할 수 있습니다. 이 메서드는 노드의 이름과 해당 노드가 실행된 후 호출할 "라우팅 함수"를 받습니다:
 
 ```python
 graph.add_conditional_edges("node_a", routing_function)
@@ -428,7 +428,7 @@ graph.add_conditional_edges("node_a", routing_function, {True: "node_b", False: 
 
 ### Entry Point
 
-진입점은 그래프가 시작될 때 실행되는 첫 번째 노드입니다. 가상 [`START`](https://langchain-ai.github.io/langgraph/reference/constants/#langgraph.constants.START) 노드에서 실행할 첫 번째 노드로 [`add_edge`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.StateGraph.add_edge) 메서드를 사용하여 그래프에 진입할 위치를 지정할 수 있습니다.
+진입점은 그래프가 시작될 때 실행되는 첫 번째 노드입니다. 가상 [`START`](https://reference.langchain.com/python/langgraph/constants/#langgraph.constants.START) 노드에서 실행할 첫 번째 노드로 [`add_edge`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph.add_edge) 메서드를 사용하여 그래프에 진입할 위치를 지정할 수 있습니다.
 
 ```python
 from langgraph.graph import START
@@ -442,7 +442,7 @@ graph.add_edge(START, "node_a")
 
 ### Conditional Entry Point
 
-조건부 진입점을 사용하면 커스텀 로직에 따라 서로 다른 노드에서 시작할 수 있습니다. 가상 [`START`](https://langchain-ai.github.io/langgraph/reference/constants/#langgraph.constants.START) 노드에서 [`add_conditional_edges`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.StateGraph.add_conditional_edges)를 사용하여 이를 수행할 수 있습니다.
+조건부 진입점을 사용하면 커스텀 로직에 따라 서로 다른 노드에서 시작할 수 있습니다. 가상 [`START`](https://reference.langchain.com/python/langgraph/constants/#langgraph.constants.START) 노드에서 [`add_conditional_edges`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph.add_conditional_edges)를 사용하여 이를 수행할 수 있습니다.
 
 ```python
 from langgraph.graph import START
@@ -464,7 +464,7 @@ graph.add_conditional_edges(START, routing_function, {True: "node_b", False: "no
 
 기본적으로 `Nodes`와 `Edges`는 사전에 정의되며 동일한 공유 상태에서 작동합니다. 하지만 정확한 엣지를 미리 알 수 없거나 동시에 서로 다른 버전의 `State`가 존재하기를 원할 수 있습니다. 이에 대한 일반적인 예는 [map-reduce](/oss/python/langgraph/graph-api#map-reduce-and-the-send-api) 디자인 패턴입니다. 이 디자인 패턴에서 첫 번째 노드는 객체 리스트를 생성할 수 있으며, 이러한 모든 객체에 다른 노드를 적용하고 싶을 수 있습니다. 객체의 수를 미리 알 수 없을 수 있으며(즉, 엣지의 수를 알 수 없을 수 있음) 다운스트림 `Node`에 대한 입력 `State`는 달라야 합니다(생성된 각 객체에 대해 하나씩).
 
-이 디자인 패턴을 지원하기 위해 LangGraph는 조건부 엣지에서 [`Send`](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.Send) 객체를 반환하는 것을 지원합니다. `Send`는 두 개의 인자를 받습니다: 첫 번째는 노드의 이름이고 두 번째는 해당 노드에 전달할 상태입니다.
+이 디자인 패턴을 지원하기 위해 LangGraph는 조건부 엣지에서 [`Send`](https://reference.langchain.com/python/langgraph/types/#langgraph.types.Send) 객체를 반환하는 것을 지원합니다. `Send`는 두 개의 인자를 받습니다: 첫 번째는 노드의 이름이고 두 번째는 해당 노드에 전달할 상태입니다.
 
 ```python
 def continue_to_jokes(state: OverallState):
@@ -479,7 +479,7 @@ graph.add_conditional_edges("node_a", continue_to_jokes)
 
 ## `Command`
 
-제어 흐름(엣지)과 상태 업데이트(노드)를 결합하는 것이 유용할 수 있습니다. 예를 들어, 동일한 노드에서 상태 업데이트를 수행하고 다음에 갈 노드를 결정하고 싶을 수 있습니다. LangGraph는 노드 함수에서 [`Command`](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.Command) 객체를 반환하여 이를 수행할 수 있는 방법을 제공합니다:
+제어 흐름(엣지)과 상태 업데이트(노드)를 결합하는 것이 유용할 수 있습니다. 예를 들어, 동일한 노드에서 상태 업데이트를 수행하고 다음에 갈 노드를 결정하고 싶을 수 있습니다. LangGraph는 노드 함수에서 [`Command`](https://reference.langchain.com/python/langgraph/types/#langgraph.types.Command) 객체를 반환하여 이를 수행할 수 있는 방법을 제공합니다:
 
 ```python
 def my_node(state: State) -> Command[Literal["my_other_node"]]:
@@ -633,5 +633,8 @@ graph.invoke(inputs, config={"recursion_limit": 5}, context={"llm": "anthropic"}
 ---
 
 <Callout icon="pen-to-square" iconType="regular">
-  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/graph-api.mdx)
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/graph-api.mdx)
 </Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

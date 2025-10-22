@@ -20,7 +20,7 @@ LangChain 스트리밍으로 가능한 작업:
 
 ## 에이전트 진행 상황
 
-에이전트 진행 상황을 스트리밍하려면 `stream_mode="updates"`와 함께 [`stream()`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.stream) 또는 [`astream()`](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.state.CompiledStateGraph.astream) 메서드를 사용하십시오. 이렇게 하면 모든 에이전트 단계 후에 이벤트가 방출됩니다.
+에이전트 진행 상황을 스트리밍하려면 `stream_mode="updates"`와 함께 [`stream()`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.CompiledStateGraph.stream) 또는 [`astream()`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.CompiledStateGraph.astream) 메서드를 사용하십시오. 이렇게 하면 모든 에이전트 단계 후에 이벤트가 방출됩니다.
 
 
 
@@ -295,5 +295,8 @@ content: {'model': {'messages': [AIMessage(content='San Francisco weather: It's 
 ---
 
 <Callout icon="pen-to-square" iconType="regular">
-  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/streaming.mdx)
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/streaming.mdx)
 </Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

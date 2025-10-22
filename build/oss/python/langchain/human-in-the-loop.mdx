@@ -6,7 +6,7 @@ title: Human-in-the-loop
 Human-in-the-Loop(HITL) middleware를 사용하면 agent 도구 호출에 사람의 감독을 추가할 수 있습니다.
 모델이 검토가 필요할 수 있는 작업(예: 파일 작성 또는 SQL 실행)을 제안할 때 middleware는 실행을 일시 중지하고 결정을 기다릴 수 있습니다.
 
-이것은 구성 가능한 정책에 대해 각 도구 호출을 확인하여 수행됩니다. 개입이 필요한 경우 middleware는 실행을 중단하는 [interrupt](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.interrupt)를 발생시킵니다. 그래프 state는 LangGraph의 [지속성 계층](/oss/python/langgraph/persistence)을 사용하여 저장되므로 실행을 안전하게 일시 중지하고 나중에 재개할 수 있습니다.
+이것은 구성 가능한 정책에 대해 각 도구 호출을 확인하여 수행됩니다. 개입이 필요한 경우 middleware는 실행을 중단하는 [interrupt](https://reference.langchain.com/python/langgraph/types/#langgraph.types.interrupt)를 발생시킵니다. 그래프 state는 LangGraph의 [지속성 계층](/oss/python/langgraph/persistence)을 사용하여 저장되므로 실행을 안전하게 일시 중지하고 나중에 재개할 수 있습니다.
 
 그런 다음 사람의 결정이 다음에 발생할 일을 결정합니다: 작업을 그대로 승인(`approve`)하거나, 실행 전에 수정(`edit`)하거나, 피드백과 함께 거부(`reject`)할 수 있습니다.
 
@@ -69,7 +69,7 @@ agent = create_agent(
 
 <Info>
     Interrupt 간에 그래프 state를 유지하려면 checkpointer를 구성해야 합니다.
-    프로덕션에서는 [`AsyncPostgresSaver`](https://langchain-ai.github.io/langgraph/reference/checkpoints/#langgraph.checkpoint.postgres.aio.AsyncPostgresSaver)와 같은 영구 checkpointer를 사용하세요. 테스트 또는 프로토타이핑의 경우 [`InMemorySaver`](https://langchain-ai.github.io/langgraph/reference/checkpoints/#langgraph.checkpoint.memory.InMemorySaver)를 사용하세요.
+    프로덕션에서는 [`AsyncPostgresSaver`](https://reference.langchain.com/python/langgraph/checkpoints/#langgraph.checkpoint.postgres.aio.AsyncPostgresSaver)와 같은 영구 checkpointer를 사용하세요. 테스트 또는 프로토타이핑의 경우 [`InMemorySaver`](https://reference.langchain.com/python/langgraph/checkpoints/#langgraph.checkpoint.memory.InMemorySaver)를 사용하세요.
 
     Agent를 호출할 때 대화 스레드와 실행을 연결하는 **스레드 ID**를 포함하는 `config`를 전달하세요.
     자세한 내용은 [LangGraph interrupt 문서](/oss/python/langgraph/interrupts)를 참조하세요.
@@ -265,7 +265,7 @@ Middleware는 모델이 응답을 생성한 후 도구 호출이 실행되기 �
 
 1. Agent가 모델을 호출하여 응답을 생성합니다.
 2. Middleware가 응답에서 도구 호출을 검사합니다.
-3. 호출 중 사람의 입력이 필요한 경우 middleware는 `action_requests` 및 `review_configs`가 포함된 `HITLRequest`를 구축하고 [interrupt](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.interrupt)를 호출합니다.
+3. 호출 중 사람의 입력이 필요한 경우 middleware는 `action_requests` 및 `review_configs`가 포함된 `HITLRequest`를 구축하고 [interrupt](https://reference.langchain.com/python/langgraph/types/#langgraph.types.interrupt)를 호출합니다.
 4. Agent는 사람의 결정을 기다립니다.
 5. `HITLResponse` 결정에 따라 middleware는 승인되거나 편집된 호출을 실행하고, 거부된 호출에 대한 [ToolMessage](https://reference.langchain.com/python/langchain/messages/#langchain.messages.ToolMessage)를 합성하고, 실행을 재개합니다.
 
@@ -273,12 +273,15 @@ Middleware는 모델이 응답을 생성한 후 도구 호출이 실행되기 �
 
 ## 사용자 정의 HITL 로직
 
-더 전문화된 워크플로우의 경우 [interrupt](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.interrupt) primitive와 [middleware](/oss/python/langchain/middleware) 추상화를 직접 사용하여 사용자 정의 HITL 로직을 구축할 수 있습니다.
+더 전문화된 워크플로우의 경우 [interrupt](https://reference.langchain.com/python/langgraph/types/#langgraph.types.interrupt) primitive와 [middleware](/oss/python/langchain/middleware) 추상화를 직접 사용하여 사용자 정의 HITL 로직을 구축할 수 있습니다.
 
 Interrupt를 agent의 작업에 통합하는 방법을 이해하려면 위의 [실행 생명주기](#실행-생명주기)를 검토하세요.
 
 ---
 
 <Callout icon="pen-to-square" iconType="regular">
-  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/human-in-the-loop.mdx)
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/human-in-the-loop.mdx)
 </Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

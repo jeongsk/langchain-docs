@@ -8,17 +8,17 @@ title: Runtime
 LangChain의 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 내부적으로 LangGraph의 런타임 위에서 실행됩니다.
 
 
-LangGraph는 다음 정보를 포함하는 [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) 객체를 제공합니다:
+LangGraph는 다음 정보를 포함하는 [Runtime](https://reference.langchain.com/python/langgraph/runtime/#langgraph.runtime.Runtime) 객체를 제공합니다:
 
 1. **Context**: 에이전트 호출에 대한 사용자 ID, 데이터베이스 연결 또는 기타 종속성과 같은 정적 정보
-2. **Store**: [장기 메모리](/oss/python/langchain/long-term-memory)에 사용되는 [BaseStore](https://langchain-ai.github.io/langgraph/reference/store/#langgraph.store.base.BaseStore) 인스턴스
+2. **Store**: [장기 메모리](/oss/python/langchain/long-term-memory)에 사용되는 [BaseStore](https://reference.langchain.com/python/langgraph/store/#langgraph.store.base.BaseStore) 인스턴스
 3. **Stream writer**: `"custom"` 스트림 모드를 통해 정보를 스트리밍하는 데 사용되는 객체
 
 런타임 정보는 [툴](#inside-tools) 및 [미들웨어](#inside-middleware) 내에서 액세스할 수 있습니다.
 
 ## 액세스
 
-[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)로 에이전트를 생성할 때, `context_schema`를 지정하여 에이전트 [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime)에 저장되는 `context`의 구조를 정의할 수 있습니다.
+[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)로 에이전트를 생성할 때, `context_schema`를 지정하여 에이전트 [Runtime](https://reference.langchain.com/python/langgraph/runtime/#langgraph.runtime.Runtime)에 저장되는 `context`의 구조를 정의할 수 있습니다.
 
 
 
@@ -55,7 +55,7 @@ agent.invoke(
 * 장기 메모리 읽기 또는 쓰기
 * [커스텀 스트림](/oss/python/langchain/streaming#custom-updates)에 쓰기 (예: 툴 진행 상황/업데이트)
 
-`ToolRuntime` 매개변수를 사용하여 툴 내부에서 [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) 객체에 액세스합니다.
+`ToolRuntime` 매개변수를 사용하여 툴 내부에서 [Runtime](https://reference.langchain.com/python/langgraph/runtime/#langgraph.runtime.Runtime) 객체에 액세스합니다.
 
 ```python
 from dataclasses import dataclass
@@ -84,7 +84,7 @@ def fetch_user_email_preferences(runtime: ToolRuntime[Context]) -> str:  # [!cod
 
 미들웨어에서 런타임 정보에 액세스하여 사용자 컨텍스트를 기반으로 동적 프롬프트를 생성하거나, 메시지를 수정하거나, 에이전트 동작을 제어할 수 있습니다.
 
-미들웨어 데코레이터 내부에서 [Runtime](https://langchain-ai.github.io/langgraph/reference/runtime/#langgraph.runtime.Runtime) 객체에 액세스하려면 `request.runtime`을 사용합니다. 런타임 객체는 미들웨어 함수에 전달되는 [`ModelRequest`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.ModelRequest) 매개변수에서 사용할 수 있습니다.
+미들웨어 데코레이터 내부에서 [Runtime](https://reference.langchain.com/python/langgraph/runtime/#langgraph.runtime.Runtime) 객체에 액세스하려면 `request.runtime`을 사용합니다. 런타임 객체는 미들웨어 함수에 전달되는 [`ModelRequest`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.ModelRequest) 매개변수에서 사용할 수 있습니다.
 
 ```python
 from dataclasses import dataclass
@@ -133,5 +133,8 @@ agent.invoke(
 ---
 
 <Callout icon="pen-to-square" iconType="regular">
-  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/runtime.mdx)
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/runtime.mdx)
 </Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

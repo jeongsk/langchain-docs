@@ -116,7 +116,7 @@ model = init_chat_model(
 
 
 <Info>
-    각 채팅 모델 통합에는 프로바이더별 기능을 제어하는 데 사용되는 추가 매개변수가 있을 수 있습니다. 예를 들어 [`ChatOpenAI`](https://reference.langchain.com/python/integrations/langchain_openai/#langchain_openai.ChatOpenAI)는 OpenAI Responses 또는 Completions API 사용 여부를 지정하는 `use_responses_api`가 있습니다.
+    각 채팅 모델 통합에는 프로바이더별 기능을 제어하는 데 사용되는 추가 매개변수가 있을 수 있습니다. 예를 들어 [`ChatOpenAI`](https://reference.langchain.com/python/integrations/langchain_openai/ChatOpenAI/)는 OpenAI Responses 또는 Completions API 사용 여부를 지정하는 `use_responses_api`가 있습니다.
 
     특정 채팅 모델에서 지원하는 모든 매개변수를 찾으려면 [채팅 모델 통합](/oss/python/integrations/chat) 페이지를 참조하세요.
 </Info>
@@ -777,7 +777,7 @@ LangChain은 자체 하드웨어에서 로컬로 모델을 실행하는 것을 �
 많은 프로바이더는 동일한 토큰의 반복 처리 시 대기 시간과 비용을 줄이기 위한 프롬프트 캐싱 기능을 제공합니다. 이러한 기능은 **암묵적** 또는 **명시적**일 수 있습니다:
 
 - **암묵적 프롬프트 캐싱:** 요청이 캐시에 도달하면 프로바이더가 자동으로 비용 절감을 전달합니다. 예: [OpenAI](/oss/python/integrations/chat/openai) 및 [Gemini](/oss/python/integrations/chat/google_generative_ai) (Gemini 2.5 이상).
-- **명시적 캐싱:** 프로바이더가 더 큰 제어 또는 비용 절감을 보장하기 위해 캐시 포인트를 수동으로 표시할 수 있습니다. 예: [`ChatOpenAI`](https://reference.langchain.com/python/integrations/langchain_openai/#langchain_openai.ChatOpenAI) (`prompt_cache_key`를 통해), [Anthropic](/oss/python/integrations/chat/anthropic#prompt-caching), [AWS Bedrock](/oss/python/integrations/chat/bedrock#prompt-caching), [Gemini](https://python.langchain.com/api_reference/google_genai/chat_models/langchain_google_genai.chat_models.ChatGoogleGenerativeAI.html).
+- **명시적 캐싱:** 프로바이더가 더 큰 제어 또는 비용 절감을 보장하기 위해 캐시 포인트를 수동으로 표시할 수 있습니다. 예: [`ChatOpenAI`](https://reference.langchain.com/python/integrations/langchain_openai/ChatOpenAI/) (`prompt_cache_key`를 통해), [Anthropic](/oss/python/integrations/chat/anthropic#prompt-caching), [AWS Bedrock](/oss/python/integrations/chat/bedrock#prompt-caching), [Gemini](https://python.langchain.com/api_reference/google_genai/chat_models/langchain_google_genai.chat_models.ChatGoogleGenerativeAI.html).
 
 <Warning>
     프롬프트 캐싱은 종종 최소 입력 토큰 임계값 이상에서만 적용됩니다. 자세한 내용은 [프로바이더 페이지](/oss/python/integrations/chat)를 참조하세요.
@@ -1180,5 +1180,8 @@ configurable_model.invoke(
 ---
 
 <Callout icon="pen-to-square" iconType="regular">
-  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/models.mdx)
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langchain/models.mdx)
 </Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>

@@ -7,16 +7,16 @@ import AlphaCallout from '/snippets/alpha-lg-callout.mdx';
 
 <AlphaCallout />
 
-[Pregel](https://langchain-ai.github.io/langgraph/reference/pregel/)은 LangGraph의 런타임을 구현하며, LangGraph 애플리케이션의 실행을 관리합니다.
+[Pregel](https://reference.langchain.com/python/langgraph/pregel/)은 LangGraph의 런타임을 구현하며, LangGraph 애플리케이션의 실행을 관리합니다.
 
-[StateGraph](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.StateGraph)를 컴파일하거나 [entrypoint](https://langchain-ai.github.io/langgraph/reference/func/#langgraph.func.entrypoint)를 생성하면 입력과 함께 호출할 수 있는 [Pregel](https://langchain-ai.github.io/langgraph/reference/pregel/) 인스턴스가 생성됩니다.
+[StateGraph](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph)를 컴파일하거나 @[entrypoint][entrypoint]를 생성하면 입력과 함께 호출할 수 있는 [Pregel](https://reference.langchain.com/python/langgraph/pregel/) 인스턴스가 생성됩니다.
 
 
 
 
 이 가이드는 런타임의 고수준 개념을 설명하고, Pregel을 사용하여 직접 애플리케이션을 구현하는 방법을 제공합니다.
 
-> **참고:** [Pregel](https://langchain-ai.github.io/langgraph/reference/pregel/) 런타임의 이름은 그래프를 사용한 대규모 병렬 연산의 효율적인 방법을 설명하는 [Google의 Pregel 알고리즘](https://research.google/pubs/pub37252/)에서 유래했습니다.
+> **참고:** [Pregel](https://reference.langchain.com/python/langgraph/pregel/) 런타임의 이름은 그래프를 사용한 대규모 병렬 연산의 효율적인 방법을 설명하는 [Google의 Pregel 알고리즘](https://research.google/pubs/pub37252/)에서 유래했습니다.
 
 
 
@@ -41,16 +41,16 @@ LangGraph에서 Pregel은 [**액터**](https://en.wikipedia.org/wiki/Actor_model
 
 채널은 액터(PregelNode) 간의 통신에 사용됩니다. 각 채널은 값 타입, 업데이트 타입, 그리고 업데이트 함수를 가지고 있습니다. 업데이트 함수는 업데이트 시퀀스를 받아 저장된 값을 수정합니다. 채널은 한 체인에서 다른 체인으로 데이터를 전송하거나, 체인에서 향후 단계의 자신에게 데이터를 전송하는 데 사용할 수 있습니다. LangGraph는 여러 내장 채널을 제공합니다:
 
-* [LastValue](https://langchain-ai.github.io/langgraph/reference/channels/#langgraph.channels.LastValue): 기본 채널로, 채널에 전송된 마지막 값을 저장합니다. 입력 및 출력 값, 또는 한 단계에서 다음 단계로 데이터를 전송하는 데 유용합니다.
-* [Topic](https://langchain-ai.github.io/langgraph/reference/channels/#langgraph.channels.Topic): 구성 가능한 PubSub 토픽으로, **액터** 간에 여러 값을 전송하거나 출력을 누적하는 데 유용합니다. 값을 중복 제거하거나 여러 단계에 걸쳐 값을 누적하도록 구성할 수 있습니다.
-* [BinaryOperatorAggregate](https://langchain-ai.github.io/langgraph/reference/pregel/#langgraph.pregel.Pregel--advanced-channels-context-and-binaryoperatoraggregate): 지속적인 값을 저장하며, 현재 값과 채널에 전송된 각 업데이트에 이진 연산자를 적용하여 업데이트됩니다. 여러 단계에 걸쳐 집계를 계산하는 데 유용합니다. 예: `total = BinaryOperatorAggregate(int, operator.add)`
+* [LastValue](https://reference.langchain.com/python/langgraph/channels/#langgraph.channels.LastValue): 기본 채널로, 채널에 전송된 마지막 값을 저장합니다. 입력 및 출력 값, 또는 한 단계에서 다음 단계로 데이터를 전송하는 데 유용합니다.
+* [Topic](https://reference.langchain.com/python/langgraph/channels/#langgraph.channels.Topic): 구성 가능한 PubSub 토픽으로, **액터** 간에 여러 값을 전송하거나 출력을 누적하는 데 유용합니다. 값을 중복 제거하거나 여러 단계에 걸쳐 값을 누적하도록 구성할 수 있습니다.
+* [BinaryOperatorAggregate](https://reference.langchain.com/python/langgraph/pregel/#langgraph.pregel.Pregel--advanced-channels-context-and-binaryoperatoraggregate): 지속적인 값을 저장하며, 현재 값과 채널에 전송된 각 업데이트에 이진 연산자를 적용하여 업데이트됩니다. 여러 단계에 걸쳐 집계를 계산하는 데 유용합니다. 예: `total = BinaryOperatorAggregate(int, operator.add)`
 
 
 
 
 ## 예제
 
-대부분의 사용자는 [StateGraph](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.StateGraph) API 또는 [entrypoint](https://langchain-ai.github.io/langgraph/reference/func/#langgraph.func.entrypoint) 데코레이터를 통해 Pregel과 상호작용하지만, Pregel과 직접 상호작용하는 것도 가능합니다.
+대부분의 사용자는 [StateGraph](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph) API 또는 @[entrypoint][entrypoint] 데코레이터를 통해 Pregel과 상호작용하지만, Pregel과 직접 상호작용하는 것도 가능합니다.
 
 
 
@@ -249,7 +249,7 @@ LangGraph는 Pregel 애플리케이션을 생성하기 위한 두 가지 고수�
 
 <Tabs>
     <Tab title="StateGraph (Graph API)">
-    [StateGraph (Graph API)](https://langchain-ai.github.io/langgraph/reference/graphs/#langgraph.graph.StateGraph)는 Pregel 애플리케이션의 생성을 단순화하는 더 높은 수준의 추상화입니다. 노드와 엣지의 그래프를 정의할 수 있습니다. 그래프를 컴파일하면 StateGraph API가 자동으로 Pregel 애플리케이션을 생성합니다.
+    [StateGraph (Graph API)](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph)는 Pregel 애플리케이션의 생성을 단순화하는 더 높은 수준의 추상화입니다. 노드와 엣지의 그래프를 정의할 수 있습니다. 그래프를 컴파일하면 StateGraph API가 자동으로 Pregel 애플리케이션을 생성합니다.
 
     ```python
     from typing import TypedDict
@@ -325,7 +325,7 @@ LangGraph는 Pregel 애플리케이션을 생성하기 위한 두 가지 고수�
 
     </Tab>
     <Tab title="Functional API">
-    [Functional API](/oss/python/langgraph/functional-api)에서는 [`entrypoint`](https://langchain-ai.github.io/langgraph/reference/func/#langgraph.func.entrypoint)를 사용하여 Pregel 애플리케이션을 생성할 수 있습니다. `entrypoint` 데코레이터를 사용하면 입력을 받고 출력을 반환하는 함수를 정의할 수 있습니다.
+    [Functional API](/oss/python/langgraph/functional-api)에서는 @[`entrypoint`][entrypoint]를 사용하여 Pregel 애플리케이션을 생성할 수 있습니다. `entrypoint` 데코레이터를 사용하면 입력을 받고 출력을 반환하는 함수를 정의할 수 있습니다.
 
     ```python
     from typing import TypedDict
@@ -368,5 +368,8 @@ LangGraph는 Pregel 애플리케이션을 생성하기 위한 두 가지 고수�
 ---
 
 <Callout icon="pen-to-square" iconType="regular">
-  [Edit the source of this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/pregel.mdx)
+    [Edit the source of this page on GitHub.](https://github.com/langchain-ai/docs/edit/main/src/oss/langgraph/pregel.mdx)
 </Callout>
+<Tip icon="terminal" iconType="regular">
+    [Connect these docs programmatically](/use-these-docs) to Claude, VSCode, and more via MCP for    real-time answers.
+</Tip>
