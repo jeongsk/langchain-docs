@@ -1,43 +1,43 @@
 ---
-title: "Key-value stores"
+title: "Key-value 스토어"
 ---
 
-## Overview
+## 개요
 
-LangChain provides a key-value store interface for storing and retrieving data by key. The key-value store interface in LangChain is primarily used for caching [embeddings](/oss/python/integrations/text_embedding).
+LangChain은 키를 통해 데이터를 저장하고 검색하는 key-value 스토어 인터페이스를 제공합니다. LangChain의 key-value 스토어 인터페이스는 주로 [임베딩](/oss/python/integrations/text_embedding)을 캐싱하는 데 사용됩니다.
 
-## Interface
+## 인터페이스
 
-All [`BaseStores`](https://python.langchain.com/api_reference/core/stores/langchain_core.stores.BaseStore.html) support the following interface:
+모든 [`BaseStores`](https://python.langchain.com/api_reference/core/stores/langchain_core.stores.BaseStore.html)는 다음 인터페이스를 지원합니다:
 
-- `mget(key: Sequence[str]) -> List[Optional[bytes]]`: get the contents of multiple keys, returning `None` if the key does not exist
-- `mset(key_value_pairs: Sequence[Tuple[str, bytes]]) -> None`: set the contents of multiple keys
-- `mdelete(key: Sequence[str]) -> None`: delete multiple keys
-- `yield_keys(prefix: Optional[str] = None) -> Iterator[str]`: yield all keys in the store, optionally filtering by a prefix
+- `mget(key: Sequence[str]) -> List[Optional[bytes]]`: 여러 키의 내용을 가져오며, 키가 존재하지 않으면 `None`을 반환합니다
+- `mset(key_value_pairs: Sequence[Tuple[str, bytes]]) -> None`: 여러 키의 내용을 설정합니다
+- `mdelete(key: Sequence[str]) -> None`: 여러 키를 삭제합니다
+- `yield_keys(prefix: Optional[str] = None) -> Iterator[str]`: 스토어의 모든 키를 생성하며, 선택적으로 접두사로 필터링할 수 있습니다
 
 <Note>
-Base stores are designed to work **multiple** key-value pairs at once for efficiency. This saves on network round-trips and may allow for more efficient batch operations in the underlying store.
+Base 스토어는 효율성을 위해 **여러** key-value 쌍을 한 번에 처리하도록 설계되었습니다. 이를 통해 네트워크 왕복 시간을 절약하고 기본 스토어에서 더 효율적인 일괄 작업을 수행할 수 있습니다.
 </Note>
 
-## Built-in stores for local development
+## 로컬 개발을 위한 내장 스토어
 
 <Columns cols={2}>
-  <Card title="InMemoryByteStore" icon="link" href="/oss/python/integrations/stores/in_memory" arrow="true" cta="View guide" />
-  <Card title="LocalFileStore" icon="link" href="/oss/python/integrations/stores/file_system" arrow="true" cta="View guide" />
+  <Card title="InMemoryByteStore" icon="link" href="/oss/python/integrations/stores/in_memory" arrow="true" cta="가이드 보기" />
+  <Card title="LocalFileStore" icon="link" href="/oss/python/integrations/stores/file_system" arrow="true" cta="가이드 보기" />
 </Columns>
 
-## Custom stores
+## 커스텀 스토어
 
-You can also implement your own custom store by extending the `BaseStore` class. See the [store interface documentation](https://python.langchain.com/api_reference/core/stores/langchain_core.stores.BaseStore.html) for more details.
+`BaseStore` 클래스를 확장하여 자체 커스텀 스토어를 구현할 수도 있습니다. 자세한 내용은 [스토어 인터페이스 문서](https://python.langchain.com/api_reference/core/stores/langchain_core.stores.BaseStore.html)를 참조하세요.
 
-## All integrations
+## 모든 통합
 
 <Columns cols={3}>
-  <Card title="AstraDBByteStore" icon="link" href="/oss/python/integrations/stores/astradb" arrow="true" cta="View guide" />
-  <Card title="CassandraByteStore" icon="link" href="/oss/python/integrations/stores/cassandra" arrow="true" cta="View guide" />
-  <Card title="ElasticsearchEmbeddingsCache" icon="link" href="/oss/python/integrations/stores/elasticsearch" arrow="true" cta="View guide" />
-  <Card title="RedisStore" icon="link" href="/oss/python/integrations/stores/redis" arrow="true" cta="View guide" />
-  <Card title="UpstashRedisByteStore" icon="link" href="/oss/python/integrations/stores/upstash_redis" arrow="true" cta="View guide" />
+  <Card title="AstraDBByteStore" icon="link" href="/oss/python/integrations/stores/astradb" arrow="true" cta="가이드 보기" />
+  <Card title="CassandraByteStore" icon="link" href="/oss/python/integrations/stores/cassandra" arrow="true" cta="가이드 보기" />
+  <Card title="ElasticsearchEmbeddingsCache" icon="link" href="/oss/python/integrations/stores/elasticsearch" arrow="true" cta="가이드 보기" />
+  <Card title="RedisStore" icon="link" href="/oss/python/integrations/stores/redis" arrow="true" cta="가이드 보기" />
+  <Card title="UpstashRedisByteStore" icon="link" href="/oss/python/integrations/stores/upstash_redis" arrow="true" cta="가이드 보기" />
 </Columns>
 
 ---
