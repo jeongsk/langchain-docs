@@ -2,18 +2,18 @@
 title: Neo4j
 ---
 
->[Neo4j](https://neo4j.com/docs/getting-started/) is a graph database management system developed by `Neo4j, Inc`.
+>[Neo4j](https://neo4j.com/docs/getting-started/)는 `Neo4j, Inc`에서 개발한 그래프 데이터베이스 관리 시스템입니다.
 
->The data elements `Neo4j` stores are nodes, edges connecting them, and attributes of nodes and edges. Described by its developers as an ACID-compliant transactional database with native graph storage and processing, `Neo4j` is available in a non-open-source "community edition" licensed with a modification of the GNU General Public License, with online backup and high availability extensions licensed under a closed-source commercial license. Neo also licenses `Neo4j` with these extensions under closed-source commercial terms.
+>`Neo4j`가 저장하는 데이터 요소는 노드, 노드들을 연결하는 엣지, 그리고 노드와 엣지의 속성입니다. 개발자들은 이를 네이티브 그래프 스토리지 및 처리 기능을 갖춘 ACID 준수 트랜잭션 데이터베이스로 설명합니다. `Neo4j`는 GNU General Public License를 수정한 라이선스로 제공되는 비오픈소스 "커뮤니티 에디션"과, 온라인 백업 및 고가용성 확장 기능이 포함된 상용 라이선스 버전으로 제공됩니다. Neo는 이러한 확장 기능이 포함된 `Neo4j`를 상용 라이선스로도 제공합니다.
 
->This notebook shows how to use LLMs to provide a natural language interface to a graph database you can query with the `Cypher` query language.
+>이 노트북은 LLM을 사용하여 `Cypher` 쿼리 언어로 조회할 수 있는 그래프 데이터베이스에 자연어 인터페이스를 제공하는 방법을 보여줍니다.
 
->[Cypher](https://en.wikipedia.org/wiki/Cypher_(query_language)) is a declarative graph query language that allows for expressive and efficient data querying in a property graph.
+>[Cypher](https://en.wikipedia.org/wiki/Cypher_(query_language))는 속성 그래프에서 효율적이고 표현력 있는 데이터 쿼리를 가능하게 하는 선언적 그래프 쿼리 언어입니다.
 
-## Setting up
+## 설정하기
 
-You will need to have a running `Neo4j` instance. One option is to create a [free Neo4j database instance in their Aura cloud service](https://neo4j.com/cloud/platform/aura-graph-database/). You can also run the database locally using the [Neo4j Desktop application](https://neo4j.com/download/), or running a docker container.
-You can run a local docker container by running the executing the following script:
+실행 중인 `Neo4j` 인스턴스가 필요합니다. 한 가지 옵션은 [Aura 클라우드 서비스에서 무료 Neo4j 데이터베이스 인스턴스를 생성](https://neo4j.com/cloud/platform/aura-graph-database/)하는 것입니다. [Neo4j Desktop 애플리케이션](https://neo4j.com/download/)을 사용하여 로컬에서 데이터베이스를 실행하거나, Docker 컨테이너를 실행할 수도 있습니다.
+다음 스크립트를 실행하여 로컬 Docker 컨테이너를 실행할 수 있습니다:
 
 ```
 docker run \
@@ -21,11 +21,11 @@ docker run \
     -p 7474:7474 -p 7687:7687 \
     -d \
     -e NEO4J_AUTH=neo4j/password \
-    -e NEO4J_PLUGINS=\[\"apoc\"\]  \
+    -e NEO4J_PLUGINS=\["apoc"\]  \
     neo4j:latest
 ```
 
-If you are using the docker container, you need to wait a couple of second for the database to start.
+Docker 컨테이너를 사용하는 경우, 데이터베이스가 시작될 때까지 몇 초 정도 기다려야 합니다.
 
 ```python
 from langchain_neo4j import GraphCypherQAChain, Neo4jGraph
@@ -36,7 +36,7 @@ from langchain_openai import ChatOpenAI
 graph = Neo4jGraph(url="bolt://localhost:7687", username="neo4j", password="password")
 ```
 
-We default to OpenAI models in this guide.
+이 가이드에서는 기본적으로 OpenAI 모델을 사용합니다.
 
 ```python
 import getpass
@@ -46,9 +46,9 @@ if "OPENAI_API_KEY" not in os.environ:
     os.environ["OPENAI_API_KEY"] = getpass.getpass("OpenAI API Key:")
 ```
 
-## Seeding the database
+## 데이터베이스에 데이터 추가하기
 
-Assuming your database is empty, you can populate it using Cypher query language. The following Cypher statement is idempotent, which means the database information will be the same if you run it one or multiple times.
+데이터베이스가 비어 있다고 가정하고, Cypher 쿼리 언어를 사용하여 데이터를 추가할 수 있습니다. 다음 Cypher 문은 멱등성을 가지므로, 한 번 실행하든 여러 번 실행하든 데이터베이스 정보는 동일하게 유지됩니다.
 
 ```python
 graph.query(
@@ -66,9 +66,9 @@ MERGE (a)-[:ACTED_IN]->(m)
 []
 ```
 
-## Refresh graph schema information
+## 그래프 스키마 정보 새로고침
 
-If the schema of database changes, you can refresh the schema information needed to generate Cypher statements.
+데이터베이스 스키마가 변경되면, Cypher 문을 생성하는 데 필요한 스키마 정보를 새로고침할 수 있습니다.
 
 ```python
 graph.refresh_schema()
@@ -88,9 +88,9 @@ The relationships:
 (:Actor)-[:ACTED_IN]->(:Movie)
 ```
 
-## Enhanced schema information
+## 향상된 스키마 정보
 
-Choosing the enhanced schema version enables the system to automatically scan for example values within the databases and calculate some distribution metrics. For example, if a node property has less than 10 distinct values, we return all possible values in the schema. Otherwise, return only a single example value per node and relationship property.
+향상된 스키마 버전을 선택하면 시스템이 데이터베이스 내의 예시 값을 자동으로 스캔하고 일부 분포 메트릭을 계산합니다. 예를 들어, 노드 속성이 10개 미만의 고유 값을 가지면 스키마에서 모든 가능한 값을 반환합니다. 그렇지 않으면 노드 및 관계 속성당 하나의 예시 값만 반환합니다.
 
 ```python
 enhanced_graph = Neo4jGraph(
@@ -115,9 +115,9 @@ The relationships:
 (:Actor)-[:ACTED_IN]->(:Movie)
 ```
 
-## Querying the graph
+## 그래프 쿼리하기
 
-We can now use the graph cypher QA chain to ask question of the graph
+이제 그래프 Cypher QA 체인을 사용하여 그래프에 질문할 수 있습니다.
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -146,10 +146,10 @@ Full Context:
  'result': 'Tom Cruise, Val Kilmer, Anthony Edwards, and Meg Ryan played in Top Gun.'}
 ```
 
-## Limit the number of results
+## 결과 수 제한하기
 
-You can limit the number of results from the Cypher QA Chain using the `top_k` parameter.
-The default is 10.
+`top_k` 매개변수를 사용하여 Cypher QA 체인의 결과 수를 제한할 수 있습니다.
+기본값은 10입니다.
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -182,9 +182,9 @@ Full Context:
  'result': 'Tom Cruise, Val Kilmer played in Top Gun.'}
 ```
 
-## Return intermediate results
+## 중간 결과 반환하기
 
-You can return intermediate steps from the Cypher QA Chain using the `return_intermediate_steps` parameter
+`return_intermediate_steps` 매개변수를 사용하여 Cypher QA 체인의 중간 단계를 반환할 수 있습니다.
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -216,9 +216,9 @@ Intermediate steps: [{'query': "MATCH (a:Actor)-[:ACTED_IN]->(m:Movie)\nWHERE m.
 Final answer: Tom Cruise, Val Kilmer, Anthony Edwards, and Meg Ryan played in Top Gun.
 ```
 
-## Return direct results
+## 직접 결과 반환하기
 
-You can return direct results from the Cypher QA Chain using the `return_direct` parameter
+`return_direct` 매개변수를 사용하여 Cypher QA 체인에서 직접 결과를 반환할 수 있습니다.
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -252,9 +252,9 @@ RETURN a.name
   {'a.name': 'Meg Ryan'}]}
 ```
 
-## Add examples in the Cypher generation prompt
+## Cypher 생성 프롬프트에 예시 추가하기
 
-You can define the Cypher statement you want the LLM to generate for particular questions
+특정 질문에 대해 LLM이 생성할 Cypher 문을 정의할 수 있습니다.
 
 ```python
 from langchain_core.prompts.prompt import PromptTemplate
@@ -309,9 +309,9 @@ Full Context:
  'result': 'There were 4 actors in Top Gun.'}
 ```
 
-## Use separate LLMs for Cypher and answer generation
+## Cypher 생성과 답변 생성에 서로 다른 LLM 사용하기
 
-You can use the `cypher_llm` and `qa_llm` parameters to define different llms
+`cypher_llm`과 `qa_llm` 매개변수를 사용하여 서로 다른 LLM을 정의할 수 있습니다.
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -344,9 +344,9 @@ Full Context:
  'result': 'Tom Cruise, Val Kilmer, Anthony Edwards, and Meg Ryan played in Top Gun.'}
 ```
 
-## Ignore specified node and relationship types
+## 특정 노드 및 관계 유형 무시하기
 
-You can use `include_types` or `exclude_types` to ignore parts of the graph schema when generating Cypher statements.
+Cypher 문을 생성할 때 그래프 스키마의 일부를 무시하려면 `include_types` 또는 `exclude_types`를 사용할 수 있습니다.
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -372,9 +372,9 @@ Relationship properties are the following:
 The relationships are the following:
 ```
 
-## Validate generated Cypher statements
+## 생성된 Cypher 문 검증하기
 
-You can use the `validate_cypher` parameter to validate and correct relationship directions in generated Cypher statements
+`validate_cypher` 매개변수를 사용하여 생성된 Cypher 문의 관계 방향을 검증하고 수정할 수 있습니다.
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -407,10 +407,10 @@ Full Context:
  'result': 'Tom Cruise, Val Kilmer, Anthony Edwards, and Meg Ryan played in Top Gun.'}
 ```
 
-## Provide context from database results as tool/function output
+## 데이터베이스 결과의 컨텍스트를 도구/함수 출력으로 제공하기
 
-You can use the `use_function_response` parameter to pass context from database results to an LLM as a tool/function output. This method improves the response accuracy and relevance of an answer as the LLM follows the provided context more closely.
-_You will need to use an LLM with native function calling support to use this feature_.
+`use_function_response` 매개변수를 사용하여 데이터베이스 결과의 컨텍스트를 LLM에 도구/함수 출력으로 전달할 수 있습니다. 이 방법은 LLM이 제공된 컨텍스트를 더 밀접하게 따르기 때문에 답변의 정확성과 관련성을 향상시킵니다.
+_이 기능을 사용하려면 네이티브 함수 호출을 지원하는 LLM이 필요합니다_.
 
 ```python
 chain = GraphCypherQAChain.from_llm(
@@ -440,9 +440,9 @@ Full Context:
  'result': 'The main actors in Top Gun are Tom Cruise, Val Kilmer, Anthony Edwards, and Meg Ryan.'}
 ```
 
-You can provide custom system message when using the function response feature by providing `function_response_system` to instruct the model on how to generate answers.
+함수 응답 기능을 사용할 때 `function_response_system`을 제공하여 모델에게 답변 생성 방법을 지시하는 사용자 정의 시스템 메시지를 제공할 수 있습니다.
 
-_Note that `qa_prompt` will have no effect when using `use_function_response`_
+_`use_function_response`를 사용할 때 `qa_prompt`는 효과가 없습니다_
 
 ```python
 chain = GraphCypherQAChain.from_llm(
