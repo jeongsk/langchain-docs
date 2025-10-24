@@ -2,23 +2,23 @@
 title: Azure OpenAI Whisper Parser
 ---
 
->[Azure OpenAI Whisper Parser](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/whisper-overview)는 머신러닝을 활용하여 오디오 파일을 영어 텍스트로 변환하는 Azure OpenAI Whisper API를 래핑한 것입니다.
+>[Azure OpenAI Whisper Parser](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/whisper-overview) is a wrapper around the Azure OpenAI Whisper API which utilizes machine learning to transcribe audio files to english text.
 >
->Parser는 `.mp3`, `.mp4`, `.mpeg`, `.mpga`, `.m4a`, `.wav`, `.webm`을 지원합니다.
+>The Parser supports `.mp3`, `.mp4`, `.mpeg`, `.mpga`, `.m4a`, `.wav`, and `.webm`.
 
-현재 구현은 LangChain 핵심 원칙을 따르며 다른 로더와 함께 사용하여 오디오 다운로드 및 파싱을 모두 처리할 수 있습니다. 그 결과 parser는 `Iterator[Document]`를 `yield`합니다.
+The current implementation follows LangChain core principles and can be used with other loaders to handle both audio downloading and parsing. As a result of this the parser will `yield` an `Iterator[Document]`.
 
-## 사전 요구 사항
+## Prerequisites
 
-이 서비스에는 [여기](https://learn.microsoft.com/en-us/azure/ai-services/openai/whisper-quickstart?tabs=command-line%2Cpython-new%2Cjavascript&pivots=programming-language-python) 가이드를 따라 설정할 수 있는 Azure 자격 증명, Azure 엔드포인트 및 Whisper Model 배포가 필요합니다. 또한 필수 종속성을 설치해야 합니다.
+The service requires Azure credentials, Azure endpoint and Whisper Model deployment, which can be set up by following the guide [here](https://learn.microsoft.com/en-us/azure/ai-services/openai/whisper-quickstart?tabs=command-line%2Cpython-new%2Cjavascript&pivots=programming-language-python). Furthermore, the required dependencies must be installed.
 
 ```python
-%pip install -Uq  langchain langchain-community openai
+pip install -Uq  langchain langchain-community openai
 ```
 
-## 예제 1
+## Example 1
 
-`AzureOpenAIWhisperParser`의 메서드인 `.lazy_parse`는 변환할 파일의 파일 경로가 포함된 `Blob` 객체를 매개변수로 받습니다.
+The `AzureOpenAIWhisperParser`'s method, `.lazy_parse`, accepts a `Blob` object as a parameter containing the file path of the file to be transcribed.
 
 ```python
 from langchain_core.documents.base import Blob
@@ -49,9 +49,9 @@ for doc in documents:
     print(doc.page_content)
 ```
 
-## 예제 2
+## Example 2
 
-`AzureOpenAIWhisperParser`는 `GenericLoader`와 함께 `YoutubeAudioLoader`와 같은 오디오 로더와 함께 사용할 수도 있습니다.
+The `AzureOpenAIWhisperParser` can also be used in conjunction with audio loaders, like the `YoutubeAudioLoader` with a `GenericLoader`.
 
 ```python
 from langchain_community.document_loaders.blob_loaders.youtube_audio import (

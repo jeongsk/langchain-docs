@@ -1,32 +1,31 @@
 ---
-title: "임베딩 모델"
-description: "텍스트 임베딩 모델 통합에 대한 개요 및 가이드"
+title: "Embedding models"
 ---
 
-## 개요
+## Overview
 
 <Note>
-이 개요는 **텍스트 기반 임베딩 모델**을 다룹니다. LangChain은 현재 멀티모달 임베딩을 지원하지 않습니다.
+This overview covers **text-based embedding models**. LangChain does not currently support multimodal embeddings.
 </Note>
 
-임베딩 모델은 문장, 단락, 트윗과 같은 원시 텍스트를 **의미론적 의미**를 포착하는 고정 길이의 숫자 벡터로 변환합니다. 이러한 벡터를 통해 기계는 정확한 단어가 아닌 의미를 기반으로 텍스트를 비교하고 검색할 수 있습니다.
+Embedding models transform raw text—such as a sentence, paragraph, or tweet—into a fixed-length vector of numbers that captures its **semantic meaning**. These vectors allow machines to compare and search text based on meaning rather than exact words.
 
-실제로 이는 유사한 아이디어를 가진 텍스트가 벡터 공간에서 서로 가깝게 배치된다는 것을 의미합니다. 예를 들어, *"머신 러닝"*이라는 구문만 일치시키는 대신, 임베딩은 다른 표현을 사용하더라도 관련 개념을 논의하는 문서를 찾아낼 수 있습니다.
+In practice, this means that texts with similar ideas are placed close together in the vector space. For example, instead of matching only the phrase *"machine learning"*, embeddings can surface documents that discuss related concepts even when different wording is used.
 
-### 작동 방식
+### How it works
 
-1. **벡터화** — 모델은 각 입력 문자열을 고차원 벡터로 인코딩합니다.
-2. **유사도 점수 계산** — 벡터는 수학적 메트릭을 사용하여 비교되며, 기반 텍스트가 얼마나 밀접하게 관련되어 있는지를 측정합니다.
+1. **Vectorization** — The model encodes each input string as a high-dimensional vector.
+2. **Similarity scoring** — Vectors are compared using mathematical metrics to measure how closely related the underlying texts are.
 
-### 유사도 메트릭
+### Similarity metrics
 
-임베딩을 비교하는 데 일반적으로 사용되는 여러 메트릭이 있습니다:
+Several metrics are commonly used to compare embeddings:
 
-* **코사인 유사도** — 두 벡터 사이의 각도를 측정합니다.
-* **유클리드 거리** — 점 사이의 직선 거리를 측정합니다.
-* **내적** — 한 벡터가 다른 벡터에 얼마나 투영되는지를 측정합니다.
+* **Cosine similarity** — measures the angle between two vectors.
+* **Euclidean distance** — measures the straight-line distance between points.
+* **Dot product** — measures how much one vector projects onto another.
 
-다음은 두 벡터 간의 코사인 유사도를 계산하는 예제입니다:
+Here's an example of computing cosine similarity between two vectors:
 
 ```python
 import numpy as np
@@ -39,25 +38,25 @@ similarity = cosine_similarity(query_embedding, document_embedding)
 print("Cosine Similarity:", similarity)
 ```
 
-## 인터페이스
+## Interface
 
-LangChain은 @[Embeddings] 인터페이스를 통해 텍스트 임베딩 모델(예: OpenAI, Cohere, Hugging Face)에 대한 표준 인터페이스를 제공합니다.
+LangChain provides a standard interface for text embedding models (e.g., OpenAI, Cohere, Hugging Face) via the @[Embeddings] interface.
 
-두 가지 주요 메서드를 사용할 수 있습니다:
+Two main methods are available:
 
-* `embed_documents(texts: List[str]) → List[List[float]]`: 문서 목록을 임베딩합니다.
-* `embed_query(text: str) → List[float]`: 단일 쿼리를 임베딩합니다.
+* `embed_documents(texts: List[str]) → List[List[float]]`: Embeds a list of documents.
+* `embed_query(text: str) → List[float]`: Embeds a single query.
 
 <Note>
-인터페이스는 쿼리와 문서를 서로 다른 전략으로 임베딩할 수 있도록 허용하지만, 실제로는 대부분의 제공업체가 동일한 방식으로 처리합니다.
+The interface allows queries and documents to be embedded with different strategies, though most providers handle them the same way in practice.
 </Note>
 
-## 주요 통합
+## Top integrations
 
-| 제공업체                                                               | 패키지                                                                                                                                                            |
+| Provider                                                               | Package                                                                                                                                                            |
 |------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [OpenAI](/oss/integrations/text_embedding/openai)                      | [`langchain-openai`](https://python.langchain.com/api_reference/openai/chat_models/langchain_openai.chat_models.base.ChatOpenAI.html)                              |
-| [Azure OpenAI](/oss/integrations/text_embedding/azure_openai)       | [`langchain-openai`](https://python.langchain.com/api_reference/openai/embeddings/langchain_openai.embeddings.azure.AzureOpenAIEmbeddings.html)                    |
+| [OpenAI on Azure](/oss/integrations/text_embedding/azure_openai)       | [`langchain-openai`](https://python.langchain.com/api_reference/openai/embeddings/langchain_openai.embeddings.azure.AzureOpenAIEmbeddings.html)                    |
 | [Google Gemini](/oss/integrations/text_embedding/google_generative_ai) | [`langchain-google-genai`](https://python.langchain.com/api_reference/google_genai/embeddings/langchain_google_genai.embeddings.GoogleGenerativeAIEmbeddings.html) |
 | [Ollama](/oss/integrations/text_embedding/ollama)                      | [`langchain-ollama`](https://python.langchain.com/api_reference/ollama/embeddings/langchain_ollama.embeddings.OllamaEmbeddings.html)                               |
 | [Together](/oss/integrations/text_embedding/together)                  | [`langchain-together`](https://python.langchain.com/api_reference/together/embeddings/langchain_together.embeddings.TogetherEmbeddings.html)                       |
@@ -72,36 +71,36 @@ LangChain은 @[Embeddings] 인터페이스를 통해 텍스트 임베딩 모델(
 | [AI/ML API](/oss/integrations/text_embedding/aimlapi)                  | [`langchain-aimlapi`](https://python.langchain.com/api_reference/aimlapi/embeddings/langchain_aimlapi.embeddings.AimlapiEmbeddings.html)                           |
 
 
-## 캐싱
+## Caching
 
-임베딩은 재계산을 피하기 위해 저장하거나 임시로 캐시할 수 있습니다.
+Embeddings can be stored or temporarily cached to avoid needing to recompute them.
 
-임베딩 캐싱은 `CacheBackedEmbeddings`를 사용하여 수행할 수 있습니다. 이 래퍼는 임베딩을 키-값 저장소에 저장하며, 텍스트가 해시되고 해시가 캐시의 키로 사용됩니다.
+Caching embeddings can be done using a `CacheBackedEmbeddings`. This wrapper stores embeddings in a key-value store, where the text is hashed and the hash is used as the key in the cache.
 
-`CacheBackedEmbeddings`를 초기화하는 주요 방법은 `from_bytes_store`입니다. 다음 매개변수를 사용합니다:
+The main supported way to initialize a `CacheBackedEmbeddings` is `from_bytes_store`. It takes the following parameters:
 
-- **`underlying_embedder`**: 임베딩에 사용할 임베더입니다.
-- **`document_embedding_cache`**: 문서 임베딩을 캐싱하기 위한 [`ByteStore`](/oss/integrations/stores/)입니다.
-- **`batch_size`**: (선택 사항, 기본값 `None`) 저장소 업데이트 사이에 임베딩할 문서 수입니다.
-- **`namespace`**: (선택 사항, 기본값 `""`) 문서 캐시에 사용할 네임스페이스입니다. 충돌을 방지하는 데 도움이 됩니다(예: 임베딩 모델 이름으로 설정).
-- **`query_embedding_cache`**: (선택 사항, 기본값 `None`) 쿼리 임베딩을 캐싱하기 위한 [`ByteStore`](/oss/integrations/stores/)이거나, `document_embedding_cache`와 동일한 저장소를 재사용하려면 `True`입니다.
+- **`underlying_embedder`**: The embedder to use for embedding.
+- **`document_embedding_cache`**: Any [`ByteStore`](/oss/integrations/stores/) for caching document embeddings.
+- **`batch_size`**: (optional, defaults to `None`) The number of documents to embed between store updates.
+- **`namespace`**: (optional, defaults to `""`) The namespace to use for the document cache. Helps avoid collisions (e.g., set it to the embedding model name).
+- **`query_embedding_cache`**: (optional, defaults to `None`) A [`ByteStore`](/oss/integrations/stores/) for caching query embeddings, or `True` to reuse the same store as `document_embedding_cache`.
 
 <Important>
-- 서로 다른 임베딩 모델을 사용할 때 충돌을 방지하려면 항상 `namespace` 매개변수를 설정하세요.
-- `CacheBackedEmbeddings`는 기본적으로 쿼리 임베딩을 캐시하지 않습니다. 이를 활성화하려면 `query_embedding_cache`를 지정하세요.
+- Always set the `namespace` parameter to avoid collisions when using different embedding models.
+- `CacheBackedEmbeddings` does not cache query embeddings by default. To enable this, specify a `query_embedding_cache`.
 </Important>
 
 ```python
 import time
-from langchain.embeddings import CacheBackedEmbeddings  # [!code highlight]
-from langchain.storage import LocalFileStore # [!code highlight]
+from langchain_classic.embeddings import CacheBackedEmbeddings  # [!code highlight]
+from langchain_classic.storage import LocalFileStore # [!code highlight]
 from langchain_core.vectorstores import InMemoryVectorStore
 
-# 기본 임베딩 모델 생성
-underlying_embeddings = ... # 예: OpenAIEmbeddings(), HuggingFaceEmbeddings() 등
+# Create your underlying embeddings model
+underlying_embeddings = ... # e.g., OpenAIEmbeddings(), HuggingFaceEmbeddings(), etc.
 
-# 저장소는 임베딩을 로컬 파일 시스템에 유지합니다
-# 프로덕션 용도가 아니라 로컬 테스트에 유용합니다
+# Store persists embeddings to the local filesystem
+# This isn't for production use, but is useful for local
 store = LocalFileStore("./cache/") # [!code highlight]
 
 cached_embedder = CacheBackedEmbeddings.from_bytes_store(
@@ -110,105 +109,105 @@ cached_embedder = CacheBackedEmbeddings.from_bytes_store(
     namespace=underlying_embeddings.model
 )
 
-# 예제: 쿼리 임베딩 캐싱
+# Example: caching a query embedding
 tic = time.time()
 print(cached_embedder.embed_query("Hello, world!"))
 print(f"First call took: {time.time() - tic:.2f} seconds")
 
-# 후속 호출은 캐시를 사용합니다
+# Subsequent calls use the cache
 tic = time.time()
 print(cached_embedder.embed_query("Hello, world!"))
 print(f"Second call took: {time.time() - tic:.2f} seconds")
 ```
 
-프로덕션 환경에서는 일반적으로 데이터베이스 또는 클라우드 스토리지와 같은 더 견고한 영구 저장소를 사용합니다. 옵션은 [stores 통합](/oss/integrations/stores/)을 참조하세요.
+In production, you would typically use a more robust persistent store, such as a database or cloud storage. Please see [stores integrations](/oss/integrations/stores/) for options.
 
-## 모든 통합
+## All embedding models
 
 <Columns cols={3}>
-<Card title="Aleph Alpha" icon="link" href="/oss/integrations/text_embedding/aleph_alpha" arrow="true" cta="가이드 보기" />
-<Card title="Anyscale" icon="link" href="/oss/integrations/text_embedding/anyscale" arrow="true" cta="가이드 보기" />
-<Card title="Ascend" icon="link" href="/oss/integrations/text_embedding/ascend" arrow="true" cta="가이드 보기" />
-<Card title="AI/ML API" icon="link" href="/oss/integrations/text_embedding/aimlapi" arrow="true" cta="가이드 보기" />
-<Card title="AwaDB" icon="link" href="/oss/integrations/text_embedding/awadb" arrow="true" cta="가이드 보기" />
-<Card title="AzureOpenAI" icon="link" href="/oss/integrations/text_embedding/azure_openai" arrow="true" cta="가이드 보기" />
-<Card title="Baichuan Text Embeddings" icon="link" href="/oss/integrations/text_embedding/baichuan" arrow="true" cta="가이드 보기" />
-<Card title="Baidu Qianfan" icon="link" href="/oss/integrations/text_embedding/baidu_qianfan_endpoint" arrow="true" cta="가이드 보기" />
-<Card title="Baseten" icon="link" href="/oss/integrations/text_embedding/baseten" arrow="true" cta="가이드 보기" />
-<Card title="Bedrock" icon="link" href="/oss/integrations/text_embedding/bedrock" arrow="true" cta="가이드 보기" />
-<Card title="BGE on Hugging Face" icon="link" href="/oss/integrations/text_embedding/bge_huggingface" arrow="true" cta="가이드 보기" />
-<Card title="Bookend AI" icon="link" href="/oss/integrations/text_embedding/bookend" arrow="true" cta="가이드 보기" />
-<Card title="Clarifai" icon="link" href="/oss/integrations/text_embedding/clarifai" arrow="true" cta="가이드 보기" />
-<Card title="Cloudflare Workers AI" icon="link" href="/oss/integrations/text_embedding/cloudflare_workersai" arrow="true" cta="가이드 보기" />
-<Card title="Clova Embeddings" icon="link" href="/oss/integrations/text_embedding/clova" arrow="true" cta="가이드 보기" />
-<Card title="Cohere" icon="link" href="/oss/integrations/text_embedding/cohere" arrow="true" cta="가이드 보기" />
-<Card title="DashScope" icon="link" href="/oss/integrations/text_embedding/dashscope" arrow="true" cta="가이드 보기" />
-<Card title="Databricks" icon="link" href="/oss/integrations/text_embedding/databricks" arrow="true" cta="가이드 보기" />
-<Card title="DeepInfra" icon="link" href="/oss/integrations/text_embedding/deepinfra" arrow="true" cta="가이드 보기" />
-<Card title="EDEN AI" icon="link" href="/oss/integrations/text_embedding/edenai" arrow="true" cta="가이드 보기" />
-<Card title="Elasticsearch" icon="link" href="/oss/integrations/text_embedding/elasticsearch" arrow="true" cta="가이드 보기" />
-<Card title="Embaas" icon="link" href="/oss/integrations/text_embedding/embaas" arrow="true" cta="가이드 보기" />
-<Card title="Fake Embeddings" icon="link" href="/oss/integrations/text_embedding/fake" arrow="true" cta="가이드 보기" />
-<Card title="FastEmbed by Qdrant" icon="link" href="/oss/integrations/text_embedding/fastembed" arrow="true" cta="가이드 보기" />
-<Card title="Fireworks" icon="link" href="/oss/integrations/text_embedding/fireworks" arrow="true" cta="가이드 보기" />
-<Card title="Google Gemini" icon="link" href="/oss/integrations/text_embedding/google_generative_ai" arrow="true" cta="가이드 보기" />
-<Card title="Google Vertex AI" icon="link" href="/oss/integrations/text_embedding/google_vertex_ai_palm" arrow="true" cta="가이드 보기" />
-<Card title="GPT4All" icon="link" href="/oss/integrations/text_embedding/gpt4all" arrow="true" cta="가이드 보기" />
-<Card title="Gradient" icon="link" href="/oss/integrations/text_embedding/gradient" arrow="true" cta="가이드 보기" />
-<Card title="GreenNode" icon="link" href="/oss/integrations/text_embedding/greennode" arrow="true" cta="가이드 보기" />
-<Card title="Hugging Face" icon="link" href="/oss/integrations/text_embedding/huggingfacehub" arrow="true" cta="가이드 보기" />
-<Card title="IBM watsonx.ai" icon="link" href="/oss/integrations/text_embedding/ibm_watsonx" arrow="true" cta="가이드 보기" />
-<Card title="Infinity" icon="link" href="/oss/integrations/text_embedding/infinity" arrow="true" cta="가이드 보기" />
-<Card title="Instruct Embeddings" icon="link" href="/oss/integrations/text_embedding/instruct_embeddings" arrow="true" cta="가이드 보기" />
-<Card title="IPEX-LLM CPU" icon="link" href="/oss/integrations/text_embedding/ipex_llm" arrow="true" cta="가이드 보기" />
-<Card title="IPEX-LLM GPU" icon="link" href="/oss/integrations/text_embedding/ipex_llm_gpu" arrow="true" cta="가이드 보기" />
-<Card title="Intel Extension for Transformers" icon="link" href="/oss/integrations/text_embedding/itrex" arrow="true" cta="가이드 보기" />
-<Card title="Jina" icon="link" href="/oss/integrations/text_embedding/jina" arrow="true" cta="가이드 보기" />
-<Card title="John Snow Labs" icon="link" href="/oss/integrations/text_embedding/johnsnowlabs_embedding" arrow="true" cta="가이드 보기" />
-<Card title="LASER" icon="link" href="/oss/integrations/text_embedding/laser" arrow="true" cta="가이드 보기" />
-<Card title="Lindorm" icon="link" href="/oss/integrations/text_embedding/lindorm" arrow="true" cta="가이드 보기" />
-<Card title="Llama.cpp" icon="link" href="/oss/integrations/text_embedding/llamacpp" arrow="true" cta="가이드 보기" />
-<Card title="LLMRails" icon="link" href="/oss/integrations/text_embedding/llm_rails" arrow="true" cta="가이드 보기" />
-<Card title="LocalAI" icon="link" href="/oss/integrations/text_embedding/localai" arrow="true" cta="가이드 보기" />
-<Card title="MiniMax" icon="link" href="/oss/integrations/text_embedding/minimax" arrow="true" cta="가이드 보기" />
-<Card title="MistralAI" icon="link" href="/oss/integrations/text_embedding/mistralai" arrow="true" cta="가이드 보기" />
-<Card title="Model2Vec" icon="link" href="/oss/integrations/text_embedding/model2vec" arrow="true" cta="가이드 보기" />
-<Card title="ModelScope" icon="link" href="/oss/integrations/text_embedding/modelscope_embedding" arrow="true" cta="가이드 보기" />
-<Card title="MosaicML" icon="link" href="/oss/integrations/text_embedding/mosaicml" arrow="true" cta="가이드 보기" />
-<Card title="Naver" icon="link" href="/oss/integrations/text_embedding/naver" arrow="true" cta="가이드 보기" />
-<Card title="Nebius" icon="link" href="/oss/integrations/text_embedding/nebius" arrow="true" cta="가이드 보기" />
-<Card title="Netmind" icon="link" href="/oss/integrations/text_embedding/netmind" arrow="true" cta="가이드 보기" />
-<Card title="NLP Cloud" icon="link" href="/oss/integrations/text_embedding/nlp_cloud" arrow="true" cta="가이드 보기" />
-<Card title="Nomic" icon="link" href="/oss/integrations/text_embedding/nomic" arrow="true" cta="가이드 보기" />
-<Card title="NVIDIA NIMs" icon="link" href="/oss/integrations/text_embedding/nvidia_ai_endpoints" arrow="true" cta="가이드 보기" />
-<Card title="Oracle Cloud Infrastructure" icon="link" href="/oss/integrations/text_embedding/oci_generative_ai" arrow="true" cta="가이드 보기" />
-<Card title="Ollama" icon="link" href="/oss/integrations/text_embedding/ollama" arrow="true" cta="가이드 보기" />
-<Card title="OpenClip" icon="link" href="/oss/integrations/text_embedding/open_clip" arrow="true" cta="가이드 보기" />
-<Card title="OpenAI" icon="link" href="/oss/integrations/text_embedding/openai" arrow="true" cta="가이드 보기" />
-<Card title="OpenVINO" icon="link" href="/oss/integrations/text_embedding/openvino" arrow="true" cta="가이드 보기" />
-<Card title="Optimum Intel" icon="link" href="/oss/integrations/text_embedding/optimum_intel" arrow="true" cta="가이드 보기" />
-<Card title="Oracle AI Vector Search" icon="link" href="/oss/integrations/text_embedding/oracleai" arrow="true" cta="가이드 보기" />
-<Card title="OVHcloud" icon="link" href="/oss/integrations/text_embedding/ovhcloud" arrow="true" cta="가이드 보기" />
-<Card title="Pinecone Embeddings" icon="link" href="/oss/integrations/text_embedding/pinecone" arrow="true" cta="가이드 보기" />
-<Card title="PredictionGuard" icon="link" href="/oss/integrations/text_embedding/predictionguard" arrow="true" cta="가이드 보기" />
-<Card title="PremAI" icon="link" href="/oss/integrations/text_embedding/premai" arrow="true" cta="가이드 보기" />
-<Card title="SageMaker" icon="link" href="/oss/integrations/text_embedding/sagemaker-endpoint" arrow="true" cta="가이드 보기" />
-<Card title="SambaNovaCloud" icon="link" href="/oss/integrations/text_embedding/sambanova" arrow="true" cta="가이드 보기" />
-<Card title="SambaStudio" icon="link" href="/oss/integrations/text_embedding/sambastudio" arrow="true" cta="가이드 보기" />
-<Card title="Self Hosted" icon="link" href="/oss/integrations/text_embedding/self-hosted" arrow="true" cta="가이드 보기" />
-<Card title="Sentence Transformers" icon="link" href="/oss/integrations/text_embedding/sentence_transformers" arrow="true" cta="가이드 보기" />
-<Card title="Solar" icon="link" href="/oss/integrations/text_embedding/solar" arrow="true" cta="가이드 보기" />
-<Card title="SpaCy" icon="link" href="/oss/integrations/text_embedding/spacy_embedding" arrow="true" cta="가이드 보기" />
-<Card title="SparkLLM" icon="link" href="/oss/integrations/text_embedding/sparkllm" arrow="true" cta="가이드 보기" />
-<Card title="TensorFlow Hub" icon="link" href="/oss/integrations/text_embedding/tensorflowhub" arrow="true" cta="가이드 보기" />
-<Card title="Text Embeddings Inference" icon="link" href="/oss/integrations/text_embedding/text_embeddings_inference" arrow="true" cta="가이드 보기" />
-<Card title="TextEmbed" icon="link" href="/oss/integrations/text_embedding/textembed" arrow="true" cta="가이드 보기" />
-<Card title="Titan Takeoff" icon="link" href="/oss/integrations/text_embedding/titan_takeoff" arrow="true" cta="가이드 보기" />
-<Card title="Together AI" icon="link" href="/oss/integrations/text_embedding/together" arrow="true" cta="가이드 보기" />
-<Card title="Upstage" icon="link" href="/oss/integrations/text_embedding/upstage" arrow="true" cta="가이드 보기" />
-<Card title="Volc Engine" icon="link" href="/oss/integrations/text_embedding/volcengine" arrow="true" cta="가이드 보기" />
-<Card title="Voyage AI" icon="link" href="/oss/integrations/text_embedding/voyageai" arrow="true" cta="가이드 보기" />
-<Card title="Xinference" icon="link" href="/oss/integrations/text_embedding/xinference" arrow="true" cta="가이드 보기" />
-<Card title="YandexGPT" icon="link" href="/oss/integrations/text_embedding/yandex" arrow="true" cta="가이드 보기" />
-<Card title="ZhipuAI" icon="link" href="/oss/integrations/text_embedding/zhipuai" arrow="true" cta="가이드 보기" />
+<Card title="Aleph Alpha" icon="link" href="/oss/integrations/text_embedding/aleph_alpha" arrow="true" cta="View guide" />
+<Card title="Anyscale" icon="link" href="/oss/integrations/text_embedding/anyscale" arrow="true" cta="View guide" />
+<Card title="Ascend" icon="link" href="/oss/integrations/text_embedding/ascend" arrow="true" cta="View guide" />
+<Card title="AI/ML API" icon="link" href="/oss/integrations/text_embedding/aimlapi" arrow="true" cta="View guide" />
+<Card title="AwaDB" icon="link" href="/oss/integrations/text_embedding/awadb" arrow="true" cta="View guide" />
+<Card title="AzureOpenAI" icon="link" href="/oss/integrations/text_embedding/azure_openai" arrow="true" cta="View guide" />
+<Card title="Baichuan Text Embeddings" icon="link" href="/oss/integrations/text_embedding/baichuan" arrow="true" cta="View guide" />
+<Card title="Baidu Qianfan" icon="link" href="/oss/integrations/text_embedding/baidu_qianfan_endpoint" arrow="true" cta="View guide" />
+<Card title="Baseten" icon="link" href="/oss/integrations/text_embedding/baseten" arrow="true" cta="View guide" />
+<Card title="Bedrock" icon="link" href="/oss/integrations/text_embedding/bedrock" arrow="true" cta="View guide" />
+<Card title="BGE on Hugging Face" icon="link" href="/oss/integrations/text_embedding/bge_huggingface" arrow="true" cta="View guide" />
+<Card title="Bookend AI" icon="link" href="/oss/integrations/text_embedding/bookend" arrow="true" cta="View guide" />
+<Card title="Clarifai" icon="link" href="/oss/integrations/text_embedding/clarifai" arrow="true" cta="View guide" />
+<Card title="Cloudflare Workers AI" icon="link" href="/oss/integrations/text_embedding/cloudflare_workersai" arrow="true" cta="View guide" />
+<Card title="Clova Embeddings" icon="link" href="/oss/integrations/text_embedding/clova" arrow="true" cta="View guide" />
+<Card title="Cohere" icon="link" href="/oss/integrations/text_embedding/cohere" arrow="true" cta="View guide" />
+<Card title="DashScope" icon="link" href="/oss/integrations/text_embedding/dashscope" arrow="true" cta="View guide" />
+<Card title="Databricks" icon="link" href="/oss/integrations/text_embedding/databricks" arrow="true" cta="View guide" />
+<Card title="DeepInfra" icon="link" href="/oss/integrations/text_embedding/deepinfra" arrow="true" cta="View guide" />
+<Card title="EDEN AI" icon="link" href="/oss/integrations/text_embedding/edenai" arrow="true" cta="View guide" />
+<Card title="Elasticsearch" icon="link" href="/oss/integrations/text_embedding/elasticsearch" arrow="true" cta="View guide" />
+<Card title="Embaas" icon="link" href="/oss/integrations/text_embedding/embaas" arrow="true" cta="View guide" />
+<Card title="Fake Embeddings" icon="link" href="/oss/integrations/text_embedding/fake" arrow="true" cta="View guide" />
+<Card title="FastEmbed by Qdrant" icon="link" href="/oss/integrations/text_embedding/fastembed" arrow="true" cta="View guide" />
+<Card title="Fireworks" icon="link" href="/oss/integrations/text_embedding/fireworks" arrow="true" cta="View guide" />
+<Card title="Google Gemini" icon="link" href="/oss/integrations/text_embedding/google_generative_ai" arrow="true" cta="View guide" />
+<Card title="Google Vertex AI" icon="link" href="/oss/integrations/text_embedding/google_vertex_ai_palm" arrow="true" cta="View guide" />
+<Card title="GPT4All" icon="link" href="/oss/integrations/text_embedding/gpt4all" arrow="true" cta="View guide" />
+<Card title="Gradient" icon="link" href="/oss/integrations/text_embedding/gradient" arrow="true" cta="View guide" />
+<Card title="GreenNode" icon="link" href="/oss/integrations/text_embedding/greennode" arrow="true" cta="View guide" />
+<Card title="Hugging Face" icon="link" href="/oss/integrations/text_embedding/huggingfacehub" arrow="true" cta="View guide" />
+<Card title="IBM watsonx.ai" icon="link" href="/oss/integrations/text_embedding/ibm_watsonx" arrow="true" cta="View guide" />
+<Card title="Infinity" icon="link" href="/oss/integrations/text_embedding/infinity" arrow="true" cta="View guide" />
+<Card title="Instruct Embeddings" icon="link" href="/oss/integrations/text_embedding/instruct_embeddings" arrow="true" cta="View guide" />
+<Card title="IPEX-LLM CPU" icon="link" href="/oss/integrations/text_embedding/ipex_llm" arrow="true" cta="View guide" />
+<Card title="IPEX-LLM GPU" icon="link" href="/oss/integrations/text_embedding/ipex_llm_gpu" arrow="true" cta="View guide" />
+<Card title="Intel Extension for Transformers" icon="link" href="/oss/integrations/text_embedding/itrex" arrow="true" cta="View guide" />
+<Card title="Jina" icon="link" href="/oss/integrations/text_embedding/jina" arrow="true" cta="View guide" />
+<Card title="John Snow Labs" icon="link" href="/oss/integrations/text_embedding/johnsnowlabs_embedding" arrow="true" cta="View guide" />
+<Card title="LASER" icon="link" href="/oss/integrations/text_embedding/laser" arrow="true" cta="View guide" />
+<Card title="Lindorm" icon="link" href="/oss/integrations/text_embedding/lindorm" arrow="true" cta="View guide" />
+<Card title="Llama.cpp" icon="link" href="/oss/integrations/text_embedding/llamacpp" arrow="true" cta="View guide" />
+<Card title="LLMRails" icon="link" href="/oss/integrations/text_embedding/llm_rails" arrow="true" cta="View guide" />
+<Card title="LocalAI" icon="link" href="/oss/integrations/text_embedding/localai" arrow="true" cta="View guide" />
+<Card title="MiniMax" icon="link" href="/oss/integrations/text_embedding/minimax" arrow="true" cta="View guide" />
+<Card title="MistralAI" icon="link" href="/oss/integrations/text_embedding/mistralai" arrow="true" cta="View guide" />
+<Card title="Model2Vec" icon="link" href="/oss/integrations/text_embedding/model2vec" arrow="true" cta="View guide" />
+<Card title="ModelScope" icon="link" href="/oss/integrations/text_embedding/modelscope_embedding" arrow="true" cta="View guide" />
+<Card title="MosaicML" icon="link" href="/oss/integrations/text_embedding/mosaicml" arrow="true" cta="View guide" />
+<Card title="Naver" icon="link" href="/oss/integrations/text_embedding/naver" arrow="true" cta="View guide" />
+<Card title="Nebius" icon="link" href="/oss/integrations/text_embedding/nebius" arrow="true" cta="View guide" />
+<Card title="Netmind" icon="link" href="/oss/integrations/text_embedding/netmind" arrow="true" cta="View guide" />
+<Card title="NLP Cloud" icon="link" href="/oss/integrations/text_embedding/nlp_cloud" arrow="true" cta="View guide" />
+<Card title="Nomic" icon="link" href="/oss/integrations/text_embedding/nomic" arrow="true" cta="View guide" />
+<Card title="NVIDIA NIMs" icon="link" href="/oss/integrations/text_embedding/nvidia_ai_endpoints" arrow="true" cta="View guide" />
+<Card title="Oracle Cloud Infrastructure" icon="link" href="/oss/integrations/text_embedding/oci_generative_ai" arrow="true" cta="View guide" />
+<Card title="Ollama" icon="link" href="/oss/integrations/text_embedding/ollama" arrow="true" cta="View guide" />
+<Card title="OpenClip" icon="link" href="/oss/integrations/text_embedding/open_clip" arrow="true" cta="View guide" />
+<Card title="OpenAI" icon="link" href="/oss/integrations/text_embedding/openai" arrow="true" cta="View guide" />
+<Card title="OpenVINO" icon="link" href="/oss/integrations/text_embedding/openvino" arrow="true" cta="View guide" />
+<Card title="Optimum Intel" icon="link" href="/oss/integrations/text_embedding/optimum_intel" arrow="true" cta="View guide" />
+<Card title="Oracle AI Vector Search" icon="link" href="/oss/integrations/text_embedding/oracleai" arrow="true" cta="View guide" />
+<Card title="OVHcloud" icon="link" href="/oss/integrations/text_embedding/ovhcloud" arrow="true" cta="View guide" />
+<Card title="Pinecone Embeddings" icon="link" href="/oss/integrations/text_embedding/pinecone" arrow="true" cta="View guide" />
+<Card title="PredictionGuard" icon="link" href="/oss/integrations/text_embedding/predictionguard" arrow="true" cta="View guide" />
+<Card title="PremAI" icon="link" href="/oss/integrations/text_embedding/premai" arrow="true" cta="View guide" />
+<Card title="SageMaker" icon="link" href="/oss/integrations/text_embedding/sagemaker-endpoint" arrow="true" cta="View guide" />
+<Card title="SambaNovaCloud" icon="link" href="/oss/integrations/text_embedding/sambanova" arrow="true" cta="View guide" />
+<Card title="SambaStudio" icon="link" href="/oss/integrations/text_embedding/sambastudio" arrow="true" cta="View guide" />
+<Card title="Self Hosted" icon="link" href="/oss/integrations/text_embedding/self-hosted" arrow="true" cta="View guide" />
+<Card title="Sentence Transformers" icon="link" href="/oss/integrations/text_embedding/sentence_transformers" arrow="true" cta="View guide" />
+<Card title="Solar" icon="link" href="/oss/integrations/text_embedding/solar" arrow="true" cta="View guide" />
+<Card title="SpaCy" icon="link" href="/oss/integrations/text_embedding/spacy_embedding" arrow="true" cta="View guide" />
+<Card title="SparkLLM" icon="link" href="/oss/integrations/text_embedding/sparkllm" arrow="true" cta="View guide" />
+<Card title="TensorFlow Hub" icon="link" href="/oss/integrations/text_embedding/tensorflowhub" arrow="true" cta="View guide" />
+<Card title="Text Embeddings Inference" icon="link" href="/oss/integrations/text_embedding/text_embeddings_inference" arrow="true" cta="View guide" />
+<Card title="TextEmbed" icon="link" href="/oss/integrations/text_embedding/textembed" arrow="true" cta="View guide" />
+<Card title="Titan Takeoff" icon="link" href="/oss/integrations/text_embedding/titan_takeoff" arrow="true" cta="View guide" />
+<Card title="Together AI" icon="link" href="/oss/integrations/text_embedding/together" arrow="true" cta="View guide" />
+<Card title="Upstage" icon="link" href="/oss/integrations/text_embedding/upstage" arrow="true" cta="View guide" />
+<Card title="Volc Engine" icon="link" href="/oss/integrations/text_embedding/volcengine" arrow="true" cta="View guide" />
+<Card title="Voyage AI" icon="link" href="/oss/integrations/text_embedding/voyageai" arrow="true" cta="View guide" />
+<Card title="Xinference" icon="link" href="/oss/integrations/text_embedding/xinference" arrow="true" cta="View guide" />
+<Card title="YandexGPT" icon="link" href="/oss/integrations/text_embedding/yandex" arrow="true" cta="View guide" />
+<Card title="ZhipuAI" icon="link" href="/oss/integrations/text_embedding/zhipuai" arrow="true" cta="View guide" />
 </Columns>

@@ -2,31 +2,31 @@
 title: TensorFlow Datasets
 ---
 
->[TensorFlow Datasets](https://www.tensorflow.org/datasets)는 TensorFlow 또는 Jax와 같은 다른 Python ML 프레임워크와 함께 사용할 수 있는 즉시 사용 가능한 데이터셋 컬렉션입니다. 모든 데이터셋은 [tf.data.Datasets](https://www.tensorflow.org/api_docs/python/tf/data/Dataset)로 제공되어 사용하기 쉽고 고성능 입력 파이프라인을 가능하게 합니다. 시작하려면 [가이드](https://www.tensorflow.org/datasets/overview)와 [데이터셋 목록](https://www.tensorflow.org/datasets/catalog/overview#all_datasets)을 참조하세요.
+>[TensorFlow Datasets](https://www.tensorflow.org/datasets) is a collection of datasets ready to use, with TensorFlow or other Python ML frameworks, such as Jax. All datasets are exposed as [tf.data.Datasets](https://www.tensorflow.org/api_docs/python/tf/data/Dataset), enabling easy-to-use and high-performance input pipelines. To get started see the [guide](https://www.tensorflow.org/datasets/overview) and the [list of datasets](https://www.tensorflow.org/datasets/catalog/overview#all_datasets).
 
-이 노트북은 `TensorFlow Datasets`를 다운스트림에서 사용할 수 있는 Document 형식으로 로드하는 방법을 보여줍니다.
+This notebook shows how to load `TensorFlow Datasets` into a Document format that we can use downstream.
 
-## 설치
+## Installation
 
-`tensorflow` 및 `tensorflow-datasets` 파이썬 패키지를 설치해야 합니다.
+You need to install `tensorflow` and `tensorflow-datasets` python packages.
 
 ```python
-%pip install -qU  tensorflow
+pip install -qU  tensorflow
 ```
 
 ```python
-%pip install -qU  tensorflow-datasets
+pip install -qU  tensorflow-datasets
 ```
 
-## 예제
+## Example
 
-예제로 [`mlqa/en` 데이터셋](https://www.tensorflow.org/datasets/catalog/mlqa#mlqaen)을 사용합니다.
+As an example, we use the [`mlqa/en` dataset](https://www.tensorflow.org/datasets/catalog/mlqa#mlqaen).
 
->`MLQA` (`Multilingual Question Answering Dataset`)는 다국어 질문 답변 성능을 평가하기 위한 벤치마크 데이터셋입니다. 데이터셋은 아랍어, 독일어, 스페인어, 영어, 힌디어, 베트남어, 중국어의 7개 언어로 구성되어 있습니다.
+>`MLQA` (`Multilingual Question Answering Dataset`) is a benchmark dataset for evaluating multilingual question answering performance. The dataset consists of 7 languages: Arabic, German, Spanish, English, Hindi, Vietnamese, Chinese.
 >
->- 홈페이지: [github.com/facebookresearch/MLQA](https://github.com/facebookresearch/MLQA)
->- 소스 코드: `tfds.datasets.mlqa.Builder`
->- 다운로드 크기: 72.21 MiB
+>- Homepage: [github.com/facebookresearch/MLQA](https://github.com/facebookresearch/MLQA)
+>- Source code: `tfds.datasets.mlqa.Builder`
+>- Download size: 72.21 MiB
 
 ```python
 # Feature structure of `mlqa/en` dataset:
@@ -63,11 +63,11 @@ ds
 <_TakeDataset element_spec={'answers': {'answer_start': TensorSpec(shape=(None,), dtype=tf.int32, name=None), 'text': TensorSpec(shape=(None,), dtype=tf.string, name=None)}, 'context': TensorSpec(shape=(), dtype=tf.string, name=None), 'id': TensorSpec(shape=(), dtype=tf.string, name=None), 'question': TensorSpec(shape=(), dtype=tf.string, name=None), 'title': TensorSpec(shape=(), dtype=tf.string, name=None)}>
 ```
 
-이제 데이터셋 샘플을 Document로 변환하는 사용자 정의 함수를 만들어야 합니다.
+Now we have to create a custom function to convert dataset sample into a Document.
 
-이것은 필수 사항입니다. TF 데이터셋에 대한 표준 형식이 없기 때문에 사용자 정의 변환 함수를 만들어야 합니다.
+This is a requirement. There is no standard format for the TF datasets that's why we need to make a custom transformation function.
 
-`context` 필드를 `Document.page_content`로 사용하고 다른 필드를 `Document.metadata`에 배치하겠습니다.
+Let's use `context` field as the `Document.page_content` and place other fields in the `Document.metadata`.
 
 ```python
 from langchain_core.documents import Document
@@ -114,12 +114,12 @@ loader = TensorflowDatasetLoader(
 )
 ```
 
-`TensorflowDatasetLoader`는 다음 매개변수를 가집니다:
+`TensorflowDatasetLoader` has these parameters:
 
-- `dataset_name`: 로드할 데이터셋의 이름
-- `split_name`: 로드할 분할의 이름. 기본값은 "train"입니다.
-- `load_max_docs`: 로드할 문서 수의 제한. 기본값은 100입니다.
-- `sample_to_document_function`: 데이터셋 샘플을 Document로 변환하는 함수
+- `dataset_name`: the name of the dataset to load
+- `split_name`: the name of the split to load. Defaults to "train".
+- `load_max_docs`: a limit to the number of loaded documents. Defaults to 100.
+- `sample_to_document_function`: a function that converts a dataset sample to a Document
 
 ```python
 docs = loader.load()

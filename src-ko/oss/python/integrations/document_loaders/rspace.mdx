@@ -2,37 +2,38 @@
 title: RSpace
 ---
 
-이 노트북은 RSpace 전자 실험 노트에서 연구 노트 및 문서를 가져와 LangChain 파이프라인으로 가져오기 위해 RSpace 문서 로더를 사용하는 방법을 보여줍니다.
+This notebook shows how to use the RSpace document loader to import research notes and documents from RSpace Electronic
+Lab Notebook into LangChain pipelines.
 
-시작하려면 RSpace 계정과 API 키가 필요합니다.
+To start you'll need an RSpace account and an API key.
 
-[https://community.researchspace.com](https://community.researchspace.com)에서 무료 계정을 설정하거나 기관의 RSpace를 사용할 수 있습니다.
+You can set up a free account at [https://community.researchspace.com](https://community.researchspace.com) or use your institutional RSpace.
 
-계정의 프로필 페이지에서 RSpace API 토큰을 받을 수 있습니다.
+You can get an RSpace API token from your account's profile page.
 
 ```python
-%pip install -qU  rspace_client
+pip install -qU  rspace_client
 ```
 
-RSpace API 키를 환경 변수로 저장하는 것이 가장 좋습니다.
+It's best to store your RSpace API key as an environment variable.
 
         RSPACE_API_KEY=&lt;YOUR_KEY&gt;
 
-RSpace 설치의 URL도 설정해야 합니다. 예:
+You'll also need to set the URL of your RSpace installation e.g.
 
         RSPACE_URL=https://community.researchspace.com
 
-이러한 정확한 환경 변수 이름을 사용하면 자동으로 감지됩니다.
+If you use these exact environment variable names, they will be detected automatically.
 
 ```python
 from langchain_community.document_loaders.rspace import RSpaceLoader
 ```
 
-RSpace에서 다양한 항목을 가져올 수 있습니다:
+You can import various items from RSpace:
 
-* 단일 RSpace 구조화 또는 기본 문서. 이것은 LangChain 문서에 1:1로 매핑됩니다.
-* 폴더 또는 노트북. 노트북 또는 폴더 내의 모든 문서가 LangChain 문서로 가져와집니다.
-* RSpace Gallery에 PDF 파일이 있는 경우, 이를 개별적으로 가져올 수도 있습니다. 내부적으로 LangChain의 PDF 로더가 사용되며 이는 PDF 페이지당 하나의 LangChain 문서를 생성합니다.
+* A single RSpace structured or basic document. This will map 1-1 to a LangChain document.
+* A folder or noteook. All documents inside the notebook or folder are imported as LangChain documents.
+* If you have PDF files in the RSpace Gallery, these can be imported individually as well. Under the hood, LangChain's PDF loader will be used and this creates one LangChain document per PDF page.
 
 ```python
 ## replace these ids with some from your own research notes.
@@ -49,7 +50,7 @@ for rs_id in rspace_ids:
         print(doc.page_content[:500])
 ```
 
-위와 같이 환경 변수를 사용하지 않으려면 RSpaceLoader에 전달할 수 있습니다
+If you don't want to use the environment variables as above, you can pass these into the RSpaceLoader
 
 ```python
 loader = RSpaceLoader(

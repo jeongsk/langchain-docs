@@ -2,13 +2,13 @@
 title: Google BigQuery
 ---
 
->[Google BigQuery](https://cloud.google.com/bigquery)는 클라우드 전반에 걸쳐 작동하고 데이터와 함께 확장되는 서버리스 및 비용 효율적인 엔터프라이즈 데이터 웨어하우스입니다.
-`BigQuery`는 `Google Cloud Platform`의 일부입니다.
+>[Google BigQuery](https://cloud.google.com/bigquery) is a serverless and cost-effective enterprise data warehouse that works across clouds and scales with your data.
+`BigQuery` is a part of the `Google Cloud Platform`.
 
-행당 하나의 문서로 `BigQuery` 쿼리를 로드합니다.
+Load a `BigQuery` query with one document per row.
 
 ```python
-%pip install -qU langchain-google-community[bigquery]
+pip install -qU langchain-google-community[bigquery]
 ```
 
 ```python
@@ -36,7 +36,7 @@ FROM (
 """
 ```
 
-## 기본 사용법
+## Basic Usage
 
 ```python
 loader = BigQueryLoader(BASE_QUERY)
@@ -52,7 +52,7 @@ print(data)
 [Document(page_content='id: 1\ndna_sequence: ATTCGA\norganism: Lokiarchaeum sp. (strain GC14_75).', lookup_str='', metadata={}, lookup_index=0), Document(page_content='id: 2\ndna_sequence: AGGCGA\norganism: Heimdallarchaeota archaeon (strain LC_2).', lookup_str='', metadata={}, lookup_index=0), Document(page_content='id: 3\ndna_sequence: TCCGGA\norganism: Acidianus hospitalis (strain W1).', lookup_str='', metadata={}, lookup_index=0)]
 ```
 
-## 콘텐츠와 메타데이터 열 지정
+## Specifying Which Columns are Content vs Metadata
 
 ```python
 loader = BigQueryLoader(
@@ -72,10 +72,10 @@ print(data)
 [Document(page_content='dna_sequence: ATTCGA\norganism: Lokiarchaeum sp. (strain GC14_75).', lookup_str='', metadata={'id': 1}, lookup_index=0), Document(page_content='dna_sequence: AGGCGA\norganism: Heimdallarchaeota archaeon (strain LC_2).', lookup_str='', metadata={'id': 2}, lookup_index=0), Document(page_content='dna_sequence: TCCGGA\norganism: Acidianus hospitalis (strain W1).', lookup_str='', metadata={'id': 3}, lookup_index=0)]
 ```
 
-## 메타데이터에 소스 추가
+## Adding Source to Metadata
 
 ```python
-# `id` 열이 두 번 반환되고 한 인스턴스가 `source`로 별칭 지정됩니다
+# Note that the `id` column is being returned twice, with one instance aliased as `source`
 ALIASED_QUERY = """
 SELECT
   id,

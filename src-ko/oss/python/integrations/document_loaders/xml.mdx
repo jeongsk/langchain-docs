@@ -2,48 +2,48 @@
 title: UnstructuredXMLLoader
 ---
 
-이 가이드는 UnstructuredXMLLoader [문서 로더](https://python.langchain.com/docs/concepts/document_loaders) 시작하기에 대한 간단한 개요를 제공합니다. `UnstructuredXMLLoader`는 `XML` 파일을 로드하는 데 사용됩니다. 이 로더는 `.xml` 파일에서 작동합니다. 페이지 콘텐츠는 XML 태그에서 추출된 텍스트가 됩니다.
+This guide provides a quick overview for getting started with UnstructuredXMLLoader [document loader](https://python.langchain.com/docs/concepts/document_loaders). The `UnstructuredXMLLoader` is used to load `XML` files. The loader works with `.xml` files. The page content will be the text extracted from the XML tags.
 
-## 개요
+## Overview
 
-### 통합 세부 정보
+### Integration details
 
-| 클래스 | 패키지 | 로컬 | 직렬화 가능 | [JS 지원](https://js.langchain.com/docs/integrations/document_loaders/file_loaders/unstructured/)|
+| Class | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/document_loaders/file_loaders/unstructured/)|
 | :--- | :--- | :---: | :---: |  :---: |
 | [UnstructuredXMLLoader](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.xml.UnstructuredXMLLoader.html) | [langchain_community](https://python.langchain.com/api_reference/community/index.html) | ✅ | ❌ | ✅ |
 
-### 로더 기능
+### Loader features
 
-| 소스 | 문서 지연 로딩 | 네이티브 비동기 지원
+| Source | Document Lazy Loading | Native Async Support
 | :---: | :---: | :---: |
 | UnstructuredXMLLoader | ✅ | ❌ |
 
-## 설정
+## Setup
 
-UnstructuredXMLLoader 문서 로더에 액세스하려면 `langchain-community` 통합 패키지를 설치해야 합니다.
+To access UnstructuredXMLLoader document loader you'll need to install the `langchain-community` integration package.
 
-### 자격 증명
+### Credentials
 
-UnstructuredXMLLoader를 사용하는 데 자격 증명이 필요하지 않습니다
+No credentials are needed to use the UnstructuredXMLLoader
 
-모델 호출의 자동 추적을 활성화하려면 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정하세요:
-
-```python
-# os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
-# os.environ["LANGSMITH_TRACING"] = "true"
-```
-
-### 설치
-
-**langchain_community**를 설치하세요.
+To enable automated tracing of your model calls, set your [LangSmith](https://docs.smith.langchain.com/) API key:
 
 ```python
-%pip install -qU langchain_community
+os.environ["LANGSMITH_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
+os.environ["LANGSMITH_TRACING"] = "true"
 ```
 
-## 초기화
+### Installation
 
-이제 모델 객체를 인스턴스화하고 문서를 로드할 수 있습니다:
+Install **langchain_community**.
+
+```python
+pip install -qU langchain_community
+```
+
+## Initialization
+
+Now we can instantiate our model object and load documents:
 
 ```python
 from langchain_community.document_loaders import UnstructuredXMLLoader
@@ -53,7 +53,7 @@ loader = UnstructuredXMLLoader(
 )
 ```
 
-## 로드
+## Load
 
 ```python
 docs = loader.load()
@@ -72,19 +72,19 @@ print(docs[0].metadata)
 {'source': './example_data/factbook.xml'}
 ```
 
-## 지연 로드
+## Lazy Load
 
 ```python
 page = []
 for doc in loader.lazy_load():
     page.append(doc)
     if len(page) >= 10:
-        # 페이지 단위 작업을 수행합니다. 예:
+        # do some paged operation, e.g.
         # index.upsert(page)
 
         page = []
 ```
 
-## API 레퍼런스
+## API reference
 
-모든 __ModuleName__Loader 기능 및 구성에 대한 자세한 문서는 API 레퍼런스를 참조하세요: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.xml.UnstructuredXMLLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.xml.UnstructuredXMLLoader.html)
+For detailed documentation of all __ModuleName__Loader features and configurations head to the API reference: [python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.xml.UnstructuredXMLLoader.html](https://python.langchain.com/api_reference/community/document_loaders/langchain_community.document_loaders.xml.UnstructuredXMLLoader.html)

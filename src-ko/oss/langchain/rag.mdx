@@ -1,6 +1,6 @@
 ---
-title: LangChain으로 RAG 에이전트 구축하기
-sidebarTitle: RAG 에이전트
+title: Build a RAG agent with LangChain
+sidebarTitle: RAG agent
 ---
 
 import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
@@ -10,40 +10,39 @@ import EmbeddingsTabsJS from '/snippets/embeddings-tabs-js.mdx';
 import VectorstoreTabsPy from '/snippets/vectorstore-tabs-py.mdx';
 import VectorstoreTabsJS from '/snippets/vectorstore-tabs-js.mdx';
 
-## 개요
 
-LLM이 가능하게 하는 가장 강력한 애플리케이션 중 하나는 정교한 질의응답(Q&A) 챗봇입니다. 이는 특정 소스 정보에 대한 질문에 답변할 수 있는 애플리케이션입니다. 이러한 애플리케이션은 검색 증강 생성(Retrieval Augmented Generation) 또는 [RAG](/oss/langchain/retrieval/)로 알려진 기술을 사용합니다.
+## Overview
 
-이 튜토리얼에서는 비정형 텍스트 데이터 소스를 기반으로 간단한 Q&A 애플리케이션을 구축하는 방법을 보여줍니다. 다음을 시연합니다:
+One of the most powerful applications enabled by LLMs is sophisticated question-answering (Q&A) chatbots. These are applications that can answer questions about specific source information. These applications use a technique known as Retrieval Augmented Generation, or [RAG](/oss/langchain/retrieval/).
 
-1. 간단한 도구로 검색을 수행하는 RAG [에이전트](#rag-agents). 이는 범용 구현입니다.
-2. 쿼리당 단일 LLM 호출만 사용하는 2단계 RAG [체인](#rag-chains). 이는 간단한 쿼리에 대한 빠르고 효과적인 방법입니다.
+This tutorial will show how to build a simple Q&A application over an unstructured text data source. We will demonstrate:
 
-### 개념
+1. A RAG [agent](#rag-agents) that executes searches with a simple tool. This is a good general-purpose implementation.
+2. A two-step RAG [chain](#rag-chains) that uses just a single LLM call per query. This is a fast and effective method for simple queries.
 
-다음 개념을 다룹니다:
+### Concepts
 
-- **인덱싱**: 소스에서 데이터를 수집하고 인덱싱하는 파이프라인. *일반적으로 별도의 프로세스에서 발생합니다.*
+We will cover the following concepts:
 
-- **검색 및 생성**: 실제 RAG 프로세스로, 런타임에 사용자 쿼리를 받아 인덱스에서 관련 데이터를 검색한 다음 모델에 전달합니다.
+- **Indexing**: a pipeline for ingesting data from a source and indexing it. *This usually happens in a separate process.*
 
-데이터 인덱싱이 완료되면 [에이전트](/oss/langchain/agents)를 오케스트레이션 프레임워크로 사용하여 검색 및 생성 단계를 구현합니다.
+- **Retrieval and generation**: the actual RAG process, which takes the user query at run time and retrieves the relevant data from the index, then passes that to the model.
+
+Once we've indexed our data, we will use an [agent](/oss/langchain/agents) as our orchestration framework to implement the retrieval and generation steps.
 
 <Note>
-이 튜토리얼의 인덱싱 부분은 [시맨틱 검색 튜토리얼](/oss/langchain/knowledge-base)을 대부분 따릅니다.
+    The indexing portion of this tutorial will largely follow the [semantic search tutorial](/oss/langchain/knowledge-base).
 
-데이터가 이미 검색 가능한 경우(즉, 검색을 실행하는 함수가 있는 경우) 또는 해당 튜토리얼의 내용에 익숙하다면
-[검색 및 생성](#2-retrieval-and-generation) 섹션으로 건너뛰어도 됩니다.
+    If your data is already available for search (i.e., you have a function to execute a search), or you're comfortable with the content from that tutorial, feel free to skip to the section on [retrieval and generation](#2-retrieval-and-generation)
 </Note>
 
-### 미리보기
+### Preview
 
-이 가이드에서는 웹사이트 콘텐츠에 대한 질문에 답변하는 앱을 구축합니다. 사용할 특정 웹사이트는 Lilian Weng의 [LLM 기반 자율 에이전트](https://lilianweng.github.io/posts/2023-06-23-agent/) 블로그 게시물로,
-게시물의 내용에 대해 질문할 수 있습니다.
+In this guide we'll build an app that answers questions about the website's content. The specific website we will use is the [LLM Powered Autonomous Agents](https://lilianweng.github.io/posts/2023-06-23-agent/) blog post by Lilian Weng, which allows us to ask questions about the contents of the post.
 
-약 40줄의 코드로 간단한 인덱싱 파이프라인과 RAG 체인을 만들 수 있습니다. 전체 코드 스니펫은 아래를 참조하세요:
+We can create a simple indexing pipeline and RAG chain to do this in ~40 lines of code. See below for the full code snippet:
 
-<Accordion title="전체 코드 스니펫 확장">
+<Accordion title="Expand for full code snippet">
 
 :::python
 ```python
@@ -87,7 +86,7 @@ prompt = (
     "You have access to a tool that retrieves context from a blog post. "
     "Use the tool to help answer user queries."
 )
-agent = create_agent(llm, tools, system_prompt=prompt)
+agent = create_agent(model, tools, system_prompt=prompt)
 ```
 
 ```python
@@ -188,24 +187,27 @@ for await (const step of await agent.stream(agentInputs, {
 ```
 :::
 
-[LangSmith 트레이스](https://smith.langchain.com/public/a117a1f8-c96c-4c16-a285-00b85646118e/r)를 확인하세요.
+Check out the [LangSmith trace](https://smith.langchain.com/public/a117a1f8-c96c-4c16-a285-00b85646118e/r).
 
 </Accordion>
 
-## 설정
+## Setup
 
 
-### 설치
+### Installation
 
-이 튜토리얼에는 다음 langchain 종속성이 필요합니다:
+This tutorial requires these langchain dependencies:
 
 :::python
 <CodeGroup>
 ```bash pip
-pip install langchain langchain-text-splitters langchain-community
+pip install langchain langchain-text-splitters langchain-community bs4
+```
+```bash uv
+uv add langchain langchain-text-splitters langchain-community bs4
 ```
 ```bash conda
-conda install langchain langchain-text-splitters langchain-community -c conda-forge
+conda install langchain langchain-text-splitters langchain-community bs4 -c conda-forge
 ```
 </CodeGroup>
 :::
@@ -225,15 +227,13 @@ pnpm add langchain @langchain/community @langchain/textsplitters
 
 :::
 
-자세한 내용은 [설치 가이드](/oss/langchain/install)를 참조하세요.
+For more details, see our [Installation guide](/oss/langchain/install).
 
 ### LangSmith
 
-LangChain으로 구축하는 많은 애플리케이션에는 여러 LLM 호출이 포함된 여러 단계가 포함됩니다.
-이러한 애플리케이션이 복잡해질수록 체인 또는 에이전트 내부에서 정확히 무슨 일이 일어나고 있는지 검사할 수 있는 것이 중요해집니다.
-이를 수행하는 가장 좋은 방법은 [LangSmith](https://smith.langchain.com)를 사용하는 것입니다.
+Many of the applications you build with LangChain will contain multiple steps with multiple invocations of LLM calls. As these applications get more complex, it becomes crucial to be able to inspect what exactly is going on inside your chain or agent. The best way to do this is with [LangSmith](https://smith.langchain.com).
 
-위 링크에서 가입한 후 트레이스 로깅을 시작하도록 환경 변수를 설정하세요:
+After you sign up at the link above, make sure to set your environment variables to start logging traces:
 
 ```shell
 export LANGSMITH_TRACING="true"
@@ -241,7 +241,7 @@ export LANGSMITH_API_KEY="..."
 ```
 
 :::python
-또는 Python에서 설정합니다:
+Or, set them in Python:
 
 ```python
 import getpass
@@ -252,11 +252,11 @@ os.environ["LANGSMITH_API_KEY"] = getpass.getpass()
 ```
 :::
 
-### 구성 요소
+### Components
 
-LangChain의 통합 모음에서 세 가지 구성 요소를 선택해야 합니다.
+We will need to select three components from LangChain's suite of integrations.
 
-채팅 모델 선택:
+Select a chat model:
 :::python
 <ChatModelTabsPy />
 :::
@@ -264,7 +264,7 @@ LangChain의 통합 모음에서 세 가지 구성 요소를 선택해야 합니
 <ChatModelTabsJS />
 :::
 
-임베딩 모델 선택:
+Select an embeddings model:
 :::python
 <EmbeddingsTabsPy />
 :::
@@ -272,7 +272,7 @@ LangChain의 통합 모음에서 세 가지 구성 요소를 선택해야 합니
 <EmbeddingsTabsJS />
 :::
 
-벡터 저장소 선택:
+Select a vector store:
 :::python
 <VectorstoreTabsPy />
 :::
@@ -281,41 +281,29 @@ LangChain의 통합 모음에서 세 가지 구성 요소를 선택해야 합니
 :::
 
 
-## 1. 인덱싱
+## 1. Indexing
 
 <Note>
-**이 섹션은 [시맨틱 검색 튜토리얼](/oss/langchain/knowledge-base)의 내용을 축약한 버전입니다.**
+**This section is an abbreviated version of the content in the [semantic search tutorial](/oss/langchain/knowledge-base).**
 
-데이터가 이미 인덱싱되어 검색 가능한 경우(즉, 검색을 실행하는 함수가 있는 경우) 또는
-[문서 로더](/oss/langchain/retrieval#document_loaders),
-[임베딩](/oss/langchain/retrieval#embedding_models) 및 [벡터 저장소](/oss/langchain/retrieval#vectorstores)에 익숙한 경우
-[검색 및 생성](/oss/langchain/rag#2-retrieval-and-generation)의 다음 섹션으로 건너뛰어도 됩니다.
+If your data is already indexed and available for search (i.e., you have a function to execute a search), or if you're comfortable with [document loaders](/oss/langchain/retrieval#document_loaders), [embeddings](/oss/langchain/retrieval#embedding_models), and [vector stores](/oss/langchain/retrieval#vectorstores), feel free to skip to the next section on [retrieval and generation](/oss/langchain/rag#2-retrieval-and-generation).
 
 </Note>
 
-인덱싱은 일반적으로 다음과 같이 작동합니다:
+Indexing commonly works as follows:
 
-1. **로드**: 먼저 데이터를 로드해야 합니다. 이는 [문서 로더](/oss/langchain/retrieval#document_loaders)로 수행됩니다.
-2. **분할**: [텍스트 분할기](/oss/langchain/retrieval#text_splitters)는 큰 `Documents`를 작은 청크로 분할합니다. 이는 데이터 인덱싱과 모델에 전달하는 데 모두 유용합니다. 큰 청크는 검색하기 어렵고 모델의 제한된 컨텍스트 창에 맞지 않기 때문입니다.
-3. **저장**: 나중에 검색할 수 있도록 분할을 저장하고 인덱싱할 장소가 필요합니다. 이는 종종 [VectorStore](/oss/langchain/retrieval#vectorstores)와 [Embeddings](/oss/langchain/retrieval#embedding_models) 모델을 사용하여 수행됩니다.
+1. **Load**: First we need to load our data. This is done with [Document Loaders](/oss/langchain/retrieval#document_loaders).
+2. **Split**: [Text splitters](/oss/langchain/retrieval#text_splitters) break large `Documents` into smaller chunks. This is useful both for indexing data and passing it into a model, as large chunks are harder to search over and won't fit in a model's finite context window.
+3. **Store**: We need somewhere to store and index our splits, so that they can be searched over later. This is often done using a [VectorStore](/oss/langchain/retrieval#vectorstores) and [Embeddings](/oss/langchain/retrieval#embedding_models) model.
 
 ![index_diagram](/images/rag_indexing.png)
 
-### 문서 로드
+### Loading documents
 
-먼저 블로그 게시물 콘텐츠를 로드해야 합니다.
-[DocumentLoaders](/oss/langchain/retrieval#document_loaders)를
-사용할 수 있습니다. 이는 소스에서 데이터를 로드하고
-@[Document] 객체 목록을 반환하는 객체입니다.
+We need to first load the blog post contents. We can use [DocumentLoaders](/oss/langchain/retrieval#document_loaders) for this, which are objects that load in data from a source and return a list of @[Document] objects.
 
 :::python
-이 경우 `urllib`을 사용하여 웹 URL에서 HTML을 로드하고 `BeautifulSoup`을 사용하여 텍스트로 구문 분석하는
-[WebBaseLoader](/oss/integrations/document_loaders/web_base)를
-사용합니다. `bs_kwargs`를 통해 `BeautifulSoup` 파서에 매개변수를 전달하여
-HTML -\> 텍스트 구문 분석을 사용자 정의할 수 있습니다([BeautifulSoup
-문서](https://beautiful-soup-4.readthedocs.io/en/latest/#beautifulsoup) 참조).
-이 경우 "post-content", "post-title" 또는
-"post-header" 클래스가 있는 HTML 태그만 관련이 있으므로 다른 모든 태그를 제거합니다.
+In this case we'll use the [WebBaseLoader](/oss/integrations/document_loaders/web_base), which uses `urllib` to load HTML from web URLs and `BeautifulSoup` to parse it to text. We can customize the HTML -\> text parsing by passing in parameters into the `BeautifulSoup` parser via `bs_kwargs` (see [BeautifulSoup docs](https://beautiful-soup-4.readthedocs.io/en/latest/#beautifulsoup)). In this case only HTML tags with class “post-content”, “post-title”, or “post-header” are relevant, so we'll remove all others.
 
 ```python
 import bs4
@@ -378,25 +366,22 @@ console.log(docs[0].pageContent.slice(0, 500));
 Building agents with LLM (large language model) as its core controller is...
 ```
 :::
-**더 알아보기**
+**Go deeper**
 
-`DocumentLoader`: 소스에서 데이터를 `Documents` 목록으로 로드하는 객체.
+`DocumentLoader`: Object that loads data from a source as list of `Documents`.
 
-- [통합](/oss/integrations/document_loaders/): 선택할 수 있는 160개 이상의
-  통합.
+- [Integrations](/oss/integrations/document_loaders/): 160+
+  integrations to choose from.
 - @[Interface][BaseLoader]:
-  기본 인터페이스에 대한 API 참조.
+  API reference for the base interface.
 
-### 문서 분할
+### Splitting documents
 
-로드된 문서는 42,000자가 넘어 많은 모델의 컨텍스트 창에 맞지 않습니다. 컨텍스트 창에 전체 게시물을 넣을 수 있는 모델의 경우에도
-모델은 매우 긴 입력에서 정보를 찾는 데 어려움을 겪을 수 있습니다.
+Our loaded document is over 42k characters which is too long to fit into the context window of many models. Even for those models that could fit the full post in their context window, models can struggle to find information in very long inputs.
 
-이를 처리하기 위해 @[`Document`]를 임베딩 및 벡터 저장을 위한 청크로 분할합니다. 이는 런타임에 블로그 게시물의 가장 관련성 높은 부분만 검색하는 데 도움이 됩니다.
+To handle this we'll split the @[`Document`] into chunks for embedding and vector storage. This should help us retrieve only the most relevant parts of the blog post at run time.
 
-[시맨틱 검색 튜토리얼](/oss/langchain/knowledge-base)에서와 같이 새 줄과 같은 일반적인 구분 기호를 사용하여 문서를 재귀적으로 분할하는
-`RecursiveCharacterTextSplitter`를 사용합니다. 각 청크가 적절한 크기가 될 때까지 분할합니다. 이는
-일반 텍스트 사용 사례에 권장되는 텍스트 분할기입니다.
+As in the [semantic search tutorial](/oss/langchain/knowledge-base), we use a `RecursiveCharacterTextSplitter`, which will recursively split the document using common separators like new lines until each chunk is the appropriate size. This is the recommended text splitter for generic text use cases.
 
 :::python
 ```python
@@ -415,12 +400,13 @@ print(f"Split blog post into {len(all_splits)} sub-documents.")
 Split blog post into 66 sub-documents.
 ```
 
-**더 알아보기**
+**Go deeper**
 
-`TextSplitter`: 저장 및 검색을 위해 @[`Document`] 객체 목록을 더 작은 청크로 분할하는 객체.
+`TextSplitter`: Object that splits a list of @[`Document`] objects into smaller
+chunks for storage and retrieval.
 
-- [통합](/oss/integrations/splitters/)
-- [인터페이스](https://python.langchain.com/api_reference/text_splitters/base/langchain_text_splitters.base.TextSplitter.html): 기본 인터페이스에 대한 API 참조.
+- [Integrations](/oss/integrations/splitters/)
+- [Interface](https://python.langchain.com/api_reference/text_splitters/base/langchain_text_splitters.base.TextSplitter.html): API reference for the base interface.
 
 :::
 :::js
@@ -440,13 +426,11 @@ Split blog post into 29 sub-documents.
 :::
 
 
-### 문서 저장
+### Storing documents
 
-이제 런타임에 검색할 수 있도록 66개의 텍스트 청크를 인덱싱해야 합니다. [시맨틱 검색 튜토리얼](/oss/langchain/knowledge-base)에 따라
-각 문서 분할의 내용을 [임베딩](/oss/langchain/retrieval#embedding_models/)하고 이러한 임베딩을
-[벡터 저장소](/oss/langchain/retrieval#vectorstores/)에 삽입하는 접근 방식을 사용합니다. 입력 쿼리가 주어지면 벡터 검색을 사용하여 관련 문서를 검색할 수 있습니다.
+Now we need to index our 66 text chunks so that we can search over them at runtime. Following the [semantic search tutorial](/oss/langchain/knowledge-base), our approach is to [embed](/oss/langchain/retrieval#embedding_models/) the contents of each document split and insert these embeddings into a [vector store](/oss/langchain/retrieval#vectorstores/). Given an input query, we can then use vector search to retrieve relevant documents.
 
-[튜토리얼 시작](/oss/langchain/rag#components) 시 선택한 벡터 저장소 및 임베딩 모델을 사용하여 단일 명령으로 모든 문서 분할을 임베딩하고 저장할 수 있습니다.
+We can embed and store all of our document splits in a single command using the vector store and embeddings model selected at the [start of the tutorial](/oss/langchain/rag#components).
 
 :::python
 ```python
@@ -463,42 +447,39 @@ print(document_ids[:3])
 await vectorStore.addDocuments(allSplits);
 ```
 :::
-**더 알아보기**
+**Go deeper**
 
-`Embeddings`: 텍스트를 임베딩으로 변환하는 데 사용되는 텍스트 임베딩 모델 래퍼.
+`Embeddings`: Wrapper around a text embedding model, used for converting text to embeddings.
 
-- [통합](/oss/integrations/text_embedding/): 선택할 수 있는 30개 이상의 통합.
-- [인터페이스](https://python.langchain.com/api_reference/core/embeddings/langchain_core.embeddings.Embeddings.html): 기본 인터페이스에 대한 API 참조.
+- [Integrations](/oss/integrations/text_embedding/): 30+ integrations to choose from.
+- @[Interface][Embeddings]: API reference for the base interface.
 
-`VectorStore`: 임베딩을 저장하고 쿼리하는 데 사용되는 벡터 데이터베이스 래퍼.
+`VectorStore`: Wrapper around a vector database, used for storing and querying embeddings.
 
-- [통합](/oss/integrations/vectorstores/): 선택할 수 있는 40개 이상의 통합.
-- [인터페이스](https://python.langchain.com/api_reference/core/vectorstores/langchain_core.vectorstores.base.VectorStore.html): 기본 인터페이스에 대한 API 참조.
+- [Integrations](/oss/integrations/vectorstores/): 40+ integrations to choose from.
+- [Interface](https://python.langchain.com/api_reference/core/vectorstores/langchain_core.vectorstores.base.VectorStore.html): API reference for the base interface.
 
-이것으로 파이프라인의 **인덱싱** 부분이 완료됩니다. 이 시점에서
-블로그 게시물의 청크 내용을 포함하는 쿼리 가능한 벡터 저장소가 있습니다. 사용자 질문이 주어지면 이상적으로 질문에 답변하는
-블로그 게시물의 스니펫을 반환할 수 있어야 합니다.
+This completes the **Indexing** portion of the pipeline. At this point we have a query-able vector store containing the chunked contents of our blog post. Given a user question, we should ideally be able to return the snippets of the blog post that answer the question.
 
-## 2. 검색 및 생성
+## 2. Retrieval and Generation
 
-RAG 애플리케이션은 일반적으로 다음과 같이 작동합니다:
+RAG applications commonly work as follows:
 
-1. **검색**: 사용자 입력이 주어지면 [Retriever](/oss/langchain/retrieval#retrievers)를 사용하여 저장소에서 관련 분할을 검색합니다.
-2. **생성**: [모델](/oss/langchain/models)은 질문과 검색된 데이터를 모두 포함하는 프롬프트를 사용하여 답변을 생성합니다.
+1. **Retrieve**: Given a user input, relevant splits are retrieved from storage using a [Retriever](/oss/langchain/retrieval#retrievers).
+2. **Generate**: A [model](/oss/langchain/models) produces an answer using a prompt that includes both the question with the retrieved data
 
 ![retrieval_diagram](/images/rag_retrieval_generation.png)
 
-이제 실제 애플리케이션 로직을 작성해 보겠습니다. 사용자 질문을 받아 해당 질문과 관련된 문서를 검색하고 검색된 문서와 초기 질문을
-모델에 전달하여 답변을 반환하는 간단한 애플리케이션을 만들려고 합니다.
+Now let's write the actual application logic. We want to create a simple application that takes a user question, searches for documents relevant to that question, passes the retrieved documents and initial question to a model, and returns an answer.
 
-다음을 시연합니다:
+We will demonstrate:
 
-1. 간단한 도구로 검색을 수행하는 RAG [에이전트](#rag-agents). 이는 범용 구현입니다.
-2. 쿼리당 단일 LLM 호출만 사용하는 2단계 RAG [체인](#rag-chains). 이는 간단한 쿼리에 대한 빠르고 효과적인 방법입니다.
+1. A RAG [agent](#rag-agents) that executes searches with a simple tool. This is a good general-purpose implementation.
+2. A two-step RAG [chain](#rag-chains) that uses just a single LLM call per query. This is a fast and effective method for simple queries.
 
-### RAG 에이전트
+### RAG agents
 
-RAG 애플리케이션의 한 가지 형태는 정보를 검색하는 도구가 있는 간단한 [에이전트](/oss/langchain/agents)입니다. 벡터 저장소를 래핑하는 [도구](/oss/langchain/tools)를 구현하여 최소한의 RAG 에이전트를 조립할 수 있습니다:
+One formulation of a RAG application is as a simple [agent](/oss/langchain/agents) with a tool that retrieves information. We can assemble a minimal RAG agent by implementing a [tool](/oss/langchain/tools) that wraps our vector store:
 
 :::python
 ```python
@@ -517,8 +498,7 @@ def retrieve_context(query: str):
 
 <Tip>
 
-여기서는 @[tool decorator][tool]를 사용하여
-각 [ToolMessage](/oss/langchain/messages#tool-message)에 원시 문서를 [artifacts](/oss/langchain/messages#param-artifact)로 첨부하도록 도구를 구성합니다. 이를 통해 모델에 전송되는 문자열화된 표현과 별도로 애플리케이션에서 문서 메타데이터에 액세스할 수 있습니다.
+Here we use the @[tool decorator][@tool] to configure the tool to attach raw documents as [artifacts](/oss/langchain/messages#param-artifact) to each [ToolMessage](/oss/langchain/messages#tool-message). This will let us access document metadata in our application, separate from the stringified representation that is sent to the model.
 
 </Tip>
 :::
@@ -548,31 +528,29 @@ const retrieve = tool(
 );
 ```
 <Tip>
-
-여기서는 `responseFormat`을 `content_and_artifact`로 지정하여
-각 [ToolMessage](/oss/langchain/messages#tool-message)에 원시 문서를 [artifacts](/oss/langchain/messages#param-artifact)로 첨부하도록 도구를 구성합니다. 이를 통해 모델에 전송되는 문자열화된 표현과 별도로 애플리케이션에서 문서 메타데이터에 액세스할 수 있습니다.
-
+    Here we specify the `responseFormat` to `content_and_artifact` to confiugre the tool to attach raw documents as [artifacts](/oss/langchain/messages#param-artifact) to each [ToolMessage](/oss/langchain/messages#tool-message). This will let us access document metadata in our application, separate from the stringified representation that is sent to the model.
 </Tip>
 :::
 
 :::python
 <Tip>
-검색 도구는 위 예제에서와 같이 단일 문자열 `query` 인수로 제한되지 않습니다. 인수를 추가하여
-LLM이 추가 검색 매개변수를 지정하도록 강제할 수 있습니다. 예를 들어 카테고리:
+    Retrieval tools are not limited to a single string `query` argument, as in the above example. You can
+    force the LLM to specify additional search parameters by adding arguments— for example, a category:
 
-```python
-from typing import Literal
+    ```python
+    from typing import Literal
 
-def retrieve_context(query: str, section: Literal["beginning", "middle", "end"]):
-```
+    def retrieve_context(query: str, section: Literal["beginning", "middle", "end"]):
+    ```
 </Tip>
 :::
 
-도구가 주어지면 에이전트를 구성할 수 있습니다:
+Given our tool, we can construct the agent:
 
 :::python
 ```python
 from langchain.agents import create_agent
+
 
 tools = [retrieve_context]
 # If desired, specify custom instructions
@@ -580,12 +558,12 @@ prompt = (
     "You have access to a tool that retrieves context from a blog post. "
     "Use the tool to help answer user queries."
 )
-agent = create_agent(llm, tools, system_prompt=prompt)
+agent = create_agent(model, tools, system_prompt=prompt)
 ```
 :::
 :::js
 
-도구가 주어지면 에이전트를 구성할 수 있습니다:
+Given our tool, we can construct the agent:
 
 ```typescript
 import { createAgent } from "langchain";
@@ -600,7 +578,7 @@ const agent = createAgent({ model: "openai:gpt-5", tools, systemPrompt });
 ```
 :::
 
-테스트해 보겠습니다. 일반적으로 반복적인 검색 단계 시퀀스를 답변하는 데 필요한 질문을 구성합니다:
+Let's test this out. We construct a question that would typically require an iterative sequence of retrieval steps to answer:
 
 :::python
 ```python
@@ -703,46 +681,44 @@ The standard method for task decomposition involves...
 -----
 ```
 :::
-에이전트가 다음을 수행합니다:
+Note that the agent:
 
-1. 작업 분해의 표준 방법을 검색하기 위한 쿼리를 생성합니다.
-2. 답변을 받은 후 그것의 일반적인 확장을 검색하기 위한 두 번째 쿼리를 생성합니다.
-3. 모든 필요한 컨텍스트를 받은 후 질문에 답변합니다.
+1. Generates a query to search for a standard method for task decomposition;
+2. Receiving the answer, generates a second query to search for common extensions of it;
+3. Having received all necessary context, answers the question.
 
-지연 시간 및 기타 메타데이터와 함께 전체 단계 시퀀스를
-[LangSmith 트레이스](https://smith.langchain.com/public/7b42d478-33d2-4631-90a4-7cb731681e88/r)에서 볼 수 있습니다.
+We can see the full sequence of steps, along with latency and other metadata, in the [LangSmith trace](https://smith.langchain.com/public/7b42d478-33d2-4631-90a4-7cb731681e88/r).
 
 <Tip>
-
-[LangGraph](/oss/langgraph/overview) 프레임워크를 직접 사용하여 더 깊은 수준의 제어 및 사용자 정의를 추가할 수 있습니다. 예를 들어 문서 관련성을 평가하고 검색 쿼리를 다시 작성하는 단계를 추가할 수 있습니다. 더 고급 형식은 LangGraph의 [Agentic RAG 튜토리얼](/oss/langgraph/agentic-rag)을 확인하세요.
-
+    You can add a deeper level of control and customization using the [LangGraph](/oss/langgraph/overview) framework directly— for example, you can add steps to grade document relevance and rewrite search queries. Check out LangGraph's [Agentic RAG tutorial](/oss/langgraph/agentic-rag) for more advanced formulations.
 </Tip>
 
 
-### RAG 체인
+### RAG chains
 
-위의 [에이전트 RAG](#rag-agents) 형식에서는 LLM이 사용자 쿼리에 답변하는 데 도움이 되는 [도구 호출](/oss/langchain/models#tool-calling)을 생성하는 데 재량을 사용하도록 허용합니다. 이는 범용 솔루션이지만 몇 가지 절충점이 있습니다:
+In the above [agentic RAG](#rag-agents) formulation we allow the LLM to use its discretion in generating a [tool call](/oss/langchain/models#tool-calling) to help answer user queries. This is a good general-purpose solution, but comes with some trade-offs:
 
-| ✅ 장점                                                                 | ⚠️ 단점                                                                 |
+| ✅ Benefits                                                                 | ⚠️ Drawbacks                                                                 |
 |-----------------------------------------------------------------------------|----------------------------------------------------------------------------|
-| **필요할 때만 검색** – LLM은 불필요한 검색을 트리거하지 않고 인사말, 후속 조치 및 간단한 쿼리를 처리할 수 있습니다. | **두 번의 추론 호출** – 검색이 수행될 때 쿼리를 생성하는 데 한 번의 호출이 필요하고 최종 응답을 생성하는 데 한 번의 호출이 필요합니다. |
-| **컨텍스트 검색 쿼리** – 검색을 `query` 입력이 있는 도구로 처리함으로써 LLM은 대화 컨텍스트를 통합하는 자체 쿼리를 작성합니다. | **제어 감소** – LLM이 실제로 필요할 때 검색을 건너뛰거나 불필요할 때 추가 검색을 실행할 수 있습니다. |
-| **여러 검색 허용** – LLM은 단일 사용자 쿼리를 지원하기 위해 여러 검색을 실행할 수 있습니다. |                                                                            |
+| **Search only when needed** – The LLM can handle greetings, follow-ups, and simple queries without triggering unnecessary searches. | **Two inference calls** – When a search is performed, it requires one call to generate the query and another to produce the final response. |
+| **Contextual search queries** – By treating search as a tool with a `query` input, the LLM crafts its own queries that incorporate conversational context. | **Reduced control** – The LLM may skip searches when they are actually needed, or issue extra searches when unnecessary. |
+| **Multiple searches allowed** – The LLM can execute several searches in support of a single user query. |                                                                            |
 
 
-또 다른 일반적인 접근 방식은 항상 검색을 실행하는(잠재적으로 원시 사용자 쿼리 사용) 2단계 체인이며 결과를 단일 LLM 쿼리의 컨텍스트로 통합합니다. 이는 쿼리당 단일 추론 호출을 생성하여 유연성을 희생하여 지연 시간을 줄입니다.
+Another common approach is a two-step chain, in which we always run a search (potentially using the raw user query) and incorporate the result as context for a single LLM query. This results in a single inference call per query, buying reduced latency at the expense of flexibility.
 
-이 접근 방식에서는 더 이상 루프에서 모델을 호출하지 않고 대신 단일 패스를 만듭니다. 에이전트에서 도구를 제거하고 대신 검색 단계를 사용자 정의 프롬프트에 통합하여 이 체인을 구현할 수 있습니다:
+In this approach we no longer call the model in a loop, but instead make a single pass.
+
+We can implement this chain by removing tools from the agent and instead incorporating the retrieval step into a custom prompt:
 
 :::python
 ```python
-from langchain.agents import AgentState
-from langchain.messages import MessageLikeRepresentation
+from langchain.agents.middleware import dynamic_prompt, ModelRequest
 
-
-def prompt_with_context(state: AgentState) -> list[MessageLikeRepresentation]:
+@dynamic_prompt
+def prompt_with_context(request: ModelRequest) -> str:
     """Inject context into state messages."""
-    last_query = state["messages"][-1].text
+    last_query = request.state["messages"][-1].text
     retrieved_docs = vector_store.similarity_search(last_query)
 
     docs_content = "\n\n".join(doc.page_content for doc in retrieved_docs)
@@ -752,10 +728,10 @@ def prompt_with_context(state: AgentState) -> list[MessageLikeRepresentation]:
         f"\n\n{docs_content}"
     )
 
-    return [{"role": "system", "content": system_message}, *list(state["messages"])]
+    return system_message
 
 
-agent = create_agent(llm, tools=[], system_prompt=prompt_with_context)
+agent = create_agent(model, tools=[], middleware=[prompt_with_context])
 ```
 :::
 :::js
@@ -789,7 +765,7 @@ const agent = createAgent({
 ```
 :::
 
-테스트해 보겠습니다:
+Let's try this out:
 :::python
 ```python
 query = "What is task decomposition?"
@@ -824,26 +800,24 @@ for await (const step of stream) {
 }
 ```
 :::
-[LangSmith 트레이스](https://smith.langchain.com/public/0322904b-bc4c-4433-a568-54c6b31bbef4/r/9ef1c23e-380e-46bf-94b3-d8bb33df440c)에서
-모델 프롬프트에 통합된 검색된 컨텍스트를 볼 수 있습니다.
+In the [LangSmith trace](https://smith.langchain.com/public/0322904b-bc4c-4433-a568-54c6b31bbef4/r/9ef1c23e-380e-46bf-94b3-d8bb33df440c) we can see the retrieved context incorporated into the model prompt.
 
-이는 일반적으로 의미 검색을 통해 사용자 쿼리를 실행하여 추가 컨텍스트를 가져오려는 제한된 설정의 간단한 쿼리에 대한 빠르고 효과적인 방법입니다.
+This is a fast and effective method for simple queries in constrained settings, when we typically do want to run user queries through semantic search to pull additional context.
 
-<Accordion title="소스 문서 반환">
+<Accordion title="Returning source documents">
 
-위의 [RAG 체인](#rag-chains)은 해당 실행을 위해 검색된 컨텍스트를 단일 시스템 메시지에 통합합니다.
+The above [RAG chain](#rag-chains) incorporates retrieved context into a single system message for that run.
 
-[에이전트 RAG](#rag-agents) 형식에서와 같이 때때로 문서 메타데이터에 액세스하기 위해 애플리케이션 상태에 원시 소스 문서를 포함하려고 합니다. 2단계 체인 경우에 다음을 통해 이를 수행할 수 있습니다:
+As in the [agentic RAG](#rag-agents) formulation, we sometimes want to include raw source documents in the application state to have access to document metadata. We can do this for the two-step chain case by:
 
-1. 검색된 문서를 저장하기 위해 상태에 키 추가
-2. [pre-model hook](/oss/langchain/agents#pre-model-hook)을 통해 새 노드를 추가하여
-해당 키를 채웁니다(컨텍스트도 삽입).
+1. Adding a key to the state to store the retrieved documents
+2. Adding a new node via a [pre-model hook](/oss/langchain/agents#pre-model-hook) to populate that key (as well as inject the context).
 
 :::python
 ```python
+from typing import Any
 from langchain_core.documents import Document
 from langchain.agents.middleware import AgentMiddleware, AgentState
-from langchain.messages import AIMessage
 
 
 class State(AgentState):
@@ -924,12 +898,12 @@ const agent = createAgent({
 </Accordion>
 
 
-## 다음 단계
+## Next steps
 
-이제 @[`create_agent`]를 통해 간단한 RAG 애플리케이션을 구현했으므로 새로운 기능을 쉽게 통합하고 더 깊이 들어갈 수 있습니다:
+Now that we've implemented a simple RAG application via @[`create_agent`], we can easily incorporate new features and go deeper:
 
-- 반응형 사용자 경험을 위해 토큰 및 기타 정보 [스트리밍](/oss/langchain/streaming)
-- 다중 턴 상호 작용을 지원하기 위해 [대화 메모리](/oss/langchain/short-term-memory) 추가
-- 대화 스레드 간 메모리를 지원하기 위해 [장기 메모리](/oss/langchain/long-term-memory) 추가
-- [구조화된 응답](/oss/langchain/structured-output) 추가
-- [LangSmith Deployments](/langsmith/deployments)로 애플리케이션 배포
+- [Stream](/oss/langchain/streaming) tokens and other information for responsive user experiences
+- Add [conversational memory](/oss/langchain/short-term-memory) to support multi-turn interactions
+- Add [long-term memory](/oss/langchain/long-term-memory) to support memory across conversational threads
+- Add [structured responses](/oss/langchain/structured-output)
+- Deploy your application with [LangSmith Deployments](/langsmith/deployments)

@@ -1,76 +1,80 @@
 ---
 title:
-sidebarTitle: All docs
+sidebarTitle: Home
 mode: "custom"
 ---
 
 
 <div class="mx-auto max-w-8xl px-0 lg:px-5" style={{ paddingBottom: "8rem" }}>
     <div class="mdx-content prose prose-gray dark:prose-invert mx-4 pt-10">
-        <h1 class="flex whitespace-pre-wrap group font-semibold text-2xl sm:text-3xl mt-8">문서</h1>
+        <h1 class="flex whitespace-pre-wrap group font-semibold text-2xl sm:text-3xl mt-8">Documentation</h1>
 
-        LangChain은 agent 엔지니어링을 위한 플랫폼입니다. Replit, Clay, Rippling, Cloudflare, Workday 등의 AI 팀들이 신뢰할 수 있는 agent를 개발하기 위해 LangChain 제품을 사용하고 있습니다.
+        LangChain is the platform for agent engineering. AI teams at Replit, Clay, Rippling, Cloudflare, Workday, and more trust LangChain's products to engineer reliable agents.
 
-        저희의 **오픈 소스 프레임워크**는 agent 구축을 돕습니다:
+        Our **open source frameworks** help you build agents:
 
-        - [**LangChain**](/oss/python/langchain/overview)은 원하는 모델 제공자를 사용하여 agent를 빠르게 구축할 수 있도록 도와줍니다.
-        - [**LangGraph**](/oss/python/langgraph/overview)는 저수준 orchestration, 메모리, human-in-the-loop 지원을 통해 커스텀 agent의 모든 단계를 제어할 수 있게 합니다. 또한 durable execution으로 장기 실행 작업을 관리할 수 있습니다.
+        - [**LangChain**](/oss/python/langchain/overview) helps you quickly get started building agents, with any model provider of your choice.
+        - [**LangGraph**](/oss/python/langgraph/overview) allows you to control every step of your custom agent with low-level orchestration, memory, and human-in-the-loop support. You can manage long-running tasks with durable execution.
 
-        [**LangSmith**](/langsmith/home)는 AI 팀이 실시간 프로덕션 데이터를 사용하여 지속적으로 테스트하고 개선할 수 있도록 돕는 플랫폼입니다. LangSmith는 다음을 제공합니다:
+        [**LangSmith**](/langsmith/home) is a platform that helps AI teams use live production data for continuous testing and improvement. LangSmith provides:
 
-        - **Observability**: 상세한 tracing과 집계된 추세 메트릭을 통해 agent가 어떻게 생각하고 행동하는지 정확히 확인할 수 있습니다.
-        - **Evaluation**: 프로덕션 데이터와 오프라인 데이터셋에서 agent 동작을 테스트하고 평가하여 지속적으로 개선할 수 있습니다.
-        - **Deployment**: 장기 실행 작업을 위해 구축된 확장 가능한 인프라를 사용하여 원클릭으로 agent를 배포할 수 있습니다.
+        - **Observability** to see exactly how your agent thinks and acts with detailed tracing and aggregate trend metrics.
+        - **Evaluation** to test and score agent behavior on production data and offline datasets for continuous improvement.
+        - **Deployment** to ship your agent in one click, using scalable infrastructure built for long-running tasks.
 
-        <h2 class="flex whitespace-pre-wrap group font-semibold">시작하기</h2>
+        <Callout icon="bullhorn" color="#DFC5FE" iconType="regular">
+        LangGraph Platform is now [LangSmith Deployment](/langsmith/deployments). For more information, check out the [Changelog](https://changelog.langchain.com/announcements/product-naming-changes-langsmith-deployment-and-langsmith-studio).
+        </Callout>
+
+        <h2 class="flex whitespace-pre-wrap group font-semibold">Get started</h2>
 
         <CardGroup cols={4}>
-            <Card title="첫 번째 agent 구축하기" icon="gear" href="/oss/python/langchain/quickstart" cta="시작하기" />
-            <Card title="LangSmith 가입하기" icon="screwdriver-wrench" href="https://smith.langchain.com/" cta="LangSmith 사용해보기" />
-            <Card title="첫 번째 trace 전송하기" icon="monitor-waveform" href="/langsmith/integrations" cta="시작하기" />
-            <Card title="고급 agent 구축하기" icon="gears" href="/oss/python/langgraph/quickstart" cta="시작하기"/>
+            <Card title="Build your first agent" icon="gear" href="/oss/python/langchain/quickstart" cta="Get started" />
+            <Card title="Sign up for LangSmith" icon="screwdriver-wrench" href="https://smith.langchain.com/" cta="Try LangSmith" />
+            <Card title="Send your first trace" icon="monitor-waveform" href="/langsmith/integrations" cta="Get started" />
+            <Card title="Build an advanced agent" icon="robot" href="/oss/python/langgraph/quickstart" cta="Get started"/>
         </CardGroup>
 
-        <h2 class="flex whitespace-pre-wrap group font-semibold">오픈 소스 agent 프레임워크</h2>
+        <h2 class="flex whitespace-pre-wrap group font-semibold">Open source agent frameworks</h2>
 
         <Tabs>
             <Tab title="Python" icon="python">
                 <CardGroup cols={2}>
                     <Card
-                        title="LangChain"
+                        title="LangChain (Python)"
                         href="/oss/python/langchain/overview"
                         icon="link"
-                        cta="자세히 보기"
+                        cta="Learn more"
                     >
-                        원하는 모델 제공자를 사용하여 agent를 빠르게 구축할 수 있습니다.
+                        Quickly get started building agents, with any model provider of your choice.
                     </Card>
                     <Card
-                        title="LangGraph"
+                        title="LangGraph (Python)"
                         href="/oss/python/langgraph/overview"
                         icon="circle-nodes"
-                        cta="자세히 보기"
+                        cta="Learn more"
                     >
-                        저수준 orchestration, 메모리, human-in-the-loop 지원을 통해 커스텀 agent의 모든 단계를 제어할 수 있습니다.
+                        Control every step of your custom agent with low-level orchestration, memory, and human-in-the-loop support.
                     </Card>
                 </CardGroup>
             </Tab>
-            <Tab title="JavaScript" icon="js">
+            <Tab title="TypeScript" icon="js">
                 <CardGroup cols={2}>
                     <Card
-                        title="LangChain"
+                        title="LangChain (TypeScript)"
                         href="/oss/javascript/langchain/overview"
                         icon="link"
-                        cta="자세히 보기"
+                        cta="Learn more"
                     >
-                        원하는 모델 제공자를 사용하여 agent를 빠르게 구축할 수 있습니다.
+                        Quickly get started building agents, with any model provider of your choice.
                     </Card>
                     <Card
-                        title="LangGraph"
+                        title="LangGraph (TypeScript)"
                         href="/oss/javascript/langgraph/overview"
                         icon="circle-nodes"
-                        cta="자세히 보기"
+                        cta="Learn more"
                     >
-                        저수준 orchestration, 메모리, human-in-the-loop 지원을 통해 커스텀 agent의 모든 단계를 제어할 수 있습니다.
+                        Control every step of your custom agent with low-level orchestration, memory, and human-in-the-loop support.
                     </Card>
                 </CardGroup>
             </Tab>
@@ -83,40 +87,40 @@ mode: "custom"
                 title="Observability"
                 href="/langsmith/observability"
                 icon="magnifying-glass"
-                cta="자세히 보기"
+                cta="Learn more"
             >
-                상세한 tracing과 집계된 추세 메트릭을 통해 agent가 어떻게 생각하고 행동하는지 정확히 확인할 수 있습니다.
+                See exactly how your agent thinks and acts with detailed tracing and aggregate trend metrics.
             </Card>
             <Card
                 title="Evaluation"
                 href="/langsmith/evaluation"
                 icon="chart-simple"
-                cta="자세히 보기"
+                cta="Learn more"
             >
-                프로덕션 데이터 또는 오프라인 데이터셋에서 agent 동작을 테스트하고 평가하여 성능을 지속적으로 개선할 수 있습니다.
+                Test and score agent behavior on production data or offline datasets to continuously improve performance.
             </Card>
             <Card
                 title="Prompt Engineering"
                 href="/langsmith/prompt-engineering"
                 icon="terminal"
-                cta="자세히 보기"
+                cta="Learn more"
             >
-                버전 관리, prompt 최적화, 협업 기능을 활용하여 prompt를 반복적으로 개선할 수 있습니다.
+                Iterate on prompts with version control, prompt optimization, and collaboration features.
             </Card>
             <Card
                 title="Deployment"
                 href="/langsmith/deployments"
                 icon="rocket-launch"
-                cta="자세히 보기"
+                cta="Learn more"
             >
-                장기 실행 작업을 위해 구축된 확장 가능한 인프라를 사용하여 원클릭으로 agent를 배포할 수 있습니다.
+                Ship your agent in one click, using scalable infrastructure built for long-running tasks.
             </Card>
         </CardGroup>
     </div>
 </div>
 
-{/* hack way to hide the callout cards*/}
+{/* Hack to hide the callout cards*/}
 <div className="relative">
-    <div className="absolute top-0 left-0 w-screen h-20 dark:bg-background-dark z-10">
+    <div className="absolute top-0 left-0 w-screen h-48 bg-background-light dark:bg-background-dark z-10">
     </div>
 </div>

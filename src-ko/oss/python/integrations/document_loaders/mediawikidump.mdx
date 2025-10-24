@@ -2,20 +2,20 @@
 title: MediaWiki Dump
 ---
 
->[MediaWiki XML Dumps](https://www.mediawiki.org/wiki/Manual:Importing_XML_dumps)는 사이트 관련 데이터 없이 위키의 콘텐츠(모든 개정판이 포함된 위키 페이지)를 포함합니다. XML 덤프는 위키 데이터베이스의 전체 백업을 생성하지 않으며, 덤프에는 사용자 계정, 이미지, 편집 로그 등이 포함되지 않습니다.
+>[MediaWiki XML Dumps](https://www.mediawiki.org/wiki/Manual:Importing_XML_dumps) contain the content of a wiki (wiki pages with all their revisions), without the site-related data. A XML dump does not create a full backup of the wiki database, the dump does not contain user accounts, images, edit logs, etc.
 
-이 문서는 MediaWiki XML 덤프 파일을 다운스트림에서 사용할 수 있는 문서 형식으로 로드하는 방법을 다룹니다.
+This covers how to load a MediaWiki XML dump file into a document format that we can use downstream.
 
-`mediawiki-utilities`의 `mwxml`을 사용하여 덤프하고 `earwig`의 `mwparserfromhell`을 사용하여 MediaWiki wikicode를 파싱합니다.
+It uses `mwxml` from `mediawiki-utilities` to dump and `mwparserfromhell` from `earwig` to parse MediaWiki wikicode.
 
-덤프 파일은 dumpBackup.php 또는 Wiki의 Special:Statistics 페이지에서 얻을 수 있습니다.
+Dump files can be obtained with dumpBackup.php or on the Special:Statistics page of the Wiki.
 
 ```python
 # mediawiki-utilities supports XML schema 0.11 in unmerged branches
-%pip install -qU git+https://github.com/mediawiki-utilities/python-mwtypes@updates_schema_0.11
+pip install -qU git+https://github.com/mediawiki-utilities/python-mwtypes@updates_schema_0.11
 # mediawiki-utilities mwxml has a bug, fix PR pending
-%pip install -qU git+https://github.com/gdedrouas/python-mwxml@xml_format_0.11
-%pip install -qU mwparserfromhell
+pip install -qU git+https://github.com/gdedrouas/python-mwxml@xml_format_0.11
+pip install -qU mwparserfromhell
 ```
 
 ```python
