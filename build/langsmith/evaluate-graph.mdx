@@ -1,21 +1,21 @@
 ---
-title: How to evaluate a graph
-sidebarTitle: Evaluate a graph
+title: 그래프를 평가하는 방법
+sidebarTitle: 그래프 평가
 ---
 
 <Info>
 [langgraph](https://langchain-ai.github.io/langgraph/)
 </Info>
 
-`langgraph` is a library for building stateful, multi-actor applications with LLMs, used to create agent and multi-agent workflows. Evaluating `langgraph` graphs can be challenging because a single invocation can involve many LLM calls, and which LLM calls are made may depend on the outputs of preceding calls. In this guide we will focus on the mechanics of how to pass graphs and graph nodes to `evaluate()` / `aevaluate()`. For evaluation techniques and best practices when building agents head to the [langgraph docs](https://langchain-ai.github.io/langgraph/tutorials/#evaluation).
+`langgraph`는 LLM을 사용하여 상태를 가진 다중 액터 애플리케이션을 구축하기 위한 라이브러리로, 에이전트 및 멀티 에이전트 워크플로우를 생성하는 데 사용됩니다. `langgraph` 그래프를 평가하는 것은 까다로울 수 있는데, 단일 호출이 여러 LLM 호출을 포함할 수 있고, 어떤 LLM 호출이 이루어질지가 이전 호출의 출력에 따라 달라질 수 있기 때문입니다. 이 가이드에서는 `evaluate()` / `aevaluate()`에 그래프와 그래프 노드를 전달하는 방법의 메커니즘에 초점을 맞출 것입니다. 에이전트를 구축할 때의 평가 기법과 모범 사례에 대해서는 [langgraph 문서](https://langchain-ai.github.io/langgraph/tutorials/#evaluation)를 참조하세요.
 
-## End-to-end evaluations
+## 엔드투엔드 평가
 
-The most common type of evaluation is an end-to-end one, where we want to evaluate the final graph output for each example input.
+가장 일반적인 평가 유형은 엔드투엔드 평가로, 각 예제 입력에 대한 최종 그래프 출력을 평가하고자 하는 것입니다.
 
-### Define a graph
+### 그래프 정의
 
-Lets construct a simple ReACT agent to start:
+간단한 ReACT 에이전트를 먼저 구성해 보겠습니다:
 
 ```python
 from typing import Annotated, Literal, TypedDict
@@ -95,9 +95,9 @@ workflow.add_edge("tools", 'agent')
 app = workflow.compile()
 ```
 
-### Create a dataset
+### 데이터셋 생성
 
-Let's create a simple dataset of questions and expected responses:
+질문과 예상 응답으로 구성된 간단한 데이터셋을 생성해 보겠습니다:
 
 ```python
 from langsmith import Client
@@ -122,11 +122,11 @@ dataset = ls_client.create_dataset(
 )
 ```
 
-### Create an evaluator
+### 평가자 생성
 
-And a simple evaluator:
+그리고 간단한 평가자를 만들어 보겠습니다:
 
-Requires `langsmith>=0.2.0`
+`langsmith>=0.2.0` 필요
 
 ```python
 judge_llm = init_chat_model("gpt-4o")
@@ -157,15 +157,15 @@ async def correct(outputs: dict, reference_outputs: dict) -> bool:
     return response.content.upper() == "CORRECT"
 ```
 
-### Run evaluations
+### 평가 실행
 
-Now we can run our evaluations and explore the results. We'll just need to wrap our graph function so that it can take inputs in the format they're stored on our example:
+이제 평가를 실행하고 결과를 탐색할 수 있습니다. 예제에 저장된 형식으로 입력을 받을 수 있도록 그래프 함수를 래핑하기만 하면 됩니다:
 
 <Note>
-If all of your graph nodes are defined as sync functions then you can use `evaluate` or `aevaluate`. If any of you nodes are defined as async, you'll need to use `aevaluate`
+그래프 노드가 모두 동기 함수로 정의되어 있다면 `evaluate` 또는 `aevaluate`를 사용할 수 있습니다. 노드 중 하나라도 비동기로 정의되어 있다면 `aevaluate`를 사용해야 합니다
 </Note>
 
-Requires `langsmith>=0.2.0`
+`langsmith>=0.2.0` 필요
 
 ```python
 from langsmith import aevaluate
@@ -186,11 +186,11 @@ experiment_results = await aevaluate(
 )
 ```
 
-## Evaluating intermediate steps
+## 중간 단계 평가
 
-Often it is valuable to evaluate not only the final output of an agent but also the intermediate steps it has taken. What's nice about `langgraph` is that the output of a graph is a state object that often already carries information about the intermediate steps taken. Usually we can evaluate whatever we're interested in just by looking at the messages in our state. For example, we can look at the messages to assert that the model invoked the 'search' tool upon as a first step.
+에이전트의 최종 출력뿐만 아니라 중간 단계도 평가하는 것이 유용한 경우가 많습니다. `langgraph`의 장점은 그래프의 출력이 이미 중간 단계에 대한 정보를 포함하고 있는 상태 객체라는 것입니다. 일반적으로 상태의 메시지를 살펴봄으로써 관심 있는 모든 것을 평가할 수 있습니다. 예를 들어, 메시지를 살펴봄으로써 모델이 첫 번째 단계로 'search' 도구를 호출했는지 확인할 수 있습니다.
 
-Requires `langsmith>=0.2.0`
+`langsmith>=0.2.0` 필요
 
 ```python
 def right_tool(outputs: dict) -> bool:
@@ -206,10 +206,10 @@ experiment_results = await aevaluate(
 )
 ```
 
-If we need access to information about intermediate steps that isn't in state, we can look at the Run object. This contains the full traces for all node inputs and outputs:
+상태에 없는 중간 단계에 대한 정보가 필요한 경우, Run 객체를 살펴볼 수 있습니다. 이 객체는 모든 노드 입력 및 출력에 대한 전체 추적을 포함하고 있습니다:
 
 <Check>
-See more about what arguments you can pass to custom evaluators in this [how-to guide](/langsmith/code-evaluator).
+커스텀 평가자에 전달할 수 있는 인수에 대한 자세한 내용은 이 [방법 가이드](/langsmith/code-evaluator)를 참조하세요.
 </Check>
 
 ```python
@@ -231,9 +231,9 @@ experiment_results = await aevaluate(
 )
 ```
 
-## Running and evaluating individual nodes
+## 개별 노드 실행 및 평가
 
-Sometimes you want to evaluate a single node directly to save time and costs. `langgraph` makes it easy to do this. In this case we can even continue using the evaluators we've been using.
+시간과 비용을 절약하기 위해 단일 노드를 직접 평가하고 싶을 때가 있습니다. `langgraph`는 이를 쉽게 수행할 수 있게 해줍니다. 이 경우 우리가 사용해 온 평가자를 계속 사용할 수도 있습니다.
 
 ```python
 node_target = example_to_state | app.nodes["agent"]
@@ -247,13 +247,13 @@ node_experiment_results = await aevaluate(
 )
 ```
 
-## Related
+## 관련 문서
 
-* [`langgraph` evaluation docs](https://langchain-ai.github.io/langgraph/tutorials/#evaluation)
+* [`langgraph` 평가 문서](https://langchain-ai.github.io/langgraph/tutorials/#evaluation)
 
-## Reference code
+## 참조 코드
 
-<Accordion title="Click to see a consolidated code snippet">
+<Accordion title="통합된 코드 스니펫을 보려면 클릭하세요">
 
 ```python
 from typing import Annotated, Literal, TypedDict

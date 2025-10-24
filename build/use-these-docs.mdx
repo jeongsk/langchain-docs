@@ -1,67 +1,67 @@
 ---
-title: Use docs programmatically
-description: Connect LangChain documentation to your AI tools and workflows
+title: 프로그래밍 방식으로 문서 사용하기
+description: LangChain 문서를 AI 도구와 워크플로우에 연결하세요
 ---
 
-We want to make our documentation as accessible as possible. We've included several ways for you to use these docs programmatically through AI assistants, code editors, and direct integrations, such as Model Context Protocol (MCP).
+LangChain 문서를 최대한 접근 가능하도록 만들고자 합니다. AI 어시스턴트, 코드 에디터, 그리고 Model Context Protocol(MCP)과 같은 직접 통합을 통해 프로그래밍 방식으로 문서를 활용할 수 있는 여러 가지 방법을 제공하고 있습니다.
 
-## Quick access options
+## 빠른 액세스 옵션
 
-On any page in our documentation, you'll find a contextual menu dropdown in the top right corner:
+문서의 모든 페이지 오른쪽 상단에서 컨텍스트 메뉴 드롭다운을 확인하실 수 있습니다:
 
 <img
     className="block dark:hidden"
     src="/images/copy-page-light.png"
-    alt="Copy page light mode"
+    alt="라이트 모드 페이지 복사"
 />
 
 <img
     className="hidden dark:block"
     src="/images/copy-page-dark.png"
-    alt="Copy page dark mode"
+    alt="다크 모드 페이지 복사"
 />
 
-This includes our `llms.txt`, MCP server connection, and other quick access options such as ChatGPT and Claude.
+이 메뉴에는 `llms.txt`, MCP 서버 연결, ChatGPT 및 Claude와 같은 다양한 빠른 액세스 옵션이 포함되어 있습니다.
 
-## Use our MCP server
+## MCP 서버 사용하기
 
-Our documentation includes a built-in **Model Context Protocol (MCP) server** that lets AI applications query the latest docs in real-time.
+LangChain 문서에는 AI 애플리케이션이 최신 문서를 실시간으로 조회할 수 있도록 해주는 **Model Context Protocol(MCP) 서버**가 내장되어 있습니다.
 
-The LangChain docs MCP server is available at:
+LangChain 문서 MCP 서버는 다음 주소에서 이용 가능합니다:
 
 ```txt
 https://docs.langchain.com/mcp
 ```
 
-Once connected, you can ask your AI assistant questions about LangChain, LangGraph, and LangSmith, and it will search our documentation to provide accurate, current answers.
+연결이 완료되면 AI 어시스턴트에게 LangChain, LangGraph, LangSmith에 관한 질문을 할 수 있으며, 어시스턴트는 문서를 검색하여 정확하고 최신의 답변을 제공할 것입니다.
 
-### Connect with Claude Code
+### Claude Code와 연결하기
 
-If you're using Claude Code, run this command in your terminal to add the server to your current project:
+Claude Code를 사용하고 계신다면, 터미널에서 다음 명령어를 실행하여 현재 프로젝트에 서버를 추가하세요:
 
 ```bash
 claude mcp add --transport http docs-langchain https://docs.langchain.com/mcp
 ```
 
 <Note>
-    **Project (local) scoped**
+    **프로젝트(로컬) 범위 적용**
 
-    The command above adds the MCP server only to your current project/working directory. To add the MCP server globally and access it in all projects, add the user scope by adding `--scope user` to the command:
+    위 명령어는 현재 프로젝트/작업 디렉토리에만 MCP 서버를 추가합니다. MCP 서버를 전역적으로 추가하여 모든 프로젝트에서 액세스하려면 명령어에 `--scope user`를 추가하여 사용자 범위를 설정하세요:
 
     ```bash
     claude mcp add --transport http docs-langchain --scope user https://docs.langchain.com/mcp
     ```
 </Note>
 
-### Connect with Claude Desktop
+### Claude Desktop과 연결하기
 
-1. Open Claude Desktop
-2. Go to Settings > Connectors
-3. Add our MCP server URL: `https://docs.langchain.com/mcp`
+1. Claude Desktop을 여세요
+2. 설정 > 커넥터로 이동하세요
+3. MCP 서버 URL을 추가하세요: `https://docs.langchain.com/mcp`
 
-### Connect with Cursor or VS Code
+### Cursor 또는 VS Code와 연결하기
 
-Add the following to your MCP settings configuration file:
+MCP 설정 구성 파일에 다음 내용을 추가하세요:
 
 ```json
 {
@@ -73,11 +73,11 @@ Add the following to your MCP settings configuration file:
 }
 ```
 
-## Learn more
+## 더 알아보기
 
-For more information about using Mintlify's MCP servers, see the [official Mintlify documentation](https://www.mintlify.com/docs/ai/model-context-protocol).
+Mintlify의 MCP 서버 사용에 관한 자세한 정보는 [공식 Mintlify 문서](https://www.mintlify.com/docs/ai/model-context-protocol)를 참조하세요.
 
-Have questions or feedback? Let us know in our [community forum](https://forum.langchain.com/).
+질문이나 피드백이 있으신가요? [커뮤니티 포럼](https://forum.langchain.com/)에서 알려주세요.
 
 ---
 
