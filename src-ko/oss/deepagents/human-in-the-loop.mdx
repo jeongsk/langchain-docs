@@ -1,17 +1,17 @@
 ---
 title: Human-in-the-loop
-description: Learn how to configure human approval for sensitive tool operations
+description: 민감한 도구 작업에 대한 사람의 승인을 구성하는 방법을 알아봅니다
 ---
 
-Some tool operations may be sensitive and require human approval before execution. Deep agents support human-in-the-loop workflows through LangGraph's interrupt capabilities. You can configure which tools require approval using the `interrupt_on` parameter.
+일부 도구 작업은 민감하여 실행 전에 사람의 승인이 필요할 수 있습니다. Deep agents는 LangGraph의 인터럽트 기능을 통해 human-in-the-loop 워크플로를 지원합니다. `interrupt_on` 매개변수를 사용하여 승인이 필요한 도구를 구성할 수 있습니다.
 
-## Basic configuration
+## 기본 구성
 
-The `interrupt_on` parameter accepts a dictionary mapping tool names to interrupt configurations. Each tool can be configured with:
+`interrupt_on` 매개변수는 도구 이름과 인터럽트 구성을 매핑하는 딕셔너리를 받습니다. 각 도구는 다음과 같이 구성할 수 있습니다:
 
-- **`True`**: Enable interrupts with default behavior (approve, edit, reject allowed)
-- **`False`**: Disable interrupts for this tool
-- **`{"allowed_decisions": [...]}`**: Custom configuration with specific allowed decisions
+- **`True`**: 기본 동작으로 인터럽트를 활성화합니다 (승인, 편집, 거부 허용)
+- **`False`**: 이 도구에 대한 인터럽트를 비활성화합니다
+- **`{"allowed_decisions": [...]}`**: 특정 허용 결정이 있는 사용자 정의 구성
 
 :::python
 ```python
@@ -34,18 +34,18 @@ def send_email(to: str, subject: str, body: str) -> str:
     """Send an email."""
     return f"Sent email to {to}"
 
-# Checkpointer is REQUIRED for human-in-the-loop
+# Checkpointer는 human-in-the-loop에 필수입니다
 checkpointer = MemorySaver()
 
 agent = create_deep_agent(
     model="anthropic:claude-sonnet-4-20250514",
     tools=[delete_file, read_file, send_email],
     interrupt_on={
-        "delete_file": True,  # Default: approve, edit, reject
-        "read_file": False,   # No interrupts needed
-        "send_email": {"allowed_decisions": ["approve", "reject"]},  # No editing
+        "delete_file": True,  # 기본값: 승인, 편집, 거부
+        "read_file": False,   # 인터럽트 불필요
+        "send_email": {"allowed_decisions": ["approve", "reject"]},  # 편집 불가
     },
-    checkpointer=checkpointer  # Required!
+    checkpointer=checkpointer  # 필수입니다!
 )
 ```
 :::
@@ -56,26 +56,26 @@ agent = create_deep_agent(
 ```
 :::
 
-## Decision types
+## 결정 유형
 
-The `allowed_decisions` list controls what actions a human can take when reviewing a tool call:
+`allowed_decisions` 목록은 도구 호출을 검토할 때 사람이 취할 수 있는 작업을 제어합니다:
 
-- **`"approve"`**: Execute the tool with the original arguments as proposed by the agent
-- **`"edit"`**: Modify the tool arguments before execution
-- **`"reject"`**: Skip executing this tool call entirely
+- **`"approve"`**: 에이전트가 제안한 원래 인수로 도구를 실행합니다
+- **`"edit"`**: 실행 전에 도구 인수를 수정합니다
+- **`"reject"`**: 이 도구 호출 실행을 완전히 건너뜁니다
 
-You can customize which decisions are available for each tool:
+각 도구에 대해 사용 가능한 결정을 사용자 정의할 수 있습니다:
 
 :::python
 ```python
 interrupt_on = {
-    # Sensitive operations: allow all options
+    # 민감한 작업: 모든 옵션 허용
     "delete_file": {"allowed_decisions": ["approve", "edit", "reject"]},
 
-    # Moderate risk: approval or rejection only
+    # 중간 위험: 승인 또는 거부만 가능
     "write_file": {"allowed_decisions": ["approve", "reject"]},
 
-    # Must approve (no rejection allowed)
+    # 반드시 승인해야 함 (거부 불가)
     "critical_operation": {"allowed_decisions": ["approve"]},
 }
 ```
@@ -87,52 +87,52 @@ interrupt_on = {
 ```
 :::
 
-## Handle interrupts
+## 인터럽트 처리
 
-When an interrupt is triggered, the agent pauses execution and returns control. Check for interrupts in the result and handle them accordingly.
+인터럽트가 트리거되면 에이전트는 실행을 일시 중지하고 제어권을 반환합니다. 결과에서 인터럽트를 확인하고 적절하게 처리하세요.
 
 :::python
 ```python
 import uuid
 from langgraph.types import Command
 
-# Create config with thread_id for state persistence
+# 상태 지속성을 위한 thread_id가 포함된 config 생성
 config = {"configurable": {"thread_id": str(uuid.uuid4())}}
 
-# Invoke the agent
+# 에이전트 호출
 result = agent.invoke({
     "messages": [{"role": "user", "content": "Delete the file temp.txt"}]
 }, config=config)
 
-# Check if execution was interrupted
+# 실행이 중단되었는지 확인
 if result.get("__interrupt__"):
-    # Extract interrupt information
+    # 인터럽트 정보 추출
     interrupts = result["__interrupt__"][0].value
     action_requests = interrupts["action_requests"]
     review_configs = interrupts["review_configs"]
 
-    # Create a lookup map from tool name to review config
+    # 도구 이름에서 검토 구성으로의 조회 맵 생성
     config_map = {cfg["action_name"]: cfg for cfg in review_configs}
 
-    # Display the pending actions to the user
+    # 사용자에게 보류 중인 작업 표시
     for action in action_requests:
         review_config = config_map[action["name"]]
         print(f"Tool: {action['name']}")
         print(f"Arguments: {action['args']}")
         print(f"Allowed decisions: {review_config['allowed_decisions']}")
 
-    # Get user decisions (one per action_request, in order)
+    # 사용자 결정 가져오기 (action_request당 하나씩, 순서대로)
     decisions = [
-        {"type": "approve"}  # User approved the deletion
+        {"type": "approve"}  # 사용자가 삭제를 승인함
     ]
 
-    # Resume execution with decisions
+    # 결정과 함께 실행 재개
     result = agent.invoke(
         Command(resume={"decisions": decisions}),
-        config=config  # Must use the same config!
+        config=config  # 동일한 config를 사용해야 합니다!
     )
 
-# Process final result
+# 최종 결과 처리
 print(result["messages"][-1]["content"])
 ```
 :::
@@ -143,9 +143,9 @@ print(result["messages"][-1]["content"])
 ```
 :::
 
-## Multiple tool calls
+## 여러 도구 호출
 
-When the agent calls multiple tools that require approval, all interrupts are batched together in a single interrupt. You must provide decisions for each one in order.
+에이전트가 승인이 필요한 여러 도구를 호출하면 모든 인터럽트가 단일 인터럽트로 일괄 처리됩니다. 각각에 대해 순서대로 결정을 제공해야 합니다.
 
 :::python
 ```python
@@ -162,13 +162,13 @@ if result.get("__interrupt__"):
     interrupts = result["__interrupt__"][0].value
     action_requests = interrupts["action_requests"]
 
-    # Two tools need approval
+    # 두 개의 도구가 승인을 필요로 함
     assert len(action_requests) == 2
 
-    # Provide decisions in the same order as action_requests
+    # action_requests와 동일한 순서로 결정 제공
     decisions = [
-        {"type": "approve"},  # First tool: delete_file
-        {"type": "reject"}    # Second tool: send_email
+        {"type": "approve"},  # 첫 번째 도구: delete_file
+        {"type": "reject"}    # 두 번째 도구: send_email
     ]
 
     result = agent.invoke(
@@ -184,9 +184,9 @@ if result.get("__interrupt__"):
 ```
 :::
 
-## Edit tool arguments
+## 도구 인수 편집
 
-When `"edit"` is in the allowed decisions, you can modify the tool arguments before execution:
+허용된 결정에 `"edit"`이 포함되어 있으면 실행 전에 도구 인수를 수정할 수 있습니다:
 
 :::python
 ```python
@@ -194,14 +194,14 @@ if result.get("__interrupt__"):
     interrupts = result["__interrupt__"][0].value
     action_request = interrupts["action_requests"][0]
 
-    # Original args from the agent
+    # 에이전트의 원래 인수
     print(action_request["args"])  # {"to": "everyone@company.com", ...}
 
-    # User decides to edit the recipient
+    # 사용자가 수신자를 편집하기로 결정
     decisions = [{
         "type": "edit",
         "edited_action": {
-            "name": action_request["name"],  # Must include the tool name
+            "name": action_request["name"],  # 도구 이름을 포함해야 합니다
             "args": {"to": "team@company.com", "subject": "...", "body": "..."}
         }
     }]
@@ -219,9 +219,9 @@ if result.get("__interrupt__"):
 ```
 :::
 
-## Subagent interrupts
+## 서브에이전트 인터럽트
 
-Each subagent can have its own `interrupt_on` configuration that overrides the main agent's settings:
+각 서브에이전트는 메인 에이전트의 설정을 재정의하는 자체 `interrupt_on` 구성을 가질 수 있습니다:
 
 :::python
 ```python
@@ -237,9 +237,9 @@ agent = create_deep_agent(
         "system_prompt": "You are a file management assistant.",
         "tools": [delete_file, read_file],
         "interrupt_on": {
-            # Override: require approval for reads in this subagent
+            # 재정의: 이 서브에이전트에서 읽기에 대한 승인 필요
             "delete_file": True,
-            "read_file": True,  # Different from main agent!
+            "read_file": True,  # 메인 에이전트와 다릅니다!
         }
     }],
     checkpointer=checkpointer
@@ -253,13 +253,13 @@ agent = create_deep_agent(
 ```
 :::
 
-When a subagent triggers an interrupt, the handling is the same – check for `__interrupt__` and resume with `Command`.
+서브에이전트가 인터럽트를 트리거하면 처리 방법은 동일합니다. `__interrupt__`를 확인하고 `Command`로 재개하세요.
 
-## Best practices
+## 모범 사례
 
-### Always use a checkpointer
+### 항상 checkpointer 사용
 
-Human-in-the-loop requires a checkpointer to persist agent state between the interrupt and resume:
+Human-in-the-loop은 인터럽트와 재개 사이에 에이전트 상태를 유지하기 위해 checkpointer가 필요합니다:
 
 :::python
 ```python
@@ -269,29 +269,29 @@ checkpointer = MemorySaver()
 agent = create_deep_agent(
     tools=[...],
     interrupt_on={...},
-    checkpointer=checkpointer  # Required for HITL
+    checkpointer=checkpointer  # HITL에 필수입니다
 )
 ```
 :::
 
-### Use the same thread ID
+### 동일한 thread ID 사용
 
-When resuming, you must use the same config with the same `thread_id`:
+재개할 때 동일한 `thread_id`를 가진 동일한 config를 사용해야 합니다:
 
 :::python
 ```python
-# First call
+# 첫 번째 호출
 config = {"configurable": {"thread_id": "my-thread"}}
 result = agent.invoke(input, config=config)
 
-# Resume (use same config)
+# 재개 (동일한 config 사용)
 result = agent.invoke(Command(resume={...}), config=config)
 ```
 :::
 
-### Match decision order to actions
+### 결정 순서를 작업과 일치
 
-The decisions list must match the order of `action_requests`:
+decisions 목록은 `action_requests`의 순서와 일치해야 합니다:
 
 :::python
 ```python
@@ -299,10 +299,10 @@ if result.get("__interrupt__"):
     interrupts = result["__interrupt__"][0].value
     action_requests = interrupts["action_requests"]
 
-    # Create one decision per action, in order
+    # 각 작업에 대해 하나의 결정을 순서대로 생성
     decisions = []
     for action in action_requests:
-        decision = get_user_decision(action)  # Your logic
+        decision = get_user_decision(action)  # 사용자의 로직
         decisions.append(decision)
 
     result = agent.invoke(
@@ -312,21 +312,21 @@ if result.get("__interrupt__"):
 ```
 :::
 
-### Tailor configurations by risk
+### 위험도에 따라 구성 조정
 
-Configure different tools based on their risk level:
+도구의 위험 수준에 따라 서로 다른 도구를 구성하세요:
 
 :::python
 ```python
 interrupt_on = {
-    # High risk: full control (approve, edit, reject)
+    # 높은 위험: 전체 제어 (승인, 편집, 거부)
     "delete_file": {"allowed_decisions": ["approve", "edit", "reject"]},
     "send_email": {"allowed_decisions": ["approve", "edit", "reject"]},
 
-    # Medium risk: no editing allowed
+    # 중간 위험: 편집 불가
     "write_file": {"allowed_decisions": ["approve", "reject"]},
 
-    # Low risk: no interrupts
+    # 낮은 위험: 인터럽트 없음
     "read_file": False,
     "list_files": False,
 }

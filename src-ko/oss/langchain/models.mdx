@@ -1,39 +1,39 @@
 ---
-title: Models
+title: 모델
 ---
 
 import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
 import ChatModelTabsJS from '/snippets/chat-model-tabs-js.mdx';
 
-[LLMs](https://en.wikipedia.org/wiki/Large_language_model) are powerful AI tools that can interpret and generate text like humans. They're versatile enough to write content, translate languages, summarize, and answer questions without needing specialized training for each task.
+[LLM](https://en.wikipedia.org/wiki/Large_language_model)은 인간처럼 텍스트를 해석하고 생성할 수 있는 강력한 AI 도구입니다. 콘텐츠 작성, 언어 번역, 요약, 질문 답변 등 각 작업에 대한 전문적인 훈련 없이도 다양한 작업을 수행할 수 있습니다.
 
-In addition to text generation, many models support:
+텍스트 생성 외에도 많은 모델이 다음 기능을 지원합니다:
 
-* <Icon icon="hammer" size={16} /> [Tool calling](#tool-calling) - calling external tools (like databases queries or API calls) and use results in their responses.
-* <Icon icon="shapes" size={16} /> [Structured output](#structured-outputs) - where the model's response is constrained to follow a defined format.
-* <Icon icon="image" size={16} /> [Multimodality](#multimodal) - process and return data other than text, such as images, audio, and video.
-* <Icon icon="brain" size={16} /> [Reasoning](#reasoning) - models perform multi-step reasoning to arrive at a conclusion.
+* <Icon icon="hammer" size={16} /> [도구 호출](#tool-calling) - 외부 도구(데이터베이스 쿼리 또는 API 호출 등)를 호출하고 그 결과를 응답에 사용합니다.
+* <Icon icon="shapes" size={16} /> [구조화된 출력](#structured-outputs) - 모델의 응답이 정의된 형식을 따르도록 제한됩니다.
+* <Icon icon="image" size={16} /> [멀티모달](#multimodal) - 이미지, 오디오, 비디오 등 텍스트 이외의 데이터를 처리하고 반환합니다.
+* <Icon icon="brain" size={16} /> [추론](#reasoning) - 모델이 결론에 도달하기 위해 다단계 추론을 수행합니다.
 
-Models are the reasoning engine of [agents](/oss/langchain/agents). They drive the agent's decision-making process, determining which tools to call, how to interpret results, and when to provide a final answer.
+모델은 [에이전트](/oss/langchain/agents)의 추론 엔진입니다. 어떤 도구를 호출할지, 결과를 어떻게 해석할지, 언제 최종 답변을 제공할지 결정하는 에이전트의 의사결정 프로세스를 주도합니다.
 
-The quality and capabilities of the model you choose directly impact your agent's reliability and performance. Different models excel at different tasks - some are better at following complex instructions, others at structured reasoning, and some support larger context windows for handling more information.
+선택하는 모델의 품질과 기능은 에이전트의 신뢰성과 성능에 직접적인 영향을 미칩니다. 모델마다 뛰어난 작업이 다릅니다. 복잡한 지시사항을 따르는 데 뛰어난 모델도 있고, 구조화된 추론에 능한 모델도 있으며, 더 많은 정보를 처리하기 위해 더 큰 컨텍스트 윈도우를 지원하는 모델도 있습니다.
 
-LangChain's standard model interfaces give you access to many different provider integrations, which makes it easy to experiment with and switch between models to find the best fit for your case.
+LangChain의 표준 모델 인터페이스는 다양한 제공업체 통합에 대한 액세스를 제공하므로 모델을 쉽게 실험하고 전환하여 사용 사례에 가장 적합한 모델을 찾을 수 있습니다.
 
 <Info>
-    For provider-specific integration information and capabilities, see the provider's [integration page](/oss/integrations/providers/overview).
+    제공업체별 통합 정보 및 기능에 대해서는 해당 제공업체의 [통합 페이지](/oss/integrations/providers/overview)를 참조하세요.
 </Info>
 
-## Basic usage
+## 기본 사용법
 
-Models can be utilized in two ways:
+모델은 두 가지 방식으로 활용할 수 있습니다:
 
-1. **With agents** - Models can be dynamically specified when creating an [agent](/oss/langchain/agents#model).
-2. **Standalone** - Models can be called directly (outside of the agent loop) for tasks like text generation, classification, or extraction without the need for an agent framework.
+1. **에이전트와 함께** - [에이전트](/oss/langchain/agents#model)를 생성할 때 모델을 동적으로 지정할 수 있습니다.
+2. **독립 실행형** - 에이전트 프레임워크 없이 텍스트 생성, 분류 또는 추출과 같은 작업을 위해 모델을 직접(에이전트 루프 외부에서) 호출할 수 있습니다.
 
-The same model interface works in both contexts, which gives you the flexibility to start simple and scale up to more complex agent-based workflows as needed.
+두 컨텍스트 모두에서 동일한 모델 인터페이스가 작동하므로 간단하게 시작하여 필요에 따라 더 복잡한 에이전트 기반 워크플로우로 확장할 수 있는 유연성을 제공합니다.
 
-### Initialize a model
+### 모델 초기화
 
 :::python
 The easiest way to get started with a standalone model in LangChain is to use @[`init_chat_model`] to initialize one from a [provider](/oss/integrations/providers/overview) of your choice (examples below):

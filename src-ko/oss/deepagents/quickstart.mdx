@@ -1,15 +1,15 @@
 ---
-title: Quickstart
-description: Build your first deep agent in minutes
+title: 빠른 시작
+description: 몇 분 만에 첫 번째 Deep Agent 구축하기
 ---
 
-This guide walks you through creating your first deep agent with planning, file system tools, and subagent capabilities. You'll build a research agent that can conduct research and write reports.
+이 가이드는 계획 수립, 파일 시스템 도구, 하위 에이전트 기능을 갖춘 첫 번째 Deep Agent를 생성하는 과정을 안내합니다. 리서치를 수행하고 보고서를 작성할 수 있는 연구 에이전트를 구축하게 됩니다.
 
-## Prerequisites
+## 사전 요구 사항
 
-Before you begin, make sure you have an API key from a model provider (e.g., Anthropic, OpenAI).
+시작하기 전에, 모델 제공자(예: Anthropic, OpenAI)로부터 API 키를 보유하고 있는지 확인하세요.
 
-### Step 1: Install dependencies
+### 1단계: 의존성 설치
 
 <CodeGroup>
     ```bash pip
@@ -25,14 +25,14 @@ Before you begin, make sure you have an API key from a model provider (e.g., Ant
     ```
 </CodeGroup>
 
-### Step 2: Set up your API keys
+### 2단계: API 키 설정
 
 ```bash
 export ANTHROPIC_API_KEY="your-api-key"
 export TAVILY_API_KEY="your-tavily-api-key"
 ```
 
-### Step 3: Create a search tool
+### 3단계: 검색 도구 생성
 
 :::python
 ```python
@@ -65,17 +65,17 @@ def internet_search(
 ```
 :::
 
-### Step 4: Create a deep agent
+### 4단계: Deep Agent 생성
 
 ```python
-# System prompt to steer the agent to be an expert researcher
-research_instructions = """You are an expert researcher. Your job is to conduct thorough research and then write a polished report.
+# 에이전트를 전문 연구원으로 안내하는 시스템 프롬프트
+research_instructions = """당신은 전문 연구원입니다. 당신의 임무는 철저한 리서치를 수행한 후 세련된 보고서를 작성하는 것입니다.
 
-You have access to an internet search tool as your primary means of gathering information.
+정보 수집의 주요 수단으로 인터넷 검색 도구에 접근할 수 있습니다.
 
 ## `internet_search`
 
-Use this to run an internet search for a given query. You can specify the max number of results to return, the topic, and whether raw content should be included.
+주어진 쿼리에 대해 인터넷 검색을 실행하는 데 사용합니다. 반환할 최대 결과 수, 주제, 원시 콘텐츠 포함 여부를 지정할 수 있습니다.
 """
 
 agent = create_deep_agent(
@@ -84,30 +84,30 @@ agent = create_deep_agent(
 )
 ```
 
-### Step 5: Run the agent
+### 5단계: 에이전트 실행
 
 ```python
 result = agent.invoke({"messages": [{"role": "user", "content": "What is langgraph?"}]})
 
-# Print the agent's response
+# 에이전트의 응답 출력
 print(result["messages"][-1].content)
 ```
 
-## What happened?
+## 무슨 일이 일어났나요?
 
-Your deep agent automatically:
+Deep Agent는 자동으로 다음 작업을 수행했습니다:
 
-1. **Planned its approach**: Used the built-in `write_todos` tool to break down the research task
-2. **Conducted research**: Called the `internet_search` tool to gather information
-3. **Managed context**: Used file system tools (`write_file`, `read_file`) to offload large search results
-4. **Spawned subagents** (if needed): Delegated complex subtasks to specialized subagents
-5. **Synthesized a report**: Compiled findings into a coherent response
+1. **접근 방식 계획**: 내장된 `write_todos` 도구를 사용하여 리서치 작업을 세분화했습니다
+2. **리서치 수행**: `internet_search` 도구를 호출하여 정보를 수집했습니다
+3. **컨텍스트 관리**: 파일 시스템 도구(`write_file`, `read_file`)를 사용하여 대용량 검색 결과를 오프로드했습니다
+4. **하위 에이전트 생성**(필요한 경우): 복잡한 하위 작업을 특화된 하위 에이전트에 위임했습니다
+5. **보고서 종합**: 조사 결과를 일관성 있는 응답으로 정리했습니다
 
-## Next steps
+## 다음 단계
 
-Now that you've built your first deep agent:
+첫 번째 Deep Agent를 구축했으니 이제:
 
-- **Customize your agent**: Learn about [customization options](/oss/deepagents/customization), including custom system prompts, tools, and subagents.
-- **Understand middleware**: Dive into the [middleware architecture](/oss/deepagents/middleware) that powers deep agents.
-- **Add long-term memory**: Enable [persistent memory](/oss/deepagents/long-term-memory) across conversations.
-- **Deploy to production**: Learn about [deployment options](/oss/langgraph/deploy) for LangGraph applications.
+- **에이전트 커스터마이징**: 사용자 정의 시스템 프롬프트, 도구, 하위 에이전트를 포함한 [커스터마이징 옵션](/oss/deepagents/customization)에 대해 알아보세요.
+- **미들웨어 이해**: Deep Agent를 구동하는 [미들웨어 아키텍처](/oss/deepagents/middleware)를 자세히 살펴보세요.
+- **장기 메모리 추가**: 대화 간 [영구 메모리](/oss/deepagents/long-term-memory)를 활성화하세요.
+- **프로덕션 배포**: LangGraph 애플리케이션을 위한 [배포 옵션](/oss/langgraph/deploy)에 대해 알아보세요.

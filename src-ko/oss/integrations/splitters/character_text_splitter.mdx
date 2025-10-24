@@ -1,22 +1,22 @@
 ---
-title: Splitting by character
+title: 문자 기반 분할
 ---
 
-Character-based splitting is the simplest approach to text splitting. It divides text using a specified character sequence (default: `"\n\n"`), with chunk length measured by the number of characters.
+문자 기반 분할은 텍스트 분할의 가장 간단한 방식입니다. 지정된 문자 시퀀스(기본값: `"\n\n"`)를 사용하여 텍스트를 나누며, 청크 길이는 문자 개수로 측정됩니다.
 
-**Key points**:
-1. **How text is split**: by a given character separator.
-2. **How chunk size is measured**: by character count.
+**주요 사항**:
+1. **텍스트 분할 방식**: 지정된 문자 구분자를 기준으로 분할합니다.
+2. **청크 크기 측정 방식**: 문자 개수로 측정합니다.
 
 :::python
-You can choose between:
-- `.split_text` — returns plain string chunks.
-- `.create_documents` — returns LangChain @[Document] objects, useful when metadata needs to be preserved for downstream tasks.
+다음 중에서 선택할 수 있습니다:
+- `.split_text` — 일반 문자열 청크를 반환합니다.
+- `.create_documents` — LangChain @[Document] 객체를 반환하며, 하위 작업에서 메타데이터를 보존해야 할 때 유용합니다.
 :::
 :::js
-You can choose between:
-- `.splitText` — returns plain string chunks.
-- `.createDocuments` — returns LangChain @[Document] objects, useful when metadata needs to be preserved for downstream tasks.
+다음 중에서 선택할 수 있습니다:
+- `.splitText` — 일반 문자열 청크를 반환합니다.
+- `.createDocuments` — LangChain @[Document] 객체를 반환하며, 하위 작업에서 메타데이터를 보존해야 할 때 유용합니다.
 :::
 
 :::python
@@ -48,7 +48,7 @@ bun add @langchain/textsplitters
 ```python
 from langchain_text_splitters import CharacterTextSplitter
 
-# Load an example document
+# 예제 문서 로드
 with open("state_of_the_union.txt") as f:
     state_of_the_union = f.read()
 
@@ -71,7 +71,7 @@ page_content='Madam Speaker, Madam Vice President, our First Lady and Second Gen
 import { CharacterTextSplitter } from "@langchain/textsplitters";
 import { readFileSync } from "fs";
 
-// Example: read a long document
+// 예제: 긴 문서 읽기
 const stateOfTheUnion = readFileSync("state_of_the_union.txt", "utf8");
 
 const splitter = new CharacterTextSplitter({
@@ -90,7 +90,7 @@ Document {
 :::
 
 :::python
-Use `.create_documents` to propagate metadata associated with each document to the output chunks:
+각 문서와 연결된 메타데이터를 출력 청크에 전파하려면 `.create_documents`를 사용하세요:
 
 ```python
 metadatas = [{"document": 1}, {"document": 2}]
@@ -104,7 +104,7 @@ page_content='Madam Speaker, Madam Vice President, our First Lady and Second Gen
 ```
 :::
 :::js
-Use `.createDocuments` to propagate metadata associated with each document to the output chunks:
+각 문서와 연결된 메타데이터를 출력 청크에 전파하려면 `.createDocuments`를 사용하세요:
 
 ```ts
 const metadatas = [{"document": 1}, {"document": 2}]
@@ -123,7 +123,7 @@ Document {
 :::
 
 :::python
-Use `.split_text` to obtain the string content directly:
+문자열 콘텐츠를 직접 얻으려면 `.split_text`를 사용하세요:
 
 ```python
 text_splitter.split_text(state_of_the_union)[0]
@@ -134,7 +134,7 @@ text_splitter.split_text(state_of_the_union)[0]
 
 :::
 :::js
-Use `.splitText` to obtain the string content directly:
+문자열 콘텐츠를 직접 얻으려면 `.splitText`를 사용하세요:
 
 ```ts
 splitter.splitText(stateOfTheUnion)[0]
