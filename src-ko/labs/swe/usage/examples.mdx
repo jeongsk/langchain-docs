@@ -1,39 +1,39 @@
 ---
-title: Examples
-description: A collection of example tasks for Open SWE
+title: 예제
+description: Open SWE를 위한 예제 작업 모음
 ---
 
-If you want to try out Open SWE, but aren't sure where to start, here are a few example tasks you can try out.
+Open SWE를 사용해 보고 싶지만 어디서 시작해야 할지 모르겠다면, 다음 예제 작업들을 시도해 보세요.
 
 <Steps>
-  <Step title="Clone the TypeScript template">
-    The examples below are all for TypeScript tasks. For these, you should clone an empty TypeScript template repository:
+  <Step title="TypeScript 템플릿 클론하기">
+    아래의 모든 예제는 TypeScript 작업을 위한 것입니다. 이를 위해 빈 TypeScript 템플릿 저장소를 클론해야 합니다:
 
     [bracesproul/typescript-template](https://github.com/bracesproul/typescript-template)
 
-    Visit the GitHub UI, and click `Use this template` to create a new repository based on this template.
+    GitHub UI를 방문하여 `Use this template`을 클릭해 이 템플릿을 기반으로 새 저장소를 생성하세요.
 
   </Step>
 
-  <Step title="Give Open SWE access to your repository">
-    If you did not give Open SWE to all of your repositories when setting it up the first time, you'll need to give Open SWE access to this repository.
+  <Step title="Open SWE에 저장소 접근 권한 부여하기">
+    처음 설정할 때 Open SWE에 모든 저장소에 대한 권한을 부여하지 않았다면, 이 저장소에 대한 접근 권한을 부여해야 합니다.
 
-    1. Visit the settings page on Open SWE: [swe.langchain.com/settings](https://swe.langchain.com/settings)
-    2. To the right of your user inside the `Current User` section, click the `+` button. This will redirect you to GitHub where you can authorize Open SWE to access your repositories.
-    3. Select the new TypeScript template you just created.
+    1. Open SWE의 설정 페이지를 방문하세요: [swe.langchain.com/settings](https://swe.langchain.com/settings)
+    2. `Current User` 섹션 내에서 사용자 오른쪽에 있는 `+` 버튼을 클릭하세요. GitHub로 리디렉션되어 Open SWE가 저장소에 접근할 수 있도록 권한을 부여할 수 있습니다.
+    3. 방금 생성한 새 TypeScript 템플릿을 선택하세요.
 
-    Once done, it will redirect you back to Open SWE. Once here, find the new repository under the repo dropdown above the chat input.
+    완료되면 Open SWE로 다시 리디렉션됩니다. 여기서 채팅 입력창 위의 저장소 드롭다운에서 새 저장소를 찾을 수 있습니다.
 
   </Step>
 
-  <Step title="Submit one of the example tasks">
-    After cloning the template and giving Open SWE access to it, you can submit one of the example tasks!
+  <Step title="예제 작업 중 하나 제출하기">
+    템플릿을 클론하고 Open SWE에 접근 권한을 부여한 후에는 예제 작업 중 하나를 제출할 수 있습니다!
   </Step>
 </Steps>
 
-Below are a series of examples you can try out:
+다음은 시도해 볼 수 있는 일련의 예제들입니다:
 
-<Accordion title="RESTful 'Books' micro-service">
+<Accordion title="RESTful 'Books' 마이크로서비스">
   ```txt
   Create an Express-based API exposing CRUD endpoints for `/books`.
   Include request validation with `zod`, proper HTTP status codes, and an
@@ -42,7 +42,7 @@ Below are a series of examples you can try out:
   ```
 </Accordion>
 
-<Accordion title="WebSocket live counter">
+<Accordion title="WebSocket 실시간 카운터">
   ```txt
   Add a small WebSocket server (using `ws`) that tracks how many clients
   are currently connected and broadcasts the updated count every 5 seconds.
@@ -51,7 +51,7 @@ Below are a series of examples you can try out:
   ```
 </Accordion>
 
-<Accordion title="GitHub issue sync CLI">
+<Accordion title="GitHub 이슈 동기화 CLI">
   ```txt
   Implement a CLI (`src/sync-issues.ts`) that reads a `config.json` with
   one or more GitHub repos, fetches their open issues via the GitHub REST API,
@@ -60,7 +60,7 @@ Below are a series of examples you can try out:
   ```
 </Accordion>
 
-<Accordion title="JWT + refresh-token auth layer">
+<Accordion title="JWT + 리프레시 토큰 인증 레이어">
   ```txt
   Build a middleware that issues short-lived access tokens and long-lived
   refresh tokens. Store refresh tokens in a signed, HttpOnly cookie and expose
@@ -69,7 +69,7 @@ Below are a series of examples you can try out:
   ```
 </Accordion>
 
-<Accordion title="Pluggable caching service">
+<Accordion title="플러그형 캐싱 서비스">
   ```txt
   Design a generic cache interface with `get`, `set`, and `invalidate`
   methods, then provide two adapters: an in-memory `Map` implementation and a
@@ -78,7 +78,7 @@ Below are a series of examples you can try out:
   ```
 </Accordion>
 
-<Accordion title="GraphQL wrapper over REST API">
+<Accordion title="REST API를 감싸는 GraphQL 래퍼">
   ```txt
   Stand up an Apollo Server that federates data from the public
   JSONPlaceholder `/users` and `/posts` endpoints. Expose a `user(id)` query
@@ -87,7 +87,7 @@ Below are a series of examples you can try out:
   ```
 </Accordion>
 
-<Accordion title="Image upload to S3 with signed URLs">
+<Accordion title="서명된 URL을 사용한 S3 이미지 업로드">
   ```txt
   Create an endpoint that returns a time-limited pre-signed PUT URL for
   an S3 bucket (use `@aws-sdk/client-s3`). Include a small React demo (Vite)
@@ -96,7 +96,7 @@ Below are a series of examples you can try out:
   ```
 </Accordion>
 
-<Accordion title="Locale-aware date utility library">
+<Accordion title="로케일 인식 날짜 유틸리티 라이브러리">
   ```txt
   Publish an internal `/src/date` module that formats, parses, and
   time-zone-converts dates using `luxon`. Support at least 'en-US', 'de-DE', and
