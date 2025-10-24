@@ -1,65 +1,63 @@
 ---
-title: Guardrails
-description: agent에 대한 안전 검사 및 콘텐츠 필터링 구현하기
+title: 가드레일
+description: 에이전트를 위한 안전 검사 및 콘텐츠 필터링 구현
 ---
 
-import AlphaCallout from '/snippets/alpha-lc-callout.mdx';
 
-<AlphaCallout />
 
-Guardrails는 agent 실행의 주요 지점에서 콘텐츠를 검증하고 필터링하여 안전하고 규정을 준수하는 AI 애플리케이션을 구축하는 데 도움을 줍니다. 민감한 정보를 탐지하고, 콘텐츠 정책을 시행하며, 출력을 검증하고, 문제를 일으키기 전에 안전하지 않은 동작을 방지할 수 있습니다.
+가드레일은 에이전트 실행의 주요 지점에서 콘텐츠를 검증하고 필터링하여 안전하고 규정을 준수하는 AI 애플리케이션을 구축할 수 있도록 지원합니다. 민감한 정보를 감지하고, 콘텐츠 정책을 시행하며, 출력을 검증하고, 문제가 발생하기 전에 안전하지 않은 동작을 방지할 수 있습니다.
 
 일반적인 사용 사례는 다음과 같습니다:
-- PII 유출 방지
+- PII(개인 식별 정보) 유출 방지
 - 프롬프트 인젝션 공격 탐지 및 차단
 - 부적절하거나 유해한 콘텐츠 차단
 - 비즈니스 규칙 및 규정 준수 요구사항 시행
 - 출력 품질 및 정확성 검증
 
-[middleware](/oss/python/langchain/middleware)를 사용하여 agent가 시작하기 전, 완료된 후 또는 model 및 tool 호출 전후와 같은 전략적 지점에서 실행을 가로채는 방식으로 guardrails를 구현할 수 있습니다.
+[미들웨어](/oss/python/langchain/middleware)를 사용하여 전략적 지점에서 실행을 가로채는 방식으로 가드레일을 구현할 수 있습니다. 에이전트가 시작되기 전, 완료된 후, 또는 모델 및 도구 호출 주변에 적용할 수 있습니다.
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <img
     src="/oss/images/middleware_final.png"
-    alt="Middleware flow diagram showing hooks before and after model and tools"
-    height="300"
+    alt="미들웨어 흐름 다이어그램"
     className="rounded-lg"
   />
 </div>
 
-Guardrails는 두 가지 보완적인 접근 방식으로 구현할 수 있습니다:
+가드레일은 두 가지 상호 보완적인 방식으로 구현할 수 있습니다:
 
 <CardGroup cols={2}>
-  <Card title="결정론적 guardrails" icon="list-check">
-    정규 표현식 패턴, 키워드 매칭 또는 명시적 검사와 같은 규칙 기반 로직을 사용합니다. 빠르고 예측 가능하며 비용 효율적이지만 미묘한 위반을 놓칠 수 있습니다.
+  <Card title="결정론적 가드레일" icon="list-check">
+    정규식 패턴, 키워드 매칭 또는 명시적 검사와 같은 규칙 기반 로직을 사용합니다. 빠르고 예측 가능하며 비용 효율적이지만, 미묘한 위반 사항을 놓칠 수 있습니다.
   </Card>
-  <Card title="Model 기반 guardrails" icon="brain">
-    LLM이나 분류기를 사용하여 의미적 이해를 바탕으로 콘텐츠를 평가합니다. 규칙이 놓치는 미묘한 문제를 포착하지만 더 느리고 비용이 많이 듭니다.
+  <Card title="모델 기반 가드레일" icon="brain">
+    LLM 또는 분류기를 사용하여 의미론적 이해를 바탕으로 콘텐츠를 평가합니다. 규칙이 놓치는 미묘한 문제를 포착할 수 있지만, 더 느리고 비용이 많이 듭니다.
   </Card>
 </CardGroup>
 
-LangChain은 내장 guardrails(예: [PII 탐지](#pii-detection), [human-in-the-loop](#human-in-the-loop))와 두 접근 방식 모두를 사용하여 커스텀 guardrails를 구축할 수 있는 유연한 middleware 시스템을 모두 제공합니다.
+LangChain은 내장 가드레일(예: [PII 감지](#pii-detection), [human-in-the-loop](#human-in-the-loop))과 두 가지 접근 방식 중 하나를 사용하여 커스텀 가드레일을 구축할 수 있는 유연한 미들웨어 시스템을 모두 제공합니다.
 
-## 내장 guardrails
+## 내장 가드레일
 
-### PII 탐지
+### PII 감지
 
-LangChain은 대화에서 개인 식별 정보(PII)를 탐지하고 처리하기 위한 내장 middleware를 제공합니다. 이 middleware는 이메일, 신용카드, IP 주소 등과 같은 일반적인 PII 유형을 탐지할 수 있습니다.
+LangChain은 대화에서 PII(개인 식별 정보)를 감지하고 처리하기 위한 내장 미들웨어를 제공합니다. 이 미들웨어는 이메일, 신용카드, IP 주소 등과 같은 일반적인 PII 유형을 감지할 수 있습니다.
 
-PII 탐지 middleware는 규정 준수 요구사항이 있는 의료 및 금융 애플리케이션, 로그를 정제해야 하는 고객 서비스 agent, 그리고 일반적으로 민감한 사용자 데이터를 처리하는 모든 애플리케이션에 유용합니다.
+PII 감지 미들웨어는 규정 준수 요구사항이 있는 의료 및 금융 애플리케이션, 로그를 삭제해야 하는 고객 서비스 에이전트, 그리고 일반적으로 민감한 사용자 데이터를 처리하는 모든 애플리케이션에 유용합니다.
 
-PII middleware는 탐지된 PII를 처리하기 위한 여러 전략을 지원합니다:
+PII 미들웨어는 감지된 PII를 처리하기 위한 여러 전략을 지원합니다:
 
 | 전략 | 설명 | 예시 |
 |----------|-------------|---------|
 | `redact` | `[REDACTED_TYPE]`으로 교체 | `[REDACTED_EMAIL]` |
-| `mask` | 부분적으로 가림 (예: 마지막 4자리) | `****-****-****-1234` |
+| `mask` | 부분적으로 가림(예: 마지막 4자리) | `****-****-****-1234` |
 | `hash` | 결정론적 해시로 교체 | `a8f5f167...` |
-| `block` | 탐지 시 예외 발생 | 오류 발생 |
+| `block` | 감지 시 예외 발생 | 오류 발생 |
 
 ```python
 from langchain.agents import create_agent
 from langchain.agents.middleware import PIIMiddleware
+
 
 agent = create_agent(
     model="openai:gpt-4o",
@@ -87,7 +85,7 @@ agent = create_agent(
     ],
 )
 
-# When user provides PII, it will be handled according to the strategy
+# 사용자가 PII를 제공하면 전략에 따라 처리됩니다
 result = agent.invoke({
     "messages": [{"role": "user", "content": "My email is john.doe@example.com and card is 4532-1234-5678-9010"}]
 })
@@ -96,38 +94,38 @@ result = agent.invoke({
 
 
 
-<Accordion title="Built-in PII types and configuration">
+<Accordion title="내장 PII 유형 및 구성">
 
 **내장 PII 유형:**
 - `email` - 이메일 주소
-- `credit_card` - 신용카드 번호 (Luhn 검증됨)
+- `credit_card` - 신용카드 번호(Luhn 검증됨)
 - `ip` - IP 주소
 - `mac_address` - MAC 주소
 - `url` - URL
 
 **구성 옵션:**
 
-파라미터 | 설명 | 기본값
+매개변수 | 설명 | 기본값
 -----------|-------------|---------
-`pii_type` | 탐지할 PII 유형 (내장 또는 커스텀) | 필수
-`strategy` | 탐지된 PII 처리 방법 (`"block"`, `"redact"`, `"mask"`, `"hash"`) | `"redact"`
-`detector` | 커스텀 탐지기 함수 또는 정규식 패턴 | `None` (내장 사용)
-`apply_to_input` | model 호출 전 사용자 메시지 검사 | `True`
-`apply_to_output` | model 호출 후 AI 메시지 검사 | `False`
-`apply_to_tool_results` | tool 실행 후 결과 메시지 검사 | `False`
+`pii_type` | 감지할 PII 유형(내장 또는 커스텀) | 필수
+`strategy` | 감지된 PII를 처리하는 방법(`"block"`, `"redact"`, `"mask"`, `"hash"`) | `"redact"`
+`detector` | 커스텀 감지기 함수 또는 정규식 패턴 | `None`(내장 사용)
+`apply_to_input` | 모델 호출 전 사용자 메시지 검사 | `True`
+`apply_to_output` | 모델 호출 후 AI 메시지 검사 | `False`
+`apply_to_tool_results` | 실행 후 도구 결과 메시지 검사 | `False`
 
 
 
 
 </Accordion>
 
-PII 탐지 기능에 대한 자세한 내용은 [middleware 문서](/oss/python/langchain/middleware#pii-detection)를 참조하세요.
+PII 감지 기능에 대한 전체 세부 정보는 [미들웨어 문서](/oss/python/langchain/middleware#pii-detection)를 참조하세요.
 
 ### Human-in-the-loop
 
-LangChain은 민감한 작업을 실행하기 전에 사람의 승인을 요구하는 내장 middleware를 제공합니다. 이는 중요한 의사결정에 가장 효과적인 guardrails 중 하나입니다.
+LangChain은 민감한 작업을 실행하기 전에 사람의 승인을 요구하는 내장 미들웨어를 제공합니다. 이는 높은 위험도의 결정에 가장 효과적인 가드레일 중 하나입니다.
 
-Human-in-the-loop middleware는 금융 거래 및 이체, 프로덕션 데이터 삭제 또는 수정, 외부 당사자에게 통신 전송, 그리고 비즈니스에 큰 영향을 미치는 모든 작업과 같은 경우에 유용합니다.
+Human-in-the-loop 미들웨어는 금융 거래 및 이체, 프로덕션 데이터 삭제 또는 수정, 외부 당사자에게 통신 전송, 그리고 상당한 비즈니스 영향을 미치는 모든 작업과 같은 경우에 유용합니다.
 
 ```python
 from langchain.agents import create_agent
@@ -135,29 +133,29 @@ from langchain.agents.middleware import HumanInTheLoopMiddleware
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.types import Command
 
+
 agent = create_agent(
     model="openai:gpt-4o",
     tools=[search_tool, send_email_tool, delete_database_tool],
     middleware=[
         HumanInTheLoopMiddleware(
             interrupt_on={
-                # Require approval for sensitive operations
+                # 민감한 작업에 대한 승인 요구
                 "send_email": True,
                 "delete_database": True,
-                # Auto-approve safe operations
+                # 안전한 작업은 자동 승인
                 "search": False,
             }
         ),
     ],
-    # persist the state across interrupts
+    # 중단 상태를 유지
     checkpointer=InMemorySaver(),
-
 )
 
-# Human-in-the-loop requires a thread ID for persistence
+# Human-in-the-loop은 지속성을 위해 스레드 ID가 필요합니다
 config = {"configurable": {"thread_id": "some_id"}}
 
-# Agent will pause and wait for approval before executing sensitive tools
+# 에이전트는 민감한 도구를 실행하기 전에 일시 중지하고 승인을 기다립니다
 result = agent.invoke(
     {"messages": [{"role": "user", "content": "Send an email to the team"}]},
     config=config
@@ -165,33 +163,35 @@ result = agent.invoke(
 
 result = agent.invoke(
     Command(resume={"decisions": [{"type": "approve"}]}),
-    config=config  # Same thread ID to resume the paused conversation
+    config=config  # 일시 중지된 대화를 재개하기 위해 동일한 스레드 ID 사용
 )
 ```
 
 
 
 
-승인 워크플로우 구현에 대한 자세한 내용은 [human-in-the-loop 문서](/oss/python/langchain/human-in-the-loop)를 참조하세요.
+<Tip>
+    승인 워크플로우 구현에 대한 전체 세부 정보는 [human-in-the-loop 문서](/oss/python/langchain/human-in-the-loop)를 참조하세요.
+</Tip>
 
-## 커스텀 guardrails
+## 커스텀 가드레일
 
-더 정교한 guardrails를 위해 agent 실행 전후에 실행되는 커스텀 middleware를 생성할 수 있습니다. 이를 통해 검증 로직, 콘텐츠 필터링 및 안전 검사를 완전히 제어할 수 있습니다.
+더 정교한 가드레일을 위해 에이전트가 실행되기 전이나 후에 실행되는 커스텀 미들웨어를 생성할 수 있습니다. 이를 통해 검증 로직, 콘텐츠 필터링 및 안전 검사를 완전히 제어할 수 있습니다.
 
-### agent 이전 guardrails
+### Before agent 가드레일
 
-"before agent" hook을 사용하여 각 호출 시작 시 요청을 한 번 검증합니다. 이는 인증, 속도 제한 또는 처리가 시작되기 전에 부적절한 요청을 차단하는 것과 같은 세션 수준 검사에 유용합니다.
+"before agent" 훅을 사용하여 각 호출이 시작될 때 한 번 요청을 검증합니다. 이는 인증, 속도 제한 또는 처리가 시작되기 전에 부적절한 요청을 차단하는 것과 같은 세션 수준 검사에 유용합니다.
 
 <CodeGroup>
 
-```python title="Class syntax"
+```python title="클래스 구문"
 from typing import Any
 
 from langchain.agents.middleware import AgentMiddleware, AgentState, hook_config
 from langgraph.runtime import Runtime
 
 class ContentFilterMiddleware(AgentMiddleware):
-    """Deterministic guardrail: Block requests containing banned keywords."""
+    """결정론적 가드레일: 금지된 키워드가 포함된 요청 차단"""
 
     def __init__(self, banned_keywords: list[str]):
         super().__init__()
@@ -199,7 +199,7 @@ class ContentFilterMiddleware(AgentMiddleware):
 
     @hook_config(can_jump_to=["end"])
     def before_agent(self, state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
-        # Get the first user message
+        # 첫 번째 사용자 메시지 가져오기
         if not state["messages"]:
             return None
 
@@ -209,21 +209,21 @@ class ContentFilterMiddleware(AgentMiddleware):
 
         content = first_message.content.lower()
 
-        # Check for banned keywords
+        # 금지된 키워드 검사
         for keyword in self.banned_keywords:
             if keyword in content:
-                # Block execution before any processing
+                # 처리 전에 실행 차단
                 return {
                     "messages": [{
                         "role": "assistant",
-                        "content": "I cannot process requests containing inappropriate content. Please rephrase your request."
+                        "content": "부적절한 콘텐츠가 포함된 요청은 처리할 수 없습니다. 요청을 다시 표현해 주세요."
                     }],
                     "jump_to": "end"
                 }
 
         return None
 
-# Use the custom guardrail
+# 커스텀 가드레일 사용
 from langchain.agents import create_agent
 
 agent = create_agent(
@@ -236,13 +236,13 @@ agent = create_agent(
     ],
 )
 
-# This request will be blocked before any processing
+# 이 요청은 처리되기 전에 차단됩니다
 result = agent.invoke({
     "messages": [{"role": "user", "content": "How do I hack into a database?"}]
 })
 ```
 
-```python title="Decorator syntax"
+```python title="데코레이터 구문"
 from typing import Any
 
 from langchain.agents.middleware import before_agent, AgentState, hook_config
@@ -252,8 +252,8 @@ banned_keywords = ["hack", "exploit", "malware"]
 
 @before_agent(can_jump_to=["end"])
 def content_filter(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
-    """Deterministic guardrail: Block requests containing banned keywords."""
-    # Get the first user message
+    """결정론적 가드레일: 금지된 키워드가 포함된 요청 차단"""
+    # 첫 번째 사용자 메시지 가져오기
     if not state["messages"]:
         return None
 
@@ -263,21 +263,21 @@ def content_filter(state: AgentState, runtime: Runtime) -> dict[str, Any] | None
 
     content = first_message.content.lower()
 
-    # Check for banned keywords
+    # 금지된 키워드 검사
     for keyword in banned_keywords:
         if keyword in content:
-            # Block execution before any processing
+            # 처리 전에 실행 차단
             return {
                 "messages": [{
                     "role": "assistant",
-                    "content": "I cannot process requests containing inappropriate content. Please rephrase your request."
+                    "content": "부적절한 콘텐츠가 포함된 요청은 처리할 수 없습니다. 요청을 다시 표현해 주세요."
                 }],
                 "jump_to": "end"
             }
 
     return None
 
-# Use the custom guardrail
+# 커스텀 가드레일 사용
 from langchain.agents import create_agent
 
 agent = create_agent(
@@ -286,7 +286,7 @@ agent = create_agent(
     middleware=[content_filter],
 )
 
-# This request will be blocked before any processing
+# 이 요청은 처리되기 전에 차단됩니다
 result = agent.invoke({
     "messages": [{"role": "user", "content": "How do I hack into a database?"}]
 })
@@ -297,13 +297,13 @@ result = agent.invoke({
 
 
 
-### agent 이후 guardrails
+### After agent 가드레일
 
-"after agent" hook을 사용하여 사용자에게 반환하기 전에 최종 출력을 한 번 검증합니다. 이는 model 기반 안전 검사, 품질 검증 또는 완전한 agent 응답에 대한 최종 규정 준수 스캔에 유용합니다.
+"after agent" 훅을 사용하여 사용자에게 반환하기 전에 최종 출력을 한 번 검증합니다. 이는 모델 기반 안전 검사, 품질 검증 또는 완전한 에이전트 응답에 대한 최종 규정 준수 스캔에 유용합니다.
 
 <CodeGroup>
 
-```python title="Class syntax"
+```python title="클래스 구문"
 from langchain.agents.middleware import AgentMiddleware, AgentState, hook_config
 from langgraph.runtime import Runtime
 from langchain_core.messages import AIMessage
@@ -311,7 +311,7 @@ from langchain.chat_models import init_chat_model
 from typing import Any
 
 class SafetyGuardrailMiddleware(AgentMiddleware):
-    """Model-based guardrail: Use an LLM to evaluate response safety."""
+    """모델 기반 가드레일: LLM을 사용하여 응답 안전성 평가"""
 
     def __init__(self):
         super().__init__()
@@ -319,7 +319,7 @@ class SafetyGuardrailMiddleware(AgentMiddleware):
 
     @hook_config(can_jump_to=["end"])
     def after_agent(self, state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
-        # Get the final AI response
+        # 최종 AI 응답 가져오기
         if not state["messages"]:
             return None
 
@@ -327,11 +327,11 @@ class SafetyGuardrailMiddleware(AgentMiddleware):
         if not isinstance(last_message, AIMessage):
             return None
 
-        # Use a model to evaluate safety
-        safety_prompt = f"""Evaluate if this response is safe and appropriate.
-        Respond with only 'SAFE' or 'UNSAFE'.
+        # 모델을 사용하여 안전성 평가
+        safety_prompt = f"""이 응답이 안전하고 적절한지 평가하세요.
+        'SAFE' 또는 'UNSAFE'로만 응답하세요.
 
-        Response: {last_message.content}"""
+        응답: {last_message.content}"""
 
         result = self.safety_model.invoke([{"role": "user", "content": safety_prompt}])
 
@@ -339,14 +339,14 @@ class SafetyGuardrailMiddleware(AgentMiddleware):
             return {
                 "messages": [{
                     "role": "assistant",
-                    "content": "I cannot provide that response. Please rephrase your request."
+                    "content": "해당 응답을 제공할 수 없습니다. 요청을 다시 표현해 주세요."
                 }],
                 "jump_to": "end"
             }
 
         return None
 
-# Use the safety guardrail
+# 안전 가드레일 사용
 from langchain.agents import create_agent
 
 agent = create_agent(
@@ -360,7 +360,7 @@ result = agent.invoke({
 })
 ```
 
-```python title="Decorator syntax"
+```python title="데코레이터 구문"
 from langchain.agents.middleware import after_agent, AgentState, hook_config
 from langgraph.runtime import Runtime
 from langchain_core.messages import AIMessage
@@ -371,8 +371,8 @@ safety_model = init_chat_model("openai:gpt-4o-mini")
 
 @after_agent(can_jump_to=["end"])
 def safety_guardrail(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
-    """Model-based guardrail: Use an LLM to evaluate response safety."""
-    # Get the final AI response
+    """모델 기반 가드레일: LLM을 사용하여 응답 안전성 평가"""
+    # 최종 AI 응답 가져오기
     if not state["messages"]:
         return None
 
@@ -380,11 +380,11 @@ def safety_guardrail(state: AgentState, runtime: Runtime) -> dict[str, Any] | No
     if not isinstance(last_message, AIMessage):
         return None
 
-    # Use a model to evaluate safety
-    safety_prompt = f"""Evaluate if this response is safe and appropriate.
-    Respond with only 'SAFE' or 'UNSAFE'.
+    # 모델을 사용하여 안전성 평가
+    safety_prompt = f"""이 응답이 안전하고 적절한지 평가하세요.
+    'SAFE' 또는 'UNSAFE'로만 응답하세요.
 
-    Response: {last_message.content}"""
+    응답: {last_message.content}"""
 
     result = safety_model.invoke([{"role": "user", "content": safety_prompt}])
 
@@ -392,14 +392,14 @@ def safety_guardrail(state: AgentState, runtime: Runtime) -> dict[str, Any] | No
         return {
             "messages": [{
                 "role": "assistant",
-                "content": "I cannot provide that response. Please rephrase your request."
+                "content": "해당 응답을 제공할 수 없습니다. 요청을 다시 표현해 주세요."
             }],
             "jump_to": "end"
         }
 
     return None
 
-# Use the safety guardrail
+# 안전 가드레일 사용
 from langchain.agents import create_agent
 
 agent = create_agent(
@@ -419,9 +419,9 @@ result = agent.invoke({
 
 
 
-### 여러 guardrails 결합하기
+### 여러 가드레일 결합
 
-middleware 배열에 추가하여 여러 guardrails를 쌓을 수 있습니다. 순서대로 실행되어 계층화된 보호를 구축할 수 있습니다:
+미들웨어 배열에 추가하여 여러 가드레일을 쌓을 수 있습니다. 가드레일은 순서대로 실행되어 계층화된 보호를 구축할 수 있습니다:
 
 ```python
 from langchain.agents import create_agent
@@ -431,17 +431,17 @@ agent = create_agent(
     model="openai:gpt-4o",
     tools=[search_tool, send_email_tool],
     middleware=[
-        # Layer 1: Deterministic input filter (before agent)
+        # 레이어 1: 결정론적 입력 필터(before agent)
         ContentFilterMiddleware(banned_keywords=["hack", "exploit"]),
 
-        # Layer 2: PII protection (before and after model)
+        # 레이어 2: PII 보호(모델 전후)
         PIIMiddleware("email", strategy="redact", apply_to_input=True),
         PIIMiddleware("email", strategy="redact", apply_to_output=True),
 
-        # Layer 3: Human approval for sensitive tools
+        # 레이어 3: 민감한 도구에 대한 사람의 승인
         HumanInTheLoopMiddleware(interrupt_on={"send_email": True}),
 
-        # Layer 4: Model-based safety check (after agent)
+        # 레이어 4: 모델 기반 안전 검사(after agent)
         SafetyGuardrailMiddleware(),
     ],
 )
@@ -452,10 +452,10 @@ agent = create_agent(
 
 ## 추가 리소스
 
-- [Middleware 문서](/oss/python/langchain/middleware) - 커스텀 middleware에 대한 전체 가이드
-- [Middleware API 참조](https://reference.langchain.com/python/langchain/middleware/) - 커스텀 middleware에 대한 전체 가이드
+- [미들웨어 문서](/oss/python/langchain/middleware) - 커스텀 미들웨어 완전 가이드
+- [미들웨어 API 레퍼런스](https://reference.langchain.com/python/langchain/middleware/) - 커스텀 미들웨어 완전 가이드
 - [Human-in-the-loop](/oss/python/langchain/human-in-the-loop) - 민감한 작업에 대한 사람의 검토 추가
-- [Testing agents](/oss/python/langchain/test) - 안전 메커니즘 테스트 전략
+- [에이전트 테스트](/oss/python/langchain/test) - 안전 메커니즘 테스트 전략
 
 ---
 

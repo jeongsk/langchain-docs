@@ -2,10 +2,10 @@
 title: Pandas DataFrame
 ---
 
-이 노트북은 [pandas](https://pandas.pydata.org/pandas-docs/stable/user_guide/index) DataFrame에서 데이터를 로드하는 방법을 다룹니다.
+This notebook goes over how to load data from a [pandas](https://pandas.pydata.org/pandas-docs/stable/user_guide/index) DataFrame.
 
 ```python
-%pip install -qU  pandas
+pip install -qU  pandas
 ```
 
 ```python
@@ -126,7 +126,7 @@ loader.load()
 ```
 
 ```python
-# 더 큰 테이블의 경우 전체 테이블을 메모리로 읽지 않는 지연 로드 사용
+# Use lazy load for larger table, which won't read the full table into memory
 for i in loader.lazy_load():
     print(i)
 ```

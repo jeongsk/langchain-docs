@@ -1,25 +1,12 @@
 ---
-title: Customize Deep Agents
-sidebarTitle: Customization
-description: Learn how to customize deep agents with system prompts, tools, subagents, and more
+title: Deep Agent 커스터마이징
+sidebarTitle: 커스터마이징
+description: 시스템 프롬프트, 도구, 하위 에이전트 등을 사용하여 deep agent를 커스터마이징하는 방법을 알아보세요
 ---
 
-## Model
+## 모델
 
-By default, `deepagents` uses `"claude-sonnet-4-5-20250929"`. You can customize this by passing any [LangChain model object](https://python.langchain.com/docs/integrations/chat/).
-
-
-
-```typescript
-// TODO: Add JS implementation
-```
-
-
-## System prompt
-
-Deep agents come with a built-in system prompt inspired by Claude Code's system prompt. The default system prompt contains detailed instructions for using the built-in planning tool, file system tools, and subagents.
-
-Each deep agent tailored to a use case should include a custom system prompt specific to that use case.
+기본적으로 `deepagents`는 `"claude-sonnet-4-5-20250929"`를 사용합니다. [LangChain 모델 객체](https://python.langchain.com/docs/integrations/chat/)를 전달하여 이를 커스터마이징할 수 있습니다.
 
 
 
@@ -28,9 +15,11 @@ Each deep agent tailored to a use case should include a custom system prompt spe
 ```
 
 
-## Tools
+## 시스템 프롬프트
 
-Just like tool-calling agents, a deep agent gets a set of top level tools that it has access to.
+Deep agent는 Claude Code의 시스템 프롬프트에서 영감을 받은 내장 시스템 프롬프트를 제공합니다. 기본 시스템 프롬프트에는 내장된 계획 도구, 파일 시스템 도구, 하위 에이전트를 사용하기 위한 상세한 지침이 포함되어 있습니다.
+
+특정 사용 사례에 맞게 조정된 각 deep agent는 해당 사용 사례에 특화된 커스텀 시스템 프롬프트를 포함해야 합니다.
 
 
 
@@ -39,14 +28,25 @@ Just like tool-calling agents, a deep agent gets a set of top level tools that i
 ```
 
 
-In addition to any tools that you provide, deep agents also get access to a number of default tools:
+## 도구
 
-- **write_todos** - Update the agent's to-do list
-- **ls** - List all files in the agent's filesystem
-- **read_file** - Read a file from the agent's filesystem
-- **write_file** - Write a new file in the agent's filesystem
-- **edit_file** - Edit an existing file in the agent's filesystem
-- **task** - Spawn a subagent to handle a specific task
+도구 호출 에이전트와 마찬가지로, deep agent는 접근 가능한 최상위 레벨 도구 세트를 가집니다.
+
+
+
+```typescript
+// TODO: Add JS implementation
+```
+
+
+제공하는 도구 외에도, deep agent는 여러 기본 도구에 접근할 수 있습니다:
+
+- `write_todos` – 에이전트의 할 일 목록을 업데이트합니다
+- `ls` – 에이전트의 파일 시스템에 있는 모든 파일을 나열합니다
+- `read_file` – 에이전트의 파일 시스템에서 파일을 읽습니다
+- `write_file` – 에이전트의 파일 시스템에 새 파일을 작성합니다
+- `edit_file` – 에이전트의 파일 시스템에서 기존 파일을 편집합니다
+- `task` – 특정 작업을 처리할 하위 에이전트를 생성합니다
 
 ---
 

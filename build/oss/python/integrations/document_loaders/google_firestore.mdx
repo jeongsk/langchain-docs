@@ -2,72 +2,72 @@
 title: Google Firestore (Native Mode)
 ---
 
-> [Google Firestore](https://cloud.google.com/firestore)는 Firebase 및 Google Cloud의 모바일, 웹 및 서버 개발을 위한 서버리스 문서 지향 데이터베이스입니다. Firestore NoSQL 문서 데이터베이스는 쉬운 개발과 자동 확장을 허용합니다.
+> [Firestore](https://cloud.google.com/firestore) is a serverless document-oriented database that scales to meet any demand. Extend your database application to build AI-powered experiences leveraging Firestore's LangChain integrations.
 
-이 노트북은 [Google Firestore](https://cloud.google.com/firestore)를 사용하여 [langchain 문서를 저장, 로드 및 삭제](/oss/python/integrations/document_loaders)하는 방법을 다룹니다.
+This notebook goes over how to use [Firestore](https://cloud.google.com/firestore) to [save, load and delete langchain documents](/oss/python/integrations/document_loaders) with `FirestoreLoader` and `FirestoreSaver`.
 
-패키지에 대한 자세한 내용은 [GitHub](https://github.com/googleapis/langchain-google-firestore-python/)에서 확인하세요.
+Learn more about the package on [GitHub](https://github.com/googleapis/langchain-google-firestore-python/).
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/googleapis/langchain-google-firestore-python/blob/main/docs/document_loader.ipynb)
 
-## 시작하기 전에
+## Before You Begin
 
-이 노트북을 실행하려면 다음을 수행해야 합니다:
+To run this notebook, you will need to do the following:
 
-- [Google Cloud 프로젝트를 생성합니다](https://developers.google.com/workspace/guides/create-project).
-- [Firestore API를 활성화합니다](https://console.cloud.google.com/flows/enableapi?apiid=firestore.googleapis.com).
-- [Firestore 데이터베이스를 생성합니다](https://cloud.google.com/firestore/docs/manage-databases).
+* [Create a Google Cloud Project](https://developers.google.com/workspace/guides/create-project)
+* [Enable the Firestore API](https://console.cloud.google.com/flows/enableapi?apiid=firestore.googleapis.com)
+* [Create a Firestore database](https://cloud.google.com/firestore/docs/manage-databases)
 
-이 노트북을 실행한 후 위 단계를 완료했는지 확인하고 실행 중인 노트북 환경에서 Google Cloud 프로젝트에 대한 액세스 권한이 있는지 확인하세요:
-
-- Google Colab을 사용하는 경우 아래 셀을 실행하고 계속하세요.
-- Vertex AI Workbench를 사용하는 경우 [여기](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env)의 설정 지침을 확인하세요.
-
-### 🦜🔗 라이브러리 설치
-
-통합은 자체 `langchain-google-firestore` 패키지에 포함되어 있으므로 설치해야 합니다.
+After confirmed access to database in the runtime environment of this notebook, filling the following values and run the cell before running example scripts.
 
 ```python
-%pip install -qU langchain-google-firestore
+# @markdown Please specify a source for demo purpose.
+SOURCE = "test"  # @param {type:"Query"|"CollectionGroup"|"DocumentReference"|"string"}
 ```
 
-**Colab 전용**: 다음 셀의 주석을 제거하여 커널을 재시작하거나 버튼을 사용하여 커널을 재시작하세요. Vertex AI Workbench의 경우 상단 버튼을 사용하여 터미널을 재시작할 수 있습니다.
+### 🦜🔗 Library Installation
+
+The integration lives in its own `langchain-google-firestore` package, so we need to install it.
 
 ```python
-# # 설치 후 자동으로 커널을 재시작합니다
+pip install -qU langchain-google-firestore
+```
+
+**Colab only**: Uncomment the following cell to restart the kernel or use the button to restart the kernel. For Vertex AI Workbench you can restart the terminal using the button on top.
+
+```python
+# # Automatically restart kernel after installs so that your environment can access the new packages
 # import IPython
 
 # app = IPython.Application.instance()
 # app.kernel.do_shutdown(True)
 ```
 
-### ☁ Google Cloud 프로젝트 설정
+### ☁ Set Your Google Cloud Project
 
-이 노트북의 통합을 활용할 수 있도록 Google Cloud 프로젝트를 설정하세요.
+Set your Google Cloud project so that you can leverage Google Cloud resources within this notebook.
 
-1. [Google Cloud 콘솔에서 프로젝트 번호를 확인하세요](https://console.cloud.google.com/welcome).
+If you don't know your project ID, try the following:
 
-프로젝트 ID 값을 확인한 후 아래 셀을 실행할 때 ID를 설정하세요.
-
-```python
-# @markdown 아래 셀의 주석을 제거하여 Cloud SDK를 설치하세요
-# !gcloud init
-```
+* Run `gcloud config list`.
+* Run `gcloud projects list`.
+* See the support page: [Locate the project ID](https://support.google.com/googleapi/answer/7014113).
 
 ```python
-# @title 프로젝트 ID
-PROJECT_ID = ""  # @param {type:"string"}
+# @markdown Please fill in the value below with your Google Cloud project ID and then run the cell.
 
-# 프로젝트 ID를 설정합니다
+PROJECT_ID = "my-project-id"  # @param {type:"string"}
+
+# Set the project id
 !gcloud config set project {PROJECT_ID}
 ```
 
-### 🔐 인증
+### 🔐 Authentication
 
-이 노트북에 로그인한 IAM 사용자로 Google Cloud에 인증하여 Google Cloud 프로젝트에 액세스하세요.
+Authenticate to Google Cloud as the IAM user logged into this notebook in order to access your Google Cloud Project.
 
-- Colab을 사용하여 이 노트북을 실행하는 경우 아래 셀을 사용하고 계속하세요.
-- Vertex AI Workbench를 사용하는 경우 [여기](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env)의 설정 지침을 확인하세요.
+* If you are using Colab to run this notebook, use the cell below and continue.
+* If you are using Vertex AI Workbench, check out the setup instructions [here](https://github.com/GoogleCloudPlatform/generative-ai/tree/main/setup-env).
 
 ```python
 from google.colab import auth
@@ -75,11 +75,13 @@ from google.colab import auth
 auth.authenticate_user()
 ```
 
-## 기본 사용법
+## Basic Usage
 
-### 문서 저장
+### Save documents
 
-`FirestoreLoader.add_documents(<documents>)`로 langchain 문서를 저장합니다. 기본적으로 컬렉션은 `page_content` 및 `metadata` 유형의 `map`이라는 두 개의 필드를 가진 문서로 채워집니다.
+`FirestoreSaver` can store Documents into Firestore. By default it will try to extract the Document reference from the metadata
+
+Save langchain documents with `FirestoreSaver.upsert_documents(<documents>)`.
 
 ```python
 from langchain_core.documents import Document
@@ -92,9 +94,9 @@ data = [Document(page_content="Hello, World!")]
 saver.upsert_documents(data)
 ```
 
-#### 새 컬렉션에 저장
+#### Save documents without reference
 
-컬렉션은 존재하지 않는 경우 자동으로 생성됩니다.
+If a collection is specified the documents will be stored with an auto generated id.
 
 ```python
 saver = FirestoreSaver("Collection")
@@ -102,39 +104,33 @@ saver = FirestoreSaver("Collection")
 saver.upsert_documents(data)
 ```
 
-### 문서 로드
+#### Save documents with other references
 
-`FirestoreLoader.load()` 또는 `Firestore.lazy_load()`로 langchain 문서를 로드합니다. `lazy_load`는 반복 중에만 쿼리를 평가하는 제너레이터를 반환합니다. `FirestoreLoader` 클래스를 초기화하려면 다음이 필요합니다:
+```python
+doc_ids = ["AnotherCollection/doc_id", "foo/bar"]
+saver = FirestoreSaver()
 
-1. `source` - Firestore 컬렉션 또는 쿼리에 대한 참조.
+saver.upsert_documents(documents=data, document_ids=doc_ids)
+```
+
+### Load from Collection or SubCollection
+
+Load langchain documents with `FirestoreLoader.load()` or `Firestore.lazy_load()`. `lazy_load` returns a generator that only queries database during the iteration. To initialize `FirestoreLoader` class you need to provide:
+
+1. `source` - An instance of a Query, CollectionGroup, DocumentReference or the single `\`-delimited path to a Firestore collection.
 
 ```python
 from langchain_google_firestore import FirestoreLoader
 
 loader_collection = FirestoreLoader("Collection")
+loader_subcollection = FirestoreLoader("Collection/doc/SubCollection")
+
 
 data_collection = loader_collection.load()
+data_subcollection = loader_subcollection.load()
 ```
 
-### 문서 삭제
-
-`FirestoreSaver.delete_documents(<documents>)`로 Firestore 컬렉션에서 langchain 문서 목록을 삭제합니다.
-
-```python
-saver = FirestoreSaver()
-
-saver.delete_documents(data)
-
-# 컬렉션은 비어 있거나 존재하지 않음
-data_collection = loader_collection.load()
-print(f"Documents left: {len(data_collection)}")
-```
-
-## 고급 사용법
-
-### 자체 문서 참조 로드
-
-사용자는 Firestore 컬렉션 대신 DocumentReference를 제공할 수 있습니다.
+### Load a single Document
 
 ```python
 from google.cloud import firestore
@@ -142,40 +138,47 @@ from google.cloud import firestore
 client = firestore.Client()
 doc_ref = client.collection("foo").document("bar")
 
-loader_doc_ref = FirestoreLoader(doc_ref)
+loader_document = FirestoreLoader(doc_ref)
+
+data = loader_document.load()
 ```
 
-### 쿼리에서 로드
-
-사용자는 컬렉션 또는 CollectionGroup 쿼리에서 로드할 수 있습니다.
+### Load from CollectionGroup or Query
 
 ```python
-from google.cloud.firestore import CollectionGroup, FieldFilter
+from google.cloud.firestore import CollectionGroup, FieldFilter, Query
 
 col_ref = client.collection("col_group")
 collection_group = CollectionGroup(col_ref)
 
-loader_group = FirestoreLoader(collection_group.where(filter=FieldFilter("region", "==", "west_coast")))
+loader_group = FirestoreLoader(collection_group)
+
+col_ref = client.collection("collection")
+query = col_ref.where(filter=FieldFilter("region", "==", "west_coast"))
+
+loader_query = FirestoreLoader(query)
 ```
 
-### 사용자 정의 클라이언트
+### Delete documents
 
-사용자는 사용자 정의 클라이언트를 전달할 수 있습니다.
+Delete a list of langchain documents from Firestore collection with `FirestoreSaver.delete_documents(<documents>)`.
+
+If document ids is provided, the Documents will be ignored.
 
 ```python
-from google.auth import compute_engine
-from google.cloud.firestore import Client
+saver = FirestoreSaver()
 
-client = Client(database="non-default-db", creds=compute_engine.Credentials())
-loader = FirestoreLoader(
-    source="foo/bar/subcol",
-    client=client,
-)
+saver.delete_documents(data)
+
+# The Documents will be ignored and only the document ids will be used.
+saver.delete_documents(data, doc_ids)
 ```
 
-### 사용자 정의 문서 페이지 콘텐츠 및 메타데이터 필드 설정
+## Advanced Usage
 
-`page_content_fields` 및 `metadata_fields`를 통해 페이지 콘텐츠 및 메타데이터가 Document로 로드되는 방식을 사용자 정의할 수 있습니다.
+### Load documents with customize document page content & metadata
+
+The arguments of `page_content_fields` and `metadata_fields` will specify the Firestore Document fields to be written into LangChain Document `page_content` and `metadata`.
 
 ```python
 loader = FirestoreLoader(
@@ -183,17 +186,24 @@ loader = FirestoreLoader(
     page_content_fields=["data_field"],
     metadata_fields=["metadata_field"],
 )
+
+data = loader.load()
 ```
 
-#### 메타데이터와 유사하게 페이지 콘텐츠 필드 사용자 정의
+#### Customize Page Content Format
 
-`page_content_fields` 및 `metadata_fields`를 모두 지정하면 두 목록에 모두 나타나는 필드는 무시됩니다.
+When the `page_content` contains only one field the information will be the field value only. Otherwise the `page_content` will be in JSON format.
+
+### Customize Connection & Authentication
 
 ```python
+from google.auth import compute_engine
+from google.cloud.firestore import Client
+
+client = Client(database="non-default-db", creds=compute_engine.Credentials())
 loader = FirestoreLoader(
-    source="foo/bar/subcol",
-    page_content_fields=["data_field"],
-    metadata_fields=["data_field"],
+    source="foo",
+    client=client,
 )
 ```
 

@@ -1,34 +1,33 @@
 ---
-title: Middleware
-description: 모든 단계에서 에이전트 실행을 제어하고 커스터마이징합니다
+title: 미들웨어
+description: 에이전트 실행의 모든 단계를 제어하고 커스터마이징합니다
 ---
 
 
-Middleware는 에이전트 내부에서 발생하는 작업을 더욱 세밀하게 제어할 수 있는 방법을 제공합니다.
 
-핵심 에이전트 루프는 모델을 호출하고, 모델이 실행할 도구를 선택하도록 한 다음, 더 이상 도구를 호출하지 않을 때 종료됩니다:
+미들웨어는 에이전트 내부에서 발생하는 동작을 더욱 정밀하게 제어할 수 있는 방법을 제공합니다.
+
+핵심 에이전트 루프는 모델 호출, 모델이 실행할 도구 선택, 그리고 더 이상 도구를 호출하지 않을 때 종료되는 과정을 포함합니다:
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <img
     src="/oss/images/core_agent_loop.png"
-    alt="Core agent loop diagram"
-    height="450"
+    alt="핵심 에이전트 루프 다이어그램"
     className="rounded-lg"
   />
 </div>
 
-Middleware는 각 단계의 전후에 훅을 노출합니다:
+미들웨어는 이러한 각 단계의 전후에 훅을 노출합니다:
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <img
     src="/oss/images/middleware_final.png"
-    alt="Middleware flow diagram"
-    height="300"
+    alt="미들웨어 흐름 다이어그램"
     className="rounded-lg"
   />
 </div>
 
-## Middleware로 무엇을 할 수 있나요?
+## 미들웨어로 할 수 있는 일
 
 <CardGroup cols={2}>
   <Card title="모니터링" icon="chart-line">
@@ -40,12 +39,12 @@ Middleware는 각 단계의 전후에 훅을 노출합니다:
   <Card title="제어" icon="sliders">
     재시도, 폴백 및 조기 종료 로직을 추가합니다
   </Card>
-  <Card title="적용" icon="shield">
+  <Card title="강제" icon="shield">
     속도 제한, 가드레일 및 PII 탐지를 적용합니다
   </Card>
 </CardGroup>
 
-@[`create_agent`]에 middleware를 전달하여 추가할 수 있습니다:
+@[`create_agent`]에 미들웨어를 전달하여 추가합니다:
 
 
 
@@ -64,18 +63,18 @@ const agent = createAgent({
 ```
 
 
-## 내장 middleware
+## 내장 미들웨어
 
-LangChain은 일반적인 사용 사례를 위한 사전 구축된 middleware를 제공합니다:
+LangChain은 일반적인 사용 사례를 위한 사전 구축된 미들웨어를 제공합니다:
 
-### 요약(Summarization)
+### 요약
 
-토큰 제한에 도달할 때 대화 기록을 자동으로 요약합니다.
+토큰 제한에 근접할 때 대화 기록을 자동으로 요약합니다.
 
 <Tip>
-**다음과 같은 경우에 적합합니다:**
-- 컨텍스트 윈도우를 초과하는 장기 대화
-- 광범위한 기록을 가진 다중 턴 대화
+**다음과 같은 경우에 적합:**
+- 컨텍스트 창을 초과하는 장기 실행 대화
+- 광범위한 기록이 있는 다중 턴 대화
 - 전체 대화 컨텍스트 보존이 중요한 애플리케이션
 </Tip>
 
@@ -99,12 +98,12 @@ const agent = createAgent({
 ```
 
 
-<Accordion title="구성 옵션">
+<Accordion title="설정 옵션">
 
 
 
 <ParamField body="model" type="string" required>
-  요약을 생성하는 모델
+  요약 생성을 위한 모델
 </ParamField>
 
 <ParamField body="maxTokensBeforeSummary" type="number">
@@ -116,11 +115,11 @@ const agent = createAgent({
 </ParamField>
 
 <ParamField body="tokenCounter" type="function">
-  커스텀 토큰 계산 함수. 기본값은 문자 기반 계산입니다.
+  사용자 정의 토큰 카운팅 함수. 기본값은 문자 기반 카운팅입니다.
 </ParamField>
 
 <ParamField body="summaryPrompt" type="string">
-  커스텀 프롬프트 템플릿. 지정하지 않으면 내장 템플릿을 사용합니다.
+  사용자 정의 프롬프트 템플릿. 지정되지 않으면 내장 템플릿을 사용합니다.
 </ParamField>
 
 <ParamField body="summaryPrefix" type="string" default="## Previous conversation summary:">
@@ -130,15 +129,15 @@ const agent = createAgent({
 
 </Accordion>
 
-### Human-in-the-loop
+### 휴먼 인 더 루프
 
 도구 호출이 실행되기 전에 사람의 승인, 편집 또는 거부를 위해 에이전트 실행을 일시 중지합니다.
 
 <Tip>
-**다음과 같은 경우에 적합합니다:**
-- 사람의 승인이 필요한 고위험 작업 (데이터베이스 쓰기, 금융 거래)
+**다음과 같은 경우에 적합:**
+- 사람의 승인이 필요한 고위험 작업(데이터베이스 쓰기, 금융 거래)
 - 사람의 감독이 필수인 규정 준수 워크플로
-- 사람의 피드백이 에이전트를 안내하는 데 사용되는 장기 실행 대화
+- 에이전트 가이드를 위해 사람의 피드백이 사용되는 장기 실행 대화
 </Tip>
 
 
@@ -152,13 +151,13 @@ const agent = createAgent({
   middleware: [
     humanInTheLoopMiddleware({
       interruptOn: {
-        // 이메일 전송에 대해 승인, 편집 또는 거부 필요
+        // 이메일 전송에 대한 승인, 편집 또는 거부 필요
         send_email: {
           allowAccept: true,
           allowEdit: true,
           allowRespond: true,
         },
-        // 이메일 읽기는 자동 승인
+        // 이메일 읽기 자동 승인
         read_email: false,
       }
     })
@@ -167,15 +166,15 @@ const agent = createAgent({
 ```
 
 
-<Accordion title="구성 옵션">
+<Accordion title="설정 옵션">
 
 
 
 <ParamField body="interruptOn" type="object" required>
-  도구 이름과 승인 구성의 매핑
+  도구 이름을 승인 설정에 매핑
 </ParamField>
 
-**도구 승인 구성 옵션:**
+**도구 승인 설정 옵션:**
 
 <ParamField body="allowAccept" type="boolean" default="false">
   승인 허용 여부
@@ -193,24 +192,24 @@ const agent = createAgent({
 </Accordion>
 
 <Note>
-**중요:** Human-in-the-loop middleware는 중단 간 상태를 유지하기 위해 [checkpointer](/oss/javascript/langgraph/persistence#checkpoints)가 필요합니다.
+**중요:** 휴먼 인 더 루프 미들웨어는 중단 간 상태를 유지하기 위해 [체크포인터](/oss/javascript/langgraph/persistence#checkpoints)가 필요합니다.
 
-전체 예제와 통합 패턴은 [human-in-the-loop 문서](/oss/javascript/langchain/human-in-the-loop)를 참조하세요.
+전체 예제 및 통합 패턴은 [휴먼 인 더 루프 문서](/oss/javascript/langchain/human-in-the-loop)를 참조하세요.
 </Note>
 
 ### Anthropic 프롬프트 캐싱
 
-Anthropic 모델에서 반복적인 프롬프트 접두사를 캐싱하여 비용을 절감합니다.
+Anthropic 모델로 반복적인 프롬프트 접두사를 캐싱하여 비용을 절감합니다.
 
 <Tip>
-**다음과 같은 경우에 적합합니다:**
-- 긴 반복 시스템 프롬프트를 가진 애플리케이션
-- 여러 호출에서 동일한 컨텍스트를 재사용하는 에이전트
-- 대량 배포의 API 비용 절감
+**다음과 같은 경우에 적합:**
+- 길고 반복되는 시스템 프롬프트가 있는 애플리케이션
+- 호출 간 동일한 컨텍스트를 재사용하는 에이전트
+- 대량 배포를 위한 API 비용 절감
 </Tip>
 
 <Info>
-[Anthropic Prompt Caching](https://docs.claude.com/en/docs/build-with-claude/prompt-caching#cache-limitations) 전략 및 제한사항에 대해 자세히 알아보세요.
+[Anthropic 프롬프트 캐싱](https://docs.claude.com/en/docs/build-with-claude/prompt-caching#cache-limitations) 전략 및 제한 사항에 대해 자세히 알아보세요.
 </Info>
 
 
@@ -235,14 +234,14 @@ await agent.invoke({
   messages: [new HumanMessage("Hi, my name is Bob")]
 });
 
-// 캐시 히트, 시스템 프롬프트가 캐시됨
+// 캐시 히트, 시스템 프롬프트가 캐싱됨
 const result = await agent.invoke({
   messages: [new HumanMessage("What's my name?")]
 });
 ```
 
 
-<Accordion title="구성 옵션">
+<Accordion title="설정 옵션">
 
 
 
@@ -258,9 +257,9 @@ const result = await agent.invoke({
 무한 루프나 과도한 비용을 방지하기 위해 모델 호출 수를 제한합니다.
 
 <Tip>
-**다음과 같은 경우에 적합합니다:**
-- 폭주하는 에이전트가 너무 많은 API 호출을 하는 것을 방지
-- 프로덕션 배포에서 비용 통제 적용
+**다음과 같은 경우에 적합:**
+- 너무 많은 API 호출을 하는 에이전트 방지
+- 프로덕션 배포에 대한 비용 제어 강제
 - 특정 호출 예산 내에서 에이전트 동작 테스트
 </Tip>
 
@@ -274,21 +273,21 @@ const agent = createAgent({
   tools: [...],
   middleware: [
     modelCallLimitMiddleware({
-      threadLimit: 10, // 스레드당 최대 10회 호출 (실행 간)
-      runLimit: 5, // 실행당 최대 5회 호출 (단일 호출)
-      exitBehavior: "end", // 또는 "error"로 예외 throw
+      threadLimit: 10, // 스레드당 최대 10회 호출(실행 간)
+      runLimit: 5, // 실행당 최대 5회 호출(단일 호출)
+      exitBehavior: "end", // 또는 "error"로 예외 발생
     }),
   ],
 });
 ```
 
 
-<Accordion title="구성 옵션">
+<Accordion title="설정 옵션">
 
 
 
 <ParamField body="threadLimit" type="number">
-  스레드의 모든 실행에서 최대 모델 호출 수. 기본값은 제한 없음입니다.
+  스레드의 모든 실행에 걸친 최대 모델 호출 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="runLimit" type="number">
@@ -296,7 +295,7 @@ const agent = createAgent({
 </ParamField>
 
 <ParamField body="exitBehavior" type="string" default="end">
-  제한에 도달했을 때의 동작. 옵션: `"end"` (정상 종료) 또는 `"error"` (예외 throw)
+  제한 도달 시 동작. 옵션: `"end"`(정상 종료) 또는 `"error"`(예외 발생)
 </ParamField>
 
 
@@ -304,13 +303,13 @@ const agent = createAgent({
 
 ### 도구 호출 제한
 
-특정 도구 또는 모든 도구에 대한 호출 수를 제한합니다.
+특정 도구 또는 모든 도구에 대한 도구 호출 수를 제한합니다.
 
 <Tip>
-**다음과 같은 경우에 적합합니다:**
-- 비싼 외부 API에 대한 과도한 호출 방지
+**다음과 같은 경우에 적합:**
+- 비용이 많이 드는 외부 API에 대한 과도한 호출 방지
 - 웹 검색 또는 데이터베이스 쿼리 제한
-- 특정 도구 사용에 대한 속도 제한 적용
+- 특정 도구 사용에 대한 속도 제한 강제
 </Tip>
 
 
@@ -336,16 +335,16 @@ const agent = createAgent({
 ```
 
 
-<Accordion title="구성 옵션">
+<Accordion title="설정 옵션">
 
 
 
 <ParamField body="toolName" type="string">
-  제한할 특정 도구. 제공하지 않으면 모든 도구에 제한이 적용됩니다.
+  제한할 특정 도구. 제공되지 않으면 모든 도구에 제한이 적용됩니다.
 </ParamField>
 
 <ParamField body="threadLimit" type="number">
-  스레드의 모든 실행에서 최대 도구 호출 수. 기본값은 제한 없음입니다.
+  스레드의 모든 실행에 걸친 최대 도구 호출 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="runLimit" type="number">
@@ -353,7 +352,7 @@ const agent = createAgent({
 </ParamField>
 
 <ParamField body="exitBehavior" type="string" default="end">
-  제한에 도달했을 때의 동작. 옵션: `"end"` (정상 종료) 또는 `"error"` (예외 throw)
+  제한 도달 시 동작. 옵션: `"end"`(정상 종료) 또는 `"error"`(예외 발생)
 </ParamField>
 
 
@@ -361,13 +360,13 @@ const agent = createAgent({
 
 ### 모델 폴백
 
-기본 모델이 실패할 때 대체 모델로 자동으로 폴백합니다.
+기본 모델이 실패할 때 대체 모델로 자동 폴백합니다.
 
 <Tip>
-**다음과 같은 경우에 적합합니다:**
-- 모델 장애를 처리하는 복원력 있는 에이전트 구축
+**다음과 같은 경우에 적합:**
+- 모델 중단을 처리하는 복원력 있는 에이전트 구축
 - 더 저렴한 모델로 폴백하여 비용 최적화
-- OpenAI, Anthropic 등에 걸친 공급자 중복성
+- OpenAI, Anthropic 등의 제공업체 중복성
 </Tip>
 
 
@@ -380,7 +379,7 @@ const agent = createAgent({
   tools: [...],
   middleware: [
     modelFallbackMiddleware(
-      "openai:gpt-4o-mini", // 오류 시 먼저 시도
+      "openai:gpt-4o-mini", // 오류 시 첫 번째 시도
       "anthropic:claude-3-5-sonnet-20241022" // 그 다음 이것
     ),
   ],
@@ -388,11 +387,11 @@ const agent = createAgent({
 ```
 
 
-<Accordion title="구성 옵션">
+<Accordion title="설정 옵션">
 
 
 
-middleware는 순서대로 폴백 모델을 나타내는 가변 개수의 문자열 인수를 받습니다:
+미들웨어는 폴백 모델을 나타내는 가변 개수의 문자열 인수를 순서대로 받습니다:
 
 <ParamField body="...models" type="string[]" required>
   기본 모델이 실패할 때 순서대로 시도할 하나 이상의 폴백 모델 문자열
@@ -414,9 +413,9 @@ middleware는 순서대로 폴백 모델을 나타내는 가변 개수의 문자
 대화에서 개인 식별 정보를 탐지하고 처리합니다.
 
 <Tip>
-**다음과 같은 경우에 적합합니다:**
-- 규정 준수 요구사항이 있는 의료 및 금융 애플리케이션
-- 로그를 정화해야 하는 고객 서비스 에이전트
+**다음과 같은 경우에 적합:**
+- 규정 준수 요구 사항이 있는 의료 및 금융 애플리케이션
+- 로그를 정제해야 하는 고객 서비스 에이전트
 - 민감한 사용자 데이터를 처리하는 모든 애플리케이션
 </Tip>
 
@@ -429,70 +428,70 @@ const agent = createAgent({
   model: "openai:gpt-4o",
   tools: [...],
   middleware: [
-    // 사용자 입력의 이메일 수정
+    // 사용자 입력에서 이메일 수정
     piiRedactionMiddleware({
       piiType: "email",
       strategy: "redact",
       applyToInput: true,
     }),
-    // 신용카드 마스킹 (마지막 4자리 표시)
+    // 신용카드 마스킹(마지막 4자리 표시)
     piiRedactionMiddleware({
       piiType: "credit_card",
       strategy: "mask",
       applyToInput: true,
     }),
-    // 정규식을 사용한 커스텀 PII 유형
+    // 정규식으로 사용자 정의 PII 유형
     piiRedactionMiddleware({
       piiType: "api_key",
       detector: /sk-[a-zA-Z0-9]{32}/,
-      strategy: "block", // 탐지 시 오류 throw
+      strategy: "block", // 탐지되면 오류 발생
     }),
   ],
 });
 ```
 
 
-<Accordion title="구성 옵션">
+<Accordion title="설정 옵션">
 
 
 
 <ParamField body="piiType" type="string" required>
-  탐지할 PII 유형. 내장 유형(`email`, `credit_card`, `ip`, `mac_address`, `url`) 또는 커스텀 유형 이름일 수 있습니다.
+  탐지할 PII 유형. 내장 유형(`email`, `credit_card`, `ip`, `mac_address`, `url`) 또는 사용자 정의 유형 이름일 수 있습니다.
 </ParamField>
 
 <ParamField body="strategy" type="string" default="redact">
-  탐지된 PII를 처리하는 방법. 옵션:
-  - `"block"` - 탐지 시 오류 throw
-  - `"redact"` - `[REDACTED_TYPE]`으로 교체
-  - `"mask"` - 부분 마스킹 (예: `****-****-****-1234`)
-  - `"hash"` - 결정론적 해시로 교체
+  탐지된 PII 처리 방법. 옵션:
+  - `"block"` - 탐지 시 오류 발생
+  - `"redact"` - `[REDACTED_TYPE]`으로 대체
+  - `"mask"` - 부분 마스킹(예: `****-****-****-1234`)
+  - `"hash"` - 결정적 해시로 대체
 </ParamField>
 
 <ParamField body="detector" type="RegExp">
-  커스텀 탐지기 정규식 패턴. 제공하지 않으면 PII 유형에 대한 내장 탐지기를 사용합니다.
+  사용자 정의 탐지기 정규식 패턴. 제공되지 않으면 PII 유형에 대한 내장 탐지기를 사용합니다.
 </ParamField>
 
 <ParamField body="applyToInput" type="boolean" default="true">
-  모델 호출 전 사용자 메시지 확인
+  모델 호출 전 사용자 메시지 검사
 </ParamField>
 
 <ParamField body="applyToOutput" type="boolean" default="false">
-  모델 호출 후 AI 메시지 확인
+  모델 호출 후 AI 메시지 검사
 </ParamField>
 
 <ParamField body="applyToToolResults" type="boolean" default="false">
-  실행 후 도구 결과 메시지 확인
+  실행 후 도구 결과 메시지 검사
 </ParamField>
 
 
 </Accordion>
 
-### 계획(Planning)
+### 계획
 
 복잡한 다단계 작업을 위한 할 일 목록 관리 기능을 추가합니다.
 
 <Note>
-이 middleware는 에이전트에 `write_todos` 도구와 효과적인 작업 계획을 안내하는 시스템 프롬프트를 자동으로 제공합니다.
+이 미들웨어는 에이전트에게 `write_todos` 도구와 효과적인 작업 계획을 안내하는 시스템 프롬프트를 자동으로 제공합니다.
 </Note>
 
 
@@ -515,23 +514,23 @@ console.log(result.todos); // 상태 추적이 있는 할 일 항목 배열
 ```
 
 
-<Accordion title="구성 옵션">
+<Accordion title="설정 옵션">
 
 
 
-구성 옵션이 없습니다 (기본값 사용).
+사용 가능한 설정 옵션이 없습니다(기본값 사용).
 
 
 </Accordion>
 
 ### LLM 도구 선택기
 
-기본 모델을 호출하기 전에 LLM을 사용하여 관련 도구를 지능적으로 선택합니다.
+메인 모델을 호출하기 전에 LLM을 사용하여 관련 도구를 지능적으로 선택합니다.
 
 <Tip>
-**다음과 같은 경우에 적합합니다:**
-- 쿼리당 대부분이 관련 없는 많은 도구(10개 이상)를 가진 에이전트
-- 관련 없는 도구를 필터링하여 토큰 사용량 감소
+**다음과 같은 경우에 적합:**
+- 대부분이 쿼리당 관련이 없는 많은 도구(10개 이상)가 있는 에이전트
+- 관련 없는 도구를 필터링하여 토큰 사용량 줄이기
 - 모델 집중도 및 정확도 향상
 </Tip>
 
@@ -546,20 +545,20 @@ const agent = createAgent({
   middleware: [
     llmToolSelectorMiddleware({
       model: "openai:gpt-4o-mini", // 선택에 더 저렴한 모델 사용
-      maxTools: 3, // 가장 관련성 높은 3개 도구로 제한
-      alwaysInclude: ["search"], // 특정 도구는 항상 포함
+      maxTools: 3, // 가장 관련성 높은 도구 3개로 제한
+      alwaysInclude: ["search"], // 특정 도구 항상 포함
     }),
   ],
 });
 ```
 
 
-<Accordion title="구성 옵션">
+<Accordion title="설정 옵션">
 
 
 
 <ParamField body="model" type="string">
-  도구 선택을 위한 모델. 기본값은 에이전트의 주 모델입니다.
+  도구 선택을 위한 모델. 기본값은 에이전트의 메인 모델입니다.
 </ParamField>
 
 <ParamField body="maxTools" type="number">
@@ -567,7 +566,7 @@ const agent = createAgent({
 </ParamField>
 
 <ParamField body="alwaysInclude" type="string[]">
-  항상 선택에 포함할 도구 이름 배열
+  선택에 항상 포함할 도구 이름 배열
 </ParamField>
 
 
@@ -579,13 +578,13 @@ const agent = createAgent({
 
 ### 컨텍스트 편집
 
-도구 사용을 트리밍, 요약 또는 지움으로써 대화 컨텍스트를 관리합니다.
+도구 사용을 트리밍, 요약 또는 지우는 방식으로 대화 컨텍스트를 관리합니다.
 
 <Tip>
-**다음과 같은 경우에 적합합니다:**
-- 주기적인 컨텍스트 정리가 필요한 긴 대화
+**다음과 같은 경우에 적합:**
+- 정기적인 컨텍스트 정리가 필요한 긴 대화
 - 컨텍스트에서 실패한 도구 시도 제거
-- 커스텀 컨텍스트 관리 전략
+- 사용자 정의 컨텍스트 관리 전략
 </Tip>
 
 
@@ -607,7 +606,7 @@ const agent = createAgent({
 ```
 
 
-<Accordion title="구성 옵션">
+<Accordion title="설정 옵션">
 
 
 
@@ -624,23 +623,23 @@ const agent = createAgent({
 
 </Accordion>
 
-## 커스텀 middleware
+## 사용자 정의 미들웨어
 
-에이전트 실행 흐름의 특정 지점에서 실행되는 훅을 구현하여 커스텀 middleware를 구축합니다.
+에이전트 실행 흐름의 특정 지점에서 실행되는 훅을 구현하여 사용자 정의 미들웨어를 구축합니다.
 
 
 
-## 클래스 기반 middleware
+## 클래스 기반 미들웨어
 
 ### 두 가지 훅 스타일
 
 <CardGroup cols={2}>
-  <Card title="노드 스타일 훅" icon="diagram-project">
-    특정 실행 지점에서 순차적으로 실행됩니다. 로깅, 검증 및 상태 업데이트에 사용합니다.
-  </Card>
-  <Card title="래핑 스타일 훅" icon="arrows-rotate">
-    핸들러 호출을 완전히 제어하며 실행을 가로챕니다. 재시도, 캐싱 및 변환에 사용합니다.
-  </Card>
+    <Card title="노드 스타일 훅" icon="diagram-project">
+        특정 실행 지점에서 순차적으로 실행됩니다. 로깅, 유효성 검사 및 상태 업데이트에 사용합니다.
+    </Card>
+    <Card title="랩 스타일 훅" icon="arrows-rotate">
+        핸들러 호출을 완전히 제어하여 실행을 가로챕니다. 재시도, 캐싱 및 변환에 사용합니다.
+    </Card>
 </CardGroup>
 
 #### 노드 스타일 훅
@@ -649,13 +648,13 @@ const agent = createAgent({
 
 
 
-- `beforeAgent` - 에이전트 시작 전 (호출당 한 번)
+- `beforeAgent` - 에이전트 시작 전(호출당 한 번)
 - `beforeModel` - 각 모델 호출 전
 - `afterModel` - 각 모델 응답 후
-- `afterAgent` - 에이전트 완료 후 (호출당 최대 한 번)
+- `afterAgent` - 에이전트 완료 후(호출당 최대 한 번)
 
 
-**예시: 로깅 middleware**
+**예제: 로깅 미들웨어**
 
 
 
@@ -677,7 +676,7 @@ const loggingMiddleware = createMiddleware({
 ```
 
 
-**예시: 대화 길이 제한**
+**예제: 대화 길이 제한**
 
 
 
@@ -701,9 +700,9 @@ const createMessageLimitMiddleware = (maxMessages: number = 50) => {
 ```
 
 
-#### 래핑 스타일 훅
+#### 랩 스타일 훅
 
-실행을 가로채고 핸들러가 호출되는 시점을 제어합니다:
+실행을 가로채고 핸들러 호출 시점을 제어합니다:
 
 
 
@@ -711,9 +710,9 @@ const createMessageLimitMiddleware = (maxMessages: number = 50) => {
 - `wrapToolCall` - 각 도구 호출 주변
 
 
-핸들러가 0번 호출되는지(단락), 1번 호출되는지(정상 흐름), 여러 번 호출되는지(재시도 로직)를 결정합니다.
+핸들러를 0회(단락), 1회(정상 흐름) 또는 여러 번(재시도 로직) 호출할지 결정합니다.
 
-**예시: 모델 재시도 middleware**
+**예제: 모델 재시도 미들웨어**
 
 
 
@@ -741,7 +740,7 @@ const createRetryMiddleware = (maxRetries: number = 3) => {
 ```
 
 
-**예시: 동적 모델 선택**
+**예제: 동적 모델 선택**
 
 
 
@@ -764,7 +763,7 @@ const dynamicModelMiddleware = createMiddleware({
 ```
 
 
-**예시: 도구 호출 모니터링**
+**예제: 도구 호출 모니터링**
 
 
 
@@ -790,9 +789,9 @@ const toolMonitoringMiddleware = createMiddleware({
 ```
 
 
-### 커스텀 상태 스키마
+### 사용자 정의 상태 스키마
 
-Middleware는 커스텀 속성으로 에이전트의 상태를 확장할 수 있습니다. 커스텀 상태 유형을 정의하고 `state_schema`로 설정합니다:
+미들웨어는 사용자 정의 속성으로 에이전트의 상태를 확장할 수 있습니다. 사용자 정의 상태 타입을 정의하고 `state_schema`로 설정합니다:
 
 
 
@@ -800,7 +799,7 @@ Middleware는 커스텀 속성으로 에이전트의 상태를 확장할 수 있
 import { createMiddleware, createAgent, HumanMessage } from "langchain";
 import * as z from "zod";
 
-// 커스텀 상태 요구사항이 있는 Middleware
+// 사용자 정의 상태 요구 사항이 있는 미들웨어
 const callCounterMiddleware = createMiddleware({
   name: "CallCounterMiddleware",
   stateSchema: z.object({
@@ -808,14 +807,14 @@ const callCounterMiddleware = createMiddleware({
     userId: z.string().optional(),
   }),
   beforeModel: (state) => {
-    // 커스텀 상태 속성 접근
+    // 사용자 정의 상태 속성 접근
     if (state.modelCallCount > 10) {
       return { jumpTo: "end" };
     }
     return;
   },
   afterModel: (state) => {
-    // 커스텀 상태 업데이트
+    // 사용자 정의 상태 업데이트
     return { modelCallCount: state.modelCallCount + 1 };
   },
 });
@@ -831,7 +830,7 @@ const agent = createAgent({
   middleware: [callCounterMiddleware] as const,
 });
 
-// TypeScript는 필수 상태 속성을 강제합니다
+// TypeScript가 필요한 상태 속성을 강제합니다
 const result = await agent.invoke({
   messages: [new HumanMessage("Hello")],
   modelCallCount: 0, // 기본값으로 인해 선택사항
@@ -843,10 +842,10 @@ const result = await agent.invoke({
 
 ### 컨텍스트 확장
 
-컨텍스트 속성은 실행 가능한 구성을 통해 전달되는 구성 값입니다. 상태와 달리 컨텍스트는 읽기 전용이며 일반적으로 실행 중에 변경되지 않는 구성에 사용됩니다.
+컨텍스트 속성은 실행 가능 설정을 통해 전달되는 설정 값입니다. 상태와 달리 컨텍스트는 읽기 전용이며 일반적으로 실행 중에 변경되지 않는 설정에 사용됩니다.
 
 
-Middleware는 에이전트의 구성을 통해 충족되어야 하는 컨텍스트 요구사항을 정의할 수 있습니다:
+미들웨어는 에이전트의 설정을 통해 충족되어야 하는 컨텍스트 요구 사항을 정의할 수 있습니다:
 
 ```typescript
 import * as z from "zod";
@@ -872,7 +871,7 @@ const rateLimitMiddleware = createMiddleware({
   },
 });
 
-// 컨텍스트는 구성을 통해 제공됩니다
+// 컨텍스트는 설정을 통해 제공됩니다
 await agent.invoke(
   { messages: [new HumanMessage("Process data")] },
   {
@@ -887,7 +886,7 @@ await agent.invoke(
 
 ### 실행 순서
 
-여러 middleware를 사용할 때 실행 순서를 이해하는 것이 중요합니다:
+여러 미들웨어를 사용할 때 실행 순서를 이해하는 것이 중요합니다:
 
 
 
@@ -900,9 +899,9 @@ const agent = createAgent({
 ```
 
 
-<Accordion title="실행 흐름 (확장하려면 클릭)">
+<Accordion title="실행 흐름(펼치려면 클릭)">
 
-**Before 훅은 순서대로 실행:**
+**Before 훅은 순서대로 실행됩니다:**
 
 1. `middleware1.before_agent()`
 2. `middleware2.before_agent()`
@@ -914,11 +913,11 @@ __에이전트 루프 시작__
 6. `middleware2.before_model()`
 7. `middleware3.before_model()`
 
-**Wrap 훅은 함수 호출처럼 중첩:**
+**Wrap 훅은 함수 호출처럼 중첩됩니다:**
 
 8. `middleware1.wrap_model_call()` → `middleware2.wrap_model_call()` → `middleware3.wrap_model_call()` → model
 
-**After 훅은 역순으로 실행:**
+**After 훅은 역순으로 실행됩니다:**
 
 9. `middleware3.after_model()`
 10. `middleware2.after_model()`
@@ -934,12 +933,12 @@ __에이전트 루프 종료__
 
 **주요 규칙:**
 - `before_*` 훅: 처음부터 마지막까지
-- `after_*` 훅: 마지막부터 처음까지 (역순)
-- `wrap_*` 훅: 중첩됨 (첫 번째 middleware가 다른 모든 것을 감쌈)
+- `after_*` 훅: 마지막부터 처음까지(역순)
+- `wrap_*` 훅: 중첩됨(첫 번째 미들웨어가 다른 모든 미들웨어를 감쌈)
 
 ### 에이전트 점프
 
-middleware에서 조기에 종료하려면 `jump_to`가 포함된 딕셔너리를 반환합니다:
+미들웨어에서 조기에 종료하려면 `jump_to`가 포함된 딕셔너리를 반환합니다:
 
 
 
@@ -966,11 +965,11 @@ const earlyExitMiddleware = createMiddleware({
 
 - `"end"`: 에이전트 실행의 끝으로 점프
 - `"tools"`: 도구 노드로 점프
-- `"model"`: 모델 노드로 점프 (또는 첫 번째 `before_model` 훅)
+- `"model"`: 모델 노드로 점프(또는 첫 번째 `before_model` 훅)
 
-**중요:** `before_model` 또는 `after_model`에서 점프할 때 `"model"`로 점프하면 모든 `before_model` middleware가 다시 실행됩니다.
+**중요:** `before_model` 또는 `after_model`에서 점프할 때, `"model"`로 점프하면 모든 `before_model` 미들웨어가 다시 실행됩니다.
 
-점프를 활성화하려면 훅을 `@hook_config(can_jump_to=[...])`로 데코레이트합니다:
+점프를 활성화하려면 훅을 `@hook_config(can_jump_to=[...])`로 장식합니다:
 
 
 
@@ -991,21 +990,21 @@ const conditionalMiddleware = createMiddleware({
 
 ### 모범 사례
 
-1. Middleware를 집중적으로 유지 - 각각은 한 가지를 잘 수행해야 합니다
-2. 오류를 우아하게 처리 - middleware 오류가 에이전트를 충돌시키지 않도록 합니다
-3. **적절한 훅 유형 사용**:
-    - 순차 로직을 위한 노드 스타일 (로깅, 검증)
-    - 제어 흐름을 위한 래핑 스타일 (재시도, 폴백, 캐싱)
-4. 커스텀 상태 속성을 명확하게 문서화합니다
-5. 통합하기 전에 middleware를 독립적으로 단위 테스트합니다
-6. 실행 순서 고려 - 중요한 middleware를 목록의 첫 번째에 배치합니다
-7. 가능한 경우 내장 middleware 사용 - 바퀴를 재발명하지 마세요 :)
+1. 미들웨어를 집중적으로 유지 - 각각 한 가지 일을 잘 수행해야 함
+2. 오류를 우아하게 처리 - 미들웨어 오류로 인해 에이전트가 중단되지 않도록 함
+3. **적절한 훅 타입 사용**:
+    - 순차적 로직(로깅, 유효성 검사)에는 노드 스타일
+    - 제어 흐름(재시도, 폴백, 캐싱)에는 랩 스타일
+4. 사용자 정의 상태 속성을 명확하게 문서화
+5. 통합하기 전에 미들웨어를 독립적으로 단위 테스트
+6. 실행 순서 고려 - 중요한 미들웨어를 목록의 첫 번째에 배치
+7. 가능한 경우 내장 미들웨어 사용, 바퀴를 재발명하지 마세요 :)
 
 ## 예제
 
-### 도구를 동적으로 선택하기
+### 도구 동적 선택
 
-런타임에 관련 도구를 선택하여 성능과 정확도를 향상시킵니다.
+성능 및 정확도를 향상시키기 위해 런타임에 관련 도구를 선택합니다.
 
 <Tip>
 **이점:**
@@ -1022,7 +1021,7 @@ import { createAgent, createMiddleware } from "langchain";
 const toolSelectorMiddleware = createMiddleware({
   name: "ToolSelector",
   wrapModelCall: (request, handler) => {
-    // 상태/컨텍스트를 기반으로 작고 관련성 높은 도구 하위 집합 선택
+    // 상태/컨텍스트에 따라 작고 관련성 높은 도구 하위 집합 선택
     const relevantTools = selectRelevantTools(request.state, request.runtime);
     const modifiedRequest = { ...request, tools: relevantTools };
     return handler(modifiedRequest);
@@ -1031,8 +1030,8 @@ const toolSelectorMiddleware = createMiddleware({
 
 const agent = createAgent({
   model: "openai:gpt-4o",
-  tools: allTools, // 모든 사용 가능한 도구를 미리 등록해야 합니다
-  // Middleware를 사용하여 주어진 실행에 관련된 더 작은 하위 집합을 선택할 수 있습니다.
+  tools: allTools, // 사용 가능한 모든 도구를 미리 등록해야 함
+  // 미들웨어를 사용하여 주어진 실행에 관련된 더 작은 하위 집합을 선택할 수 있습니다.
   middleware: [toolSelectorMiddleware],
 });
 ```
@@ -1108,16 +1107,16 @@ await agent.invoke(
 
 **주요 포인트:**
 - 모든 도구를 미리 등록
-- Middleware가 요청당 관련 하위 집합을 선택
-- 구성 요구사항에 `contextSchema` 사용
+- 미들웨어가 요청당 관련 하위 집합 선택
+- 설정 요구 사항에 `contextSchema` 사용
 
 
 </Expandable>
 
 ## 추가 리소스
 
-- [Middleware API 참조](https://reference.langchain.com/python/langchain/middleware/) - 커스텀 middleware에 대한 완전한 가이드
-- [Human-in-the-loop](/oss/javascript/langchain/human-in-the-loop) - 민감한 작업에 대한 사람의 검토 추가
+- [미들웨어 API 레퍼런스](https://reference.langchain.com/python/langchain/middleware/) - 사용자 정의 미들웨어 전체 가이드
+- [휴먼 인 더 루프](/oss/javascript/langchain/human-in-the-loop) - 민감한 작업에 대한 사람의 검토 추가
 - [에이전트 테스트](/oss/javascript/langchain/test) - 안전 메커니즘 테스트 전략
 
 ---

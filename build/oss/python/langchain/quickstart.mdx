@@ -3,21 +3,23 @@ title: 빠른 시작
 ---
 
 
-이 빠른 시작 가이드는 간단한 설정에서 완전히 작동하는 AI 에이전트까지 단 몇 분 만에 구축하는 방법을 안내합니다.
+
+이 빠른 시작 가이드는 간단한 설정에서 완전히 작동하는 AI 에이전트를 단 몇 분 만에 구축하는 방법을 안내합니다.
 
 ## 기본 에이전트 구축하기
 
-질문에 답하고 도구를 호출할 수 있는 간단한 에이전트를 만드는 것부터 시작합니다. 이 에이전트는 Claude Sonnet 4.5를 언어 모델로 사용하고, 기본적인 날씨 함수를 도구로 사용하며, 간단한 프롬프트로 동작을 안내합니다.
+질문에 답하고 도구를 호출할 수 있는 간단한 에이전트를 만들어 보겠습니다. 이 에이전트는 언어 모델로 Claude Sonnet 4.5를 사용하고, 도구로 기본적인 날씨 함수를 사용하며, 동작을 안내하는 간단한 프롬프트를 사용합니다.
 
 ```python
 from langchain.agents import create_agent
+
 
 def get_weather(city: str) -> str:
     """Get weather for a given city."""
     return f"It's always sunny in {city}!"
 
 agent = create_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[get_weather],
     system_prompt="You are a helpful assistant",
 )
@@ -32,28 +34,28 @@ agent.invoke(
 
 
 <Info>
-    이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
+    이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 발급받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
 </Info>
 
 ## 실전 에이전트 구축하기
 
-다음으로, 주요 프로덕션 개념을 보여주는 실용적인 날씨 예보 에이전트를 구축합니다:
+이제 주요 프로덕션 개념을 보여주는 실용적인 날씨 예보 에이전트를 구축해 보겠습니다:
 
 1. **상세한 시스템 프롬프트**로 더 나은 에이전트 동작 구현
 2. **외부 데이터와 통합되는 도구 생성**
 3. **일관된 응답을 위한 모델 구성**
 4. **예측 가능한 결과를 위한 구조화된 출력**
-5. **채팅과 같은 상호작용을 위한 대화 메모리**
-6. **에이전트 생성 및 실행**으로 완전히 작동하는 에이전트 만들기
+5. **대화형 상호작용을 위한 대화 메모리**
+6. **완전히 기능하는 에이전트 생성 및 실행**
 
-각 단계를 살펴보겠습니다:
+각 단계를 차례대로 살펴보겠습니다:
 
 <Steps>
     <Step title="시스템 프롬프트 정의하기">
         시스템 프롬프트는 에이전트의 역할과 동작을 정의합니다. 구체적이고 실행 가능하게 작성하세요:
 
         ```python wrap
-        system_prompt = """You are an expert weather forecaster, who speaks in puns.
+        SYSTEM_PROMPT = """You are an expert weather forecaster, who speaks in puns.
 
         You have access to two tools:
 
@@ -67,10 +69,10 @@ agent.invoke(
 
     </Step>
     <Step title="도구 생성하기">
-        [도구](/oss/python/langchain/tools)를 사용하면 모델이 사용자가 정의한 함수를 호출하여 외부 시스템과 상호작용할 수 있습니다.
+        [도구](/oss/python/langchain/tools)는 모델이 정의한 함수를 호출하여 외부 시스템과 상호작용할 수 있게 합니다.
         도구는 [런타임 컨텍스트](/oss/python/langchain/runtime)에 의존할 수 있으며 [에이전트 메모리](/oss/python/langchain/short-term-memory)와도 상호작용할 수 있습니다.
 
-        아래에서 `get_user_location` 도구가 런타임 컨텍스트를 어떻게 사용하는지 확인하세요:
+        아래에서 `get_user_location` 도구가 런타임 컨텍스트를 사용하는 방법을 확인하세요:
 
         ```python
         from dataclasses import dataclass
@@ -94,21 +96,21 @@ agent.invoke(
         ```
 
         <Tip>
-            도구는 잘 문서화되어야 합니다: 도구의 이름, 설명, 인수 이름이 모델의 프롬프트의 일부가 됩니다.
-            LangChain의 [`@tool` 데코레이터](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool)는 메타데이터를 추가하고 `ToolRuntime` 매개변수를 통한 런타임 주입을 가능하게 합니다.
+            Tools should be well-documented: their name, description, and argument names become part of the model's prompt.
+            LangChain's [`@tool` decorator](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool) adds metadata and enables runtime injection via the `ToolRuntime` parameter.
         </Tip>
 
 
 
     </Step>
-    <Step title="모델 구성하기">
-        사용 사례에 적합한 [매개변수](/oss/python/langchain/models#parameters)로 [언어 모델](/oss/python/langchain/models)을 설정하세요:
+    <Step title="Configure your model">
+        Set up your [language model](/oss/python/langchain/models) with the right [parameters](/oss/python/langchain/models#parameters) for your use case:
 
         ```python
         from langchain.chat_models import init_chat_model
 
         model = init_chat_model(
-            "anthropic:claude-sonnet-4-5-20250929",
+            "anthropic:claude-sonnet-4-5",
             temperature=0.5,
             timeout=10,
             max_tokens=1000
@@ -118,8 +120,9 @@ agent.invoke(
 
 
     </Step>
-    <Step title="응답 형식 정의하기">
-        에이전트 응답이 특정 스키마와 일치해야 하는 경우, 선택적으로 구조화된 응답 형식을 정의할 수 있습니다.
+    <Step title="Define response format">
+        Optionally, define a structured response format if you need the agent responses to match
+        a specific schema.
 
         ```python
         from dataclasses import dataclass
@@ -137,8 +140,9 @@ agent.invoke(
 
 
     </Step>
-    <Step title="메모리 추가하기">
-        에이전트에 [메모리](/oss/python/langchain/short-term-memory)를 추가하여 상호작용 간 상태를 유지합니다. 이를 통해 에이전트가 이전 대화와 컨텍스트를 기억할 수 있습니다.
+    <Step title="Add memory">
+        Add [memory](/oss/python/langchain/short-term-memory) to your agent to maintain state across interactions. This allows
+        the agent to remember previous conversations and context.
 
         ```python
         from langgraph.checkpoint.memory import InMemorySaver
@@ -150,17 +154,17 @@ agent.invoke(
 
 
         <Info>
-            프로덕션 환경에서는 데이터베이스에 저장하는 영구 체크포인터를 사용하세요.
-            자세한 내용은 [메모리 추가 및 관리](/oss/python/langgraph/add-memory#manage-short-term-memory)를 참조하세요.
+            In production, use a persistent checkpointer that saves to a database.
+            See [Add and manage memory](/oss/python/langgraph/add-memory#manage-short-term-memory) for more details.
         </Info>
     </Step>
-    <Step title="에이전트 생성 및 실행하기">
-        이제 모든 구성 요소로 에이전트를 조립하고 실행해보세요!
+    <Step title="Create and run the agent">
+        Now assemble your agent with all the components and run it!
 
         ```python
         agent = create_agent(
             model=model,
-            system_prompt=system_prompt,
+            system_prompt=SYSTEM_PROMPT,
             tools=[get_user_location, get_weather_for_location],
             context_schema=Context,
             response_format=ResponseFormat,
@@ -201,7 +205,7 @@ agent.invoke(
     </Step>
 </Steps>
 
-<Expandable title="전체 예제 코드">
+<Expandable title="Full example code">
 ```python
 from dataclasses import dataclass
 
@@ -210,8 +214,9 @@ from langchain.chat_models import init_chat_model
 from langchain.tools import tool, ToolRuntime
 from langgraph.checkpoint.memory import InMemorySaver
 
+
 # Define system prompt
-system_prompt = """You are an expert weather forecaster, who speaks in puns.
+SYSTEM_PROMPT = """You are an expert weather forecaster, who speaks in puns.
 
 You have access to two tools:
 
@@ -240,7 +245,7 @@ def get_user_location(runtime: ToolRuntime[Context]) -> str:
 
 # Configure model
 model = init_chat_model(
-    "anthropic:claude-sonnet-4-5-20250929",
+    "anthropic:claude-sonnet-4-5",
     temperature=0
 )
 
@@ -259,7 +264,7 @@ checkpointer = InMemorySaver()
 # Create agent
 agent = create_agent(
     model=model,
-    system_prompt=system_prompt,
+    system_prompt=SYSTEM_PROMPT,
     tools=[get_user_location, get_weather_for_location],
     context_schema=Context,
     response_format=ResponseFormat,
@@ -302,13 +307,13 @@ print(response['structured_response'])
 
 </Expandable>
 
-축하합니다! 이제 다음과 같은 기능을 가진 AI 에이전트를 구축했습니다:
+Congratulations! You now have an AI agent that can:
 
-- **컨텍스트를 이해하고** 대화를 기억합니다
-- **여러 도구를 지능적으로** 사용합니다
-- **일관된 형식으로 구조화된 응답을** 제공합니다
-- **컨텍스트를 통해 사용자별 정보를** 처리합니다
-- **상호작용 간 대화 상태를** 유지합니다
+- **Understand context** and remember conversations
+- **Use multiple tools** intelligently
+- **Provide structured responses** in a consistent format
+- **Handle user-specific information** through context
+- **Maintain conversation state** across interactions
 
 ---
 

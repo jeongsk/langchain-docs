@@ -2,36 +2,35 @@
 title: 빠른 시작
 ---
 
-import AlphaCallout from "/snippets/alpha-lg-callout.mdx";
 
-<AlphaCallout />
 
-이 빠른 시작에서는 LangGraph Graph API 또는 Functional API를 사용하여 계산기 에이전트를 구축하는 방법을 보여줍니다.
+이 빠른 시작에서는 LangGraph Graph API 또는 Functional API를 사용하여 계산기 에이전트를 구축하는 방법을 안내합니다.
 
-- 에이전트를 노드와 에지의 그래프로 정의하려면 [Graph API 사용](#use-the-graph-api)을 선택하세요.
-- 에이전트를 단일 함수로 정의하려면 [Functional API 사용](#use-the-functional-api)을 선택하세요.
+- 노드와 엣지로 구성된 그래프 형태로 에이전트를 정의하려면 [Graph API 사용하기](#use-the-graph-api)를 참고하세요.
+- 단일 함수 형태로 에이전트를 정의하려면 [Functional API 사용하기](#use-the-functional-api)를 참고하세요.
 
 <Tip>
-개념적인 정보는 [Graph API 개요](/oss/python/langgraph/graph-api)와 [Functional API 개요](/oss/python/langgraph/functional-api)를 참조하세요.
+개념적인 내용은 [Graph API 개요](/oss/python/langgraph/graph-api)와 [Functional API 개요](/oss/python/langgraph/functional-api)를 참고하세요.
 </Tip>
 
 <Info>
-이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 발급받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
+이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 만들고 API 키를 발급받아야 합니다. 발급받은 API 키는 터미널에서 `ANTHROPIC_API_KEY` 환경 변수로 설정해주세요.
 </Info>
 
 <Tabs>
 <Tab title="Use the Graph API">
 
-## 1. 도구와 모델 정의
+## 1. 도구와 모델 정의하기
 
-이 예제에서는 Claude 3.7 Sonnet 모델을 사용하고 덧셈, 곱셈, 나눗셈을 위한 도구를 정의합니다.
+이 예제에서는 Claude Sonnet 4.5 모델을 사용하고, 덧셈, 곱셈, 나눗셈을 수행하는 도구를 정의합니다.
 
 ```python
 from langchain.tools import tool
 from langchain.chat_models import init_chat_model
 
-llm = init_chat_model(
-    "anthropic:claude-3-7-sonnet-latest",
+
+model = init_chat_model(
+    "anthropic:claude-sonnet-4-5",
     temperature=0
 )
 
@@ -39,33 +38,33 @@ llm = init_chat_model(
 # Define tools
 @tool
 def multiply(a: int, b: int) -> int:
-    """Multiply a and b.
+    """Multiply `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a * b
 
 
 @tool
 def add(a: int, b: int) -> int:
-    """Adds a and b.
+    """Adds `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a + b
 
 
 @tool
 def divide(a: int, b: int) -> float:
-    """Divide a and b.
+    """Divide `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a / b
 
@@ -73,24 +72,27 @@ def divide(a: int, b: int) -> float:
 # Augment the LLM with tools
 tools = [add, multiply, divide]
 tools_by_name = {tool.name: tool for tool in tools}
-llm_with_tools = llm.bind_tools(tools)
+model_with_tools = model.bind_tools(tools)
 ```
 
 
 
 
-## 2. 상태 정의
+## 2. 상태 정의하기
 
 그래프의 상태는 메시지와 LLM 호출 횟수를 저장하는 데 사용됩니다.
 
 <Tip>
-    LangGraph의 State는 에이전트 실행 전반에 걸쳐 지속됩니다. `operator.add`와 함께 사용된 `Annotated` 타입은 새로운 메시지가 기존 목록을 대체하는 대신 추가되도록 보장합니다.
+    LangGraph의 상태는 에이전트 실행 전체에 걸쳐 유지됩니다.
+
+    `Annotated` 타입과 `operator.add`를 함께 사용하면, 새로운 메시지가 기존 목록을 대체하지 않고 추가되도록 보장합니다.
 </Tip>
 
 ```python
 from langchain.messages import AnyMessage
 from typing_extensions import TypedDict, Annotated
 import operator
+
 
 class MessagesState(TypedDict):
     messages: Annotated[list[AnyMessage], operator.add]
@@ -100,18 +102,20 @@ class MessagesState(TypedDict):
 
 
 
-## 3. 모델 노드 정의
+## 3. 모델 노드 정의하기
 
 모델 노드는 LLM을 호출하고 도구를 호출할지 여부를 결정하는 데 사용됩니다.
 
 ```python
 from langchain.messages import SystemMessage
+
+
 def llm_call(state: dict):
     """LLM decides whether to call a tool or not"""
 
     return {
         "messages": [
-            llm_with_tools.invoke(
+            model_with_tools.invoke(
                 [
                     SystemMessage(
                         content="You are a helpful assistant tasked with performing arithmetic on a set of inputs."
@@ -127,12 +131,13 @@ def llm_call(state: dict):
 
 
 
-## 4. 도구 노드 정의
+## 4. 도구 노드 정의하기
 
 도구 노드는 도구를 호출하고 결과를 반환하는 데 사용됩니다.
 
 ```python
 from langchain.messages import ToolMessage
+
 
 def tool_node(state: dict):
     """Performs the tool call"""
@@ -148,22 +153,25 @@ def tool_node(state: dict):
 
 
 
-## 5. 종료 로직 정의
+## 5. 종료 로직 정의하기
 
-조건부 에지 함수는 LLM이 도구 호출을 했는지 여부에 따라 도구 노드로 라우팅하거나 종료하는 데 사용됩니다.
+조건부 엣지 함수는 LLM이 도구를 호출했는지 여부에 따라 도구 노드로 라우팅하거나 종료하는 데 사용됩니다.
 
 ```python
 from typing import Literal
 from langgraph.graph import StateGraph, START, END
+
 
 def should_continue(state: MessagesState) -> Literal["tool_node", END]:
     """Decide if we should continue the loop or stop based upon whether the LLM made a tool call"""
 
     messages = state["messages"]
     last_message = messages[-1]
+
     # If the LLM makes a tool call, then perform an action
     if last_message.tool_calls:
         return "tool_node"
+
     # Otherwise, we stop (reply to the user)
     return END
 ```
@@ -171,9 +179,9 @@ def should_continue(state: MessagesState) -> Literal["tool_node", END]:
 
 
 
-## 6. 에이전트 빌드 및 컴파일
+## 6. 에이전트 빌드 및 컴파일하기
 
-에이전트는 `StateGraph` 클래스를 사용하여 빌드하고 `compile` 메서드를 사용하여 컴파일합니다.
+에이전트는 [`StateGraph`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph) 클래스를 사용하여 빌드하고, [`compile`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph.compile) 메서드로 컴파일합니다.
 
 ```python
 # Build workflow
@@ -210,17 +218,18 @@ for m in messages["messages"]:
 
 
 
-축하합니다! LangGraph Graph API를 사용하여 첫 번째 에이전트를 구축했습니다.
+축하합니다! LangGraph Graph API를 사용하여 첫 번째 에이전트를 구축하셨습니다.
 
-<Accordion title="전체 코드 예제">
+<Accordion title="Full code example">
 ```python
 # Step 1: Define tools and model
 
 from langchain.tools import tool
 from langchain.chat_models import init_chat_model
 
-llm = init_chat_model(
-    "anthropic:claude-3-7-sonnet-latest",
+
+model = init_chat_model(
+    "anthropic:claude-sonnet-4-5",
     temperature=0
 )
 
@@ -228,33 +237,33 @@ llm = init_chat_model(
 # Define tools
 @tool
 def multiply(a: int, b: int) -> int:
-    """Multiply a and b.
+    """Multiply `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a * b
 
 
 @tool
 def add(a: int, b: int) -> int:
-    """Adds a and b.
+    """Adds `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a + b
 
 
 @tool
 def divide(a: int, b: int) -> float:
-    """Divide a and b.
+    """Divide `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a / b
 
@@ -262,7 +271,7 @@ def divide(a: int, b: int) -> float:
 # Augment the LLM with tools
 tools = [add, multiply, divide]
 tools_by_name = {tool.name: tool for tool in tools}
-llm_with_tools = llm.bind_tools(tools)
+model_with_tools = model.bind_tools(tools)
 
 # Step 2: Define state
 
@@ -270,18 +279,21 @@ from langchain.messages import AnyMessage
 from typing_extensions import TypedDict, Annotated
 import operator
 
+
 class MessagesState(TypedDict):
     messages: Annotated[list[AnyMessage], operator.add]
     llm_calls: int
 
 # Step 3: Define model node
 from langchain.messages import SystemMessage
+
+
 def llm_call(state: dict):
     """LLM decides whether to call a tool or not"""
 
     return {
         "messages": [
-            llm_with_tools.invoke(
+            model_with_tools.invoke(
                 [
                     SystemMessage(
                         content="You are a helpful assistant tasked with performing arithmetic on a set of inputs."
@@ -298,6 +310,7 @@ def llm_call(state: dict):
 
 from langchain.messages import ToolMessage
 
+
 def tool_node(state: dict):
     """Performs the tool call"""
 
@@ -313,15 +326,18 @@ def tool_node(state: dict):
 from typing import Literal
 from langgraph.graph import StateGraph, START, END
 
+
 # Conditional edge function to route to the tool node or end based upon whether the LLM made a tool call
 def should_continue(state: MessagesState) -> Literal["tool_node", END]:
     """Decide if we should continue the loop or stop based upon whether the LLM made a tool call"""
 
     messages = state["messages"]
     last_message = messages[-1]
+
     # If the LLM makes a tool call, then perform an action
     if last_message.tool_calls:
         return "tool_node"
+
     # Otherwise, we stop (reply to the user)
     return END
 
@@ -362,22 +378,22 @@ for m in messages["messages"]:
 
 
 
-
 </Accordion>
 </Tab>
 
 <Tab title="Use the Functional API">
 
-## 1. 도구와 모델 정의
+## 1. 도구와 모델 정의하기
 
-이 예제에서는 Claude 3.7 Sonnet 모델을 사용하고 덧셈, 곱셈, 나눗셈을 위한 도구를 정의합니다.
+이 예제에서는 Claude Sonnet 4.5 모델을 사용하고, 덧셈, 곱셈, 나눗셈을 수행하는 도구를 정의합니다.
 
 ```python
 from langchain.tools import tool
 from langchain.chat_models import init_chat_model
 
-llm = init_chat_model(
-    "anthropic:claude-3-7-sonnet-latest",
+
+model = init_chat_model(
+    "anthropic:claude-sonnet-4-5",
     temperature=0
 )
 
@@ -385,33 +401,33 @@ llm = init_chat_model(
 # Define tools
 @tool
 def multiply(a: int, b: int) -> int:
-    """Multiply a and b.
+    """Multiply `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a * b
 
 
 @tool
 def add(a: int, b: int) -> int:
-    """Adds a and b.
+    """Adds `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a + b
 
 
 @tool
 def divide(a: int, b: int) -> float:
-    """Divide a and b.
+    """Divide `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a / b
 
@@ -419,34 +435,34 @@ def divide(a: int, b: int) -> float:
 # Augment the LLM with tools
 tools = [add, multiply, divide]
 tools_by_name = {tool.name: tool for tool in tools}
-llm_with_tools = llm.bind_tools(tools)
+model_with_tools = model.bind_tools(tools)
 
 from langgraph.graph import add_messages
 from langchain.messages import (
     SystemMessage,
     HumanMessage,
-    BaseMessage,
     ToolCall,
 )
+from langchain_core.messages import BaseMessage
 from langgraph.func import entrypoint, task
 ```
 
 
 
 
-## 2. 모델 노드 정의
+## 2. 모델 노드 정의하기
 
 모델 노드는 LLM을 호출하고 도구를 호출할지 여부를 결정하는 데 사용됩니다.
 
 <Tip>
-    `@task` 데코레이터는 함수를 에이전트의 일부로 실행할 수 있는 작업으로 표시합니다. 작업은 진입점 함수 내에서 동기적 또는 비동기적으로 호출될 수 있습니다.
+    [`@task`](https://reference.langchain.com/python/langgraph/func/#langgraph.func.task) 데코레이터는 함수를 에이전트의 일부로 실행될 수 있는 작업(task)으로 표시합니다. 작업은 진입점(entrypoint) 함수 내에서 동기 또는 비동기로 호출할 수 있습니다.
 </Tip>
 
 ```python
 @task
 def call_llm(messages: list[BaseMessage]):
     """LLM decides whether to call a tool or not"""
-    return llm_with_tools.invoke(
+    return model_with_tools.invoke(
         [
             SystemMessage(
                 content="You are a helpful assistant tasked with performing arithmetic on a set of inputs."
@@ -459,7 +475,7 @@ def call_llm(messages: list[BaseMessage]):
 
 
 
-## 3. 도구 노드 정의
+## 3. 도구 노드 정의하기
 
 도구 노드는 도구를 호출하고 결과를 반환하는 데 사용됩니다.
 
@@ -475,32 +491,32 @@ def call_tool(tool_call: ToolCall):
 
 
 
-## 4. 에이전트 정의
+## 4. 에이전트 정의하기
 
-에이전트는 `entrypoint` 함수를 사용하여 빌드합니다.
+에이전트는 [`@entrypoint`](https://reference.langchain.com/python/langgraph/func/#langgraph.func.entrypoint) 함수를 사용하여 빌드됩니다.
 
 <Note>
-    Functional API에서는 노드와 에지를 명시적으로 정의하는 대신, 단일 함수 내에서 표준 제어 흐름 로직(루프, 조건문)을 작성합니다.
+    Functional API에서는 노드와 엣지를 명시적으로 정의하는 대신, 단일 함수 내에서 표준 제어 흐름 로직(반복문, 조건문)을 작성합니다.
 </Note>
 
 ```python
 @entrypoint()
 def agent(messages: list[BaseMessage]):
-    llm_response = call_llm(messages).result()
+    model_response = call_llm(messages).result()
 
     while True:
-        if not llm_response.tool_calls:
+        if not model_response.tool_calls:
             break
 
         # Execute tools
         tool_result_futures = [
-            call_tool(tool_call) for tool_call in llm_response.tool_calls
+            call_tool(tool_call) for tool_call in model_response.tool_calls
         ]
         tool_results = [fut.result() for fut in tool_result_futures]
-        messages = add_messages(messages, [llm_response, *tool_results])
-        llm_response = call_llm(messages).result()
+        messages = add_messages(messages, [model_response, *tool_results])
+        model_response = call_llm(messages).result()
 
-    messages = add_messages(messages, llm_response)
+    messages = add_messages(messages, model_response)
     return messages
 
 # Invoke
@@ -513,17 +529,18 @@ for chunk in agent.stream(messages, stream_mode="updates"):
 
 
 
-축하합니다! LangGraph Functional API를 사용하여 첫 번째 에이전트를 구축했습니다.
+축하합니다! LangGraph Functional API를 사용하여 첫 번째 에이전트를 구축하셨습니다.
 
-<Accordion title="전체 코드 예제" icon="code">
+<Accordion title="Full code example" icon="code">
 ```python
 # Step 1: Define tools and model
 
 from langchain.tools import tool
 from langchain.chat_models import init_chat_model
 
-llm = init_chat_model(
-    "anthropic:claude-3-7-sonnet-latest",
+
+model = init_chat_model(
+    "anthropic:claude-sonnet-4-5",
     temperature=0
 )
 
@@ -531,33 +548,33 @@ llm = init_chat_model(
 # Define tools
 @tool
 def multiply(a: int, b: int) -> int:
-    """Multiply a and b.
+    """Multiply `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a * b
 
 
 @tool
 def add(a: int, b: int) -> int:
-    """Adds a and b.
+    """Adds `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a + b
 
 
 @tool
 def divide(a: int, b: int) -> float:
-    """Divide a and b.
+    """Divide `a` and `b`.
 
     Args:
-        a: first int
-        b: second int
+        a: First int
+        b: Second int
     """
     return a / b
 
@@ -565,22 +582,24 @@ def divide(a: int, b: int) -> float:
 # Augment the LLM with tools
 tools = [add, multiply, divide]
 tools_by_name = {tool.name: tool for tool in tools}
-llm_with_tools = llm.bind_tools(tools)
+model_with_tools = model.bind_tools(tools)
 
 from langgraph.graph import add_messages
 from langchain.messages import (
     SystemMessage,
     HumanMessage,
-    BaseMessage,
     ToolCall,
 )
+from langchain_core.messages import BaseMessage
 from langgraph.func import entrypoint, task
 
-# Step 2: define model node
+
+# Step 2: Define model node
+
 @task
 def call_llm(messages: list[BaseMessage]):
     """LLM decides whether to call a tool or not"""
-    return llm_with_tools.invoke(
+    return model_with_tools.invoke(
         [
             SystemMessage(
                 content="You are a helpful assistant tasked with performing arithmetic on a set of inputs."
@@ -590,7 +609,8 @@ def call_llm(messages: list[BaseMessage]):
     )
 
 
-# Step 3: define tool node
+# Step 3: Define tool node
+
 @task
 def call_tool(tool_call: ToolCall):
     """Performs the tool call"""
@@ -598,24 +618,25 @@ def call_tool(tool_call: ToolCall):
     return tool.invoke(tool_call)
 
 
-# Step 4: define agent
+# Step 4: Define agent
+
 @entrypoint()
 def agent(messages: list[BaseMessage]):
-    llm_response = call_llm(messages).result()
+    model_response = call_llm(messages).result()
 
     while True:
-        if not llm_response.tool_calls:
+        if not model_response.tool_calls:
             break
 
         # Execute tools
         tool_result_futures = [
-            call_tool(tool_call) for tool_call in llm_response.tool_calls
+            call_tool(tool_call) for tool_call in model_response.tool_calls
         ]
         tool_results = [fut.result() for fut in tool_result_futures]
-        messages = add_messages(messages, [llm_response, *tool_results])
-        llm_response = call_llm(messages).result()
+        messages = add_messages(messages, [model_response, *tool_results])
+        model_response = call_llm(messages).result()
 
-    messages = add_messages(messages, llm_response)
+    messages = add_messages(messages, model_response)
     return messages
 
 # Invoke
@@ -624,7 +645,6 @@ for chunk in agent.stream(messages, stream_mode="updates"):
     print(chunk)
     print("\n")
 ```
-
 
 
 

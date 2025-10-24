@@ -1,57 +1,57 @@
 ---
 title: FAQ
-description: Frequently Asked Questions
+description: 자주 묻는 질문
 ---
 
-<Accordion title="How much does an end to end Open SWE run cost?">
-  The cost per run varies greatly based on the complexity of the task, the size of the repository, and the number of files that need to be changed.
+<Accordion title="엔드-투-엔드 Open SWE 실행 비용은 얼마나 드나요?">
+  실행당 비용은 작업의 복잡도, 리포지토리 크기, 변경해야 하는 파일 수에 따라 크게 달라집니다.
 
-  For most tasks, you can expect to pay between `$0.50` -> `$3.00` when using Claude Sonnet 4.
-  For the same tasks running on Claude Opus 4/4.1, you can expect to pay between `$1.50` -> `$9.00`.
+  대부분의 작업에서 Claude Sonnet 4를 사용할 경우 `$0.50` ~ `$3.00` 정도의 비용이 발생합니다.
+  동일한 작업을 Claude Opus 4/4.1에서 실행할 경우 `$1.50` ~ `$9.00` 정도의 비용이 발생합니다.
 
-  Always remember to monitor your runs if you're cost conscious. The most expensive run I've seen Open SWE complete was ~50M Opus 4 tokens, costing `$25.00`.
+  비용을 고려하신다면 항상 실행 상황을 모니터링하시기 바랍니다. 제가 본 가장 비싼 Open SWE 실행은 약 50M Opus 4 토큰으로 `$25.00`가 발생했습니다.
 </Accordion>
 
-<Accordion title="Does Open SWE automatically cache tokens?">
-  Yes. When using Anthropic models, all input tokens are cached on Anthropic's servers.
+<Accordion title="Open SWE는 자동으로 토큰을 캐싱하나요?">
+  네. Anthropic 모델을 사용할 경우, 모든 입력 토큰이 Anthropic 서버에 캐싱됩니다.
 </Accordion>
 
-<Accordion title="Can I disable Open SWE from creating an issue when I submit a request?">
-  Yes. There's two ways to disable Open SWE from creating an issue when you submit a request:
+<Accordion title="요청을 제출할 때 Open SWE가 이슈를 생성하지 않도록 비활성화할 수 있나요?">
+  네. 요청을 제출할 때 Open SWE가 이슈를 생성하지 않도록 비활성화하는 방법은 두 가지가 있습니다:
 
-  1. Toggle the 'eye' icon in the main chat area when submitting a request.
-  2. In the configuration tab in settings, toggle the 'Should Create Issue' switch.
+  1. 요청을 제출할 때 메인 채팅 영역에서 '눈' 아이콘을 토글합니다.
+  2. 설정의 구성 탭에서 'Should Create Issue' 스위치를 토글합니다.
 
-  By default, it's set to `true`. By modifying this setting in the configuration tab, all runs will default to that setting. You may override this setting on a per-run basis by toggling the 'eye' icon in the main chat area.
+  기본값은 `true`로 설정되어 있습니다. 구성 탭에서 이 설정을 수정하면 모든 실행이 해당 설정을 기본값으로 사용합니다. 메인 채팅 영역에서 '눈' 아이콘을 토글하여 실행별로 이 설정을 재정의할 수 있습니다.
 
-  ![Should Create Issue Toggle](/images/dont_create_issue_eye_screenshot.png)
-  ![Global Should Create Issue Toggle](/images/dont_create_issue_global_toggle_screenshot.png)
+  ![Should Create Issue 토글](/images/dont_create_issue_eye_screenshot.png)
+  ![전역 Should Create Issue 토글](/images/dont_create_issue_global_toggle_screenshot.png)
 </Accordion>
 
-<Accordion title="My run failed midway through. What now?">
-  We're sorry you're experiencing this! Open SWE will automatically commit any changes it makes to a draft pull request. This means all of your progress is saved, and you can restart the run from the last checkpoint.
+<Accordion title="실행이 중간에 실패했습니다. 어떻게 해야 하나요?">
+  불편을 드려 죄송합니다! Open SWE는 변경 사항을 드래프트 풀 리퀘스트에 자동으로 커밋합니다. 이는 모든 진행 상황이 저장되며, 마지막 체크포인트부터 실행을 재시작할 수 있음을 의미합니다.
 
-  To restart the run, click the `Restart from last checkpoint` button. This will create a new thread and will resume from where it left off.
+  실행을 재시작하려면 `Restart from last checkpoint` 버튼을 클릭하세요. 이렇게 하면 새 스레드가 생성되고 중단된 지점부터 재개됩니다.
 
-  ![Restart Run Screenshot](/images/restart_run_screenshot.png)
+  ![실행 재시작 스크린샷](/images/restart_run_screenshot.png)
 </Accordion>
 
-<Accordion title="Can I use Open SWE in a production environment?">
-  Yes! We've been using Open SWE internally at LangChain for a while now, and it's been giving us great results.
+<Accordion title="프로덕션 환경에서 Open SWE를 사용할 수 있나요?">
+  네! LangChain 내부에서 한동안 Open SWE를 사용해 왔으며, 훌륭한 결과를 얻고 있습니다.
 
-  We recommend forking and deploying Open SWE yourself if you plan on using it in a production environment. For checking out the product, the [demo application](https://swe.langchain.com) will work fine.
+  프로덕션 환경에서 사용할 계획이라면 Open SWE를 직접 포크하여 배포하는 것을 권장합니다. 제품을 확인하는 용도라면 [데모 애플리케이션](https://swe.langchain.com)을 사용해도 괜찮습니다.
 </Accordion>
 
-<Accordion title="I installed Open SWE on a repository in my organization, but it doesn't show up in the UI. Why?">
-  Some GitHub organizations require administrator approval to install GitHub apps. Please reach out to an administrator in your organization to approve the installation request.  
+<Accordion title="조직의 리포지토리에 Open SWE를 설치했는데 UI에 표시되지 않습니다. 왜 그런가요?">
+  일부 GitHub 조직은 GitHub 앱을 설치하기 위해 관리자 승인이 필요합니다. 조직의 관리자에게 연락하여 설치 요청을 승인받으시기 바랍니다.
 </Accordion>
 
-<Accordion title="What sandbox environment is Open SWE running in?">
-  Open SWE's sandbox environment is powered by [Daytona.io](https://daytona.io).
+<Accordion title="Open SWE는 어떤 샌드박스 환경에서 실행되나요?">
+  Open SWE의 샌드박스 환경은 [Daytona.io](https://daytona.io)를 기반으로 합니다.
 </Accordion>
 
-<Accordion title="Can I contribute to Open SWE?">
-  Yes! We're always looking for contributors to help us improve Open SWE. Feel free to pick up an [open issue](https://github.com/langchain-ai/open-swe/issues) or submit a pull request with a new feature or bug fix.
+<Accordion title="Open SWE에 기여할 수 있나요?">
+  네! 저희는 항상 Open SWE 개선을 도와줄 기여자를 찾고 있습니다. [오픈 이슈](https://github.com/langchain-ai/open-swe/issues)를 선택하거나 새로운 기능 또는 버그 수정과 함께 풀 리퀘스트를 제출해 주세요.
 </Accordion>
 
 ---

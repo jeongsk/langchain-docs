@@ -1,106 +1,110 @@
 ---
-title: LangSmith docs
-sidebarTitle: Overview
+title: LangSmith 문서
+sidebarTitle: 개요
 mode: wide
 ---
 
-**LangSmith provides tools for developing, debugging, and deploying LLM applications.**
-It helps you trace requests, evaluate outputs, test prompts, and manage deployments in one place.
-LangSmith is framework agnostic, so you can use it with or without LangChain’s open-source libraries
-[`langchain`](/oss/python/langchain/overview) and [`langgraph`](/oss/python/langgraph/overview).
-Prototype locally, then move to production with integrated monitoring and evaluation to build more reliable AI systems.
+**LangSmith는 LLM 애플리케이션을 개발, 디버깅 및 배포하기 위한 도구를 제공합니다.**
+요청을 추적하고, 출력을 평가하며, 프롬프트를 테스트하고, 배포를 한곳에서 관리할 수 있도록 돕습니다.
+LangSmith는 프레임워크에 구애받지 않으므로, LangChain의 오픈소스 라이브러리인
+[`langchain`](/oss/python/langchain/overview)과 [`langgraph`](/oss/python/langgraph/overview) 없이도 사용할 수 있습니다.
+로컬에서 프로토타입을 만든 다음, 통합된 모니터링 및 평가를 통해 프로덕션으로 전환하여 더욱 안정적인 AI 시스템을 구축하세요.
 
-## Get started
+<Callout icon="bullhorn" color="#DFC5FE" iconType="regular">
+LangGraph Platform은 이제 [LangSmith Deployment](/langsmith/deployments)입니다. 자세한 내용은 [변경 로그](https://changelog.langchain.com/announcements/product-naming-changes-langsmith-deployment-and-langsmith-studio)를 확인하세요.
+</Callout>
+
+## 시작하기
 
 <Steps>
-<Step title="Create an account" icon="user-plus">
-Sign up at [smith.langchain.com](https://smith.langchain.com) (no credit card required).
-You can log in with **Google**, **GitHub**, or **email**.
-</Step>
-<Step title="Create an API key" icon="key">
-Go to your [Settings page](https://smith.langchain.com/settings) → **API Keys** → **Create API Key**.
-Copy the key and save it securely.
-</Step>
+    <Step title="계정 생성" icon="user-plus">
+        [smith.langchain.com](https://smith.langchain.com)에서 회원가입하세요(신용카드 불필요).
+        **Google**, **GitHub** 또는 **이메일**로 로그인할 수 있습니다.
+    </Step>
+    <Step title="API 키 생성" icon="key">
+        [설정 페이지](https://smith.langchain.com/settings) → **API Keys** → **Create API Key**로 이동하세요.
+        키를 복사하여 안전하게 보관하세요.
+    </Step>
 </Steps>
 
-Once your account and API key are ready, choose a quickstart to begin building with LangSmith:
+계정과 API 키가 준비되면, 빠른 시작 가이드를 선택하여 LangSmith로 구축을 시작하세요:
 
 <Columns cols={3}>
-  <Card
-    title="Observability"
-    icon="magnifying-glass"
-    href="/langsmith/observability-quickstart"
-    arrow="true"
-    cta="Start tracing"
-  >
-    Gain visibility into every step your application takes to debug faster and improve reliability.
-  </Card>
-
-  <Card
-    title="Evaluation"
-    icon="chart-line"
-    href="/langsmith/evaluation-quickstart"
-    arrow="true"
-    cta="Evaluate your app"
-  >
-    Measure and track quality over time to ensure your AI applications are consistent and trustworthy.
-  </Card>
-
-<Card
-    title="Deployment"
-    icon="cloud-arrow-up"
-    iconType="solid"
-    href="/langsmith/deployments"
-    arrow="true"
-    cta="Deploy your agents"
-    >
-    Deploy your agents as LangGraph Servers, ready to scale in production.
-  </Card>
-
-  <Card
-    title="Prompt Testing"
-    icon="flask"
-    href="/langsmith/prompt-engineering-quickstart"
-    arrow="true"
-    cta="Test your prompts"
-  >
-    Iterate on prompts with built-in versioning and collaboration to ship improvements faster.
-  </Card>
-  <Card
-    title="Studio"
-    icon="window"
-    href="/langsmith/quick-start-studio"
-    arrow="true"
-    cta="Develop with Studio"
-  >
-    Use a visual interface to design, test, and refine applications end-to-end.
-  </Card>
     <Card
-    title="Hosting"
-    icon="server"
-    iconType="solid"
-    href="/langsmith/hosting"
-    arrow="true"
-    cta="Choose your hosting mode"
-  >
-    Host LangSmith in the cloud, in your environment, or hybrid to match your infrastructure and compliance needs.
-  </Card>
+        title="관찰성(Observability)"
+        icon="magnifying-glass"
+        href="/langsmith/observability-quickstart"
+        arrow="true"
+        cta="추적 시작하기"
+    >
+        애플리케이션이 수행하는 모든 단계를 가시화하여 더 빠르게 디버깅하고 안정성을 향상시키세요.
+    </Card>
+
+    <Card
+        title="평가(Evaluation)"
+        icon="chart-line"
+        href="/langsmith/evaluation-quickstart"
+        arrow="true"
+        cta="앱 평가하기"
+    >
+        시간 경과에 따른 품질을 측정하고 추적하여 AI 애플리케이션의 일관성과 신뢰성을 보장하세요.
+    </Card>
+
+    <Card
+        title="배포(Deployment)"
+        icon="cloud-arrow-up"
+        iconType="solid"
+        href="/langsmith/deployments"
+        arrow="true"
+        cta="에이전트 배포하기"
+        >
+        에이전트를 LangGraph Server로 배포하여 프로덕션 환경에서 확장할 수 있도록 준비하세요.
+    </Card>
+
+    <Card
+        title="프롬프트 테스팅"
+        icon="flask"
+        href="/langsmith/prompt-engineering-quickstart"
+        arrow="true"
+        cta="프롬프트 테스트하기"
+    >
+        내장된 버전 관리 및 협업 기능으로 프롬프트를 반복하여 개선 사항을 더 빠르게 배포하세요.
+    </Card>
+    <Card
+        title="Studio"
+        icon="window"
+        href="/langsmith/quick-start-studio"
+        arrow="true"
+        cta="Studio로 개발하기"
+    >
+        시각적 인터페이스를 사용하여 애플리케이션을 엔드투엔드로 설계, 테스트 및 개선하세요.
+    </Card>
+        <Card
+        title="호스팅(Hosting)"
+        icon="server"
+        iconType="solid"
+        href="/langsmith/hosting"
+        arrow="true"
+        cta="호스팅 모드 선택하기"
+    >
+        인프라 및 규정 준수 요구사항에 맞게 클라우드, 자체 환경 또는 하이브리드 방식으로 LangSmith를 호스팅하세요.
+    </Card>
 </Columns>
 
-## Workflow
+## 워크플로
 
-LangSmith combines observability, evaluation, deployment, and hosting in one integrated workflow—from local development to production.
+LangSmith는 로컬 개발부터 프로덕션까지 관찰성, 평가, 배포 및 호스팅을 하나의 통합 워크플로로 결합합니다.
 
 <img
     className="block dark:hidden"
     src="/langsmith/images/overview-light.svg"
-    alt="Diagram showing how LangSmith integrates observability, evaluation, deployment, and hosting in a single workflow from development to production."
+    alt="LangSmith가 개발부터 프로덕션까지 단일 워크플로에서 관찰성, 평가, 배포 및 호스팅을 통합하는 방법을 보여주는 다이어그램."
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/overview-dark.svg"
-    alt="Diagram showing how LangSmith integrates observability, evaluation, deployment, and hosting in a single workflow from development to production."
+    alt="LangSmith가 개발부터 프로덕션까지 단일 워크플로에서 관찰성, 평가, 배포 및 호스팅을 통합하는 방법을 보여주는 다이어그램."
 />
 
 ---

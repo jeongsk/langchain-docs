@@ -1,38 +1,38 @@
 ---
-title: 'RAG Server Setup'
+title: 'RAG 서버 설정'
 ---
 
-Open Agent Platform has first class support for RAG with your agents. To use this feature, you must deploy your own instance of a LangConnect RAG server.
+Open Agent Platform은 에이전트와 함께 사용할 수 있는 RAG를 일급 수준으로 지원합니다. 이 기능을 사용하려면 LangConnect RAG 서버의 자체 인스턴스를 배포해야 합니다.
 
-## About LangConnect
+## LangConnect 소개
 
-[LangConnect](https://github.com/langchain-ai/langconnect) is an open source managed retrieval service for RAG applications. It's built on top of LangChain's RAG integrations (vectorstores, document loaders, indexing API, etc.) and allows you to quickly spin up an API server for managing your collections & documents for any RAG application.
+[LangConnect](https://github.com/langchain-ai/langconnect)는 RAG 애플리케이션을 위한 오픈 소스 관리형 검색 서비스입니다. LangChain의 RAG 통합(벡터 스토어, 문서 로더, 인덱싱 API 등)을 기반으로 구축되어 있으며, 모든 RAG 애플리케이션에서 컬렉션과 문서를 관리하기 위한 API 서버를 신속하게 구성할 수 있습니다.
 
-## Deployment
+## 배포
 
-To set up LangConnect, follow the instructions in the [LangConnect README](https://github.com/langchain-ai/langconnect/blob/main/README.md). After setting it up, and either running the server locally via Docker, or deploying it to a cloud provider, you should set the `NEXT_PUBLIC_RAG_API_URL` environment variable inside the `apps/web/` directory, to the API URL of your LangConnect server.
+LangConnect를 설정하려면 [LangConnect README](https://github.com/langchain-ai/langconnect/blob/main/README.md)의 지침을 따르세요. 설정을 완료하고 Docker를 통해 로컬에서 서버를 실행하거나 클라우드 제공업체에 배포한 후, `apps/web/` 디렉토리 내에 `NEXT_PUBLIC_RAG_API_URL` 환경 변수를 LangConnect 서버의 API URL로 설정해야 합니다.
 
-For local development, this should be set to:
+로컬 개발의 경우 다음과 같이 설정해야 합니다:
 
 ```bash
 NEXT_PUBLIC_RAG_API_URL="http://localhost:8080"
 ```
 
-## Using the RAG Feature
+## RAG 기능 사용하기
 
-Once this is set, you can visit the `/rag` page in the web app to create your first collection, and upload documents to it.
+이 설정이 완료되면 웹 앱의 `/rag` 페이지를 방문하여 첫 번째 컬렉션을 생성하고 문서를 업로드할 수 있습니다.
 
-After setting up your RAG server, and configuring Open Agent Platform with an agent which can call it (like the Tools Agent), you can start to use it in your agents by selecting a collection when creating/editing an agent. This will give the agent access to a tool which can make requests to your RAG server, and retrieve relevant documents for the user's query.
+RAG 서버 설정을 완료하고 이를 호출할 수 있는 에이전트(예: Tools Agent)로 Open Agent Platform을 구성한 후, 에이전트를 생성하거나 편집할 때 컬렉션을 선택하여 에이전트에서 사용할 수 있습니다. 이렇게 하면 에이전트가 RAG 서버에 요청을 보내고 사용자의 쿼리와 관련된 문서를 검색할 수 있는 도구에 액세스할 수 있게 됩니다.
 
-## Best Practices
+## 모범 사례
 
-Since the RAG server is exposed to the agent as a tool, we recommend setting detailed descriptions on your collections when creating them, since these are the descriptions which will be attached to the tool.
+RAG 서버는 에이전트에 도구로 노출되므로, 컬렉션을 생성할 때 상세한 설명을 설정하는 것을 권장합니다. 이러한 설명이 도구에 첨부되기 때문입니다.
 
-## Authentication
+## 인증
 
-As mentioned in the Authentication section, we pass the Supabase JWT in the `Authorization` header of the request. Then, inside the LangConnect RAG server, we extract this token and verify it's valid with Supabase.
+인증 섹션에서 언급한 것처럼, 요청의 `Authorization` 헤더에 Supabase JWT를 전달합니다. 그런 다음 LangConnect RAG 서버 내에서 이 토큰을 추출하고 Supabase를 통해 유효성을 검증합니다.
 
-If it is, we receive back a user ID, which is used to verify each user is *only* able to access their own collections. We do not currently support sharing collections between users.
+유효한 경우 사용자 ID를 받게 되며, 이는 각 사용자가 *자신의* 컬렉션에만 액세스할 수 있도록 확인하는 데 사용됩니다. 현재 사용자 간 컬렉션 공유는 지원하지 않습니다.
 
 ---
 

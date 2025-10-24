@@ -2,29 +2,27 @@
 title: 빠른 시작
 ---
 
-import AlphaCallout from "/snippets/alpha-lg-callout.mdx";
 
-<AlphaCallout />
 
-이 빠른 시작에서는 LangGraph Graph API 또는 Functional API를 사용하여 계산기 에이전트를 구축하는 방법을 보여줍니다.
+이 빠른 시작에서는 LangGraph Graph API 또는 Functional API를 사용하여 계산기 에이전트를 구축하는 방법을 안내합니다.
 
-- 에이전트를 노드와 에지의 그래프로 정의하려면 [Graph API 사용](#use-the-graph-api)을 선택하세요.
-- 에이전트를 단일 함수로 정의하려면 [Functional API 사용](#use-the-functional-api)을 선택하세요.
+- 노드와 엣지로 구성된 그래프 형태로 에이전트를 정의하려면 [Graph API 사용하기](#use-the-graph-api)를 참고하세요.
+- 단일 함수 형태로 에이전트를 정의하려면 [Functional API 사용하기](#use-the-functional-api)를 참고하세요.
 
 <Tip>
-개념적인 정보는 [Graph API 개요](/oss/javascript/langgraph/graph-api)와 [Functional API 개요](/oss/javascript/langgraph/functional-api)를 참조하세요.
+개념적인 내용은 [Graph API 개요](/oss/javascript/langgraph/graph-api)와 [Functional API 개요](/oss/javascript/langgraph/functional-api)를 참고하세요.
 </Tip>
 
 <Info>
-이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 발급받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
+이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 만들고 API 키를 발급받아야 합니다. 발급받은 API 키는 터미널에서 `ANTHROPIC_API_KEY` 환경 변수로 설정해주세요.
 </Info>
 
 <Tabs>
 <Tab title="Use the Graph API">
 
-## 1. 도구와 모델 정의
+## 1. 도구와 모델 정의하기
 
-이 예제에서는 Claude 3.7 Sonnet 모델을 사용하고 덧셈, 곱셈, 나눗셈을 위한 도구를 정의합니다.
+이 예제에서는 Claude Sonnet 4.5 모델을 사용하고, 덧셈, 곱셈, 나눗셈을 수행하는 도구를 정의합니다.
 
 
 
@@ -33,8 +31,8 @@ import { ChatAnthropic } from "@langchain/anthropic";
 import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 
-const llm = new ChatAnthropic({
-  model: "claude-3-7-sonnet-latest",
+const model = new ChatAnthropic({
+  model: "claude-sonnet-4-5",
   temperature: 0,
 });
 
@@ -73,16 +71,18 @@ const toolsByName = {
   [divide.name]: divide,
 };
 const tools = Object.values(toolsByName);
-const llmWithTools = llm.bindTools(tools);
+const modelWithTools = model.bindTools(tools);
 ```
 
 
-## 2. 상태 정의
+## 2. 상태 정의하기
 
 그래프의 상태는 메시지와 LLM 호출 횟수를 저장하는 데 사용됩니다.
 
 <Tip>
-    LangGraph의 State는 에이전트 실행 전반에 걸쳐 지속됩니다. `operator.add`와 함께 사용된 `Annotated` 타입은 새로운 메시지가 기존 목록을 대체하는 대신 추가되도록 보장합니다.
+    LangGraph의 상태는 에이전트 실행 전체에 걸쳐 유지됩니다.
+
+    `Annotated` 타입과 `operator.add`를 함께 사용하면, 새로운 메시지가 기존 목록을 대체하지 않고 추가되도록 보장합니다.
 </Tip>
 
 
@@ -99,11 +99,10 @@ const MessagesState = z.object({
     .register(registry, MessagesZodMeta),
   llmCalls: z.number().optional(),
 });
-
 ```
 
 
-## 3. 모델 노드 정의
+## 3. 모델 노드 정의하기
 
 모델 노드는 LLM을 호출하고 도구를 호출할지 여부를 결정하는 데 사용됩니다.
 
@@ -113,7 +112,7 @@ const MessagesState = z.object({
 import { SystemMessage } from "@langchain/core/messages";
 async function llmCall(state: z.infer<typeof MessagesState>) {
   return {
-    messages: await llmWithTools.invoke([
+    messages: await modelWithTools.invoke([
       new SystemMessage(
         "You are a helpful assistant tasked with performing arithmetic on a set of inputs."
       ),
@@ -125,7 +124,7 @@ async function llmCall(state: z.infer<typeof MessagesState>) {
 ```
 
 
-## 4. 도구 노드 정의
+## 4. 도구 노드 정의하기
 
 도구 노드는 도구를 호출하고 결과를 반환하는 데 사용됩니다.
 
@@ -152,9 +151,9 @@ async function toolNode(state: z.infer<typeof MessagesState>) {
 ```
 
 
-## 5. 종료 로직 정의
+## 5. 종료 로직 정의하기
 
-조건부 에지 함수는 LLM이 도구 호출을 했는지 여부에 따라 도구 노드로 라우팅하거나 종료하는 데 사용됩니다.
+조건부 엣지 함수는 LLM이 도구를 호출했는지 여부에 따라 도구 노드로 라우팅하거나 종료하는 데 사용됩니다.
 
 
 
@@ -174,9 +173,9 @@ async function shouldContinue(state: z.infer<typeof MessagesState>) {
 ```
 
 
-## 6. 에이전트 빌드 및 컴파일
+## 6. 에이전트 빌드 및 컴파일하기
 
-에이전트는 `StateGraph` 클래스를 사용하여 빌드하고 `compile` 메서드를 사용하여 컴파일합니다.
+에이전트는 [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html) 클래스를 사용하여 빌드하고, @[`compile`][StateGraph.compile] 메서드로 컴파일합니다.
 
 
 
@@ -201,19 +200,20 @@ for (const message of result.messages) {
 ```
 
 
-축하합니다! LangGraph Graph API를 사용하여 첫 번째 에이전트를 구축했습니다.
+축하합니다! LangGraph Graph API를 사용하여 첫 번째 에이전트를 구축하셨습니다.
 
-<Accordion title="전체 코드 예제">
+<Accordion title="Full code example">
 
 
 ```typescript
-// Step 1: define tools and model
+// Step 1: Define tools and model
+
 import { ChatAnthropic } from "@langchain/anthropic";
 import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 
-const llm = new ChatAnthropic({
-  model: "claude-3-7-sonnet-latest",
+const model = new ChatAnthropic({
+  model: "claude-sonnet-4-5",
   temperature: 0,
 });
 
@@ -252,9 +252,10 @@ const toolsByName = {
   [divide.name]: divide,
 };
 const tools = Object.values(toolsByName);
-const llmWithTools = llm.bindTools(tools);
+const modelWithTools = model.bindTools(tools);
 
 // Step 2: Define state
+
 import { StateGraph, START, END } from "@langchain/langgraph";
 import { MessagesZodMeta } from "@langchain/langgraph";
 import { registry } from "@langchain/langgraph/zod";
@@ -268,10 +269,11 @@ const MessagesState = z.object({
 });
 
 // Step 3: Define model node
+
 import { SystemMessage } from "@langchain/core/messages";
 async function llmCall(state: z.infer<typeof MessagesState>) {
   return {
-    messages: await llmWithTools.invoke([
+    messages: await modelWithTools.invoke([
       new SystemMessage(
         "You are a helpful assistant tasked with performing arithmetic on a set of inputs."
       ),
@@ -282,6 +284,7 @@ async function llmCall(state: z.infer<typeof MessagesState>) {
 }
 
 // Step 4: Define tool node
+
 import { isAIMessage, ToolMessage } from "@langchain/core/messages";
 async function toolNode(state: z.infer<typeof MessagesState>) {
   const lastMessage = state.messages.at(-1);
@@ -301,6 +304,7 @@ async function toolNode(state: z.infer<typeof MessagesState>) {
 }
 
 // Step 5: Define logic to determine whether to end
+
 async function shouldContinue(state: z.infer<typeof MessagesState>) {
   const lastMessage = state.messages.at(-1);
   if (lastMessage == null || !isAIMessage(lastMessage)) return END;
@@ -315,6 +319,7 @@ async function shouldContinue(state: z.infer<typeof MessagesState>) {
 }
 
 // Step 6: Build and compile the agent
+
 const agent = new StateGraph(MessagesState)
   .addNode("llmCall", llmCall)
   .addNode("toolNode", toolNode)
@@ -339,9 +344,9 @@ for (const message of result.messages) {
 
 <Tab title="Use the Functional API">
 
-## 1. 도구와 모델 정의
+## 1. 도구와 모델 정의하기
 
-이 예제에서는 Claude 3.7 Sonnet 모델을 사용하고 덧셈, 곱셈, 나눗셈을 위한 도구를 정의합니다.
+이 예제에서는 Claude Sonnet 4.5 모델을 사용하고, 덧셈, 곱셈, 나눗셈을 수행하는 도구를 정의합니다.
 
 
 
@@ -350,8 +355,8 @@ import { ChatAnthropic } from "@langchain/anthropic";
 import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 
-const llm = new ChatAnthropic({
-  model: "claude-3-7-sonnet-latest",
+const model = new ChatAnthropic({
+  model: "claude-sonnet-4-5",
   temperature: 0,
 });
 
@@ -390,17 +395,17 @@ const toolsByName = {
   [divide.name]: divide,
 };
 const tools = Object.values(toolsByName);
-const llmWithTools = llm.bindTools(tools);
+const modelWithTools = model.bindTools(tools);
 
 ```
 
 
-## 2. 모델 노드 정의
+## 2. 모델 노드 정의하기
 
 모델 노드는 LLM을 호출하고 도구를 호출할지 여부를 결정하는 데 사용됩니다.
 
 <Tip>
-    `@task` 데코레이터는 함수를 에이전트의 일부로 실행할 수 있는 작업으로 표시합니다. 작업은 진입점 함수 내에서 동기적 또는 비동기적으로 호출될 수 있습니다.
+    @[`@task`] 데코레이터는 함수를 에이전트의 일부로 실행될 수 있는 작업(task)으로 표시합니다. 작업은 진입점(entrypoint) 함수 내에서 동기 또는 비동기로 호출할 수 있습니다.
 </Tip>
 
 
@@ -408,8 +413,8 @@ const llmWithTools = llm.bindTools(tools);
 ```typescript
 import { task, entrypoint } from "@langchain/langgraph";
 import { SystemMessage } from "@langchain/core/messages";
-const callLlm = task({ name: "callLlm" }, async (messages: BaseMessage[]) => {
-  return llmWithTools.invoke([
+const callmodel = task({ name: "callLlm" }, async (messages: BaseMessage[]) => {
+  return modelWithTools.invoke([
     new SystemMessage(
       "You are a helpful assistant tasked with performing arithmetic on a set of inputs."
     ),
@@ -419,7 +424,7 @@ const callLlm = task({ name: "callLlm" }, async (messages: BaseMessage[]) => {
 ```
 
 
-## 3. 도구 노드 정의
+## 3. 도구 노드 정의하기
 
 도구 노드는 도구를 호출하고 결과를 반환하는 데 사용됩니다.
 
@@ -434,12 +439,12 @@ const callTool = task({ name: "callTool" }, async (toolCall: ToolCall) => {
 ```
 
 
-## 4. 에이전트 정의
+## 4. 에이전트 정의하기
 
-에이전트는 `entrypoint` 함수를 사용하여 빌드합니다.
+에이전트는 @[`@entrypoint`] 함수를 사용하여 빌드됩니다.
 
 <Note>
-    Functional API에서는 노드와 에지를 명시적으로 정의하는 대신, 단일 함수 내에서 표준 제어 흐름 로직(루프, 조건문)을 작성합니다.
+    Functional API에서는 노드와 엣지를 명시적으로 정의하는 대신, 단일 함수 내에서 표준 제어 흐름 로직(반복문, 조건문)을 작성합니다.
 </Note>
 
 
@@ -447,20 +452,21 @@ const callTool = task({ name: "callTool" }, async (toolCall: ToolCall) => {
 ```typescript
 import { addMessages } from "@langchain/langgraph";
 import { type BaseMessage, isAIMessage } from "@langchain/core/messages";
+
 const agent = entrypoint({ name: "agent" }, async (messages: BaseMessage[]) => {
-  let llmResponse = await callLlm(messages);
+  let modelResponse = await callLlm(messages);
 
   while (true) {
-    if (!llmResponse.tool_calls?.length) {
+    if (!modelResponse.tool_calls?.length) {
       break;
     }
 
     // Execute tools
     const toolResults = await Promise.all(
-      llmResponse.tool_calls.map((toolCall) => callTool(toolCall))
+      modelResponse.tool_calls.map((toolCall) => callTool(toolCall))
     );
-    messages = addMessages(messages, [llmResponse, ...toolResults]);
-    llmResponse = await callLlm(messages);
+    messages = addMessages(messages, [modelResponse, ...toolResults]);
+    modelResponse = await callLlm(messages);
   }
 
   return messages;
@@ -468,6 +474,7 @@ const agent = entrypoint({ name: "agent" }, async (messages: BaseMessage[]) => {
 
 // Invoke
 import { HumanMessage } from "@langchain/core/messages";
+
 const result = await agent.invoke([new HumanMessage("Add 3 and 4.")]);
 
 for (const message of result) {
@@ -476,19 +483,20 @@ for (const message of result) {
 ```
 
 
-축하합니다! LangGraph Functional API를 사용하여 첫 번째 에이전트를 구축했습니다.
+축하합니다! LangGraph Functional API를 사용하여 첫 번째 에이전트를 구축하셨습니다.
 
-<Accordion title="전체 코드 예제" icon="code">
+<Accordion title="Full code example" icon="code">
 
 
 ```typescript
-// Step 1: define tools and model
+// Step 1: Define tools and model
+
 import { ChatAnthropic } from "@langchain/anthropic";
 import { tool } from "@langchain/core/tools";
 import * as z from "zod";
 
-const llm = new ChatAnthropic({
-  model: "claude-3-7-sonnet-latest",
+const model = new ChatAnthropic({
+  model: "claude-sonnet-4-5",
   temperature: 0,
 });
 
@@ -527,13 +535,14 @@ const toolsByName = {
   [divide.name]: divide,
 };
 const tools = Object.values(toolsByName);
-const llmWithTools = llm.bindTools(tools);
+const modelWithTools = model.bindTools(tools);
 
 // Step 2: Define model node
+
 import { task, entrypoint } from "@langchain/langgraph";
 import { SystemMessage } from "@langchain/core/messages";
-const callLlm = task({ name: "callLlm" }, async (messages: BaseMessage[]) => {
-  return llmWithTools.invoke([
+const callmodel = task({ name: "callLlm" }, async (messages: BaseMessage[]) => {
+  return modelWithTools.invoke([
     new SystemMessage(
       "You are a helpful assistant tasked with performing arithmetic on a set of inputs."
     ),
@@ -541,30 +550,31 @@ const callLlm = task({ name: "callLlm" }, async (messages: BaseMessage[]) => {
   ]);
 });
 
-// Step 3: define tool node
+// Step 3: Define tool node
+
 import type { ToolCall } from "@langchain/core/messages/tool";
 const callTool = task({ name: "callTool" }, async (toolCall: ToolCall) => {
   const tool = toolsByName[toolCall.name];
   return tool.invoke(toolCall);
 });
 
-// Step 4: define agent
+// Step 4: Define agent
 import { addMessages } from "@langchain/langgraph";
 import { type BaseMessage, isAIMessage } from "@langchain/core/messages";
 const agent = entrypoint({ name: "agent" }, async (messages: BaseMessage[]) => {
-  let llmResponse = await callLlm(messages);
+  let modelResponse = await callLlm(messages);
 
   while (true) {
-    if (!llmResponse.tool_calls?.length) {
+    if (!modelResponse.tool_calls?.length) {
       break;
     }
 
     // Execute tools
     const toolResults = await Promise.all(
-      llmResponse.tool_calls.map((toolCall) => callTool(toolCall))
+      modelResponse.tool_calls.map((toolCall) => callTool(toolCall))
     );
-    messages = addMessages(messages, [llmResponse, ...toolResults]);
-    llmResponse = await callLlm(messages);
+    messages = addMessages(messages, [modelResponse, ...toolResults]);
+    modelResponse = await callLlm(messages);
   }
 
   return messages;

@@ -1,45 +1,45 @@
 ---
-title: 'Custom Agents Overview'
-description: 'Building your own agents for the Open Agent Platform'
+title: '커스텀 에이전트 개요'
+description: 'Open Agent Platform을 위한 자체 에이전트 구축하기'
 ---
 
-# Building Your Own Agents
+# 자체 에이전트 구축하기
 
-We built Open Agent Platform with custom agents in mind. Although we offer a few pre-built agents, we encourage you to build your own agents, and use OAP as a platform to prototype, test and use them! This guide will help you build agents that are compatible with all of Open Agent Platform's features.
+우리는 커스텀 에이전트를 염두에 두고 Open Agent Platform을 구축했습니다. 몇 가지 사전 구축된 에이전트를 제공하지만, 여러분이 직접 에이전트를 구축하고 OAP를 프로토타입 제작, 테스트 및 사용을 위한 플랫폼으로 활용하시기를 권장합니다! 이 가이드는 Open Agent Platform의 모든 기능과 호환되는 에이전트를 구축하는 데 도움을 드립니다.
 
-## Platform Requirements
+## 플랫폼 요구사항
 
-OAP is built on top of LangSmith, which means all agents which you build to be used in OAP must be LangGraph agents deployed on LangSmith.
+OAP는 LangSmith 위에 구축되어 있으므로, OAP에서 사용하기 위해 구축하는 모든 에이전트는 LangSmith에 배포된 LangGraph 에이전트여야 합니다.
 
-## Agent Types
+## 에이전트 유형
 
-When building custom agents, you can create three main types:
+커스텀 에이전트를 구축할 때 세 가지 주요 유형을 만들 수 있습니다:
 
-1. **Standard Agents**: These are single-purpose agents that handle specific tasks.
-2. **Tools Agents**: Agents that can access external tools via the MCP protocol.
-3. **Supervisor Agents**: Agents that can orchestrate and coordinate multiple other agents.
+1. **표준 에이전트**: 특정 작업을 처리하는 단일 목적 에이전트입니다.
+2. **도구 에이전트**: MCP 프로토콜을 통해 외부 도구에 접근할 수 있는 에이전트입니다.
+3. **슈퍼바이저 에이전트**: 여러 다른 에이전트를 조정하고 협력시킬 수 있는 에이전트입니다.
 
-## Development Flow
+## 개발 흐름
 
-The typical development flow for creating custom agents involves:
+커스텀 에이전트를 생성하는 일반적인 개발 흐름은 다음과 같습니다:
 
-1. Developing and testing your agent locally using LangGraph
-2. Deploying your agent to LangSmith
-3. Configuring your Open Agent Platform to connect to your deployed agent
-4. Testing and refining your agent through the OAP interface
+1. LangGraph를 사용하여 로컬에서 에이전트를 개발하고 테스트하기
+2. LangSmith에 에이전트를 배포하기
+3. 배포된 에이전트에 연결하도록 Open Agent Platform을 구성하기
+4. OAP 인터페이스를 통해 에이전트를 테스트하고 개선하기
 
-## Getting Started
+## 시작하기
 
-To get started with building your own agents, we recommend:
+자체 에이전트 구축을 시작하려면 다음을 권장합니다:
 
-1. Familiarizing yourself with the [LangGraph framework](https://github.com/langchain-ai/langgraph)
-2. Studying the example agents we provide:
-   - [Tools Agent](https://github.com/langchain-ai/oap-langgraph-tools-agent)
-   - [Supervisor Agent](https://github.com/langchain-ai/oap-agent-supervisor)
-   - [Deep Research Agent](https://github.com/langchain-ai/oap-deep-researcher)
-3. Understanding how to make your agent configurable, as detailed in the [Configuration](/labs/oap/custom-agents/configuration) section
+1. [LangGraph 프레임워크](https://github.com/langchain-ai/langgraph)에 익숙해지기
+2. 우리가 제공하는 예제 에이전트를 학습하기:
+   - [도구 에이전트](https://github.com/langchain-ai/oap-langgraph-tools-agent)
+   - [슈퍼바이저 에이전트](https://github.com/langchain-ai/oap-agent-supervisor)
+   - [심층 조사 에이전트](https://github.com/langchain-ai/oap-deep-researcher)
+3. [구성](/labs/oap/custom-agents/configuration) 섹션에 자세히 설명된 대로 에이전트를 구성 가능하게 만드는 방법 이해하기
 
-Building custom agents allows you to create specialized AI assistants that can be easily managed and used through the Open Agent Platform interface.
+커스텀 에이전트를 구축하면 Open Agent Platform 인터페이스를 통해 쉽게 관리하고 사용할 수 있는 특화된 AI 어시스턴트를 만들 수 있습니다.
 
 ---
 

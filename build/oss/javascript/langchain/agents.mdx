@@ -1,16 +1,17 @@
 ---
-title: Agent
+title: 에이전트
 ---
 
 
-Agent는 언어 모델과 도구를 결합하여 작업에 대해 추론하고, 사용할 도구를 결정하며, 반복적으로 솔루션을 향해 작업하는 시스템을 생성합니다.
+
+에이전트는 언어 모델과 [도구](/oss/javascript/langchain/tools)를 결합하여 작업에 대해 추론하고, 사용할 도구를 결정하며, 반복적으로 솔루션을 향해 작업하는 시스템을 만듭니다.
 
 
-`createAgent()`는 프로덕션 준비가 완료된 agent 구현을 제공합니다.
+`createAgent()`는 프로덕션에 바로 사용할 수 있는 에이전트 구현을 제공합니다.
 
 
-[LLM Agent는 목표를 달성하기 위해 루프에서 도구를 실행합니다](https://simonwillison.net/2025/Sep/18/agents/).
-Agent는 중지 조건이 충족될 때까지 실행됩니다. 즉, 모델이 최종 출력을 생성하거나 반복 제한에 도달할 때까지 실행됩니다.
+[LLM 에이전트는 목표를 달성하기 위해 루프 내에서 도구를 실행합니다](https://simonwillison.net/2025/Sep/18/agents/).
+에이전트는 중지 조건이 충족될 때까지 실행됩니다. 즉, 모델이 최종 출력을 내보내거나 반복 제한에 도달할 때까지 실행됩니다.
 
 ```mermaid
 %%{
@@ -44,7 +45,7 @@ graph TD
 <Info>
 
 
-`createAgent()`는 [LangGraph](/oss/javascript/langgraph/overview)를 사용하여 **그래프** 기반 agent 런타임을 구축합니다. 그래프는 agent가 정보를 처리하는 방법을 정의하는 노드(단계)와 엣지(연결)로 구성됩니다. Agent는 이 그래프를 통해 이동하면서 모델 노드(모델 호출), 도구 노드(도구 실행) 또는 middleware와 같은 노드를 실행합니다.
+`createAgent()`는 [LangGraph](/oss/javascript/langgraph/overview)를 사용하여 **그래프** 기반 에이전트 런타임을 구축합니다. 그래프는 에이전트가 정보를 처리하는 방법을 정의하는 노드(단계)와 엣지(연결)로 구성됩니다. 에이전트는 이 그래프를 통해 이동하며, 모델 노드(모델을 호출), 도구 노드(도구를 실행) 또는 미들웨어와 같은 노드를 실행합니다.
 
 
 [Graph API](/oss/javascript/langgraph/graph-api)에 대해 자세히 알아보세요.
@@ -53,13 +54,15 @@ graph TD
 
 ## 핵심 구성 요소
 
-### Model
+### 모델
 
-[Model](/oss/javascript/langchain/models)은 agent의 추론 엔진입니다. 정적 및 동적 모델 선택을 모두 지원하는 여러 방식으로 지정할 수 있습니다.
+[모델](/oss/javascript/langchain/models)은 에이전트의 추론 엔진입니다. 정적 및 동적 모델 선택을 모두 지원하며 여러 방법으로 지정할 수 있습니다.
 
 #### 정적 모델
 
-정적 모델은 agent 생성 시 한 번 구성되며 실행 중에 변경되지 않습니다. 이것이 가장 일반적이고 간단한 접근 방식입니다. <Tooltip tip="`provider:model` 형식을 따르는 문자열 (예: openai:gpt-5)" cta="매핑 보기" href="https://reference.langchain.com/python/langchain/models/#langchain.chat_models.init_chat_model(model_provider)">모델 식별자 문자열</Tooltip>에서 정적 모델을 초기화하려면:
+정적 모델은 에이전트를 생성할 때 한 번 구성되며 실행 전체에서 변경되지 않습니다. 이것이 가장 일반적이고 간단한 접근 방식입니다.
+
+<Tooltip tip="`provider:model` 형식을 따르는 문자열 (예: openai:gpt-5)" cta="매핑 보기" href="https://reference.langchain.com/python/langchain/models/#langchain.chat_models.init_chat_model(model_provider)">모델 식별자 문자열</Tooltip>에서 정적 모델을 초기화하려면:
 
 
 ```ts wrap
@@ -73,7 +76,7 @@ const agent = createAgent({
 
 
 
-모델 식별자 문자열은 `provider:model` 형식을 사용합니다 (예: `"openai:gpt-5"`). 모델 구성을 더 세밀하게 제어하려는 경우 provider 패키지를 사용하여 모델 인스턴스를 직접 초기화할 수 있습니다:
+모델 식별자 문자열은 `provider:model` 형식을 사용합니다(예: `"openai:gpt-5"`). 모델 구성을 더 세밀하게 제어하려는 경우 공급자 패키지를 사용하여 모델 인스턴스를 직접 초기화할 수 있습니다:
 
 ```ts wrap
 import { createAgent } from "langchain";
@@ -92,17 +95,17 @@ const agent = createAgent({
 });
 ```
 
-모델 인스턴스는 구성에 대한 완전한 제어를 제공합니다. `temperature`, `max_tokens`, `timeouts`와 같은 특정 매개변수를 설정하거나 API 키, `base_url` 및 기타 provider별 설정을 구성해야 할 때 사용하세요. 모델에서 사용 가능한 매개변수와 메서드를 보려면 [API 참조](/oss/javascript/integrations/providers/)를 참조하세요.
+모델 인스턴스를 사용하면 구성을 완전히 제어할 수 있습니다. `temperature`, `max_tokens`, `timeouts`와 같은 특정 매개변수를 설정하거나 API 키, `base_url` 및 기타 공급자별 설정을 구성해야 할 때 사용하세요. 모델에서 사용 가능한 매개변수와 메서드를 보려면 [API 참조](/oss/javascript/integrations/providers/)를 참조하세요.
 
 
 #### 동적 모델
 
-동적 모델은 현재 <Tooltip tip="변경 불가능한 구성과 agent 실행 전반에 걸쳐 지속되는 컨텍스트 데이터를 포함하는 agent의 실행 환경 (예: 사용자 ID, 세션 세부 정보 또는 애플리케이션별 구성).">runtime</Tooltip> 및 <Tooltip tip="메시지, 사용자 정의 필드 및 처리 중에 추적하고 잠재적으로 수정해야 하는 모든 정보를 포함하여 agent 실행을 통해 흐르는 데이터 (예: 사용자 기본 설정 또는 도구 사용 통계).">state</Tooltip>와 컨텍스트를 기반으로 선택됩니다. 이를 통해 정교한 라우팅 로직과 비용 최적화가 가능합니다.
+동적 모델은 현재 <Tooltip tip="메시지, 사용자 정의 필드 및 처리 중에 추적되고 잠재적으로 수정되어야 하는 정보(예: 사용자 선호도 또는 도구 사용 통계)를 포함하여 에이전트 실행을 통해 흐르는 데이터입니다.">상태</Tooltip>와 컨텍스트를 기반으로 <Tooltip tip="에이전트의 실행 전반에 걸쳐 지속되는 불변 구성 및 컨텍스트 데이터를 포함하는 에이전트의 실행 환경(예: 사용자 ID, 세션 세부 정보 또는 애플리케이션별 구성)입니다.">런타임</Tooltip>에 선택됩니다. 이를 통해 정교한 라우팅 로직과 비용 최적화가 가능합니다.
 
 
-동적 모델을 사용하려면 요청에서 모델을 수정하는 `wrapModelCall`로 middleware를 생성하세요:
+동적 모델을 사용하려면 요청에서 모델을 수정하는 `wrapModelCall`을 사용하여 미들웨어를 생성하세요:
 
-```ts wrap
+```ts
 import { ChatOpenAI } from "@langchain/openai";
 import { createAgent, createMiddleware } from "langchain";
 
@@ -129,26 +132,28 @@ const agent = createAgent({
 });
 ```
 
-middleware 및 고급 패턴에 대한 자세한 내용은 [middleware 문서](/oss/javascript/langchain/middleware)를 참조하세요.
+미들웨어 및 고급 패턴에 대한 자세한 내용은 [미들웨어 문서](/oss/javascript/langchain/middleware)를 참조하세요.
 
 
 <Tip>
-모델 구성 세부 정보는 [Models](/oss/javascript/langchain/models)를 참조하세요. 동적 모델 선택 패턴은 [middleware의 동적 모델](/oss/javascript/langchain/middleware#dynamic-model)을 참조하세요.
+모델 구성 세부 정보는 [모델](/oss/javascript/langchain/models)을 참조하세요. 동적 모델 선택 패턴은 [미들웨어의 동적 모델](/oss/javascript/langchain/middleware#dynamic-model)을 참조하세요.
 </Tip>
 
 ### 도구
 
-도구는 agent에게 작업을 수행할 수 있는 능력을 제공합니다. Agent는 다음과 같은 기능을 촉진함으로써 단순한 모델 전용 도구 바인딩을 넘어섭니다:
+도구는 에이전트에게 작업을 수행할 수 있는 능력을 제공합니다. 에이전트는 다음을 용이하게 함으로써 단순한 모델 전용 도구 바인딩을 넘어섭니다:
 
-- 순차적으로 여러 도구 호출 (단일 프롬프트로 트리거됨)
+- 순차적인 여러 도구 호출(단일 프롬프트에 의해 트리거됨)
 - 적절한 경우 병렬 도구 호출
 - 이전 결과를 기반으로 한 동적 도구 선택
 - 도구 재시도 로직 및 오류 처리
-- 도구 호출 전반에 걸친 state 지속성
+- 도구 호출 간 상태 지속성
+
+자세한 내용은 [도구](/oss/javascript/langchain/tools)를 참조하세요.
 
 #### 도구 정의
 
-Agent에 도구 목록을 전달합니다.
+에이전트에 도구 목록을 전달하세요.
 
 
 ```ts wrap
@@ -184,12 +189,12 @@ const agent = createAgent({
 ```
 
 
-빈 도구 목록이 제공되면 agent는 도구 호출 기능 없이 단일 LLM 노드로 구성됩니다.
+빈 도구 목록이 제공되면 에이전트는 도구 호출 기능 없이 단일 LLM 노드로 구성됩니다.
 
 #### 도구 오류 처리
 
 
-도구 오류 처리 방법을 사용자 정의하려면 사용자 정의 middleware에서 `wrapToolCall` 훅을 사용하세요:
+도구 오류 처리 방식을 사용자 정의하려면 사용자 정의 미들웨어에서 `wrapToolCall` 후크를 사용하세요:
 
 ```ts wrap
 import { createAgent, createMiddleware, ToolMessage } from "langchain";
@@ -200,7 +205,7 @@ const handleToolErrors = createMiddleware({
     try {
       return handler(request);
     } catch (error) {
-      // 모델에 사용자 정의 오류 메시지 반환
+      // 모델에 사용자 정의 오류 메시지를 반환합니다
       return new ToolMessage({
         content: `Tool error: Please check your input and try again. (${error})`,
         tool_call_id: request.toolCall.id!,
@@ -218,19 +223,15 @@ const agent = createAgent({
 });
 ```
 
-Agent는 도구가 실패할 때 사용자 정의 오류 메시지와 함께 @[`ToolMessage`]를 반환합니다.
+도구가 실패하면 에이전트는 사용자 정의 오류 메시지와 함께 @[`ToolMessage`]를 반환합니다.
 
-
-<Tip>
-도구에 대한 자세한 내용은 [도구](/oss/javascript/langchain/tools)를 참조하세요.
-</Tip>
 
 #### ReAct 루프에서의 도구 사용
 
-Agent는 ReAct("추론 + 행동") 패턴을 따르며, 짧은 추론 단계와 타겟 도구 호출을 교대로 수행하고 결과 관찰을 후속 결정에 반영하여 최종 답변을 제공할 때까지 반복합니다.
+에이전트는 ReAct("추론 + 행동") 패턴을 따르며, 간단한 추론 단계와 목표 지향적인 도구 호출을 번갈아 수행하고, 결과 관찰을 후속 결정에 반영하여 최종 답변을 제공할 수 있을 때까지 반복합니다.
 
 <Accordion title="ReAct 루프 예제">
-프롬프트: 현재 가장 인기 있는 무선 헤드폰을 식별하고 재고 여부를 확인하세요.
+프롬프트: 현재 가장 인기 있는 무선 헤드폰을 식별하고 재고를 확인하세요.
 
 ```
 ================================ Human Message =================================
@@ -238,7 +239,7 @@ Agent는 ReAct("추론 + 행동") 패턴을 따르며, 짧은 추론 단계와 �
 Find the most popular wireless headphones right now and check if they're in stock
 ```
 
-* **추론**: "인기도는 시간에 민감하므로 제공된 검색 도구를 사용해야 합니다."
+* **추론**: "인기는 시간에 민감하므로 제공된 검색 도구를 사용해야 합니다."
 * **행동**: `search_products("wireless headphones")` 호출
 
 ```
@@ -255,7 +256,7 @@ Tool Calls:
 Found 5 products matching "wireless headphones". Top 5 results: WH-1000XM5, ...
 ```
 
-* **추론**: "답변하기 전에 최상위 항목의 재고를 확인해야 합니다."
+* **추론**: "답변하기 전에 상위 항목의 재고를 확인해야 합니다."
 * **행동**: `check_inventory("WH-1000XM5")` 호출
 
 ```
@@ -272,7 +273,7 @@ Tool Calls:
 Product WH-1000XM5: 10 units in stock
 ```
 
-* **추론**: "가장 인기 있는 모델과 재고 상태를 확보했습니다. 이제 사용자의 질문에 답변할 수 있습니다."
+* **추론**: "가장 인기 있는 모델과 재고 상태를 확인했습니다. 이제 사용자의 질문에 답변할 수 있습니다."
 * **행동**: 최종 답변 생성
 
 ```
@@ -288,7 +289,7 @@ I found wireless headphones (model WH-1000XM5) with 10 units in stock...
 
 ### 시스템 프롬프트
 
-프롬프트를 제공하여 agent가 작업에 접근하는 방식을 형성할 수 있습니다. @[`system_prompt`] 매개변수는 문자열로 제공될 수 있습니다:
+프롬프트를 제공하여 에이전트가 작업에 접근하는 방식을 형성할 수 있습니다. @[`system_prompt`] 매개변수는 문자열로 제공할 수 있습니다:
 
 
 ```ts wrap
@@ -300,11 +301,11 @@ const agent = createAgent({
 ```
 
 
-@[`system_prompt`]가 제공되지 않으면 agent는 메시지에서 직접 작업을 추론합니다.
+@[`system_prompt`]가 제공되지 않으면 에이전트는 메시지에서 직접 작업을 추론합니다.
 
 #### 동적 시스템 프롬프트
 
-런타임 컨텍스트 또는 agent state를 기반으로 시스템 프롬프트를 수정해야 하는 고급 사용 사례의 경우 [middleware](/oss/javascript/langchain/middleware)를 사용할 수 있습니다.
+런타임 컨텍스트나 에이전트 상태에 따라 시스템 프롬프트를 수정해야 하는 고급 사용 사례의 경우 [미들웨어](/oss/javascript/langchain/middleware)를 사용할 수 있습니다.
 
 
 
@@ -344,12 +345,12 @@ const result = await agent.invoke(
 
 
 <Tip>
-메시지 유형 및 포맷에 대한 자세한 내용은 [Messages](/oss/javascript/langchain/messages)를 참조하세요. 포괄적인 middleware 문서는 [Middleware](/oss/javascript/langchain/middleware)를 참조하세요.
+메시지 유형 및 형식에 대한 자세한 내용은 [메시지](/oss/javascript/langchain/messages)를 참조하세요. 포괄적인 미들웨어 문서는 [미들웨어](/oss/javascript/langchain/middleware)를 참조하세요.
 </Tip>
 
 ## 호출
 
-Agent의 [state](/oss/javascript/langgraph/graph-api#state)에 업데이트를 전달하여 agent를 호출할 수 있습니다. 모든 agent는 state에 [메시지 시퀀스](/oss/javascript/langgraph/use-graph-api#messagesstate)를 포함합니다. Agent를 호출하려면 새 메시지를 전달하세요:
+에이전트의 [`State`](/oss/javascript/langgraph/graph-api#state)에 업데이트를 전달하여 에이전트를 호출할 수 있습니다. 모든 에이전트는 상태에 [메시지 시퀀스](/oss/javascript/langgraph/use-graph-api#messagesstate)를 포함합니다. 에이전트를 호출하려면 새 메시지를 전달하세요:
 
 
 ```typescript
@@ -359,16 +360,16 @@ await agent.invoke({
 ```
 
 
-Agent에서 단계 및/또는 토큰을 스트리밍하려면 [스트리밍](/oss/javascript/langchain/streaming) 가이드를 참조하세요.
+에이전트에서 단계 및/또는 토큰을 스트리밍하려면 [스트리밍](/oss/javascript/langchain/streaming) 가이드를 참조하세요.
 
-그렇지 않으면 agent는 LangGraph [Graph API](/oss/javascript/langgraph/use-graph-api)를 따르며 관련된 모든 메서드를 지원합니다.
+그 외의 경우 에이전트는 LangGraph [Graph API](/oss/javascript/langgraph/use-graph-api)를 따르며 모든 관련 메서드를 지원합니다.
 
 ## 고급 개념
 
 ### 구조화된 출력
 
 
-특정 형식으로 agent가 출력을 반환하도록 하고 싶은 경우가 있습니다. LangChain은 `responseFormat` 매개변수를 사용하여 이를 수행하는 간단하고 보편적인 방법을 제공합니다.
+경우에 따라 에이전트가 특정 형식으로 출력을 반환하도록 할 수 있습니다. LangChain은 `responseFormat` 매개변수를 사용하여 이를 수행하는 간단하고 범용적인 방법을 제공합니다.
 
 ```ts wrap
 import * as z from "zod";
@@ -406,11 +407,11 @@ console.log(result.structuredResponse);
 구조화된 출력에 대해 자세히 알아보려면 [구조화된 출력](/oss/javascript/langchain/structured-output)을 참조하세요.
 </Tip>
 
-### Memory
+### 메모리
 
-Agent는 메시지 state를 통해 대화 히스토리를 자동으로 유지합니다. 대화 중에 추가 정보를 기억하도록 사용자 정의 state 스키마를 사용하도록 agent를 구성할 수도 있습니다.
+에이전트는 메시지 상태를 통해 대화 기록을 자동으로 유지합니다. 대화 중에 추가 정보를 기억하도록 사용자 정의 상태 스키마를 사용하도록 에이전트를 구성할 수도 있습니다.
 
-State에 저장된 정보는 agent의 [단기 메모리](/oss/javascript/langchain/short-term-memory)로 생각할 수 있습니다:
+상태에 저장된 정보는 에이전트의 [단기 메모리](/oss/javascript/langchain/short-term-memory)로 생각할 수 있습니다:
 
 
 ```ts wrap
@@ -432,15 +433,15 @@ const CustomAgentState = createAgent({
 
 
 <Tip>
-메모리에 대해 자세히 알아보려면 [Memory](/oss/javascript/concepts/memory)를 참조하세요. 세션 간에 지속되는 장기 메모리 구현에 대한 정보는 [장기 메모리](/oss/javascript/langchain/long-term-memory)를 참조하세요.
+메모리에 대해 자세히 알아보려면 [메모리](/oss/javascript/concepts/memory)를 참조하세요. 세션 간에 지속되는 장기 메모리 구현에 대한 정보는 [장기 메모리](/oss/javascript/langchain/long-term-memory)를 참조하세요.
 </Tip>
 
 ### 스트리밍
 
-`invoke`를 사용하여 agent를 호출하여 최종 응답을 얻는 방법을 살펴보았습니다. Agent가 여러 단계를 실행하는 경우 시간이 걸릴 수 있습니다. 중간 진행 상황을 표시하려면 발생하는 메시지를 스트리밍할 수 있습니다.
+`invoke`로 에이전트를 호출하여 최종 응답을 받는 방법을 살펴보았습니다. 에이전트가 여러 단계를 실행하는 경우 시간이 걸릴 수 있습니다. 중간 진행 상황을 표시하려면 메시지가 발생할 때 스트리밍할 수 있습니다.
 
 
-```ts wrap
+```ts
 const stream = await agent.stream(
   {
     messages: [{
@@ -452,7 +453,7 @@ const stream = await agent.stream(
 );
 
 for await (const chunk of stream) {
-  // 각 청크는 해당 시점의 전체 state를 포함합니다
+  // 각 청크는 해당 시점의 전체 상태를 포함합니다
   const latestMessage = chunk.messages.at(-1);
   if (latestMessage?.content) {
     console.log(`Agent: ${latestMessage.content}`);
@@ -468,22 +469,22 @@ for await (const chunk of stream) {
 스트리밍에 대한 자세한 내용은 [스트리밍](/oss/javascript/langchain/streaming)을 참조하세요.
 </Tip>
 
-### Middleware
+### 미들웨어
 
-[Middleware](/oss/javascript/langchain/middleware)는 실행의 다양한 단계에서 agent 동작을 사용자 정의하기 위한 강력한 확장성을 제공합니다. Middleware를 사용하여 다음을 수행할 수 있습니다:
+[미들웨어](/oss/javascript/langchain/middleware)는 실행의 여러 단계에서 에이전트 동작을 사용자 정의하기 위한 강력한 확장성을 제공합니다. 미들웨어를 사용하여 다음을 수행할 수 있습니다:
 
-- 모델이 호출되기 전에 state 처리 (예: 메시지 트리밍, 컨텍스트 주입)
-- 모델의 응답 수정 또는 검증 (예: 가드레일, 콘텐츠 필터링)
+- 모델이 호출되기 전에 상태 처리(예: 메시지 자르기, 컨텍스트 주입)
+- 모델의 응답 수정 또는 검증(예: 가드레일, 콘텐츠 필터링)
 - 사용자 정의 로직으로 도구 실행 오류 처리
-- State 또는 컨텍스트를 기반으로 동적 모델 선택 구현
+- 상태 또는 컨텍스트에 따른 동적 모델 선택 구현
 - 사용자 정의 로깅, 모니터링 또는 분석 추가
 
-Middleware는 핵심 agent 로직을 변경하지 않고 주요 지점에서 데이터 흐름을 가로채고 수정할 수 있도록 agent의 실행 그래프에 원활하게 통합됩니다.
+미들웨어는 에이전트의 실행 그래프에 원활하게 통합되어 핵심 에이전트 로직을 변경하지 않고도 주요 지점에서 데이터 흐름을 가로채고 수정할 수 있습니다.
 
 
 
 <Tip>
-`beforeModel`, `afterModel`, `wrapToolCall`과 같은 훅을 포함한 포괄적인 middleware 문서는 [Middleware](/oss/javascript/langchain/middleware)를 참조하세요.
+`beforeModel`, `afterModel` 및 `wrapToolCall`과 같은 후크를 포함한 포괄적인 미들웨어 문서는 [미들웨어](/oss/javascript/langchain/middleware)를 참조하세요.
 </Tip>
 
 ---

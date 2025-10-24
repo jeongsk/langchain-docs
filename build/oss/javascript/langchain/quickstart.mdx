@@ -3,11 +3,12 @@ title: 빠른 시작
 ---
 
 
-이 빠른 시작 가이드는 간단한 설정에서 완전히 작동하는 AI 에이전트까지 단 몇 분 만에 구축하는 방법을 안내합니다.
+
+이 빠른 시작 가이드는 간단한 설정에서 완전히 작동하는 AI 에이전트를 단 몇 분 만에 구축하는 방법을 안내합니다.
 
 ## 기본 에이전트 구축하기
 
-질문에 답하고 도구를 호출할 수 있는 간단한 에이전트를 만드는 것부터 시작합니다. 이 에이전트는 Claude Sonnet 4.5를 언어 모델로 사용하고, 기본적인 날씨 함수를 도구로 사용하며, 간단한 프롬프트로 동작을 안내합니다.
+질문에 답하고 도구를 호출할 수 있는 간단한 에이전트를 만들어 보겠습니다. 이 에이전트는 언어 모델로 Claude Sonnet 4.5를 사용하고, 도구로 기본적인 날씨 함수를 사용하며, 동작을 안내하는 간단한 프롬프트를 사용합니다.
 
 
 
@@ -27,7 +28,7 @@ const getWeather = tool(
 );
 
 const agent = createAgent({
-  model: "anthropic:claude-sonnet-4-5-20250929",
+  model: "anthropic:claude-sonnet-4-5",
   tools: [getWeather],
 });
 
@@ -40,21 +41,21 @@ console.log(
 
 
 <Info>
-    이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
+    이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 발급받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
 </Info>
 
 ## 실전 에이전트 구축하기
 
-다음으로, 주요 프로덕션 개념을 보여주는 실용적인 날씨 예보 에이전트를 구축합니다:
+이제 주요 프로덕션 개념을 보여주는 실용적인 날씨 예보 에이전트를 구축해 보겠습니다:
 
 1. **상세한 시스템 프롬프트**로 더 나은 에이전트 동작 구현
 2. **외부 데이터와 통합되는 도구 생성**
 3. **일관된 응답을 위한 모델 구성**
 4. **예측 가능한 결과를 위한 구조화된 출력**
-5. **채팅과 같은 상호작용을 위한 대화 메모리**
-6. **에이전트 생성 및 실행**으로 완전히 작동하는 에이전트 만들기
+5. **대화형 상호작용을 위한 대화 메모리**
+6. **완전히 기능하는 에이전트 생성 및 실행**
 
-각 단계를 살펴보겠습니다:
+각 단계를 차례대로 살펴보겠습니다:
 
 <Steps>
     <Step title="시스템 프롬프트 정의하기">
@@ -77,7 +78,7 @@ console.log(
     <Step title="도구 생성하기">
 
 
-        [도구](/oss/javascript/langchain/tools)는 에이전트가 호출할 수 있는 함수입니다. 종종 도구는 외부 시스템에 연결하려고 하며, 이를 위해 런타임 구성에 의존합니다. 여기서 `getUserLocation` 도구가 정확히 그렇게 하는 방법을 확인하세요:
+        [Tools](/oss/javascript/langchain/tools) are functions your agent can call. Oftentimes tools will want to connect to external systems, and will rely on runtime configuration to do so. Notice here how the `getUserLocation` tool does exactly that:
 
         ```ts
         import { type Runtime } from "@langchain/langgraph";
@@ -110,11 +111,11 @@ console.log(
         ```
 
         <Note>
-            [Zod](https://zod.dev/)는 사전 정의된 스키마를 검증하고 파싱하는 라이브러리입니다. 이를 사용하여 도구의 입력 스키마를 정의하면 에이전트가 올바른 인수로만 도구를 호출하도록 할 수 있습니다.
+            [Zod](https://zod.dev/) is a library for validating and parsing pre-defined schemas. You can use it to define the input schema for your tools to make sure the agent only calls the tool with the correct arguments.
 
-            또는 `schema` 속성을 [JSON schema](https://json-schema.org/overview/what-is-jsonschema) 객체로 정의할 수도 있습니다. JSON 스키마는 런타임에 검증되지 **않는다**는 점을 유념하세요.
+            Alternatively, you can define the `schema` property as a [JSON schema](https://json-schema.org/overview/what-is-jsonschema) object. Keep in mind that JSON schemas **won't** be validated at runtime.
 
-            <Accordion title="예제: 도구 입력에 JSON 스키마 사용하기">
+            <Accordion title="Example: Using JSON schema for tool input">
                 ```ts
                 const getWeather = tool(
                   ({ city }) => `It's always sunny in ${city}!`,
@@ -138,8 +139,8 @@ console.log(
         </Note>
 
     </Step>
-    <Step title="모델 구성하기">
-        사용 사례에 적합한 [매개변수](/oss/javascript/langchain/models#parameters)로 [언어 모델](/oss/javascript/langchain/models)을 설정하세요:
+    <Step title="Configure your model">
+        Set up your [language model](/oss/javascript/langchain/models) with the right [parameters](/oss/javascript/langchain/models#parameters) for your use case:
 
 
 
@@ -147,16 +148,17 @@ console.log(
         import { initChatModel } from "langchain";
 
         const model = await initChatModel(
-          "anthropic:claude-sonnet-4-5-20250929",
+          "anthropic:claude-sonnet-4-5",
           { temperature: 0.5, timeout: 10, maxTokens: 1000 }
         );
         ```
 
     </Step>
-    <Step title="응답 형식 정의하기">
+    <Step title="Define response format">
 
 
-        에이전트 응답이 특정 스키마와 일치해야 하는 경우, 선택적으로 구조화된 응답 형식을 정의할 수 있습니다.
+        Optionally, define a structured response format if you need the agent responses to match
+        a specific schema.
 
         ```ts
         const responseFormat = z.object({
@@ -166,8 +168,9 @@ console.log(
         ```
 
     </Step>
-    <Step title="메모리 추가하기">
-        에이전트에 [메모리](/oss/javascript/langchain/short-term-memory)를 추가하여 상호작용 간 상태를 유지합니다. 이를 통해 에이전트가 이전 대화와 컨텍스트를 기억할 수 있습니다.
+    <Step title="Add memory">
+        Add [memory](/oss/javascript/langchain/short-term-memory) to your agent to maintain state across interactions. This allows
+        the agent to remember previous conversations and context.
 
 
 
@@ -179,19 +182,19 @@ console.log(
 
 
         <Info>
-            프로덕션 환경에서는 데이터베이스에 저장하는 영구 체크포인터를 사용하세요.
-            자세한 내용은 [메모리 추가 및 관리](/oss/javascript/langgraph/add-memory#manage-short-term-memory)를 참조하세요.
+            In production, use a persistent checkpointer that saves to a database.
+            See [Add and manage memory](/oss/javascript/langgraph/add-memory#manage-short-term-memory) for more details.
         </Info>
     </Step>
-    <Step title="에이전트 생성 및 실행하기">
-        이제 모든 구성 요소로 에이전트를 조립하고 실행해보세요!
+    <Step title="Create and run the agent">
+        Now assemble your agent with all the components and run it!
 
 
         ```ts
         import { createAgent } from "langchain";
 
         const agent = createAgent({
-          model: "anthropic:claude-sonnet-4-5-20250929",
+          model: "anthropic:claude-sonnet-4-5",
           prompt: systemPrompt,
           tools: [getUserLocation, getWeather],
           responseFormat,
@@ -229,7 +232,7 @@ console.log(
     </Step>
 </Steps>
 
-<Expandable title="전체 예제 코드">
+<Expandable title="Full example code">
 
 
 
@@ -274,7 +277,7 @@ const getUserLocation = tool(
 
 // Configure model
 const model = await initChatModel(
-  "anthropic:claude-sonnet-4-5-20250929",
+  "anthropic:claude-sonnet-4-5",
   { temperature: 0 }
 );
 
@@ -289,7 +292,7 @@ const checkpointer = new MemorySaver();
 
 // Create agent
 const agent = createAgent({
-  model: "anthropic:claude-sonnet-4-5-20250929",
+  model: "anthropic:claude-sonnet-4-5",
   prompt: systemPrompt,
   tools: [getUserLocation, getWeather],
   responseFormat,
@@ -327,13 +330,13 @@ console.log(thankYouResponse.structuredResponse);
 
 </Expandable>
 
-축하합니다! 이제 다음과 같은 기능을 가진 AI 에이전트를 구축했습니다:
+Congratulations! You now have an AI agent that can:
 
-- **컨텍스트를 이해하고** 대화를 기억합니다
-- **여러 도구를 지능적으로** 사용합니다
-- **일관된 형식으로 구조화된 응답을** 제공합니다
-- **컨텍스트를 통해 사용자별 정보를** 처리합니다
-- **상호작용 간 대화 상태를** 유지합니다
+- **Understand context** and remember conversations
+- **Use multiple tools** intelligently
+- **Provide structured responses** in a consistent format
+- **Handle user-specific information** through context
+- **Maintain conversation state** across interactions
 
 ---
 

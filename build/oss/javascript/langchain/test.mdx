@@ -3,34 +3,35 @@ title: 테스트
 ---
 
 
-에이전트 애플리케이션은 LLM이 문제를 해결하기 위한 다음 단계를 스스로 결정하도록 합니다. 이러한 유연성은 강력하지만, 모델의 블랙박스 특성으로 인해 에이전트의 한 부분에서 수정한 내용이 나머지 부분에 어떤 영향을 미칠지 예측하기 어렵습니다. 프로덕션 준비가 된 에이전트를 구축하려면 철저한 테스트가 필수적입니다.
+
+에이전트 애플리케이션은 LLM이 문제를 해결하기 위한 다음 단계를 스스로 결정할 수 있도록 합니다. 이러한 유연성은 강력하지만, 모델의 블랙박스 특성으로 인해 에이전트의 한 부분을 조정했을 때 나머지 부분에 어떤 영향을 미칠지 예측하기 어렵습니다. 프로덕션 수준의 에이전트를 구축하려면 철저한 테스트가 필수적입니다.
 
 에이전트를 테스트하는 몇 가지 접근 방식이 있습니다:
 
-- 유닛 테스트는 에이전트의 작고 결정론적인 부분을 인메모리 페이크를 사용하여 격리된 환경에서 테스트하므로 정확한 동작을 빠르고 결정론적으로 단언할 수 있습니다.
+- 단위 테스트는 인메모리 페이크를 사용하여 에이전트의 작고 결정론적인 부분을 독립적으로 검증하므로 정확한 동작을 빠르고 결정론적으로 확인할 수 있습니다.
 
-- [통합 테스트](#integration-testing)는 실제 네트워크 호출을 사용하여 에이전트를 테스트함으로써 컴포넌트가 함께 작동하고, 자격 증명과 스키마가 일치하며, 지연 시간이 허용 가능한지 확인합니다.
+- [통합 테스트](#integration-testing)는 실제 네트워크 호출을 사용하여 에이전트를 테스트함으로써 컴포넌트들이 함께 작동하는지, 자격 증명과 스키마가 일치하는지, 지연 시간이 허용 가능한지 확인합니다.
 
-에이전트 애플리케이션은 여러 컴포넌트를 연결하고 LLM의 비결정론적 특성으로 인한 불안정성을 다루어야 하므로 통합 테스트에 더 의존하는 경향이 있습니다.
+에이전트 애플리케이션은 여러 컴포넌트를 연결하고 LLM의 비결정론적 특성으로 인한 불안정성을 처리해야 하므로 통합 테스트에 더 많이 의존하는 경향이 있습니다.
 
 
 
 ## 통합 테스트
 
-많은 에이전트 동작은 실제 LLM을 사용할 때만 나타납니다. 예를 들어 에이전트가 어떤 도구를 호출하기로 결정하는지, 응답을 어떻게 포맷하는지, 프롬프트 수정이 전체 실행 경로에 영향을 미치는지 등입니다. LangChain의 [`agentevals`](https://github.com/langchain-ai/agentevals) 패키지는 라이브 모델로 에이전트 경로를 테스트하기 위해 특별히 설계된 평가자를 제공합니다.
+많은 에이전트 동작은 실제 LLM을 사용할 때만 나타납니다. 예를 들어 에이전트가 어떤 도구를 호출하기로 결정하는지, 응답을 어떻게 포맷하는지, 또는 프롬프트 수정이 전체 실행 궤적에 영향을 미치는지 등입니다. LangChain의 [`agentevals`](https://github.com/langchain-ai/agentevals) 패키지는 실제 모델로 에이전트 궤적을 테스트하기 위해 특별히 설계된 평가자를 제공합니다.
 
-AgentEvals를 사용하면 **경로 매칭** 또는 **LLM 심판**을 수행하여 에이전트의 경로(도구 호출을 포함한 정확한 메시지 시퀀스)를 쉽게 평가할 수 있습니다:
+AgentEvals를 사용하면 **궤적 매칭** 또는 **LLM 심사**를 수행하여 에이전트의 궤적(도구 호출을 포함한 정확한 메시지 시퀀스)을 쉽게 평가할 수 있습니다:
 
-<Card title="경로 매칭" icon="equals" arrow="true" href="#trajectory-match-evaluator">
-주어진 입력에 대한 참조 경로를 하드코딩하고 단계별 비교를 통해 실행을 검증합니다.
+<Card title="궤적 매칭" icon="equals" arrow="true" href="#trajectory-match-evaluator">
+주어진 입력에 대한 참조 궤적을 하드코딩하고 단계별 비교를 통해 실행을 검증합니다.
 
-잘 정의된 워크플로우를 테스트하는 데 이상적이며, 예상되는 동작을 알고 있을 때 사용합니다. 어떤 도구가 어떤 순서로 호출되어야 하는지에 대한 구체적인 기대가 있을 때 사용하세요. 이 접근 방식은 결정론적이고 빠르며 추가 LLM 호출이 필요하지 않아 비용 효율적입니다.
+잘 정의된 워크플로우를 테스트하는 데 이상적이며, 예상 동작을 알고 있을 때 사용합니다. 어떤 도구가 어떤 순서로 호출되어야 하는지에 대한 구체적인 기대치가 있을 때 사용하세요. 이 접근 방식은 결정론적이고 빠르며 비용 효율적입니다. 추가 LLM 호출이 필요하지 않기 때문입니다.
 </Card>
 
-<Card title="LLM 심판" icon="gavel" arrow="true" href="#llm-as-judge-evaluator">
-LLM을 사용하여 에이전트의 실행 경로를 정성적으로 검증합니다. "심판" LLM은 프롬프트 루브릭(참조 경로를 포함할 수 있음)에 대해 에이전트의 결정을 검토합니다.
+<Card title="LLM 심사" icon="gavel" arrow="true" href="#llm-as-judge-evaluator">
+LLM을 사용하여 에이전트의 실행 궤적을 질적으로 검증합니다. "심사" LLM은 프롬프트 루브릭(참조 궤적을 포함할 수 있음)에 따라 에이전트의 결정을 검토합니다.
 
-더 유연하며 효율성 및 적절성과 같은 미묘한 측면을 평가할 수 있지만 LLM 호출이 필요하고 결정론적이지 않습니다. 엄격한 도구 호출이나 순서 요구 사항 없이 에이전트 경로의 전반적인 품질과 합리성을 평가하고자 할 때 사용하세요.
+더 유연하며 효율성과 적절성 같은 미묘한 측면을 평가할 수 있지만 LLM 호출이 필요하고 결정론적이지 않습니다. 엄격한 도구 호출이나 순서 요구 사항 없이 에이전트 궤적의 전반적인 품질과 합리성을 평가하고자 할 때 사용하세요.
 </Card>
 
 ### AgentEvals 설치
@@ -44,22 +45,22 @@ npm install agentevals @langchain/core
 
 또는 [AgentEvals 저장소](https://github.com/langchain-ai/agentevals)를 직접 클론하세요.
 
-### 경로 매칭 평가자
+### 궤적 매칭 평가자
 
 
-AgentEvals는 참조 경로와 에이전트의 경로를 매칭하기 위한 `createTrajectoryMatchEvaluator` 함수를 제공합니다. 선택할 수 있는 네 가지 모드가 있습니다:
+AgentEvals는 에이전트의 궤적을 참조 궤적과 비교하기 위한 `createTrajectoryMatchEvaluator` 함수를 제공합니다. 선택할 수 있는 네 가지 모드가 있습니다:
 
 
 | 모드 | 설명 | 사용 사례 |
 |------|-------------|----------|
-| `strict` | 메시지와 도구 호출이 동일한 순서로 정확히 일치 | 특정 시퀀스 테스트(예: 인증 전 정책 조회) |
-| `unordered` | 동일한 도구 호출이 순서에 관계없이 허용됨 | 순서가 중요하지 않은 정보 검색 확인 |
-| `subset` | 에이전트가 참조의 도구만 호출(추가 호출 없음) | 에이전트가 예상 범위를 초과하지 않도록 보장 |
-| `superset` | 에이전트가 최소한 참조 도구를 호출(추가 허용) | 최소 필수 작업이 수행되었는지 확인 |
+| `strict` | 메시지와 도구 호출이 동일한 순서로 정확히 일치 | 특정 시퀀스 테스트 (예: 권한 부여 전 정책 조회) |
+| `unordered` | 순서에 관계없이 동일한 도구 호출 허용 | 순서가 중요하지 않은 정보 검색 검증 |
+| `subset` | 에이전트가 참조에 있는 도구만 호출 (추가 호출 없음) | 에이전트가 예상 범위를 초과하지 않도록 보장 |
+| `superset` | 에이전트가 최소한 참조 도구를 호출 (추가 호출 허용) | 최소 필수 작업이 수행되는지 검증 |
 
 <Accordion title="엄격한 매칭">
 
-`strict` 모드는 경로에 동일한 도구 호출과 함께 동일한 순서로 동일한 메시지가 포함되어 있는지 확인하지만, 메시지 내용의 차이는 허용합니다. 이는 작업을 승인하기 전에 정책 조회를 요구하는 것과 같이 특정 작업 시퀀스를 강제해야 할 때 유용합니다.
+`strict` 모드는 궤적이 동일한 순서로 동일한 메시지를 포함하고 동일한 도구 호출을 하는지 확인합니다. 메시지 내용의 차이는 허용됩니다. 이는 작업을 권한 부여하기 전에 정책 조회를 요구하는 것과 같이 특정 작업 시퀀스를 강제해야 할 때 유용합니다.
 
 
 
@@ -128,7 +129,7 @@ async function testWeatherToolCalledStrict() {
 
 <Accordion title="순서 무관 매칭">
 
-`unordered` 모드는 동일한 도구 호출을 순서에 관계없이 허용하므로, 특정 정보를 검색했는지 확인하되 시퀀스는 중요하지 않을 때 유용합니다. 예를 들어, 에이전트가 도시의 날씨와 이벤트를 모두 확인해야 할 수 있지만 순서는 중요하지 않습니다.
+`unordered` 모드는 순서에 관계없이 동일한 도구 호출을 허용합니다. 이는 특정 정보를 검색했는지 확인하고 싶지만 시퀀스는 중요하지 않을 때 유용합니다. 예를 들어, 에이전트가 도시의 날씨와 이벤트를 모두 확인해야 할 수 있지만 순서는 중요하지 않습니다.
 
 
 
@@ -173,7 +174,7 @@ async function testMultipleToolsAnyOrder() {
     messages: [new HumanMessage("What's happening in SF today?")]
   });
 
-  // 참조는 실제 실행과 다른 순서로 호출된 도구를 보여줍니다
+  // 참조는 실제 실행과 다른 순서로 도구가 호출되었음을 보여줍니다
   const referenceTrajectory = [
     new HumanMessage("What's happening in SF today?"),
     new AIMessage({
@@ -211,7 +212,7 @@ async function testMultipleToolsAnyOrder() {
 
 <Accordion title="부분집합 및 상위집합 매칭">
 
-`superset`과 `subset` 모드는 부분 경로를 매칭합니다. `superset` 모드는 에이전트가 참조 경로의 도구를 최소한 호출했는지 확인하며 추가 도구 호출을 허용합니다. `subset` 모드는 에이전트가 참조 이외의 도구를 호출하지 않았는지 확인합니다.
+`superset`과 `subset` 모드는 부분 궤적을 매칭합니다. `superset` 모드는 에이전트가 참조 궤적의 도구를 최소한 호출했는지 확인하며, 추가 도구 호출을 허용합니다. `subset` 모드는 에이전트가 참조에 있는 도구 외에 다른 도구를 호출하지 않았는지 확인합니다.
 
 
 
@@ -258,7 +259,7 @@ async function testAgentCallsRequiredToolsPlusExtra() {
     messages: [new HumanMessage("What's the weather in Boston?")]
   });
 
-  // 참조는 getWeather만 필요하지만 에이전트는 추가 도구를 호출할 수 있습니다
+  // 참조는 getWeather만 요구하지만, 에이전트는 추가 도구를 호출할 수 있습니다
   const referenceTrajectory = [
     new HumanMessage("What's the weather in Boston?"),
     new AIMessage({
@@ -292,17 +293,17 @@ async function testAgentCallsRequiredToolsPlusExtra() {
 
 <Info>
 
-`toolArgsMatchMode` 속성 및/또는 `toolArgsMatchOverrides`를 설정하여 평가자가 실제 경로와 참조 간의 도구 호출 동등성을 고려하는 방식을 커스터마이징할 수도 있습니다. 기본적으로 동일한 도구에 대한 동일한 인수를 가진 도구 호출만 동등한 것으로 간주됩니다. 자세한 내용은 [저장소](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#tool-args-match-modes)를 참조하세요.
+`toolArgsMatchMode` 속성 및/또는 `toolArgsMatchOverrides`를 설정하여 평가자가 실제 궤적과 참조 간의 도구 호출 동등성을 고려하는 방식을 커스터마이즈할 수 있습니다. 기본적으로 동일한 도구에 대한 동일한 인수를 가진 도구 호출만 동등하다고 간주됩니다. 자세한 내용은 [저장소](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#tool-args-match-modes)를 참조하세요.
 
 </Info>
 
-### LLM 심판 평가자
+### LLM 심사 평가자
 
 
-`createTrajectoryLLMAsJudge` 함수를 사용하여 LLM으로 에이전트의 실행 경로를 평가할 수도 있습니다. 경로 매칭 평가자와 달리 참조 경로가 필요하지 않지만, 사용 가능한 경우 제공할 수 있습니다.
+`createTrajectoryLLMAsJudge` 함수를 사용하여 LLM으로 에이전트의 실행 경로를 평가할 수도 있습니다. 궤적 매칭 평가자와 달리 참조 궤적이 필요하지 않지만, 사용 가능한 경우 제공할 수 있습니다.
 
 
-<Accordion title="참조 경로 없이">
+<Accordion title="참조 궤적 없이">
 
 ```ts
 import { createAgent } from "langchain"
@@ -351,9 +352,9 @@ async function testTrajectoryQuality() {
 
 </Accordion>
 
-<Accordion title="참조 경로와 함께">
+<Accordion title="참조 궤적과 함께">
 
-참조 경로가 있는 경우 프롬프트에 추가 변수를 추가하고 참조 경로를 전달할 수 있습니다. 아래에서는 사전 빌드된 `TRAJECTORY_ACCURACY_PROMPT_WITH_REFERENCE` 프롬프트를 사용하고 `reference_outputs` 변수를 구성합니다:
+참조 궤적이 있는 경우, 프롬프트에 추가 변수를 추가하고 참조 궤적을 전달할 수 있습니다. 아래에서는 사전 구축된 `TRAJECTORY_ACCURACY_PROMPT_WITH_REFERENCE` 프롬프트를 사용하고 `reference_outputs` 변수를 구성합니다:
 
 
 
@@ -375,14 +376,14 @@ const evaluation = await evaluator({
 </Accordion>
 
 <Info>
-LLM이 경로를 평가하는 방식에 대한 더 많은 구성 옵션을 보려면 [저장소](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#trajectory-llm-as-judge)를 참조하세요.
+LLM이 궤적을 평가하는 방식에 대한 더 많은 구성 가능성은 [저장소](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#trajectory-llm-as-judge)를 참조하세요.
 </Info>
 
 
 
 ## LangSmith 통합
 
-시간 경과에 따른 실험을 추적하려면 평가자 결과를 [LangSmith](https://smith.langchain.com/)에 로그할 수 있습니다. LangSmith는 추적, 평가 및 실험 도구를 포함하는 프로덕션급 LLM 애플리케이션 구축을 위한 플랫폼입니다.
+시간이 지남에 따라 실험을 추적하려면 평가자 결과를 추적, 평가 및 실험 도구를 포함하는 프로덕션 수준의 LLM 애플리케이션 구축 플랫폼인 [LangSmith](https://smith.langchain.com/)에 기록할 수 있습니다.
 
 먼저 필요한 환경 변수를 설정하여 LangSmith를 설정합니다:
 
@@ -393,7 +394,7 @@ export LANGSMITH_TRACING="true"
 
 
 
-LangSmith는 평가를 실행하기 위한 두 가지 주요 접근 방식을 제공합니다: [Vitest/Jest](/langsmith/vitest-jest) 통합과 `evaluate` 함수입니다.
+LangSmith는 평가를 실행하기 위한 두 가지 주요 접근 방식을 제공합니다: [Vitest/Jest](/langsmith/vitest-jest) 통합 및 `evaluate` 함수.
 
 <Accordion title="vitest/jest 통합 사용">
 
@@ -487,7 +488,7 @@ await evaluate(
 );
 ```
 
-결과가 자동으로 LangSmith에 로그됩니다.
+결과는 자동으로 LangSmith에 기록됩니다.
 
 </Accordion>
 

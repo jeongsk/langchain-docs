@@ -26,13 +26,13 @@ flowchart LR
 
 ### 인터페이스
 
-LangChain은 벡터 스토어를 위한 통합된 인터페이스를 제공하여 다음 작업을 수행할 수 있습니다:
+LangChain은 벡터 스토어를 위한 통합 인터페이스를 제공하여 다음과 같은 작업을 수행할 수 있습니다:
 
 - `add_documents` - 스토어에 문서를 추가합니다.
-- `delete` - ID로 저장된 문서를 제거합니다.
+- `delete` - ID로 저장된 문서를 삭제합니다.
 - `similarity_search` - 의미적으로 유사한 문서를 쿼리합니다.
 
-이러한 추상화를 통해 애플리케이션 로직을 변경하지 않고도 서로 다른 구현 간에 전환할 수 있습니다.
+이러한 추상화를 통해 애플리케이션 로직을 변경하지 않고도 다양한 구현체 간에 전환할 수 있습니다.
 
 ### 초기화
 
@@ -45,7 +45,7 @@ vector_store = InMemoryVectorStore(embedding=SomeEmbeddingModel())
 
 ### 문서 추가
 
-다음과 같이 `Document` 객체(`page_content`와 선택적 메타데이터 포함)를 추가합니다:
+다음과 같이 `page_content`와 선택적 메타데이터를 포함하는 [`Document`](https://reference.langchain.com/python/langchain_core/documents/#langchain_core.documents.base.Document) 객체를 추가합니다:
 
 ```python
 vector_store.add_documents(documents=[doc1, doc2], ids=["id1", "id2"])
@@ -61,7 +61,7 @@ vector_store.delete(ids=["id1"])
 
 ### 유사도 검색
 
-`similarity_search`를 사용하여 의미론적 쿼리를 수행하면 가장 가까운 임베딩된 문서를 반환합니다:
+`similarity_search`를 사용하여 의미적 쿼리를 실행하면 가장 가까운 임베딩된 문서가 반환됩니다:
 
 ```python
 similar_docs = vector_store.similarity_search("your query here")
@@ -74,17 +74,17 @@ similar_docs = vector_store.similarity_search("your query here")
 
 ### 유사도 메트릭 및 인덱싱
 
-임베딩 유사도는 다음을 사용하여 계산할 수 있습니다:
+임베딩 유사도는 다음을 사용하여 계산될 수 있습니다:
 
-* **코사인 유사도(Cosine similarity)**
-* **유클리드 거리(Euclidean distance)**
-* **내적(Dot product)**
+* **코사인 유사도**
+* **유클리드 거리**
+* **내적**
 
-효율적인 검색은 종종 HNSW(Hierarchical Navigable Small World)와 같은 인덱싱 방법을 사용하지만, 구체적인 내용은 벡터 스토어에 따라 다릅니다.
+효율적인 검색은 종종 HNSW(Hierarchical Navigable Small World)와 같은 인덱싱 방법을 사용하지만, 세부 사항은 벡터 스토어에 따라 다릅니다.
 
 ### 메타데이터 필터링
 
-메타데이터(예: 출처, 날짜)로 필터링하여 검색 결과를 개선할 수 있습니다:
+메타데이터(예: 출처, 날짜)로 필터링하면 검색 결과를 정제할 수 있습니다:
 
 ```python
 vector_store.similarity_search(
@@ -95,8 +95,8 @@ vector_store.similarity_search(
 ```
 
 <important>
-메타데이터 기반 필터링 지원은 구현에 따라 다릅니다.
-선택한 벡터 스토어의 문서에서 자세한 내용을 확인하세요.
+메타데이터 기반 필터링 지원은 구현체마다 다릅니다.
+자세한 내용은 선택한 벡터 스토어의 문서를 확인하세요.
 </important>
 
 
@@ -407,6 +407,62 @@ vector_store = AstraDBVectorStore(
 )
 ```
 </Accordion>
+<Accordion title="Azure Cosmos DB NoSQL">
+
+<CodeGroup>
+```bash pip
+pip install -qU langchain-azure-ai azure-cosmos
+```
+
+```bash uv
+uv add langchain-azure-ai
+```
+</CodeGroup>
+
+```python
+from langchain_azure_ai.vectorstores.azure_cosmos_db_no_sql import (
+    AzureCosmosDBNoSqlVectorSearch,
+)
+vector_search = AzureCosmosDBNoSqlVectorSearch.from_documents(
+    documents=docs,
+    embedding=openai_embeddings,
+    cosmos_client=cosmos_client,
+    database_name=database_name,
+    container_name=container_name,
+    vector_embedding_policy=vector_embedding_policy,
+    full_text_policy=full_text_policy,
+    indexing_policy=indexing_policy,
+    cosmos_container_properties=cosmos_container_properties,
+    cosmos_database_properties={},
+    full_text_search_enabled=True,
+)
+```
+</Accordion>
+<Accordion title="Azure Cosmos DB Mongo vCore">
+
+<CodeGroup>
+```bash pip
+pip install -qU langchain-azure-ai pymongo
+```
+
+```bash uv
+uv add pymongo
+```
+</CodeGroup>
+
+```python
+from langchain_azure_ai.vectorstores.azure_cosmos_db_mongo_vcore import (
+    AzureCosmosDBMongoVCoreVectorSearch,
+)
+
+vectorstore = AzureCosmosDBMongoVCoreVectorSearch.from_documents(
+    docs,
+    openai_embeddings,
+    collection=collection,
+    index_name=INDEX_NAME,
+)
+```
+</Accordion>
 <Accordion title="Chroma">
 
 <CodeGroup>
@@ -424,7 +480,7 @@ from langchain_chroma import Chroma
 vector_store = Chroma(
     collection_name="example_collection",
     embedding_function=embeddings,
-    persist_directory="./chroma_langchain_db",  # 로컬에 데이터를 저장할 위치, 필요하지 않으면 제거
+    persist_directory="./chroma_langchain_db",  # Where to save data locally, remove if not necessary
 )
 ```
 </Accordion>
@@ -587,9 +643,11 @@ vector_store = QdrantVectorStore(
 </Accordion>
 </AccordionGroup>
 
-| Vectorstore | ID로 삭제 | 필터링 | 벡터로 검색 | 점수와 함께 검색 | 비동기 | 표준 테스트 통과 | 멀티 테넌시 | 문서 추가 시 ID |
-|------------|---------|-------|-----------|--------------|--------|---------------|-----------|---------------|
+| Vectorstore | Delete by ID | Filtering | Search by Vector | Search with score | Async | Passes Standard Tests | Multi Tenancy | IDs in add Documents |
+|------------|-------------|-----------|-----------------|------------------|--------|---------------------|---------------|-------------------|
 | [`AstraDBVectorStore`](/oss/python/integrations/vectorstores/astradb) | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ |
+| [`AzureCosmosDBNoSqlVectorStore`](/oss/python/integrations/vectorstores/azure_cosmos_db_no_sql) | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ |
+| [`AzureCosmosDBMongoVCoreVectorStore`](/oss/python/integrations/vectorstores/azure_cosmos_db_mongo_vcore) | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ |
 | [`Chroma`](/oss/python/integrations/vectorstores/chroma) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | [`Clickhouse`](/oss/python/integrations/vectorstores/clickhouse) | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ✅ |
 | [`CouchbaseSearchVectorStore`](/oss/python/integrations/vectorstores/couchbase) | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
@@ -609,7 +667,7 @@ vector_store = QdrantVectorStore(
 | [`SQLServer`](/oss/python/integrations/vectorstores/sqlserver) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ |
 | [`ZeusDB`](/oss/python/integrations/vectorstores/zeusdb) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
 
-## 모든 벡터스토어
+## 전체 벡터 스토어
 
 <Columns cols={3}>
 <Card title="Activeloop Deep Lake" icon="link" href="/oss/python/integrations/vectorstores/activeloop_deeplake" arrow="true" cta="가이드 보기"/>
@@ -621,7 +679,7 @@ vector_store = QdrantVectorStore(
 <Card title="Astra DB Vector Store" icon="link" href="/oss/python/integrations/vectorstores/astradb" arrow="true" cta="가이드 보기"/>
 <Card title="Atlas" icon="link" href="/oss/python/integrations/vectorstores/atlas" arrow="true" cta="가이드 보기"/>
 <Card title="AwaDB" icon="link" href="/oss/python/integrations/vectorstores/awadb" arrow="true" cta="가이드 보기"/>
-<Card title="Azure Cosmos DB Mongo vCore" icon="link" href="/oss/python/integrations/vectorstores/azure_cosmos_db" arrow="true" cta="가이드 보기"/>
+<Card title="Azure Cosmos DB Mongo vCore" icon="link" href="/oss/python/integrations/vectorstores/azure_cosmos_db_mongo_vcore" arrow="true" cta="가이드 보기"/>
 <Card title="Azure Cosmos DB No SQL" icon="link" href="/oss/python/integrations/vectorstores/azure_cosmos_db_no_sql" arrow="true" cta="가이드 보기"/>
 <Card title="Azure AI Search" icon="link" href="/oss/python/integrations/vectorstores/azuresearch" arrow="true" cta="가이드 보기"/>
 <Card title="Bagel" icon="link" href="/oss/python/integrations/vectorstores/bagel" arrow="true" cta="가이드 보기"/>

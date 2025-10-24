@@ -1,17 +1,18 @@
 ---
 title: "Chat 모델"
+mode: wide
 ---
 
-[Chat 모델](/oss/python/langchain/models)은 일련의 [메시지](/oss/python/langchain/messages)를 입력으로 받아 메시지를 출력으로 반환하는 언어 모델입니다 <Tooltip tip="이름에 'Chat' 접두사가 없거나 'LLM'이 접미사로 포함된 모델은 일반적으로 chat 모델 인터페이스를 따르지 않는 이전 모델을 가리키며, 대신 문자열을 입력으로 받아 문자열을 출력으로 반환하는 인터페이스를 사용합니다.">(기존의 일반 텍스트 LLM과는 다릅니다)</Tooltip>.
+[Chat 모델](/oss/python/langchain/models)은 일련의 [메시지](/oss/python/langchain/messages)를 입력으로 받아 메시지를 출력으로 반환하는 언어 모델입니다 <Tooltip tip="이름에 'Chat' 접두사가 없거나 'LLM'을 접미사로 포함하는 모델은 일반적으로 chat 모델 인터페이스를 따르지 않고 대신 문자열을 입력으로 받아 문자열을 출력으로 반환하는 인터페이스를 사용하는 구형 모델을 의미합니다.">(기존의 일반 텍스트 LLM과 대조적으로)</Tooltip>.
 
-## 주요 제공업체
+## 주요 제공자
 
 <Info>
-    **이러한 모든 LangChain 클래스가 표시된 고급 기능을 지원하지만**, 어떤 호스팅 모델이나 백엔드가 해당 기능을 지원하는지 알아보려면 제공업체별 문서를 확인해야 할 수 있습니다.
+    **모든 LangChain 클래스가 표시된 고급 기능을 지원하지만**, 어떤 호스팅 모델 또는 백엔드가 해당 기능을 지원하는지 알아보려면 제공자별 문서를 확인해야 할 수 있습니다.
 </Info>
 
 {/* TODO: finish linking to specific section for `ChatModel` */}
-| 제공업체 | [Tool 호출](/oss/python/langchain/tools) | [Structured output](/oss/python/langchain/structured-output/) | JSON mode | Local | [Multimodal](/oss/python/langchain/messages#multimodal) | 패키지 |
+| Provider | [Tool calling](/oss/python/langchain/tools) | [Structured output](/oss/python/langchain/structured-output/) | JSON mode | Local | [Multimodal](/oss/python/langchain/messages#multimodal) | Package |
 |----------|------------|-------------------|-----------|-------|------------|---------|
 | [`ChatAnthropic`](/oss/python/integrations/chat/anthropic) | ✅ | ✅ | ❌ | ❌ | ✅ | [`langchain-anthropic`](https://reference.langchain.com/python/integrations/langchain_anthropic/) |
 | [`ChatOpenAI`](/oss/python/integrations/chat/openai) | ✅ | ✅ | ✅ | ❌ | ✅ | [`langchain-openai`](https://reference.langchain.com/python/integrations/langchain_openai/ChatOpenAI/) |
@@ -736,7 +737,7 @@ title: "Chat 모델"
 </Columns>
 
 <Info>
-    통합 기능을 기여하고 싶으시다면 [통합 기능 기여하기](/oss/python/contributing#add-a-new-integration)를 참조하세요.
+    통합을 기여하고 싶으시다면 [통합 기여하기](/oss/python/contributing#add-a-new-integration)를 참조하세요.
 </Info>
 
 ---

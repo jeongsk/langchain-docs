@@ -1,29 +1,21 @@
 ---
-title: 배포
+title: 배포하기
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
-import deploy from '/snippets/oss/deploy.mdx';
+LangSmith는 에이전트를 프로덕션 시스템으로 전환하는 가장 빠른 방법입니다. 기존 호스팅 플랫폼은 상태를 유지하지 않는 단기 실행 웹 앱을 위해 구축되었지만, LangGraph는 **상태를 유지하는 장기 실행 에이전트를 위해 특별히 설계**되어 몇 분 만에 저장소에서 안정적인 클라우드 배포로 전환할 수 있습니다.
 
-<AlphaCalloutPy />
+## 사전 요구 사항
 
-
-
-LangSmith는 agent를 프로덕션 시스템으로 전환하는 가장 빠른 방법입니다. 기존 호스팅 플랫폼은 상태가 없고 수명이 짧은 웹 앱을 위해 만들어진 반면, LangGraph는 **상태를 유지하고 오래 실행되는 agent를 위해 특별히 설계**되어 있어 몇 분 안에 저장소에서 안정적인 클라우드 배포로 전환할 수 있습니다.
-
-## 사전 요구사항
-
-시작하기 전에 다음 사항이 필요합니다:
+시작하기 전에 다음 사항을 준비해야 합니다:
 
 * [GitHub 계정](https://github.com/)
 * [LangSmith 계정](https://smith.langchain.com/) (무료 가입 가능)
 
-## agent 배포하기
+## 에이전트 배포하기
 
-### 1. GitHub에 저장소 만들기
+### 1. GitHub에서 저장소 생성하기
 
-애플리케이션 코드는 LangSmith에 배포되기 위해 GitHub 저장소에 있어야 합니다. 공개 및 비공개 저장소 모두 지원됩니다. 이 빠른 시작에서는 먼저 [로컬 서버 설정 가이드](/oss/python/langchain/studio#setup-local-langgraph-server)를 따라 앱이 LangGraph와 호환되는지 확인하세요. 그런 다음 코드를 저장소에 푸시하세요.
+애플리케이션 코드는 LangSmith에 배포하려면 GitHub 저장소에 있어야 합니다. 공개 및 비공개 저장소 모두 지원됩니다. 이 퀵스타트에서는 먼저 [로컬 서버 설정 가이드](/oss/python/langchain/studio#setup-local-langgraph-server)를 따라 앱이 LangGraph와 호환되는지 확인한 다음, 코드를 저장소에 푸시하세요.
 
 <deploy />
 

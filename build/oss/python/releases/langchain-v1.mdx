@@ -3,22 +3,21 @@ title: v1의 새로운 기능
 sidebarTitle: 릴리스 노트
 ---
 
-
-**LangChain v1은 에이전트 구축을 위한 집중적이고 프로덕션 준비가 완료된 기반입니다.** 세 가지 핵심 개선 사항을 중심으로 프레임워크를 간소화했습니다:
+**LangChain v1은 에이전트 구축을 위한 집중적이고 프로덕션 준비된 기반입니다.** 세 가지 핵심 개선 사항을 중심으로 프레임워크를 간소화했습니다:
 
 <CardGroup cols={1}>
     <Card title="create_agent" icon="robot" href="#create-agent" arrow>
-        `langgraph.prebuilt.create_react_agent`를 대체하는 LangChain의 새로운 에이전트 구축 표준입니다.
+        LangChain에서 에이전트를 구축하는 새로운 표준으로, `langgraph.prebuilt.create_react_agent`를 대체합니다.
     </Card>
-    <Card title="표준 콘텐츠 블록" icon="cube" href="#표준-콘텐츠-블록" arrow>
-        여러 제공자에 걸쳐 최신 LLM 기능에 대한 통합된 접근을 제공하는 새로운 `content_blocks` 속성입니다.
+    <Card title="표준 콘텐츠 블록" icon="cube" href="#standard-content-blocks" arrow>
+        프로바이더 전반에서 최신 LLM 기능에 통합된 접근을 제공하는 새로운 `content_blocks` 속성입니다.
     </Card>
-    <Card title="간소화된 네임스페이스" icon="sitemap" href="#간소화된-패키지" arrow>
+    <Card title="간소화된 네임스페이스" icon="sitemap" href="#simplified-package" arrow>
         `langchain` 네임스페이스가 에이전트를 위한 필수 구성 요소에 집중하도록 간소화되었으며, 레거시 기능은 `langchain-classic`으로 이동했습니다.
     </Card>
 </CardGroup>
 
-업그레이드하려면 다음과 같이 실행하세요:
+업그레이드하려면 다음을 실행하세요:
 
 <CodeGroup>
 ```bash pip
@@ -33,50 +32,50 @@ uv add langchain
 
 ## `create_agent`
 
-[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 LangChain 1.0에서 에이전트를 구축하는 표준 방법입니다. [미들웨어](#middleware)를 사용하여 더 큰 커스터마이징 가능성을 제공하면서도 `langgraph.prebuilt.create_react_agent`보다 더 간단한 인터페이스를 제공합니다.
+[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 LangChain 1.0에서 에이전트를 구축하는 표준 방법입니다. `langgraph.prebuilt.create_react_agent`보다 간단한 인터페이스를 제공하면서도 [미들웨어](#middleware)를 사용하여 더 큰 커스터마이징 가능성을 제공합니다.
 
 ```python
 from langchain.agents import create_agent
 
+
 agent = create_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[search_web, analyze_data, send_email],
-    system_prompt="당신은 유용한 연구 보조원입니다."
+    system_prompt="You are a helpful research assistant."
 )
 
 result = agent.invoke({
     "messages": [
-        {"role": "user", "content": "AI 안전성 트렌드를 조사해줘"}
+        {"role": "user", "content": "Research AI safety trends"}
     ]
 })
 ```
 
-내부적으로 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 기본 에이전트 루프를 기반으로 구축되었습니다. 모델을 호출하고, 실행할 도구를 선택하게 한 다음, 더 이상 도구를 호출하지 않을 때 완료됩니다:
+내부적으로 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 기본 에이전트 루프를 기반으로 구축됩니다 -- 모델을 호출하고, 실행할 도구를 선택하게 한 후, 더 이상 도구를 호출하지 않으면 종료합니다:
 
 <div style={{ display: "flex", justifyContent: "center" }}>
-    <img
-        src="/oss/images/core_agent_loop.png"
-        alt="핵심 에이전트 루프 다이어그램"
-        height="300"
-        className="rounded-lg"
-    />
+  <img
+    src="/oss/images/core_agent_loop.png"
+    alt="핵심 에이전트 루프 다이어그램"
+    className="rounded-lg"
+  />
 </div>
 
 자세한 내용은 [에이전트](/oss/python/langchain/agents)를 참조하세요.
 
 ### 미들웨어
 
-미들웨어는 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)의 핵심 기능입니다. 고도로 커스터마이징 가능한 진입점을 제공하여 구축할 수 있는 것의 한계를 높입니다.
+미들웨어는 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)의 핵심 기능입니다. 매우 커스터마이징 가능한 진입점을 제공하여 구축할 수 있는 범위의 상한선을 높입니다.
 
-훌륭한 에이전트는 [컨텍스트 엔지니어링](/oss/python/langchain/context-engineering)이 필요합니다. 즉, 적절한 시점에 모델에 올바른 정보를 제공하는 것입니다. 미들웨어는 구성 가능한 추상화를 통해 동적 프롬프트, 대화 요약, 선택적 도구 접근, 상태 관리 및 가드레일을 제어할 수 있도록 도와줍니다.
+훌륭한 에이전트는 [컨텍스트 엔지니어링](/oss/python/langchain/context-engineering)이 필요합니다: 적절한 시기에 모델에 올바른 정보를 제공하는 것입니다. 미들웨어는 구성 가능한 추상화를 통해 동적 프롬프트, 대화 요약, 선택적 도구 접근, 상태 관리 및 가드레일을 제어할 수 있도록 도와줍니다.
 
-#### 사전 구축 미들웨어
+#### 사전 구축된 미들웨어
 
-LangChain은 일반적인 패턴을 위한 몇 가지 [사전 구축 미들웨어](/oss/python/langchain/middleware#built-in-middleware)를 제공합니다:
+LangChain은 일반적인 패턴을 위한 몇 가지 [사전 구축된 미들웨어](/oss/python/langchain/middleware#built-in-middleware)를 제공합니다:
 
 - [`PIIMiddleware`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.PIIMiddleware): 모델에 전송하기 전에 민감한 정보를 수정합니다
 - [`SummarizationMiddleware`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.SummarizationMiddleware): 대화 기록이 너무 길어지면 압축합니다
-- [`HumanInTheLoopMiddleware`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.HumanInTheLoopMiddleware): 민감한 도구 호출에 대한 승인이 필요합니다
+- [`HumanInTheLoopMiddleware`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.HumanInTheLoopMiddleware): 민감한 도구 호출에 대한 승인을 요구합니다
 
 ```python
 from langchain.agents import create_agent
@@ -86,13 +85,14 @@ from langchain.agents.middleware import (
     HumanInTheLoopMiddleware
 )
 
+
 agent = create_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[read_email, send_email],
     middleware=[
         PIIMiddleware(patterns=["email", "phone", "ssn"]),
         SummarizationMiddleware(
-            model="anthropic:claude-sonnet-4-5-20250929",
+            model="anthropic:claude-sonnet-4-5",
             max_tokens_before_summary=500
         ),
         HumanInTheLoopMiddleware(
@@ -111,27 +111,26 @@ agent = create_agent(
 필요에 맞게 커스텀 미들웨어를 구축할 수도 있습니다. 미들웨어는 에이전트 실행의 각 단계에서 훅을 노출합니다:
 
 <div style={{ display: "flex", justifyContent: "center" }}>
-    <img
-        src="/oss/images/middleware_final.png"
-        alt="미들웨어 흐름 다이어그램"
-        height="300"
-        className="rounded-lg"
-    />
+  <img
+    src="/oss/images/middleware_final.png"
+    alt="미들웨어 플로우 다이어그램"
+    className="rounded-lg"
+  />
 </div>
 
-[`AgentMiddleware`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.AgentMiddleware) 클래스의 서브클래스에 이러한 훅 중 하나를 구현하여 커스텀 미들웨어를 구축하세요:
+[`AgentMiddleware`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.AgentMiddleware) 클래스의 서브클래스에서 다음 훅 중 하나를 구현하여 커스텀 미들웨어를 구축하세요:
 
-| 훅                | 실행 시점                | 사용 사례                              |
-|-------------------|------------------------|--------------------------------------|
-| `before_agent`    | 에이전트 호출 전          | 메모리 로드, 입력 검증                  |
-| `before_model`    | 각 LLM 호출 전           | 프롬프트 업데이트, 메시지 정리           |
-| `wrap_model_call` | 각 LLM 호출을 감싸서      | 요청/응답 가로채기 및 수정              |
-| `wrap_tool_call`  | 각 도구 호출을 감싸서      | 도구 실행 가로채기 및 수정              |
-| `after_model`     | 각 LLM 응답 후           | 출력 검증, 가드레일 적용                |
-| `after_agent`     | 에이전트 완료 후          | 결과 저장, 정리                        |
+| 훅                | 실행 시점                | 사용 사례                          |
+|-------------------|--------------------------|-----------------------------------|
+| `before_agent`    | 에이전트 호출 전          | 메모리 로드, 입력 검증             |
+| `before_model`    | 각 LLM 호출 전           | 프롬프트 업데이트, 메시지 정리      |
+| `wrap_model_call` | 각 LLM 호출 전후         | 요청/응답 가로채기 및 수정         |
+| `wrap_tool_call`  | 각 도구 호출 전후         | 도구 실행 가로채기 및 수정         |
+| `after_model`     | 각 LLM 응답 후           | 출력 검증, 가드레일 적용           |
+| `after_agent`     | 에이전트 완료 후          | 결과 저장, 정리                   |
 
 
-커스텀 미들웨어 예제:
+커스텀 미들웨어 예시:
 
 ```python expandable
 from dataclasses import dataclass
@@ -169,7 +168,7 @@ class ExpertiseBasedToolMiddleware(Middleware):
         )
 
 agent = create_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[
         simple_search,
         advanced_search,
@@ -185,31 +184,31 @@ agent = create_agent(
 
 ### LangGraph 기반 구축
 
-[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 [LangGraph](/oss/python/langgraph)를 기반으로 구축되었기 때문에 다음을 통해 장기 실행 및 안정적인 에이전트에 대한 기본 지원을 자동으로 받을 수 있습니다:
+[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)가 [LangGraph](/oss/python/langgraph)를 기반으로 구축되었기 때문에, 다음을 통해 장기 실행 및 신뢰할 수 있는 에이전트를 위한 기본 지원을 자동으로 받게 됩니다:
 
 <CardGroup cols={2}>
     <Card title="영속성" icon="database">
-        내장된 체크포인팅을 통해 대화가 세션 간에 자동으로 유지됩니다
+        기본 체크포인팅을 통해 세션 간 대화가 자동으로 유지됩니다
     </Card>
     <Card title="스트리밍" icon="water">
         토큰, 도구 호출 및 추론 추적을 실시간으로 스트리밍합니다
     </Card>
-    <Card title="Human-in-the-loop" icon="hand">
-        민감한 작업 전에 인간 승인을 위해 에이전트 실행을 일시 중지합니다
+    <Card title="휴먼-인-더-루프" icon="hand">
+        민감한 작업 전에 사람의 승인을 위해 에이전트 실행을 일시 중지합니다
     </Card>
     <Card title="타임 트래블" icon="clock-rotate-left">
-        대화를 임의의 시점으로 되감고 대안 경로 및 프롬프트를 탐색합니다
+        대화를 임의의 시점으로 되돌리고 대체 경로와 프롬프트를 탐색합니다
     </Card>
 </CardGroup>
 
-이러한 기능을 사용하기 위해 LangGraph를 배울 필요는 없습니다. 기본적으로 작동합니다.
+이러한 기능을 사용하기 위해 LangGraph를 배울 필요가 없습니다—즉시 사용 가능합니다.
 
 ### 구조화된 출력
 
-[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 향상된 구조화된 출력 생성을 제공합니다:
+[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 개선된 구조화된 출력 생성 기능을 제공합니다:
 
-- **메인 루프 통합**: 구조화된 출력이 추가 LLM 호출을 요구하는 대신 메인 루프에서 생성됩니다
-- **구조화된 출력 전략**: 모델이 도구 호출 또는 제공자 측 구조화된 출력 생성 중에서 선택할 수 있습니다
+- **메인 루프 통합**: 구조화된 출력이 이제 추가 LLM 호출을 요구하지 않고 메인 루프에서 생성됩니다
+- **구조화된 출력 전략**: 모델이 도구 호출과 프로바이더 측 구조화된 출력 생성 중에서 선택할 수 있습니다
 - **비용 절감**: 추가 LLM 호출로 인한 추가 비용을 제거합니다
 
 ```python
@@ -217,13 +216,14 @@ from langchain.agents import create_agent
 from langchain.agents.structured_output import ToolStrategy
 from pydantic import BaseModel
 
+
 class Weather(BaseModel):
     temperature: float
     condition: str
 
 def weather_tool(city: str) -> str:
-    """도시의 날씨를 가져옵니다."""
-    return f"{city}는 맑고 70도입니다"
+    """Get the weather for a city."""
+    return f"it's sunny and 70 degrees in {city}"
 
 agent = create_agent(
     "openai:gpt-4o-mini",
@@ -232,16 +232,16 @@ agent = create_agent(
 )
 
 result = agent.invoke({
-    "messages": [{"role": "user", "content": "샌프란시스코의 날씨는 어때?"}]
+    "messages": [{"role": "user", "content": "What's the weather in SF?"}]
 })
 
 print(repr(result["structured_response"]))
-# 결과: `Weather(temperature=70.0, condition='sunny')`
+# results in `Weather(temperature=70.0, condition='sunny')`
 ```
 
-**오류 처리**: `ToolStrategy`의 `handle_errors` 매개변수를 통해 오류 처리를 제어합니다:
-- **파싱 오류**: 모델이 원하는 구조와 일치하지 않는 데이터를 생성합니다
-- **다중 도구 호출**: 모델이 구조화된 출력 스키마에 대해 2개 이상의 도구 호출을 생성합니다
+**오류 처리**: `ToolStrategy`의 `handle_errors` 파라미터를 통해 오류 처리를 제어합니다:
+- **파싱 오류**: 모델이 원하는 구조와 일치하지 않는 데이터를 생성할 때
+- **다중 도구 호출**: 모델이 구조화된 출력 스키마에 대해 2개 이상의 도구 호출을 생성할 때
 
 ---
 
@@ -256,52 +256,52 @@ print(repr(result["structured_response"]))
     - [`langchain-google-genai`](https://pypi.org/project/langchain-google-genai/)
     - [`langchain-ollama`](https://pypi.org/project/langchain-ollama/)
 
-    콘텐츠 블록에 대한 더 광범위한 지원은 더 많은 제공자에 걸쳐 점진적으로 롤아웃될 예정입니다.
+    콘텐츠 블록에 대한 더 광범위한 지원은 더 많은 프로바이더에 걸쳐 점진적으로 출시될 예정입니다.
 </Note>
 
-새로운 [`content_blocks`](https://reference.langchain.com/python/langchain_core/language_models/#langchain_core.messages.BaseMessage.content_blocks) 속성은 제공자 간에 작동하는 메시지 콘텐츠에 대한 표준 표현을 도입합니다:
+새로운 [`content_blocks`](https://reference.langchain.com/python/langchain_core/language_models/#langchain_core.messages.BaseMessage.content_blocks) 속성은 프로바이더 전반에서 작동하는 메시지 콘텐츠의 표준 표현을 도입합니다:
 
 ```python
 from langchain_anthropic import ChatAnthropic
 
-model = ChatAnthropic(model="claude-sonnet-4-5-20250929")
-response = model.invoke("프랑스의 수도는?")
+model = ChatAnthropic(model="claude-sonnet-4-5")
+response = model.invoke("What's the capital of France?")
 
-# 콘텐츠 블록에 대한 통합 접근
+# 콘텐츠 블록에 통합 접근
 for block in response.content_blocks:
     if block["type"] == "reasoning":
-        print(f"모델 추론: {block['reasoning']}")
+        print(f"Model reasoning: {block['reasoning']}")
     elif block["type"] == "text":
-        print(f"응답: {block['text']}")
+        print(f"Response: {block['text']}")
     elif block["type"] == "tool_call":
-        print(f"도구 호출: {block['name']}({block['args']})")
+        print(f"Tool call: {block['name']}({block['args']})")
 ```
 
-### 이점
+### 장점
 
-- **제공자 독립적**: 제공자에 관계없이 동일한 API를 사용하여 추론 추적, 인용, 내장 도구(웹 검색, 코드 인터프리터 등) 및 기타 기능에 접근합니다
+- **프로바이더 독립적**: 프로바이더에 관계없이 동일한 API를 사용하여 추론 추적, 인용, 내장 도구(웹 검색, 코드 인터프리터 등) 및 기타 기능에 접근합니다
 - **타입 안전**: 모든 콘텐츠 블록 타입에 대한 완전한 타입 힌트를 제공합니다
-- **하위 호환성**: 표준 콘텐츠는 [지연 로드](/oss/python/langchain/messages#standard-content-blocks)될 수 있으므로 관련된 중단 변경이 없습니다
+- **하위 호환성**: 표준 콘텐츠를 [지연 로드](/oss/python/langchain/messages#standard-content-blocks)할 수 있으므로 관련된 호환성 문제가 없습니다
 
-자세한 내용은 [콘텐츠 블록](/oss/python/langchain/messages#standard-content-blocks)에 대한 가이드를 참조하세요.
+자세한 내용은 [콘텐츠 블록](/oss/python/langchain/messages#standard-content-blocks) 가이드를 참조하세요.
 
 ---
 
 ## 간소화된 패키지
 
-LangChain v1은 [`langchain`](https://pypi.org/project/langchain/) 패키지 네임스페이스를 간소화하여 에이전트를 위한 필수 구성 요소에 집중합니다. 개선된 네임스페이스는 가장 유용하고 관련성 높은 기능을 노출합니다:
+LangChain v1은 [`langchain`](https://pypi.org/project/langchain/) 패키지 네임스페이스를 간소화하여 에이전트를 위한 필수 구성 요소에 집중합니다. 개선된 네임스페이스는 가장 유용하고 관련성 있는 기능을 노출합니다:
 
 ### 네임스페이스
 
-| 모듈 | 사용 가능한 것 | 참고 |
-|--------|------------------|-------|
+| 모듈 | 사용 가능한 기능 | 비고 |
+|------|------------------|------|
 | [`langchain.agents`](https://reference.langchain.com/python/langchain/agents) | [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent), [`AgentState`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.AgentState) | 핵심 에이전트 생성 기능 |
-| [`langchain.messages`](https://reference.langchain.com/python/langchain/messages) | 메시지 타입, [콘텐츠 블록](https://reference.langchain.com/python/langchain/messages/#langchain.messages.ContentBlock), [`trim_messages`](https://reference.langchain.com/python/langchain/messages/#langchain.messages.trim_messages) | @[`langchain-core`]에서 재내보내기됨 |
-| [`langchain.tools`](https://reference.langchain.com/python/langchain/tools) | [`@tool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool), [`BaseTool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.BaseTool), 주입 헬퍼 | @[`langchain-core`]에서 재내보내기됨 |
+| [`langchain.messages`](https://reference.langchain.com/python/langchain/messages) | 메시지 타입, [콘텐츠 블록](https://reference.langchain.com/python/langchain/messages/#langchain.messages.ContentBlock), [`trim_messages`](https://reference.langchain.com/python/langchain/messages/#langchain.messages.trim_messages) | @[`langchain-core`]에서 재내보내기 |
+| [`langchain.tools`](https://reference.langchain.com/python/langchain/tools) | [`@tool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool), [`BaseTool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.BaseTool), 인젝션 헬퍼 | @[`langchain-core`]에서 재내보내기 |
 | [`langchain.chat_models`](https://reference.langchain.com/python/langchain/models) | [`init_chat_model`](https://reference.langchain.com/python/langchain/models/#langchain.chat_models.init_chat_model), [`BaseChatModel`](https://reference.langchain.com/python/langchain_core/language_models/#langchain_core.language_models.chat_models.BaseChatModel) | 통합 모델 초기화 |
 | [`langchain.embeddings`](https://reference.langchain.com/python/langchain/embeddings) | [`Embeddings`](https://reference.langchain.com/python/langchain_core/embeddings/#langchain_core.embeddings.embeddings.Embeddings), [`init_embeddings`](https://reference.langchain.com/python/langchain_core/embeddings/#langchain_core.embeddings.embeddings.Embeddings) | 임베딩 모델 |
 
-이들 대부분은 편의를 위해 `langchain-core`에서 재내보내기되어 에이전트 구축을 위한 집중된 API 표면을 제공합니다.
+이들 대부분은 편의를 위해 `langchain-core`에서 재내보내기되며, 에이전트 구축을 위한 집중된 API 표면을 제공합니다.
 
 ```python
 # 에이전트 구축
@@ -320,16 +320,18 @@ from langchain.embeddings import init_embeddings
 
 ### `langchain-classic`
 
-레거시 기능은 핵심 패키지를 간결하고 집중적으로 유지하기 위해 [`langchain-classic`](https://pypi.org/project/langchain-classic)으로 이동했습니다.
+레거시 기능은 핵심 패키지를 가볍고 집중적으로 유지하기 위해 [`langchain-classic`](https://pypi.org/project/langchain-classic)으로 이동했습니다.
 
-#### `langchain-classic`에 포함된 것
+**`langchain-classic`에 포함된 내용:**
 
 - 레거시 체인 및 체인 구현
+- 리트리버(예: `MultiQueryRetriever` 또는 이전 `langchain.retrievers` 모듈의 모든 것)
 - 인덱싱 API
+- 허브 모듈(프로그래밍 방식으로 프롬프트 관리)
 - [`langchain-community`](https://pypi.org/project/langchain-community) 내보내기
 - 기타 더 이상 사용되지 않는 기능
 
-이러한 기능 중 하나를 사용하는 경우 [`langchain-classic`](https://pypi.org/project/langchain-classic)을 설치하세요:
+이러한 기능을 사용하는 경우 [`langchain-classic`](https://pypi.org/project/langchain-classic)을 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -349,15 +351,21 @@ from langchain_classic import ...  # [!code ++]
 
 from langchain.chains import ...  # [!code --]
 from langchain_classic.chains import ...  # [!code ++]
+
+from langchain.retrievers import ...  # [!code --]
+from langchain_classic.retrievers import ...  # [!code ++]
+
+from langchain import hub  # [!code --]
+from langchain_classic import hub  # [!code ++]
 ```
 
 ## 마이그레이션 가이드
 
-LangChain v1로 코드를 업데이트하는 데 도움이 필요하면 [마이그레이션 가이드](/oss/python/migrate/langchain-v1)를 참조하세요.
+LangChain v1로 코드를 업데이트하는 방법은 [마이그레이션 가이드](/oss/python/migrate/langchain-v1)를 참조하세요.
 
-## 문제 보고
+## 이슈 보고
 
-1.0에서 발견된 문제는 [GitHub](https://github.com/langchain-ai/langchain/issues)에서 `'v1'` [레이블](https://github.com/langchain-ai/langchain/issues?q=state%3Aopen%20label%3Av1)을 사용하여 보고해 주세요.
+1.0에서 발견된 모든 이슈는 `'v1'` [레이블](https://github.com/langchain-ai/langchain/issues?q=state%3Aopen%20label%3Av1)을 사용하여 [GitHub](https://github.com/langchain-ai/langchain/issues)에 보고해 주세요.
 
 ## 추가 리소스
 
@@ -371,21 +379,21 @@ LangChain v1로 코드를 업데이트하는 데 도움이 필요하면 [마이�
     <Card title="에이전트 문서" icon="book" href="/oss/python/langchain/agents" arrow>
         전체 에이전트 문서
     </Card>
-    <Card title="메시지 콘텐츠" icon="message" href="/oss/python/langchain/messages#content" arrow>
+    <Card title="메시지 콘텐츠" icon="message" href="/oss/python/langchain/messages#message-content" arrow>
         새로운 콘텐츠 블록 API
     </Card>
     <Card title="마이그레이션 가이드" icon="arrow-right-arrow-left" href="/oss/python/migrate/langchain-v1" arrow>
         LangChain v1로 마이그레이션하는 방법
     </Card>
     <Card title="GitHub" icon="github" href="https://github.com/langchain-ai/langchain">
-        문제 보고 또는 기여
+        이슈 보고 또는 기여
     </Card>
 </CardGroup>
 
-## 함께 보기
+## 참고
 
-- [버전 관리](/oss/python/versioning) - 버전 번호 이해하기
-- [릴리스 정책](/oss/python/release-policy) - 상세한 릴리스 정책
+- [버저닝](/oss/python/versioning) - 버전 번호 이해하기
+- [릴리스 정책](/oss/python/release-policy) - 자세한 릴리스 정책
 
 ---
 

@@ -2,16 +2,16 @@
 title: EverNote
 ---
 
->[EverNote](https://evernote.com/)는 사진, 오디오 및 저장된 웹 콘텐츠를 포함할 수 있는 메모를 보관하고 생성하기 위한 서비스입니다. 메모는 가상 "노트북"에 저장되며 태그 지정, 주석 추가, 편집, 검색 및 내보내기가 가능합니다.
+>[EverNote](https://evernote.com/) is intended for archiving and creating notes in which photos, audio and saved web content can be embedded. Notes are stored in virtual "notebooks" and can be tagged, annotated, edited, searched, and exported.
 
-이 노트북은 디스크에서 `Evernote` [내보내기](https://help.evernote.com/hc/en-us/articles/209005557-Export-notes-and-notebooks-as-ENEX-or-HTML) 파일(.enex)을 로드하는 방법을 보여줍니다.
+This notebook shows how to load an `Evernote` [export](https://help.evernote.com/hc/en-us/articles/209005557-Export-notes-and-notebooks-as-ENEX-or-HTML) file (.enex) from disk.
 
-내보내기의 각 메모에 대해 문서가 생성됩니다.
+A document will be created for each note in the export.
 
 ```python
 # lxml and html2text are required to parse EverNote notes
-%pip install -qU  lxml
-%pip install -qU  html2text
+pip install -qU  lxml
+pip install -qU  html2text
 ```
 
 ```python

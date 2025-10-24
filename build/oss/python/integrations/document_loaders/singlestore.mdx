@@ -2,66 +2,66 @@
 title: SingleStoreLoader
 ---
 
-`SingleStoreLoader`를 사용하면 SingleStore 데이터베이스 테이블에서 직접 문서를 로드할 수 있습니다. 이는 `langchain-singlestore` 통합 패키지의 일부입니다.
+The `SingleStoreLoader` allows you to load documents directly from a SingleStore database table. It is part of the `langchain-singlestore` integration package.
 
-## 개요
+## Overview
 
-### 통합 세부 정보
+### Integration Details
 
-| 클래스 | 패키지 | JS 지원 |
+| Class | Package | JS Support |
 | :--- | :--- | :---: |
 | `SingleStoreLoader` | `langchain_singlestore` | ❌ |
 
-### 기능
+### Features
 
-- 대용량 데이터셋을 효율적으로 처리하기 위해 문서를 지연 로딩합니다.
-- 네이티브 비동기 작업을 지원합니다.
-- 다양한 데이터베이스 스키마와 함께 작동하도록 쉽게 구성할 수 있습니다.
+- Load documents lazily to handle large datasets efficiently.
+- Supports native asynchronous operations.
+- Easily configurable to work with different database schemas.
 
-## 설정
+## Setup
 
-`SingleStoreLoader`를 사용하려면 `langchain-singlestore` 패키지를 설치해야 합니다. 아래 설치 지침을 따르세요.
+To use the `SingleStoreLoader`, you need to install the `langchain-singlestore` package. Follow the installation instructions below.
 
-### 설치
+### Installation
 
-**langchain_singlestore**를 설치합니다.
+Install **langchain_singlestore**.
 
 ```python
-%pip install -qU langchain_singlestore
+pip install -qU langchain_singlestore
 ```
 
-## 초기화
+## Initialization
 
-`SingleStoreLoader`를 초기화하려면 SingleStore 데이터베이스에 대한 연결 매개변수를 제공하고 문서를 로드할 테이블과 필드를 지정해야 합니다.
+To initialize `SingleStoreLoader`, you need to provide connection parameters for the SingleStore database and specify the table and fields to load documents from.
 
-### 필수 매개변수
+### Required Parameters
 
-- **host** (`str`): 데이터베이스의 호스트 이름, IP 주소 또는 URL입니다.
-- **table_name** (`str`): 쿼리할 테이블의 이름입니다. 기본값은 `embeddings`입니다.
-- **content_field** (`str`): 문서 콘텐츠를 포함하는 필드입니다. 기본값은 `content`입니다.
-- **metadata_field** (`str`): 문서 메타데이터를 포함하는 필드입니다. 기본값은 `metadata`입니다.
+- **host** (`str`): Hostname, IP address, or URL for the database.
+- **table_name** (`str`): Name of the table to query. Defaults to `embeddings`.
+- **content_field** (`str`): Field containing document content. Defaults to `content`.
+- **metadata_field** (`str`): Field containing document metadata. Defaults to `metadata`.
 
-### 선택적 매개변수
+### Optional Parameters
 
-- **id_field** (`str`): 문서 ID를 포함하는 필드입니다. 기본값은 `id`입니다.
+- **id_field** (`str`): Field containing document IDs. Defaults to `id`.
 
-### 연결 풀 매개변수
+### Connection Pool Parameters
 
-- **pool_size** (`int`): 풀의 활성 연결 수입니다. 기본값은 `5`입니다.
-- **max_overflow** (`int`): `pool_size`를 초과하는 최대 연결 수입니다. 기본값은 `10`입니다.
-- **timeout** (`float`): 연결 시간 제한(초)입니다. 기본값은 `30`입니다.
+- **pool_size** (`int`): Number of active connections in the pool. Defaults to `5`.
+- **max_overflow** (`int`): Maximum connections beyond `pool_size`. Defaults to `10`.
+- **timeout** (`float`): Connection timeout in seconds. Defaults to `30`.
 
-### 추가 옵션
+### Additional Options
 
-- **pure_python** (`bool`): 순수 Python 모드를 활성화합니다.
-- **local_infile** (`bool`): 로컬 파일 업로드를 허용합니다.
-- **charset** (`str`): 문자열 값에 대한 문자 집합입니다.
-- **ssl_key**, **ssl_cert**, **ssl_ca** (`str`): SSL 파일 경로입니다.
-- **ssl_disabled** (`bool`): SSL을 비활성화합니다.
-- **ssl_verify_cert** (`bool`): 서버의 인증서를 확인합니다.
-- **ssl_verify_identity** (`bool`): 서버의 ID를 확인합니다.
-- **autocommit** (`bool`): 자동 커밋을 활성화합니다.
-- **results_type** (`str`): 쿼리 결과의 구조입니다(예: `tuples`, `dicts`).
+- **pure_python** (`bool`): Enables pure Python mode.
+- **local_infile** (`bool`): Allows local file uploads.
+- **charset** (`str`): Character set for string values.
+- **ssl_key**, **ssl_cert**, **ssl_ca** (`str`): Paths to SSL files.
+- **ssl_disabled** (`bool`): Disables SSL.
+- **ssl_verify_cert** (`bool`): Verifies server's certificate.
+- **ssl_verify_identity** (`bool`): Verifies server's identity.
+- **autocommit** (`bool`): Enables autocommits.
+- **results_type** (`str`): Structure of query results (e.g., `tuples`, `dicts`).
 
 ```python
 from langchain_singlestore.document_loaders import SingleStoreLoader
@@ -75,7 +75,7 @@ loader = SingleStoreLoader(
 )
 ```
 
-## 로드
+## Load
 
 ```python
 docs = loader.load()
@@ -86,22 +86,22 @@ docs[0]
 print(docs[0].metadata)
 ```
 
-## 지연 로드
+## Lazy Load
 
 ```python
 page = []
 for doc in loader.lazy_load():
     page.append(doc)
     if len(page) >= 10:
-        # 페이징 작업을 수행합니다. 예:
+        # do some paged operation, e.g.
         # index.upsert(page)
 
         page = []
 ```
 
-## API 참조
+## API reference
 
-모든 SingleStore Document Loader 기능 및 구성에 대한 자세한 문서는 GitHub 페이지를 참조하세요: [https://github.com/singlestore-labs/langchain-singlestore/](https://github.com/singlestore-labs/langchain-singlestore/)
+For detailed documentation of all SingleStore Document Loader features and configurations head to the github page: [https://github.com/singlestore-labs/langchain-singlestore/](https://github.com/singlestore-labs/langchain-singlestore/)
 
 ---
 

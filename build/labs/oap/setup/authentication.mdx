@@ -1,50 +1,50 @@
 ---
-title: 'Authentication Setup'
-description: 'Configure authentication for Open Agent Platform'
+title: '인증 설정'
+description: 'Open Agent Platform의 인증 구성하기'
 ---
 
-The default authentication provider Open Agent Platform is configured to use is Supabase.
+Open Agent Platform이 기본적으로 사용하도록 구성된 인증 제공자는 Supabase입니다.
 
-## Setting Up Supabase
+## Supabase 설정하기
 
-To set up Supabase authentication, you must first create a new Supabase project. After creating a new project, set the following environment variables inside the `apps/web/` directory:
+Supabase 인증을 설정하려면 먼저 새로운 Supabase 프로젝트를 생성해야 합니다. 새 프로젝트를 생성한 후, `apps/web/` 디렉토리 내부에 다음 환경 변수를 설정하세요:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL="<your supabase url>"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="<your supabase anon key>"
 ```
 
-You should also enable Google authentication in your Supabase project. If you do not want to allow signing up with Google, set `NEXT_PUBLIC_GOOGLE_AUTH_DISABLED=true` in your environment variables to disable showing Google as an authentication option in the UI.
+Supabase 프로젝트에서 Google 인증도 활성화해야 합니다. Google 로그인을 허용하지 않으려면, 환경 변수에 `NEXT_PUBLIC_GOOGLE_AUTH_DISABLED=true`를 설정하여 UI에서 Google을 인증 옵션으로 표시하지 않도록 비활성화할 수 있습니다.
 
-## LangGraph Server Authentication
+## LangGraph Server 인증
 
-Since the pre-built LangGraph agents implement custom authentication, there is no need to specify a LangSmith API key when making requests to them. Instead, we pass the user's Supabase access token (JWT token) in the `Authorization` header of the request.
+사전 구축된 LangGraph 에이전트는 사용자 정의 인증을 구현하므로, 해당 에이전트에 요청할 때 LangSmith API 키를 지정할 필요가 없습니다. 대신, 요청의 `Authorization` 헤더에 사용자의 Supabase 액세스 토큰(JWT 토큰)을 전달합니다.
 
-Inside the auth middleware of the LangGraph server, we extract this token and verify it's valid with Supabase. If it is, we receive back a user ID, which is used to verify each user is *only* able to access their own agents and threads. If you want to allow users access to agents they did not create, you should update the custom authentication middleware in the LangGraph server to allow access to the agents you want users to be able to access.
+LangGraph 서버의 인증 미들웨어 내부에서 이 토큰을 추출하고 Supabase를 통해 유효성을 검증합니다. 유효한 경우, 사용자 ID를 받아오며, 이를 사용하여 각 사용자가 *자신의* 에이전트와 스레드에만 접근할 수 있도록 검증합니다. 사용자가 자신이 생성하지 않은 에이전트에 접근할 수 있도록 허용하려면, LangGraph 서버의 사용자 정의 인증 미들웨어를 업데이트하여 사용자가 접근할 수 있도록 하려는 에이전트에 대한 접근을 허용해야 합니다.
 
-Along with the `Authorization` header, we duplicate passing the Supabase JWT via the `x-supabase-access-token` header. This is because all non-LangSmith specific headers which are sent to LangGraph servers which are prefixed with `x-` are included in the configurable fields of the thread. We will need this JWT to later authenticate with the MCP server.
+`Authorization` 헤더와 함께, `x-supabase-access-token` 헤더를 통해서도 Supabase JWT를 중복으로 전달합니다. 이는 `x-`로 시작하는 모든 LangSmith 비특정 헤더가 LangGraph 서버로 전송될 때 스레드의 구성 가능한 필드에 포함되기 때문입니다. 이 JWT는 나중에 MCP 서버와 인증할 때 필요합니다.
 
-## LangSmith API Key Authentication
+## LangSmith API Key 인증
 
-If you do *not* want to use custom authentication in your LangGraph server, and instead allow anyone to access your agents, you can do so by setting the `NEXT_PUBLIC_USE_LANGSMITH_AUTH` environment variable to `true`, and setting your `LANGSMITH_API_KEY` in the environment variables inside the `apps/web/` directory.
+LangGraph 서버에서 사용자 정의 인증을 사용하지 *않고* 대신 누구나 에이전트에 접근할 수 있도록 허용하려면, `NEXT_PUBLIC_USE_LANGSMITH_AUTH` 환경 변수를 `true`로 설정하고, `apps/web/` 디렉토리 내부의 환경 변수에 `LANGSMITH_API_KEY`를 설정하면 됩니다.
 
-Lastly, ensure you have the `NEXT_PUBLIC_BASE_API_URL` environment variable set to the base API URL of your **web** server. For local development, this should be set to:
+마지막으로, `NEXT_PUBLIC_BASE_API_URL` 환경 변수가 **웹** 서버의 기본 API URL로 설정되어 있는지 확인하세요. 로컬 개발 환경에서는 다음과 같이 설정해야 합니다:
 
 ```bash
 NEXT_PUBLIC_BASE_API_URL="http://localhost:3000/api"
 ```
 
-This will cause all requests made to your web client to first pass through a proxy route, which injects the LangSmith API key into the request from the server, as to not expose the API key to the client. The request is then forwarded on to your LangGraph server.
+이렇게 하면 웹 클라이언트로 전송되는 모든 요청이 먼저 프록시 라우트를 통과하게 되며, 이 라우트는 서버에서 LangSmith API 키를 요청에 주입하여 클라이언트에 API 키가 노출되지 않도록 합니다. 그런 다음 요청이 LangGraph 서버로 전달됩니다.
 
 <Warning>
-Remember *not* to prefix your LangSmith API key environment variable with `NEXT_PUBLIC_`, as this is a **secret** and should never be exposed to the client.
+LangSmith API 키 환경 변수에는 `NEXT_PUBLIC_` 접두사를 *절대* 붙이지 마세요. 이것은 **비밀**이며 클라이언트에 노출되어서는 안 됩니다.
 </Warning>
 
-## RAG Authentication
+## RAG 인증
 
-Authenticating to your LangConnect RAG server from the web client is handled in a similar way to LangGraph authentication. We pass the Supabase JWT in the `Authorization` header of the request. Then, inside the LangConnect RAG server, we extract this token and verify it's valid with Supabase.
+웹 클라이언트에서 LangConnect RAG 서버로의 인증은 LangGraph 인증과 유사한 방식으로 처리됩니다. 요청의 `Authorization` 헤더에 Supabase JWT를 전달합니다. 그런 다음 LangConnect RAG 서버 내부에서 이 토큰을 추출하고 Supabase를 통해 유효성을 검증합니다.
 
-If it is, we receive back a user ID, which is used to verify each user is *only* able to access their own collections. We do not currently support sharing collections between users.
+유효한 경우, 사용자 ID를 받아오며, 이를 사용하여 각 사용자가 *자신의* 컬렉션에만 접근할 수 있도록 검증합니다. 현재는 사용자 간 컬렉션 공유를 지원하지 않습니다.
 
 ---
 

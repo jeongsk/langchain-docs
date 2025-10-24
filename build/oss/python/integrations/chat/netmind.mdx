@@ -2,31 +2,31 @@
 title: ChatNetmind
 ---
 
-이 문서는 Netmind [채팅 모델](https://www.netmind.ai/)을 시작하는 데 도움이 됩니다. 모든 ChatNetmind 기능 및 구성에 대한 자세한 문서는 [API 참조](https://github.com/protagolabs/langchain-netmind)를 확인하세요.
+This will help you get started with Netmind [chat models](https://www.netmind.ai/). For detailed documentation of all ChatNetmind features and configurations head to the [API reference](https://github.com/protagolabs/langchain-netmind).
 
-- 예제는 [www.netmind.ai/](https://www.netmind.ai/)를 참조하세요.
+- See [www.netmind.ai/](https://www.netmind.ai/) for an example.
 
-## 개요
+## Overview
 
-### 통합 세부 정보
+### Integration details
 
 | Class                                                                                        | Package | Local | Serializable | [JS support](https://js.langchain.com/docs/integrations/chat/) | Downloads | Version |
 |:---------------------------------------------------------------------------------------------| :--- |:-----:|:------------:|:--------------------------------------------------------------:| :---: | :---: |
 | [ChatNetmind](https://python.langchain.com/api_reference/) | [langchain-netmind](https://python.langchain.com/api_reference/) |   ✅   |      ❌       |                               ❌                                | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-netmind?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-netmind?style=flat-square&label=%20) |
 
-### 모델 기능
+### Model features
 
 | [Tool calling](/oss/python/langchain/tools) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | [Image input](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming#llm-tokens) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
 |:-----------------------------------------------:|:---------------------------------------------------------:|:---------:|:---------------------------------------------------:|:-----------:|:-----------:|:----------------------------------------------------------:|:------------:|:-----------------------------------------------------------:|:---------------------------------------:|
 |                        ✅                        |                             ✅                             |     ✅     |                          ❌                          |      ❌      |      ❌      |                             ✅                              |      ✅       |                              ✅                              |                    ✅                    |
 
-## 설정
+## Setup
 
-Netmind 모델에 액세스하려면 Netmind 계정을 생성하고 API 키를 발급받은 후 `langchain-netmind` 통합 패키지를 설치해야 합니다.
+To access Netmind models you'll need to create a/an Netmind account, get an API key, and install the `langchain-netmind` integration package.
 
-### 자격 증명
+### Credentials
 
-[www.netmind.ai/](https://www.netmind.ai/)에서 Netmind에 가입하고 API 키를 생성하세요. 생성 후에는 NETMIND_API_KEY 환경 변수를 설정하세요:
+Head to [www.netmind.ai/](https://www.netmind.ai/) to sign up to Netmind and generate an API key. Once you've done this set the NETMIND_API_KEY environment variable:
 
 ```python
 import getpass
@@ -36,19 +36,19 @@ if not os.getenv("NETMIND_API_KEY"):
     os.environ["NETMIND_API_KEY"] = getpass.getpass("Enter your Netmind API key: ")
 ```
 
-모델 호출에 대한 자동 추적을 활성화하려면 아래 주석을 해제하여 [LangSmith](https://docs.smith.langchain.com/) API 키를 설정할 수도 있습니다:
+If you want to get automated tracing of your model calls you can also set your [LangSmith](https://docs.smith.langchain.com/) API key by uncommenting below:
 
 ```python
 # os.environ["LANGCHAIN_TRACING_V2"] = "true"
 # os.environ["LANGCHAIN_API_KEY"] = getpass.getpass("Enter your LangSmith API key: ")
 ```
 
-### 설치
+### Installation
 
-LangChain Netmind 통합은 `langchain-netmind` 패키지에 포함되어 있습니다:
+The LangChain Netmind integration lives in the `langchain-netmind` package:
 
 ```python
-%pip install -qU langchain-netmind
+pip install -qU langchain-netmind
 ```
 
 ```output
@@ -57,9 +57,9 @@ LangChain Netmind 통합은 `langchain-netmind` 패키지에 포함되어 있습
 Note: you may need to restart the kernel to use updated packages.
 ```
 
-## 인스턴스화
+## Instantiation
 
-이제 모델 객체를 인스턴스화하고 채팅 완성을 생성할 수 있습니다:
+Now we can instantiate our model object and generate chat completions:
 
 ```python
 from langchain_netmind import ChatNetmind
@@ -74,7 +74,7 @@ llm = ChatNetmind(
 )
 ```
 
-## 호출
+## Invocation
 
 ```python
 messages = [
@@ -100,10 +100,10 @@ print(ai_msg.content)
 J'adore programmer.
 ```
 
-## API 참조
+## API reference
 
-모든 ChatNetmind 기능 및 구성에 대한 자세한 문서는 다음 API 참조를 확인하세요:
-- [API 참조](https://python.langchain.com/api_reference/)
+For detailed documentation of all ChatNetmind features and configurations head to the API reference:
+- [API reference](https://python.langchain.com/api_reference/)
 - [langchain-netmind](https://github.com/protagolabs/langchain-netmind)
 - [pypi](https://pypi.org/project/langchain-netmind/)
 

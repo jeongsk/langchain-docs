@@ -1,24 +1,24 @@
 ---
-title: LangSmith Chat Datasets
+title: LangSmith 채팅 데이터셋
 ---
 
-이 노트북은 LangSmith 채팅 데이터셋을 로드하고 해당 데이터로 모델을 파인튜닝하는 쉬운 방법을 보여줍니다.
-프로세스는 간단하며 3단계로 구성됩니다.
+이 노트북은 LangSmith 채팅 데이터셋을 로드하고 해당 데이터로 모델을 미세 조정하는 간편한 방법을 보여줍니다.
+이 과정은 간단하며 3단계로 구성됩니다.
 
 1. 채팅 데이터셋을 생성합니다.
 2. LangSmithDatasetChatLoader를 사용하여 예제를 로드합니다.
-3. 모델을 파인튜닝합니다.
+3. 모델을 미세 조정합니다.
 
-그런 다음 LangChain 앱에서 파인튜닝된 모델을 사용할 수 있습니다.
+그런 다음 미세 조정된 모델을 LangChain 앱에서 사용할 수 있습니다.
 
-본격적으로 시작하기 전에 전제 조건을 설치하겠습니다.
+본격적으로 시작하기 전에 필수 구성 요소를 설치하겠습니다.
 
-## 전제 조건
+## 필수 구성 요소
 
-langchain >= 0.0.311이 설치되어 있고 LangSmith API 키로 환경을 구성했는지 확인하세요.
+langchain >= 0.0.311 버전이 설치되어 있고 LangSmith API 키로 환경이 구성되어 있는지 확인하세요.
 
 ```python
-%pip install -qU  langchain langchain-openai
+pip install -qU  langchain langchain-openai
 ```
 
 ```python
@@ -30,11 +30,11 @@ os.environ["LANGSMITH_TRACING"] = "true"
 os.environ["LANGSMITH_API_KEY"] = "YOUR API KEY"
 ```
 
-## 1. 데이터셋 선택
+## 1. 데이터셋 선택하기
 
-이 노트북은 파인튜닝할 실행을 선택하는 데 직접 모델을 파인튜닝합니다. 추적된 실행에서 이러한 실행을 큐레이션하는 경우가 많습니다. LangSmith 데이터셋에 대한 자세한 내용은 [문서](https://docs.smith.langchain.com/evaluation/concepts#datasets)에서 확인할 수 있습니다.
+이 노트북은 미세 조정할 실행을 선택하여 모델을 직접 미세 조정합니다. 이러한 실행은 추적된 실행에서 선별하는 경우가 많습니다. LangSmith 데이터셋에 대한 자세한 내용은 [문서](https://docs.smith.langchain.com/evaluation/concepts#datasets)에서 확인할 수 있습니다.
 
-이 튜토리얼을 위해 여기에서 사용할 수 있는 기존 데이터셋을 업로드하겠습니다.
+이 튜토리얼에서는 사용할 수 있는 기존 데이터셋을 여기에 업로드하겠습니다.
 
 ```python
 from langsmith.client import Client
@@ -45,7 +45,7 @@ client = Client()
 ```python
 import requests
 
-url = "https://raw.githubusercontent.com/langchain-ai/langchain/master/docs/docs/integrations/chat_loaders/example_data/langsmith_chat_dataset.json"
+url = "https://raw.githubusercontent.com/langchain-ai/langchain/v0.3/docs/docs/integrations/chat_loaders/example_data/langsmith_chat_dataset.json"
 response = requests.get(url)
 response.raise_for_status()
 data = response.json()
@@ -64,7 +64,7 @@ _ = client.create_examples(
 )
 ```
 
-## 2. 데이터 준비
+## 2. 데이터 준비하기
 
 이제 LangSmithRunChatLoader의 인스턴스를 생성하고 lazy_load() 메서드를 사용하여 채팅 세션을 로드할 수 있습니다.
 
@@ -76,7 +76,7 @@ loader = LangSmithDatasetChatLoader(dataset_name=dataset_name)
 chat_sessions = loader.lazy_load()
 ```
 
-#### 채팅 세션이 로드되면 파인튜닝에 적합한 형식으로 변환합니다
+#### 채팅 세션이 로드되면 미세 조정에 적합한 형식으로 변환합니다
 
 ```python
 from langchain_community.adapters.openai import convert_messages_for_finetuning
@@ -84,9 +84,9 @@ from langchain_community.adapters.openai import convert_messages_for_finetuning
 training_data = convert_messages_for_finetuning(chat_sessions)
 ```
 
-## 3. 모델 파인튜닝
+## 3. 모델 미세 조정하기
 
-이제 OpenAI 라이브러리를 사용하여 파인튜닝 프로세스를 시작합니다.
+이제 OpenAI 라이브러리를 사용하여 미세 조정 프로세스를 시작합니다.
 
 ```python
 import json
@@ -122,9 +122,9 @@ while status != "succeeded":
 Status=[running]... 429.55s. 46.34s
 ```
 
-## 4. LangChain에서 사용
+## 4. LangChain에서 사용하기
 
-파인튜닝 후 LangChain 앱의 ChatOpenAI 모델 클래스와 함께 결과 모델 ID를 사용합니다.
+미세 조정이 완료되면 LangChain 앱에서 ChatOpenAI 모델 클래스와 함께 결과 모델 ID를 사용합니다.
 
 ```python
 # Get the fine-tuned model ID
@@ -148,7 +148,7 @@ model.invoke("There were three ravens sat on a tree.")
 AIMessage(content='[{"s": "There were three ravens", "object": "tree", "relation": "sat on"}, {"s": "three ravens", "object": "a tree", "relation": "sat on"}]')
 ```
 
-이제 LangSmith LLM 실행의 데이터를 사용하여 모델을 성공적으로 파인튜닝했습니다!
+이제 LangSmith LLM 실행 데이터를 사용하여 모델을 성공적으로 미세 조정했습니다!
 
 ---
 

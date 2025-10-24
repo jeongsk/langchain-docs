@@ -1,133 +1,125 @@
 ---
-title: Models
+title: 모델
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lc-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lc-callout-js.mdx';
 import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
 import ChatModelTabsJS from '/snippets/chat-model-tabs-js.mdx';
 
+[LLM](https://en.wikipedia.org/wiki/Large_language_model)은 인간처럼 텍스트를 해석하고 생성할 수 있는 강력한 AI 도구입니다. 콘텐츠 작성, 언어 번역, 요약, 질문 답변 등 각 작업에 대한 전문적인 훈련 없이도 다양한 작업을 수행할 수 있습니다.
 
-<AlphaCalloutJS />
+텍스트 생성 외에도 많은 모델이 다음 기능을 지원합니다:
 
-
-[LLM](https://en.wikipedia.org/wiki/Large_language_model)은 인간처럼 텍스트를 해석하고 생성할 수 있는 강력한 AI 도구입니다. 각 작업에 대한 전문적인 훈련 없이도 콘텐츠 작성, 언어 번역, 요약, 질문 답변 등 다양한 작업을 수행할 수 있을 만큼 충분히 범용적입니다.
-
-텍스트 생성 외에도 많은 모델이 다음을 지원합니다:
-
-* <Icon icon="hammer" size={16} /> [도구 호출](#tool-calling) - 외부 도구(데이터베이스 쿼리나 API 호출 등)를 호출하고 그 결과를 응답에 사용합니다.
-* <Icon icon="shapes" size={16} /> [구조화된 출력](#structured-outputs) - 모델의 응답이 정의된 형식을 따르도록 제약합니다.
-* <Icon icon="image" size={16} /> [멀티모달](#multimodal) - 이미지, 오디오, 비디오 등 텍스트 외의 데이터를 처리하고 반환합니다.
+* <Icon icon="hammer" size={16} /> [도구 호출](#tool-calling) - 외부 도구(데이터베이스 쿼리 또는 API 호출 등)를 호출하고 그 결과를 응답에 사용합니다.
+* <Icon icon="shapes" size={16} /> [구조화된 출력](#structured-outputs) - 모델의 응답이 정의된 형식을 따르도록 제한됩니다.
+* <Icon icon="image" size={16} /> [멀티모달](#multimodal) - 이미지, 오디오, 비디오 등 텍스트 이외의 데이터를 처리하고 반환합니다.
 * <Icon icon="brain" size={16} /> [추론](#reasoning) - 모델이 결론에 도달하기 위해 다단계 추론을 수행합니다.
 
-모델은 [에이전트](/oss/javascript/langchain/agents)의 추론 엔진입니다. 에이전트의 의사 결정 프로세스를 주도하며, 어떤 도구를 호출할지, 결과를 어떻게 해석할지, 언제 최종 답변을 제공할지를 결정합니다.
+모델은 [에이전트](/oss/javascript/langchain/agents)의 추론 엔진입니다. 어떤 도구를 호출할지, 결과를 어떻게 해석할지, 언제 최종 답변을 제공할지 결정하는 에이전트의 의사결정 프로세스를 주도합니다.
 
-선택하는 모델의 품질과 기능은 에이전트의 신뢰성과 성능에 직접적인 영향을 미칩니다. 모델마다 장점이 다릅니다 - 복잡한 지시 따르기에 뛰어난 모델이 있고, 구조화된 추론에 강한 모델이 있으며, 더 많은 정보를 처리할 수 있는 더 큰 컨텍스트 윈도우를 지원하는 모델도 있습니다.
+선택하는 모델의 품질과 기능은 에이전트의 신뢰성과 성능에 직접적인 영향을 미칩니다. 모델마다 뛰어난 작업이 다릅니다. 복잡한 지시사항을 따르는 데 뛰어난 모델도 있고, 구조화된 추론에 능한 모델도 있으며, 더 많은 정보를 처리하기 위해 더 큰 컨텍스트 윈도우를 지원하는 모델도 있습니다.
 
-LangChain의 표준 모델 인터페이스는 다양한 프로바이더 통합에 대한 액세스를 제공하여, 사용 사례에 가장 적합한 모델을 찾기 위해 쉽게 실험하고 전환할 수 있습니다.
+LangChain의 표준 모델 인터페이스는 다양한 제공업체 통합에 대한 액세스를 제공하므로 모델을 쉽게 실험하고 전환하여 사용 사례에 가장 적합한 모델을 찾을 수 있습니다.
 
 <Info>
-    프로바이더별 통합 정보와 기능에 대해서는 프로바이더의 [통합 페이지](/oss/javascript/integrations/providers/overview)를 참조하세요.
+    제공업체별 통합 정보 및 기능에 대해서는 해당 제공업체의 [통합 페이지](/oss/javascript/integrations/providers/overview)를 참조하세요.
 </Info>
 
 ## 기본 사용법
 
 모델은 두 가지 방식으로 활용할 수 있습니다:
 
-1. **에이전트와 함께** - 에이전트를 생성할 때 모델을 동적으로 지정할 수 있습니다. 이에 대한 자세한 내용은 [에이전트](/oss/javascript/langchain/agents#model) 가이드를 참조하세요.
-2. **독립 실행형** - 텍스트 생성, 분류 또는 추출과 같은 작업에 에이전트 프레임워크 없이 (에이전트 루프 외부에서) 모델을 직접 호출할 수 있습니다.
+1. **에이전트와 함께** - [에이전트](/oss/javascript/langchain/agents#model)를 생성할 때 모델을 동적으로 지정할 수 있습니다.
+2. **독립 실행형** - 에이전트 프레임워크 없이 텍스트 생성, 분류 또는 추출과 같은 작업을 위해 모델을 직접(에이전트 루프 외부에서) 호출할 수 있습니다.
 
-동일한 모델 인터페이스가 두 컨텍스트 모두에서 작동하므로, 간단하게 시작하여 필요에 따라 더 복잡한 에이전트 기반 워크플로로 확장할 수 있는 유연성을 제공합니다.
+두 컨텍스트 모두에서 동일한 모델 인터페이스가 작동하므로 간단하게 시작하여 필요에 따라 더 복잡한 에이전트 기반 워크플로우로 확장할 수 있는 유연성을 제공합니다.
 
 ### 모델 초기화
 
 
-LangChain에서 독립 실행형 모델을 시작하는 가장 쉬운 방법은 `initChatModel`을 사용하여 선택한 [프로바이더](/oss/javascript/integrations/providers/overview)에서 모델을 초기화하는 것입니다(아래 예제 참조):
+The easiest way to get started with a standalone model in LangChain is to use `initChatModel` to initialize one from a [provider](/oss/javascript/integrations/providers/overview) of your choice (examples below):
 
 <ChatModelTabsJS />
 ```typescript
 const response = await model.invoke("Why do parrots talk?");
 ```
-자세한 내용은 [`initChatModel`](https://v03.api.js.langchain.com/functions/langchain.chat_models_universal.initChatModel.html)을 참조하세요. 모델 [매개변수](#parameters)를 전달하는 방법에 대한 정보도 포함되어 있습니다.
+See [`initChatModel`](https://v03.api.js.langchain.com/functions/langchain.chat_models_universal.initChatModel.html) for more detail, including information on how to pass model [parameters](#parameters).
 
 
 
-### 주요 메서드
+### Key methods
 
 <Card title="Invoke" href="#invoke" icon="paper-plane" arrow="true" horizontal>
-    모델이 메시지를 입력으로 받아 완전한 응답을 생성한 후 메시지를 출력합니다.
+    The model takes messages as input and outputs messages after generating a complete response.
 </Card>
 <Card title="Stream" href="#stream" icon="tower-broadcast" arrow="true" horizontal>
-    모델을 호출하되, 출력이 실시간으로 생성되는 동안 스트리밍합니다.
+    Invoke the model, but stream the output as it is generated in real-time.
 </Card>
 <Card title="Batch" href="#batch" icon="grip" arrow="true" horizontal>
-    더 효율적인 처리를 위해 여러 요청을 배치로 모델에 전송합니다.
+    Send multiple requests to a model in a batch for more efficient processing.
 </Card>
 
 <Info>
-    채팅 모델 외에도 LangChain은 임베딩 모델 및 벡터 스토어와 같은 다른 인접 기술에 대한 지원을 제공합니다. 자세한 내용은 [통합 페이지](/oss/javascript/integrations/providers/overview)를 참조하세요.
+    In addition to chat models, LangChain provides support for other adjacent technologies, such as embedding models and vector stores. See the [integrations page](/oss/javascript/integrations/providers/overview) for details.
 </Info>
 
-## 매개변수
+## Parameters
 
-채팅 모델은 동작을 구성하는 데 사용할 수 있는 매개변수를 받습니다. 지원되는 전체 매개변수 세트는 모델과 프로바이더에 따라 다르지만, 표준 매개변수는 다음과 같습니다:
+A chat model takes parameters that can be used to configure its behavior. The full set of supported parameters varies by model and provider, but standard ones include:
 
 <ParamField body="model" type="string" required>
-    프로바이더와 함께 사용하려는 특정 모델의 이름 또는 식별자입니다.
+    The name or identifier of the specific model you want to use with a provider.
 </ParamField>
 
 
 <ParamField body="apiKey" type="string">
-    모델의 프로바이더와 인증하는 데 필요한 키입니다. 일반적으로 모델에 대한 액세스를 신청할 때 발급됩니다. 종종 <Tooltip tip="프로그램 외부에서 값이 설정되는 변수로, 일반적으로 운영 체제 또는 마이크로서비스에 내장된 기능을 통해 설정됩니다.">환경 변수</Tooltip>를 설정하여 액세스합니다.
+    The key required for authenticating with the model's provider. This is usually issued when you sign up for access to the model. Often accessed by setting an <Tooltip tip="A variable whose value is set outside the program, typically through functionality built into the operating system or microservice.">environment variable</Tooltip>.
 </ParamField>
 
 
 <ParamField body="temperature" type="number">
-    모델 출력의 무작위성을 제어합니다. 값이 높을수록 응답이 더 창의적이고, 낮을수록 더 결정론적입니다.
+    Controls the randomness of the model's output. A higher number makes responses more creative; lower ones make them more deterministic.
 </ParamField>
 
 <ParamField body="timeout" type="number">
-    요청을 취소하기 전에 모델로부터 응답을 기다리는 최대 시간(초)입니다.
+    The maximum time (in seconds) to wait for a response from the model before canceling the request.
 </ParamField>
 
 
 <ParamField body="maxTokens" type="number">
-    응답의 총 <Tooltip tip="모델이 읽고 생성하는 기본 단위입니다. 프로바이더마다 다르게 정의할 수 있지만, 일반적으로 단어 전체 또는 일부를 나타낼 수 있습니다.">토큰</Tooltip> 수를 제한하여, 출력이 얼마나 길 수 있는지를 효과적으로 제어합니다.
+    Limits the total number of <Tooltip tip="The basic unit that a model reads and generates. Providers may define them differently, but in general, they can represent a whole or part of word.">tokens</Tooltip> in the response, effectively controlling how long the output can be.
 </ParamField>
 
 <ParamField body="maxRetries" type="number">
-    네트워크 타임아웃이나 속도 제한과 같은 문제로 실패할 경우 시스템이 요청을 재전송하려고 시도하는 최대 횟수입니다.
+    The maximum number of attempts the system will make to resend a request if it fails due to issues like network timeouts or rate limits.
 </ParamField>
 
 
 
-`initChatModel`을 사용하여 이러한 매개변수를 인라인 매개변수로 전달합니다:
+Using `initChatModel`, pass these parameters as inline parameters:
 
 ```typescript Initialize using model parameters
 const model = await initChatModel(
-    "anthropic:claude-sonnet-4-5-20250929",
+    "anthropic:claude-sonnet-4-5",
     { temperature: 0.7, timeout: 30, max_tokens: 1000 }
 )
 ```
 
 
 <Info>
-    각 채팅 모델 통합에는 프로바이더별 기능을 제어하는 데 사용되는 추가 매개변수가 있을 수 있습니다. 예를 들어 @[`ChatOpenAI`]는 OpenAI Responses 또는 Completions API 사용 여부를 지정하는 `use_responses_api`가 있습니다.
+    Each chat model integration may have additional params used to control provider-specific functionality. For example, @[`ChatOpenAI`] has `use_responses_api` to dictate whether to use the OpenAI Responses or Completions API.
 
-    특정 채팅 모델에서 지원하는 모든 매개변수를 찾으려면 [채팅 모델 통합](/oss/javascript/integrations/chat) 페이지를 참조하세요.
+    To find all the parameters supported by a given chat model, head to the [chat model integrations](/oss/javascript/integrations/chat) page.
 </Info>
 
 ---
 
-## 호출
+## Invocation
 
-출력을 생성하려면 채팅 모델을 호출해야 합니다. 세 가지 주요 호출 메서드가 있으며, 각각 다른 사용 사례에 적합합니다.
-
-
+A chat model must be invoked to generate an output. There are three primary invocation methods, each suited to different use cases.
 
 ### Invoke
 
-모델을 호출하는 가장 간단한 방법은 단일 메시지 또는 메시지 목록과 함께 [`invoke()`](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#invoke)를 사용하는 것입니다.
+The most straightforward way to call a model is to use [`invoke()`](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#invoke) with a single message or a list of messages.
 
 
 
@@ -137,7 +129,7 @@ console.log(response);
 ```
 
 
-대화 기록을 나타내기 위해 모델에 메시지 목록을 제공할 수 있습니다. 각 메시지에는 모델이 대화에서 메시지를 보낸 사람을 나타내는 데 사용하는 역할이 있습니다. 역할, 유형 및 콘텐츠에 대한 자세한 내용은 [메시지](/oss/javascript/langchain/messages) 가이드를 참조하세요.
+A list of messages can be provided to a model to represent conversation history. Each message has a role that models use to indicate who sent the message in the conversation. See the [messages](/oss/javascript/langchain/messages) guide for more detail on roles, types, and content.
 
 
 
@@ -169,9 +161,9 @@ console.log(response);  // AIMessage("J'adore créer des applications.")
 
 ### Stream
 
-대부분의 모델은 생성되는 동안 출력 콘텐츠를 스트리밍할 수 있습니다. 출력을 점진적으로 표시함으로써 스트리밍은 특히 긴 응답에 대해 사용자 경험을 크게 향상시킵니다.
+Most models can stream their output content while it is being generated. By displaying output progressively, streaming significantly improves user experience, particularly for longer responses.
 
-[`stream()`](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#stream)을 호출하면 출력 청크가 생성되는 대로 반환하는 <Tooltip tip="컬렉션의 각 항목에 순서대로 점진적으로 액세스를 제공하는 객체입니다.">이터레이터</Tooltip>가 반환됩니다. 루프를 사용하여 각 청크를 실시간으로 처리할 수 있습니다:
+Calling [`stream()`](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#stream) returns an <Tooltip tip="An object that progressively provides access to each item of a collection, in order.">iterator</Tooltip> that yields output chunks as they are produced. You can use a loop to process each chunk in real-time:
 
 
 <CodeGroup>
@@ -201,7 +193,7 @@ console.log(response);  // AIMessage("J'adore créer des applications.")
 </CodeGroup>
 
 
-모델이 전체 응답 생성을 완료한 후 단일 [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html)를 반환하는 [`invoke()`](#invoke)와 달리, `stream()`은 여러 [`AIMessageChunk`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessageChunk.html) 객체를 반환하며, 각각 출력 텍스트의 일부를 포함합니다. 중요한 점은 스트림의 각 청크가 합산을 통해 전체 메시지로 수집되도록 설계되었다는 것입니다:
+As opposed to [`invoke()`](#invoke), which returns a single [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html) after the model has finished generating its full response, `stream()` returns multiple [`AIMessageChunk`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessageChunk.html) objects, each containing a portion of the output text. Importantly, each chunk in a stream is designed to be gathered into a full message via summation:
 
 
 
@@ -224,32 +216,33 @@ console.log(full.contentBlocks);
 ```
 
 
-결과 메시지는 [`invoke()`](#invoke)로 생성된 메시지와 동일하게 처리될 수 있습니다 - 예를 들어 메시지 기록에 집계되어 대화 컨텍스트로 모델에 다시 전달될 수 있습니다.
+The resulting message can be treated the same as a message that was generated with [`invoke()`](#invoke) - for example, it can be aggregated into a message history and passed back to the model as conversational context.
 
 <Warning>
-    스트리밍은 프로그램의 모든 단계가 청크 스트림을 처리하는 방법을 알고 있는 경우에만 작동합니다. 예를 들어 스트리밍 불가능한 애플리케이션은 처리하기 전에 전체 출력을 메모리에 저장해야 하는 애플리케이션입니다.
+    Streaming only works if all steps in the program know how to process a stream of chunks. For instance, an application that isn't streaming-capable would be one that needs to store the entire output in memory before it can be processed.
 </Warning>
 
-<Accordion title="고급 스트리밍 주제">
-    <Accordion title='"자동 스트리밍" 채팅 모델'>
-        LangChain은 스트리밍 메서드를 명시적으로 호출하지 않더라도 특정 경우에 스트리밍 모드를 자동으로 활성화하여 채팅 모델의 스트리밍을 단순화합니다. 이는 비스트리밍 호출 메서드를 사용하지만 여전히 채팅 모델의 중간 결과를 포함하여 전체 애플리케이션을 스트리밍하려는 경우 특히 유용합니다.
+<Accordion title="Advanced streaming topics">
+    <Accordion title='"Auto-streaming" chat models'>
+        LangChain simplifies streaming from chat models by automatically enabling streaming mode in certain cases, even when you're not explicitly calling the streaming methods. This is particularly useful when you use the non-streaming invoke method but still want to stream the entire application, including intermediate results from the chat model.
 
-        예를 들어 [LangGraph 에이전트](/oss/javascript/langchain/agents)에서는 노드 내에서 `model.invoke()`를 호출할 수 있지만, 스트리밍 모드에서 실행 중인 경우 LangChain이 자동으로 스트리밍으로 위임합니다.
+        In [LangGraph agents](/oss/javascript/langchain/agents), for example, you can call `model.invoke()` within nodes, but LangChain will automatically delegate to streaming if running in a streaming mode.
 
-        #### 작동 방식
+        #### How it works
 
-        채팅 모델을 `invoke()`할 때, 전체 애플리케이션을 스트리밍하려고 한다는 것을 감지하면 LangChain이 자동으로 내부 스트리밍 모드로 전환합니다. 호출 결과는 invoke를 사용하던 코드에 대해 동일하지만, 채팅 모델이 스트리밍되는 동안 LangChain은 LangChain의 콜백 시스템에서 @[`on_llm_new_token`] 이벤트를 호출합니다.
+        When you `invoke()` a chat model, LangChain will automatically switch to an internal streaming mode if it detects that you are trying to stream the overall application. The result of the invocation will be the same as far as the code that was using invoke is concerned; however, while the chat model is being streamed, LangChain will take care of invoking @[`on_llm_new_token`] events in LangChain's callback system.
 
 
-        콜백 이벤트를 통해 LangGraph `stream()`과 [`streamEvents()`](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#streamEvents)가 채팅 모델의 출력을 실시간으로 표시할 수 있습니다.
+        Callback events allow LangGraph `stream()` and [`streamEvents()`](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#streamEvents) to surface the chat model's output in real-time.
 
     </Accordion>
-    <Accordion title="스트리밍 이벤트">
+    <Accordion title="Streaming events">
 
 
-        LangChain 채팅 모델은 [`streamEvents()`][BaseChatModel.streamEvents]를 사용하여 시맨틱 이벤트를 스트리밍할 수도 있습니다.
+        LangChain chat models can also stream semantic events using
+        [`streamEvents()`][BaseChatModel.streamEvents].
 
-        이를 통해 이벤트 유형 및 기타 메타데이터를 기반으로 필터링이 단순화되며, 백그라운드에서 전체 메시지를 집계합니다. 아래에서 예제를 참조하세요.
+        This simplifies filtering based on event types and other metadata, and will aggregate the full message in the background. See below for an example.
 
         ```typescript
         const stream = await model.streamEvents("Hello");
@@ -277,14 +270,14 @@ console.log(full.contentBlocks);
         Full message: Hi there! How can I help today?
         ```
 
-        이벤트 유형 및 기타 세부 정보는 [`streamEvents()`](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#streamEvents) 참조를 확인하세요.
+        See the [`streamEvents()`](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#streamEvents) reference for event types and other details.
 
     </Accordion>
 </Accordion>
 
 ### Batch
 
-독립적인 요청 컬렉션을 모델에 배치 처리하면 처리가 병렬로 수행될 수 있으므로 성능이 크게 향상되고 비용이 절감될 수 있습니다:
+Batching a collection of independent requests to a model can significantly improve performance and reduce costs, as the processing can be done in parallel:
 
 
 
@@ -303,45 +296,45 @@ for (const response of responses) {
 ```
 
 <Tip>
-    `batch()`를 사용하여 많은 수의 입력을 처리할 때 최대 병렬 호출 수를 제어하고 싶을 수 있습니다. 이는 [`RunnableConfig`](https://v03.api.js.langchain.com/interfaces/_langchain_core.runnables.RunnableConfig.html) 딕셔너리에서 `maxConcurrency` 속성을 설정하여 수행할 수 있습니다.
+    When processing a large number of inputs using `batch()`, you may want to control the maximum number of parallel calls. This can be done by setting the `maxConcurrency` attribute in the [`RunnableConfig`](https://v03.api.js.langchain.com/interfaces/_langchain_core.runnables.RunnableConfig.html) dictionary.
 
     ```typescript Batch with max concurrency
     model.batch(
       listOfInputs,
       {
-        maxConcurrency: 5,  // 5개의 병렬 호출로 제한
+        maxConcurrency: 5,  // Limit to 5 parallel calls
       }
     )
     ```
 
-    지원되는 속성의 전체 목록은 [`RunnableConfig`](https://v03.api.js.langchain.com/interfaces/_langchain_core.runnables.RunnableConfig.html) 참조를 확인하세요.
+    See the [`RunnableConfig`](https://v03.api.js.langchain.com/interfaces/_langchain_core.runnables.RunnableConfig.html) reference for a full list of supported attributes.
 </Tip>
 
-배치 처리에 대한 자세한 내용은 [참조](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#batch)를 확인하세요.
+For more details on batching, see the [reference](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#batch).
 
 
 ---
 
-## 도구 호출
+## Tool calling
 
-모델은 데이터베이스에서 데이터 가져오기, 웹 검색 또는 코드 실행과 같은 작업을 수행하는 도구를 호출하도록 요청할 수 있습니다. 도구는 다음의 조합입니다:
+Models can request to call tools that perform tasks such as fetching data from a database, searching the web, or running code. Tools are pairings of:
 
-1. 도구의 이름, 설명 및/또는 인수 정의(종종 JSON 스키마)를 포함한 스키마
-2. 실행할 함수 또는 <Tooltip tip="실행을 일시 중단하고 나중에 재개할 수 있는 메서드">코루틴</Tooltip>.
+1. A schema, including the name of the tool, a description, and/or argument definitions (often a JSON schema)
+2. A function or <Tooltip tip="A method that can suspend execution and resume at a later time">coroutine</Tooltip> to execute.
 
 <Note>
-    "함수 호출"이라는 용어를 들을 수 있습니다. 우리는 이것을 "도구 호출"과 같은 의미로 사용합니다.
+    You may hear the term "function calling". We use this interchangeably with "tool calling".
 </Note>
 
 
 
-정의한 도구를 모델에서 사용할 수 있도록 하려면 [`bindTools()`](https://v03.api.js.langchain.com/classes/langchain.chat_models_universal.ConfigurableModel.html#bindTools)를 사용하여 바인딩해야 합니다. 이후 호출에서 모델은 필요에 따라 바인딩된 도구 중 하나를 선택할 수 있습니다.
+To make tools that you have defined available for use by a model, you must bind them using [`bindTools()`](https://v03.api.js.langchain.com/classes/langchain.chat_models_universal.ConfigurableModel.html#bindTools). In subsequent invocations, the model can choose to call any of the bound tools as needed.
 
 
-일부 모델 프로바이더는 모델 또는 호출 매개변수를 통해 활성화할 수 있는 내장 도구를 제공합니다(예: [`ChatOpenAI`](/oss/javascript/integrations/chat/openai), [`ChatAnthropic`](/oss/javascript/integrations/chat/anthropic)). 자세한 내용은 해당 [프로바이더 참조](/oss/javascript/integrations/providers/overview)를 확인하세요.
+Some model providers offer built-in tools that can be enabled via model or invocation parameters (e.g. [`ChatOpenAI`](/oss/javascript/integrations/chat/openai), [`ChatAnthropic`](/oss/javascript/integrations/chat/anthropic)). Check the respective [provider reference](/oss/javascript/integrations/providers/overview) for details.
 
 <Tip>
-    도구 생성에 대한 세부 정보 및 기타 옵션은 [도구 가이드](/oss/javascript/langchain/tools)를 참조하세요.
+    See the [tools guide](/oss/javascript/langchain/tools) for details and other options for creating tools.
 </Tip>
 
 
@@ -368,41 +361,41 @@ const modelWithTools = model.bindTools([getWeather]);  // [!code highlight]
 const response = await modelWithTools.invoke("What's the weather like in Boston?");
 const toolCalls = response.tool_calls || [];
 for (const tool_call of toolCalls) {
-  // 모델이 수행한 도구 호출 보기
+  // View tool calls made by the model
   console.log(`Tool: ${tool_call.name}`);
   console.log(`Args: ${tool_call.args}`);
 }
 ```
 
 
-사용자 정의 도구를 바인딩할 때 모델의 응답에는 도구 실행에 대한 **요청**이 포함됩니다. [에이전트](/oss/javascript/langchain/agents)와 별도로 모델을 사용할 때는 요청된 작업을 수행하고 결과를 후속 추론에 사용하기 위해 모델에 다시 반환하는 것은 사용자의 책임입니다. [에이전트](/oss/javascript/langchain/agents)를 사용할 때는 에이전트 루프가 도구 실행 루프를 처리합니다.
+When binding user-defined tools, the model's response includes a **request** to execute a tool. When using a model separately from an [agent](/oss/javascript/langchain/agents), it is up to you to perform the requested action and return the result back to the model for use in subsequent reasoning. Note that when using an [agent](/oss/javascript/langchain/agents), the agent loop will handle the tool execution loop for you.
 
-아래에서는 도구 호출을 사용할 수 있는 몇 가지 일반적인 방법을 보여줍니다.
+Below, we show some common ways you can use tool calling.
 
 <AccordionGroup>
-    <Accordion title="도구 실행 루프" icon="arrow-rotate-right">
-        모델이 도구 호출을 반환하면 도구를 실행하고 결과를 모델에 다시 전달해야 합니다. 이는 모델이 도구 결과를 사용하여 최종 응답을 생성할 수 있는 대화 루프를 생성합니다. LangChain에는 이 오케스트레이션을 처리하는 [에이전트](/oss/javascript/langchain/agents) 추상화가 포함되어 있습니다.
+    <Accordion title="Tool execution loop" icon="arrow-rotate-right">
+        When a model returns tool calls, you need to execute the tools and pass the results back to the model. This creates a conversation loop where the model can use tool results to generate its final response. LangChain includes [agent](/oss/javascript/langchain/agents) abstractions that handle this orchestration for you.
 
-        다음은 이를 수행하는 방법의 간단한 예입니다:
+        Here's a simple example of how to do this:
 
 
         ```typescript Tool execution loop
-        // (잠재적으로 여러) 도구를 모델에 바인딩
+        // Bind (potentially multiple) tools to the model
         const modelWithTools = model.bindTools([get_weather])
 
-        // 1단계: 모델이 도구 호출 생성
+        // Step 1: Model generates tool calls
         const messages = [{"role": "user", "content": "What's the weather in Boston?"}]
         const ai_msg = await modelWithTools.invoke(messages)
         messages.push(ai_msg)
 
-        // 2단계: 도구 실행 및 결과 수집
+        // Step 2: Execute tools and collect results
         for (const tool_call of ai_msg.tool_calls) {
-            // 생성된 인수로 도구 실행
+            // Execute the tool with the generated arguments
             const tool_result = await get_weather.invoke(tool_call)
             messages.push(tool_result)
         }
 
-        // 3단계: 최종 응답을 위해 결과를 모델에 다시 전달
+        // Step 3: Pass results back to model for final response
         const final_response = await modelWithTools.invoke(messages)
         console.log(final_response.text)
         // "The current weather in Boston is 72°F and sunny."
@@ -410,10 +403,10 @@ for (const tool_call of toolCalls) {
 
 
 
-        도구가 반환하는 각 @[`ToolMessage`]에는 원래 도구 호출과 일치하는 `tool_call_id`가 포함되어 있어 모델이 결과를 요청과 연관시키는 데 도움이 됩니다.
+        Each @[`ToolMessage`] returned by the tool includes a `tool_call_id` that matches the original tool call, helping the model correlate results with requests.
     </Accordion>
-    <Accordion title="도구 호출 강제" icon="asterisk">
-        기본적으로 모델은 사용자의 입력에 따라 바인딩된 도구를 자유롭게 선택할 수 있습니다. 그러나 특정 도구 또는 주어진 목록의 **아무** 도구를 모델이 사용하도록 강제하고 싶을 수 있습니다:
+    <Accordion title="Forcing tool calls" icon="asterisk">
+        By default, the model has the freedom to choose which bound tool to use based on the user's input. However, you might want to force choosing a tool, ensuring the model uses either a particular tool or **any** tool from a given list:
 
 
         <CodeGroup>
@@ -426,19 +419,19 @@ for (const tool_call of toolCalls) {
         </CodeGroup>
 
     </Accordion>
-    <Accordion title="병렬 도구 호출" icon="layer-group">
-        많은 모델이 적절한 경우 여러 도구를 병렬로 호출하는 것을 지원합니다. 이를 통해 모델은 다양한 소스에서 동시에 정보를 수집할 수 있습니다.
+    <Accordion title="Parallel tool calls" icon="layer-group">
+        Many models support calling multiple tools in parallel when appropriate. This allows the model to gather information from different sources simultaneously.
 
 
         ```typescript Parallel tool calls
-        const modelWithTools = model.bindTools([get_weather])
+        const modelWithTools = model.bind_tools([get_weather])
 
         const response = await modelWithTools.invoke(
             "What's the weather in Boston and Tokyo?"
         )
 
 
-        // 모델은 여러 도구 호출을 생성할 수 있습니다
+        // The model may generate multiple tool calls
         console.log(response.tool_calls)
         // [
         //   { name: 'get_weather', args: { location: 'Boston' }, id: 'call_1' },
@@ -446,7 +439,7 @@ for (const tool_call of toolCalls) {
         // ]
 
 
-        // 모든 도구 실행 (비동기로 병렬 처리 가능)
+        // Execute all tools (can be done in parallel with async)
         const results = []
         for (const tool_call of response.tool_calls || []) {
             if (tool_call.name === 'get_weather') {
@@ -458,17 +451,17 @@ for (const tool_call of toolCalls) {
 
 
 
-        모델은 요청된 작업의 독립성에 따라 병렬 실행이 적절한 시기를 지능적으로 결정합니다.
+        The model intelligently determines when parallel execution is appropriate based on the independence of the requested operations.
 
         <Tip>
-        도구 호출을 지원하는 대부분의 모델은 기본적으로 병렬 도구 호출을 활성화합니다. 일부([OpenAI](/oss/javascript/integrations/chat/openai) 및 [Anthropic](/oss/javascript/integrations/chat/anthropic) 포함)는 이 기능을 비활성화할 수 있습니다. 이를 위해 `parallel_tool_calls=False`를 설정합니다:
+        Most models supporting tool calling enable parallel tool calls by default. Some (including [OpenAI](/oss/javascript/integrations/chat/openai) and [Anthropic](/oss/javascript/integrations/chat/anthropic)) allow you to disable this feature. To do this, set `parallel_tool_calls=False`:
         ```python
         model.bind_tools([get_weather], parallel_tool_calls=False)
         ```
         </Tip>
     </Accordion>
-    <Accordion title="도구 호출 스트리밍" icon="rss">
-        응답을 스트리밍할 때 도구 호출은 @[`ToolCallChunk`]를 통해 점진적으로 구축됩니다. 이를 통해 완전한 응답을 기다리지 않고 도구 호출이 생성되는 동안 볼 수 있습니다.
+    <Accordion title="Streaming tool calls" icon="rss">
+        When streaming responses, tool calls are progressively built through @[`ToolCallChunk`]. This allows you to see tool calls as they're being generated rather than waiting for the complete response.
 
 
         ```typescript Streaming tool calls
@@ -476,7 +469,7 @@ for (const tool_call of toolCalls) {
             "What's the weather in Boston and Tokyo?"
         )
         for await (const chunk of stream) {
-            // 도구 호출 청크가 점진적으로 도착
+            // Tool call chunks arrive progressively
             if (chunk.tool_call_chunks) {
                 for (const tool_chunk of chunk.tool_call_chunks) {
                 console.log(`Tool: ${tool_chunk.get('name', '')}`)
@@ -498,7 +491,7 @@ for (const tool_call of toolCalls) {
         // Args: {"timezone": "Tokyo"}
         ```
 
-        청크를 누적하여 완전한 도구 호출을 구축할 수 있습니다:
+        You can accumulate chunks to build complete tool calls:
 
         ```typescript Accumulate tool calls
         let full: AIMessageChunk | null = null
@@ -515,15 +508,15 @@ for (const tool_call of toolCalls) {
 
 ---
 
-## 구조화된 출력
+## Structured outputs
 
-주어진 스키마와 일치하는 형식으로 응답을 제공하도록 모델에 요청할 수 있습니다. 이는 출력을 쉽게 파싱하고 후속 처리에 사용할 수 있도록 보장하는 데 유용합니다. LangChain은 구조화된 출력을 적용하기 위한 여러 스키마 유형과 방법을 지원합니다.
+Models can be requested to provide their response in a format matching a given schema. This is useful for ensuring the output can be easily parsed and used in subsequent processing. LangChain supports multiple schema types and methods for enforcing structured outputs.
 
 
 
 <Tabs>
     <Tab title="Zod">
-        [zod 스키마](https://zod.dev/)는 출력 스키마를 정의하는 선호 방법입니다. zod 스키마가 제공되면 모델 출력도 zod의 파싱 메서드를 사용하여 스키마에 대해 유효성이 검사됩니다.
+        A [zod schema](https://zod.dev/) is the preferred method of defining an output schema. Note that when a zod schema is provided, the model output will also be validated against the schema using zod's parse methods.
 
         ```typescript
         import * as z from "zod";
@@ -548,7 +541,7 @@ for (const tool_call of toolCalls) {
         ```
     </Tab>
     <Tab title="JSON Schema">
-        최대 제어 또는 상호 운용성을 위해 원시 JSON 스키마를 제공할 수 있습니다.
+        For maximum control or interoperability, you can provide a raw JSON Schema.
 
         ```typescript
         const jsonSchema = {
@@ -591,17 +584,17 @@ for (const tool_call of toolCalls) {
 
 
 <Note>
-    **구조화된 출력에 대한 주요 고려 사항:**
+    **Key considerations for structured outputs:**
 
-    - **Method 매개변수**: 일부 프로바이더는 다른 방법(`'jsonSchema'`, `'functionCalling'`, `'jsonMode'`)을 지원합니다
-    - **Include raw**: @[`includeRaw: true`][BaseChatModel.with_structured_output(include_raw)]를 사용하여 파싱된 출력과 원시 [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html)를 모두 가져옵니다
-    - **Validation**: Zod 모델은 자동 유효성 검사를 제공하지만 JSON 스키마는 수동 유효성 검사가 필요합니다
+    - **Method parameter**: Some providers support different methods (`'jsonSchema'`, `'functionCalling'`, `'jsonMode'`)
+    - **Include raw**: Use @[`includeRaw: true`][BaseChatModel.with_structured_output(include_raw)] to get both the parsed output and the raw [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html)
+    - **Validation**: Zod models provide automatic validation, while JSON Schema requires manual validation
 </Note>
 
 
-<Accordion title="예제: 파싱된 구조와 함께 메시지 출력">
+<Accordion title="Example: Message output alongside parsed structure">
 
-[토큰 수](#token-usage)와 같은 응답 메타데이터에 액세스하기 위해 파싱된 표현과 함께 원시 [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html) 객체를 반환하는 것이 유용할 수 있습니다. 이를 위해 @[`with_structured_output`][BaseChatModel.with_structured_output]를 호출할 때 @[`include_raw=True`][BaseChatModel.with_structured_output(include_raw)]를 설정합니다:
+It can be useful to return the raw [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html) object alongside the parsed representation to access response metadata such as [token counts](#token-usage). To do this, set @[`include_raw=True`][BaseChatModel.with_structured_output(include_raw)] when calling @[`with_structured_output`][BaseChatModel.with_structured_output]:
 
 
 
@@ -630,8 +623,8 @@ for (const tool_call of toolCalls) {
     ```
 
 </Accordion>
-<Accordion title="예제: 중첩된 구조">
-    스키마는 중첩될 수 있습니다:
+<Accordion title="Example: Nested structures">
+    Schemas can be nested:
 
 
     ```typescript
@@ -657,29 +650,29 @@ for (const tool_call of toolCalls) {
 
 ---
 
-## 지원되는 모델
+## Supported models
 
-LangChain은 OpenAI, Anthropic, Google, Azure, AWS Bedrock 등을 포함한 모든 주요 모델 프로바이더를 지원합니다. 각 프로바이더는 다양한 기능을 가진 다양한 모델을 제공합니다. LangChain에서 지원하는 모델의 전체 목록은 [통합 페이지](/oss/javascript/integrations/providers/overview)를 참조하세요.
+LangChain supports all major model providers, including OpenAI, Anthropic, Google, Azure, AWS Bedrock, and more. Each provider offers a variety of models with different capabilities. For a full list of supported models in LangChain, see the [integrations page](/oss/javascript/integrations/providers/overview).
 
 ---
 
-## 고급 주제
+## Advanced topics
 
-### 멀티모달
+### Multimodal
 
-특정 모델은 이미지, 오디오, 비디오와 같은 비텍스트 데이터를 처리하고 반환할 수 있습니다. [콘텐츠 블록](/oss/javascript/langchain/messages#content)을 제공하여 모델에 비텍스트 데이터를 전달할 수 있습니다.
+Certain models can process and return non-textual data such as images, audio, and video. You can pass non-textual data to a model by providing [content blocks](/oss/javascript/langchain/messages#message-content).
 
 <Tip>
-    기본 멀티모달 기능을 가진 모든 LangChain 채팅 모델은 다음을 지원합니다:
+    All LangChain chat models with underlying multimodal capabilities support:
 
-    1. 교차 프로바이더 표준 형식의 데이터([메시지 가이드](/oss/javascript/langchain/messages) 참조)
-    2. OpenAI [chat completions](https://platform.openai.com/docs/guides/images-vision?api-mode=chat) 형식
-    3. 해당 특정 프로바이더의 네이티브 형식(예: Anthropic 모델은 Anthropic 네이티브 형식을 수용)
+    1. Data in the cross-provider standard format (see [our messages guide](/oss/javascript/langchain/messages))
+    2. OpenAI [chat completions](https://platform.openai.com/docs/api-reference/chat) format
+    3. Any format that is native to that specific provider (e.g., Anthropic models accept Anthropic native format)
 </Tip>
 
-자세한 내용은 메시지 가이드의 [멀티모달 섹션](/oss/javascript/langchain/messages#multimodal)을 참조하세요.
+See the [multimodal section](/oss/javascript/langchain/messages#multimodal) of the messages guide for details.
 
-일부 모델은 응답의 일부로 멀티모달 데이터를 반환할 수도 있습니다. 이러한 경우 결과 [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html)에는 멀티모달 유형의 콘텐츠 블록이 포함됩니다.
+<Tooltip tip="Not all LLMs are made equally!" cta="See reference" href="https://models.dev/">Some models</Tooltip> can return multimodal data as part of their response. If invoked to do so, the resulting [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html) will have content blocks with multimodal types.
 
 
 
@@ -693,13 +686,13 @@ console.log(response.contentBlocks);
 ```
 
 
-특정 프로바이더에 대한 자세한 내용은 [통합 페이지](/oss/javascript/integrations/providers/overview)를 참조하세요.
+See the [integrations page](/oss/javascript/integrations/providers/overview) for details on specific providers.
 
-### 추론
+### Reasoning
 
-최신 모델은 결론에 도달하기 위해 다단계 추론을 수행할 수 있습니다. 여기에는 복잡한 문제를 더 작고 관리 가능한 단계로 분해하는 것이 포함됩니다.
+Newer models are capable of performing multi-step reasoning to arrive at a conclusion. This involves breaking down complex problems into smaller, more manageable steps.
 
-**기본 모델에서 지원하는 경우**, 이 추론 프로세스를 표시하여 모델이 최종 답변에 도달한 방법을 더 잘 이해할 수 있습니다.
+**If supported by the underlying model,** you can surface this reasoning process to better understand how the model arrived at its final answer.
 
 
 
@@ -720,35 +713,35 @@ console.log(response.contentBlocks);
 </CodeGroup>
 
 
-모델에 따라 추론에 투입해야 하는 노력 수준을 지정할 수 있는 경우도 있습니다. 마찬가지로 모델이 추론을 완전히 끄도록 요청할 수도 있습니다. 이는 추론의 범주형 "계층"(예: `'low'` 또는 `'high'`) 또는 정수 토큰 예산의 형태를 취할 수 있습니다.
+Depending on the model, you can sometimes specify the level of effort it should put into reasoning. Similarly, you can request that the model turn off reasoning entirely. This may take the form of categorical "tiers" of reasoning (e.g., `'low'` or `'high'`) or integer token budgets.
 
-자세한 내용은 해당 채팅 모델의 [통합 페이지](/oss/javascript/integrations/providers/overview) 또는 [참조](https://reference.langchain.com/python/integrations/)를 참조하세요.
+For details, see the [integrations page](/oss/javascript/integrations/providers/overview) or [reference](https://reference.langchain.com/python/integrations/) for your respective chat model.
 
 
-### 로컬 모델
+### Local models
 
-LangChain은 자체 하드웨어에서 로컬로 모델을 실행하는 것을 지원합니다. 이는 데이터 프라이버시가 중요한 시나리오, 사용자 정의 모델을 호출하려는 경우 또는 클라우드 기반 모델 사용 시 발생하는 비용을 피하고자 할 때 유용합니다.
+LangChain supports running models locally on your own hardware. This is useful for scenarios where either data privacy is critical, you want to invoke a custom model, or when you want to avoid the costs incurred when using a cloud-based model.
 
-[Ollama](/oss/javascript/integrations/chat/ollama)는 로컬로 모델을 실행하는 가장 쉬운 방법 중 하나입니다. 로컬 통합의 전체 목록은 [통합 페이지](/oss/javascript/integrations/providers/overview)를 참조하세요.
+[Ollama](/oss/javascript/integrations/chat/ollama) is one of the easiest ways to run models locally. See the full list of local integrations on the [integrations page](/oss/javascript/integrations/providers/overview).
 
-### 프롬프트 캐싱
+### Prompt caching
 
-많은 프로바이더는 동일한 토큰의 반복 처리 시 대기 시간과 비용을 줄이기 위한 프롬프트 캐싱 기능을 제공합니다. 이러한 기능은 **암묵적** 또는 **명시적**일 수 있습니다:
+Many providers offer prompt caching features to reduce latency and cost on repeat processing of the same tokens. These features can be **implicit** or **explicit**:
 
-- **암묵적 프롬프트 캐싱:** 요청이 캐시에 도달하면 프로바이더가 자동으로 비용 절감을 전달합니다. 예: [OpenAI](/oss/javascript/integrations/chat/openai) 및 [Gemini](/oss/javascript/integrations/chat/google_generative_ai) (Gemini 2.5 이상).
-- **명시적 캐싱:** 프로바이더가 더 큰 제어 또는 비용 절감을 보장하기 위해 캐시 포인트를 수동으로 표시할 수 있습니다. 예: @[`ChatOpenAI`] (`prompt_cache_key`를 통해), [Anthropic](/oss/javascript/integrations/chat/anthropic#prompt-caching), [AWS Bedrock](/oss/javascript/integrations/chat/bedrock#prompt-caching), [Gemini](https://python.langchain.com/api_reference/google_genai/chat_models/langchain_google_genai.chat_models.ChatGoogleGenerativeAI.html).
+- **Implicit prompt caching:** providers will automatically pass on cost savings if a request hits a cache. Examples: [OpenAI](/oss/javascript/integrations/chat/openai) and [Gemini](/oss/javascript/integrations/chat/google_generative_ai) (Gemini 2.5 and above).
+- **Explicit caching:** providers allow you to manually indicate cache points for greater control or to guarantee cost savings. Examples: @[`ChatOpenAI`] (via `prompt_cache_key`), Anthropic's [`AnthropicPromptCachingMiddleware`](/oss/javascript/integrations/chat/anthropic#prompt-caching) and [`cache_control`](https://docs.langchain.com/oss/python/integrations/chat/anthropic#prompt-caching) options, [AWS Bedrock](/oss/javascript/integrations/chat/bedrock#prompt-caching), [Gemini](https://python.langchain.com/api_reference/google_genai/chat_models/langchain_google_genai.chat_models.ChatGoogleGenerativeAI.html).
 
 <Warning>
-    프롬프트 캐싱은 종종 최소 입력 토큰 임계값 이상에서만 적용됩니다. 자세한 내용은 [프로바이더 페이지](/oss/javascript/integrations/chat)를 참조하세요.
+    Prompt caching is often only engaged above a minimum input token threshold. See [provider pages](/oss/javascript/integrations/chat) for details.
 </Warning>
 
-캐시 사용은 모델 응답의 [사용 메타데이터](/oss/javascript/langchain/messages#token-usage)에 반영됩니다.
+Cache usage will be reflected in the [usage metadata](/oss/javascript/langchain/messages#token-usage) of the model response.
 
-### 서버 측 도구 사용
+### Server-side tool use
 
-일부 프로바이더는 서버 측 [도구 호출](#tool-calling) 루프를 지원합니다: 모델은 웹 검색, 코드 인터프리터 및 기타 도구와 상호 작용하고 단일 대화 턴에서 결과를 분석할 수 있습니다.
+Some providers support server-side [tool-calling](#tool-calling) loops: models can interact with web search, code interpreters, and other tools and analyze the results in a single conversational turn.
 
-모델이 서버 측에서 도구를 호출하는 경우 응답 메시지의 콘텐츠에는 도구의 호출 및 결과를 나타내는 콘텐츠가 포함됩니다. 응답의 [콘텐츠 블록](/oss/javascript/langchain/messages#standard-content-blocks)에 액세스하면 프로바이더에 구애받지 않는 형식으로 서버 측 도구 호출 및 결과가 반환됩니다:
+If a model invokes a tool server-side, the content of the response message will include content representing the invocation and result of the tool. Accessing the [content blocks](/oss/javascript/langchain/messages#standard-content-blocks) of the response will return the server-side tool calls and results in a provider-agnostic format:
 
 
 ```typescript
@@ -761,20 +754,20 @@ const message = await modelWithTools.invoke("What was a positive news story from
 console.log(message.contentBlocks);
 ```
 
-이는 단일 대화 턴을 나타냅니다; 클라이언트 측 [도구 호출](#tool-calling)에서처럼 전달해야 하는 연관된 [ToolMessage](/oss/javascript/langchain/messages#tool-message) 객체가 없습니다.
+This represents a single conversational turn; there are no associated [ToolMessage](/oss/javascript/langchain/messages#tool-message) objects that need to be passed in as in client-side [tool-calling](#tool-calling).
 
-사용 가능한 도구 및 사용 세부 정보는 해당 프로바이더의 [통합 페이지](/oss/javascript/integrations/chat)를 참조하세요.
+See the [integration page](/oss/javascript/integrations/chat) for your given provider for available tools and usage details.
 
 
 
-### Base URL 또는 프록시
+### Base URL or proxy
 
-많은 채팅 모델 통합의 경우 API 요청에 대한 기본 URL을 구성할 수 있으며, 이를 통해 OpenAI 호환 API를 가진 모델 프로바이더를 사용하거나 프록시 서버를 사용할 수 있습니다.
+For many chat model integrations, you can configure the base URL for API requests, which allows you to use model providers that have OpenAI-compatible APIs or to use a proxy server.
 
 <Accordion title="Base URL" icon="link">
 
 
-    많은 모델 프로바이더가 OpenAI 호환 API를 제공합니다(예: [Together AI](https://www.together.ai/), [vLLM](https://github.com/vllm-project/vllm)). 적절한 `base_url` 매개변수를 지정하여 이러한 프로바이더와 함께 `initChatModel`을 사용할 수 있습니다:
+    Many model providers offer OpenAI-compatible APIs (e.g., [Together AI](https://www.together.ai/), [vLLM](https://github.com/vllm-project/vllm)). You can use `initChatModel` with these providers by specifying the appropriate `base_url` parameter:
 
     ```python
     model = initChatModel(
@@ -789,16 +782,16 @@ console.log(message.contentBlocks);
 
 
     <Note>
-        직접 채팅 모델 클래스 인스턴스화를 사용하는 경우 매개변수 이름은 프로바이더에 따라 다를 수 있습니다. 자세한 내용은 해당 [참조](/oss/javascript/integrations/providers/overview)를 확인하세요.
+        When using direct chat model class instantiation, the parameter name may vary by provider. Check the respective [reference](/oss/javascript/integrations/providers/overview) for details.
     </Note>
 </Accordion>
 
 
 
 
-### 로그 확률
+### Log probabilities
 
-특정 모델은 모델을 초기화할 때 `logprobs` 매개변수를 설정하여 주어진 토큰의 가능성을 나타내는 토큰 수준 로그 확률을 반환하도록 구성할 수 있습니다:
+Certain models can be configured to return token-level log probabilities representing the likelihood of a given token by setting the `logprobs` parameter when initializing the model:
 
 
 
@@ -814,24 +807,24 @@ responseMessage.response_metadata.logprobs.content.slice(0, 5);
 ```
 
 
-### 토큰 사용량
+### Token usage
 
-여러 모델 프로바이더가 호출 응답의 일부로 토큰 사용량 정보를 반환합니다. 사용 가능한 경우 이 정보는 해당 모델이 생성한 [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html) 객체에 포함됩니다. 자세한 내용은 [메시지](/oss/javascript/langchain/messages) 가이드를 참조하세요.
+A number of model providers return token usage information as part of the invocation response. When available, this information will be included on the [`AIMessage`](https://v03.api.js.langchain.com/classes/_langchain_core.messages_ai_message.AIMessage.html) objects produced by the corresponding model. For more details, see the [messages](/oss/javascript/langchain/messages) guide.
 
 <Note>
-    일부 프로바이더 API, 특히 OpenAI 및 Azure OpenAI 채팅 완성은 스트리밍 컨텍스트에서 토큰 사용량 데이터를 받기 위해 사용자가 옵트인해야 합니다. 자세한 내용은 통합 가이드의 [스트리밍 사용량 메타데이터](/oss/javascript/integrations/chat/openai#streaming-usage-metadata) 섹션을 참조하세요.
+    Some provider APIs, notably OpenAI and Azure OpenAI chat completions, require users opt-in to receiving token usage data in streaming contexts. See the [streaming usage metadata](/oss/javascript/integrations/chat/openai#streaming-usage-metadata) section of the integration guide for details.
 </Note>
 
 
 
-### 호출 구성
+### Invocation config
 
 
 
-모델을 호출할 때 [`RunnableConfig`](https://v03.api.js.langchain.com/interfaces/_langchain_core.runnables.RunnableConfig.html) 객체를 사용하여 `config` 매개변수를 통해 추가 구성을 전달할 수 있습니다. 이를 통해 실행 동작, 콜백 및 메타데이터 추적에 대한 런타임 제어를 제공합니다.
+When invoking a model, you can pass additional configuration through the `config` parameter using a [`RunnableConfig`](https://v03.api.js.langchain.com/interfaces/_langchain_core.runnables.RunnableConfig.html) object. This provides run-time control over execution behavior, callbacks, and metadata tracking.
 
 
-일반적인 구성 옵션은 다음과 같습니다:
+Common configuration options include:
 
 
 
@@ -839,52 +832,52 @@ responseMessage.response_metadata.logprobs.content.slice(0, 5);
 const response = await model.invoke(
     "Tell me a joke",
     {
-        runName: "joke_generation",      // 이 실행의 사용자 정의 이름
-        tags: ["humor", "demo"],          // 분류를 위한 태그
-        metadata: {"user_id": "123"},     // 사용자 정의 메타데이터
-        callbacks: [my_callback_handler], // 콜백 핸들러
+        runName: "joke_generation",      // Custom name for this run
+        tags: ["humor", "demo"],          // Tags for categorization
+        metadata: {"user_id": "123"},     // Custom metadata
+        callbacks: [my_callback_handler], // Callback handlers
     }
 )
 ```
 
 
-이러한 구성 값은 다음과 같은 경우에 특히 유용합니다:
-- [LangSmith](https://docs.smith.langchain.com/) 추적으로 디버깅
-- 사용자 정의 로깅 또는 모니터링 구현
-- 프로덕션 환경에서 리소스 사용 제어
-- 복잡한 파이프라인 전체에서 호출 추적
+These configuration values are particularly useful when:
+- Debugging with [LangSmith](https://docs.smith.langchain.com/) tracing
+- Implementing custom logging or monitoring
+- Controlling resource usage in production
+- Tracking invocations across complex pipelines
 
 
 
-<Accordion title="주요 구성 속성">
+<Accordion title="Key configuration attributes">
     <ParamField body="runName" type="string">
-        로그 및 추적에서 이 특정 호출을 식별합니다. 하위 호출에 상속되지 않습니다.
+        Identifies this specific invocation in logs and traces. Not inherited by sub-calls.
     </ParamField>
 
     <ParamField body="tags" type="string[]">
-        디버깅 도구에서 필터링 및 구성을 위해 모든 하위 호출에 상속되는 레이블입니다.
+        Labels inherited by all sub-calls for filtering and organization in debugging tools.
     </ParamField>
 
     <ParamField body="metadata" type="object">
-        추가 컨텍스트를 추적하기 위한 사용자 정의 키-값 쌍으로, 모든 하위 호출에 상속됩니다.
+        Custom key-value pairs for tracking additional context, inherited by all sub-calls.
     </ParamField>
 
     <ParamField body="maxConcurrency" type="number">
-        `batch()`를 사용할 때 최대 병렬 호출 수를 제어합니다.
+        Controls the maximum number of parallel calls when using `batch()`.
     </ParamField>
 
     <ParamField body="callbacks" type="CallbackHandler[]">
-        실행 중 이벤트를 모니터링하고 응답하기 위한 핸들러입니다.
+        Handlers for monitoring and responding to events during execution.
     </ParamField>
 
     <ParamField body="recursion_limit" type="number">
-        복잡한 파이프라인에서 무한 루프를 방지하기 위한 체인의 최대 재귀 깊이입니다.
+        Maximum recursion depth for chains to prevent infinite loops in complex pipelines.
     </ParamField>
 </Accordion>
 
 
 <Tip>
-    지원되는 모든 속성은 [`RunnableConfig`](https://v03.api.js.langchain.com/interfaces/_langchain_core.runnables.RunnableConfig.html) 참조를 확인하세요.
+    See full [`RunnableConfig`](https://v03.api.js.langchain.com/interfaces/_langchain_core.runnables.RunnableConfig.html) reference for all supported attributes.
 </Tip>
 
 ---

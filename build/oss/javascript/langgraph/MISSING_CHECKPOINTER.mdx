@@ -2,19 +2,17 @@
 title: MISSING_CHECKPOINTER
 ---
 
-import AlphaCallout from "/snippets/alpha-lg-callout.mdx";
 
-<AlphaCallout />
 
-checkpointer를 제공하지 않고 LangGraph의 내장 지속성 기능을 사용하려고 시도하고 있습니다.
+체크포인터를 제공하지 않고 LangGraph의 내장 지속성 기능을 사용하려고 시도하고 있습니다.
 
-이는 [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html)의 `compile()` 메서드 또는 [`entrypoint`](https://langchain-ai.github.io/langgraphjs/reference/functions/langgraph.entrypoint.html)에 `checkpointer`가 누락된 경우 발생합니다.
+이 오류는 [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html)의 `compile()` 메서드 또는 @[`@entrypoint`]에 `checkpointer`가 누락되었을 때 발생합니다.
 
 ## 문제 해결
 
-다음 사항이 이 오류를 해결하는 데 도움이 될 수 있습니다:
+다음 방법을 통해 이 오류를 해결할 수 있습니다:
 
--   checkpointer를 초기화하고 [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html)의 `compile()` 메서드 또는 [`entrypoint`](https://langchain-ai.github.io/langgraphjs/reference/functions/langgraph.entrypoint.html)에 전달하세요.
+-   체크포인터를 초기화하고 [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html)의 `compile()` 메서드 또는 @[`@entrypoint`]에 전달하세요.
 
 
 
@@ -38,9 +36,9 @@ const workflow = entrypoint(
 
 
 
--   LangGraph API를 사용하면 checkpointer를 수동으로 구현하거나 구성할 필요가 없습니다. API가 모든 지속성 인프라를 자동으로 처리합니다.
+-   체크포인터를 수동으로 구현하거나 구성할 필요 없이 LangGraph API를 사용하세요. API가 모든 지속성 인프라를 자동으로 처리합니다.
 
-## 관련 항목
+## 관련 문서
 
 - [지속성](/oss/javascript/langgraph/persistence)에 대해 자세히 알아보세요.
 

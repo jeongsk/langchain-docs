@@ -2,29 +2,29 @@
 title: WRITER PDF Parser
 ---
 
-이 가이드는 WRITER `PDFParser` [문서 로더](/oss/python/integrations/document_loaders/) 시작하기에 대한 간략한 개요를 제공합니다.
+This guide provides a quick overview for getting started with the WRITER `PDFParser` [document loader](/oss/python/integrations/document_loaders/).
 
-WRITER의 [PDF Parser](https://dev.writer.com/api-guides/api-reference/tool-api/pdf-parser#parse-pdf)는 PDF 문서를 텍스트나 Markdown과 같은 다른 형식으로 변환합니다. 이는 추가 분석이나 워크플로우 통합을 위해 PDF 파일에서 텍스트 콘텐츠를 추출하고 처리해야 할 때 특히 유용합니다. `langchain-writer`에서는 WRITER의 PDF Parser를 LangChain 문서 파서로 사용할 수 있도록 제공합니다.
+WRITER's [PDF Parser](https://dev.writer.com/api-guides/api-reference/tool-api/pdf-parser#parse-pdf) converts PDF documents into other formats like text or Markdown. This is particularly useful when you need to extract and process text content from PDF files for further analysis or integration into your workflow. In `langchain-writer`, we provide usage of WRITER's PDF Parser as a LangChain document parser.
 
-## 개요
+## Overview
 
-### 통합 세부 정보
+### Integration details
 
 | Class                                                                                                                              | Package          | Local | Serializable | JS support |                                        Downloads                                         |                                        Version                                         |
 |:-----------------------------------------------------------------------------------------------------------------------------------|:-----------------| :---: | :---: |:----------:|:------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------:|
 | [PDFParser](https://github.com/writer/langchain-writer/blob/main/langchain_writer/pdf_parser.py#L55) | [langchain-writer](https://pypi.org/project/langchain-writer/) |      ❌       |                                       ❌                                       | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-writer?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-writer?style=flat-square&label=%20) |
 
-## 설정
+## Setup
 
-`PDFParser`는 `langchain-writer` 패키지에서 사용할 수 있습니다:
+The `PDFParser` is available in the `langchain-writer` package:
 
 ```python
-%pip install --quiet -U langchain-writer
+pip install --quiet -U langchain-writer
 ```
 
-### 자격 증명
+### Credentials
 
-[WRITER AI Studio](https://app.writer.com/aistudio/signup?utm_campaign=devrel)에 가입하여 API 키를 생성하세요([Quickstart](https://dev.writer.com/api-guides/quickstart) 참조). 그런 다음 WRITER_API_KEY 환경 변수를 설정합니다:
+Sign up for [WRITER AI Studio](https://app.writer.com/aistudio/signup?utm_campaign=devrel) to generate an API key (you can follow this [Quickstart](https://dev.writer.com/api-guides/quickstart)). Then, set the WRITER_API_KEY environment variable:
 
 ```python
 import getpass
@@ -34,16 +34,16 @@ if not os.getenv("WRITER_API_KEY"):
     os.environ["WRITER_API_KEY"] = getpass.getpass("Enter your WRITER API key: ")
 ```
 
-최고 수준의 관찰 가능성을 위해 [LangSmith](https://smith.langchain.com/)를 설정하는 것도 도움이 됩니다(필수는 아님). 설정하려면 `LANGSMITH_TRACING` 및 `LANGSMITH_API_KEY` 환경 변수를 설정할 수 있습니다:
+It's also helpful (but not needed) to set up [LangSmith](https://smith.langchain.com/) for best-in-class observability. If you wish to do so, you can set the `LANGSMITH_TRACING` and `LANGSMITH_API_KEY` environment variables:
 
 ```python
-# os.environ["LANGSMITH_TRACING"] = "true"
+os.environ["LANGSMITH_TRACING"] = "true"
 # os.environ["LANGSMITH_API_KEY"] = getpass.getpass()
 ```
 
-### 인스턴스화
+### Instantiation
 
-다음으로 원하는 출력 형식으로 WRITER PDF Parser 인스턴스를 생성합니다:
+Next, instantiate an instance of the WRITER PDF Parser with the desired output format:
 
 ```python
 from langchain_writer.pdf_parser import PDFParser
@@ -51,13 +51,13 @@ from langchain_writer.pdf_parser import PDFParser
 parser = PDFParser(format="markdown")
 ```
 
-## 사용법
+## Usage
 
-PDF Parser를 사용하는 방법에는 동기식과 비동기식 두 가지가 있습니다. 어느 경우든 PDF Parser는 [`Document`](https://reference.langchain.com/python/langchain_core/documents/#langchain_core.documents.base.Document) 객체 목록을 반환하며, 각 객체는 PDF 파일의 페이지에서 파싱된 콘텐츠를 포함합니다.
+There are two ways to use the PDF Parser, either synchronously or asynchronously. In either case, the PDF Parser will return a list of [`Document`](https://reference.langchain.com/python/langchain_core/documents/#langchain_core.documents.base.Document) objects, each containing the parsed content of a page from the PDF file.
 
-### 동기식 사용
+### Synchronous usage
 
-PDF Parser를 동기식으로 호출하려면 파싱하려는 PDF 파일을 참조하는 `Blob` 객체를 `parse` 메서드에 전달합니다:
+To invoke the PDF Parser synchronously, pass a `Blob` object to the `parse` method referencing the PDF file you want to parse:
 
 ```python
 from langchain_core.documents.base import Blob
@@ -68,22 +68,22 @@ parsed_pages = parser.parse(blob=file)
 parsed_pages
 ```
 
-### 비동기식 사용
+### Asynchronous usage
 
-PDF Parser를 비동기식으로 호출하려면 파싱하려는 PDF 파일을 참조하는 `Blob` 객체를 `aparse` 메서드에 전달합니다:
+To invoke the PDF Parser asynchronously, pass a `Blob` object to the `aparse` method referencing the PDF file you want to parse:
 
 ```python
 parsed_pages_async = await parser.aparse(blob=file)
 parsed_pages_async
 ```
 
-## API 참조
+## API reference
 
-모든 `PDFParser` 기능 및 구성에 대한 자세한 문서는 [API 참조](https://python.langchain.com/api_reference/writer/pdf_parser/langchain_writer.pdf_parser.PDFParser.html#langchain_writer.pdf_parser.PDFParser)를 참조하세요.
+For detailed documentation of all `PDFParser` features and configurations, head to the [API reference](https://python.langchain.com/api_reference/writer/pdf_parser/langchain_writer.pdf_parser.PDFParser.html#langchain_writer.pdf_parser.PDFParser).
 
-## 추가 리소스
+## Additional resources
 
-WRITER의 모델(비용, 컨텍스트 윈도우, 지원되는 입력 유형 포함) 및 도구에 대한 정보는 [WRITER 문서](https://dev.writer.com/home)에서 확인할 수 있습니다.
+You can find information about WRITER's models (including costs, context windows, and supported input types) and tools in the [WRITER docs](https://dev.writer.com/home).
 
 ---
 

@@ -1,98 +1,98 @@
 ---
-title: 'Quick Start'
-description: 'Follow these steps to get your Open Agent Platform up and running quickly.'
+title: '빠른 시작'
+description: '다음 단계를 따라 Open Agent Platform을 빠르게 설정하고 실행하세요.'
 ---
 
 <Info>
-**Prerequisites:**
-- [Corepack](https://github.com/nodejs/corepack?tab=readme-ov-file#how-to-install) for building and running the platform locally
-- [LangSmith](https://smith.langchain.com/) Account (free tier is sufficient)
-- [Supabase](https://supabase.com/) Account
-- MCP Server (e.g. [Arcade](https://arcade-ai.com/))
-- An LLM API Key (e.g. [OpenAI](https://platform.openai.com/), [Anthropic](https://console.anthropic.com/), [Google](https://aistudio.google.com/))
+**사전 요구사항:**
+- 플랫폼을 로컬에서 빌드하고 실행하기 위한 [Corepack](https://github.com/nodejs/corepack?tab=readme-ov-file#how-to-install)
+- [LangSmith](https://smith.langchain.com/) 계정 (무료 플랜으로 충분합니다)
+- [Supabase](https://supabase.com/) 계정
+- MCP 서버 (예: [Arcade](https://arcade-ai.com/))
+- LLM API 키 (예: [OpenAI](https://platform.openai.com/), [Anthropic](https://console.anthropic.com/), [Google](https://aistudio.google.com/))
 </Info>
 
-## 1. Download the Open Agent Platform code
+## 1. Open Agent Platform 코드 다운로드
 
 <Steps>
-    <Step title="Clone the Repository">
-    Clone the [Open Agent Platform Repository](https://github.com/langchain-ai/open-agent-platform) from GitHub
+    <Step title="리포지토리 클론">
+    GitHub에서 [Open Agent Platform Repository](https://github.com/langchain-ai/open-agent-platform)를 클론합니다
     </Step>
-    <Step title="Set Environment Variables">
+    <Step title="환경 변수 설정">
         <Tip>
-        The repository contains a `.env.example` file listing all of the environment variables you need to run the platform.
+        리포지토리에는 플랫폼 실행에 필요한 모든 환경 변수가 나열된 `.env.example` 파일이 포함되어 있습니다.
         </Tip>
-    Set the following environment variables:
+    다음 환경 변수를 설정합니다:
     ```bash
       NEXT_PUBLIC_BASE_API_URL="http://localhost:3000/api"
       LANGSMITH_API_KEY="lsv2_..."
-      # Or whichever LLM's API key you're using
+      # 또는 사용 중인 LLM의 API 키
       OPENAI_API_KEY="..."
     ```
     </Step>
 </Steps>
 
-## 2. Authentication Setup
+## 2. 인증 설정
 
-Open Agent Platform uses Supabase for authentication by default.
+Open Agent Platform은 기본적으로 Supabase를 사용하여 인증을 처리합니다.
 
 <Steps>
-    <Step title="Create a Supabase Project">
-    Create a new project in [Supabase](https://supabase.com/).
+    <Step title="Supabase 프로젝트 생성">
+    [Supabase](https://supabase.com/)에서 새 프로젝트를 생성합니다.
     </Step>
-    <Step title="Configure Environment Variables">
-    Set the following environment variables inside the `apps/web/` directory:
+    <Step title="환경 변수 구성">
+    `apps/web/` 디렉토리 내에서 다음 환경 변수를 설정합니다:
         <Tip>
-        You can find these Next.js-specific variables in the "Connect" window in the Supabase dashboard, under "App Frameworks"
+        Supabase 대시보드의 "Connect" 창에서 "App Frameworks" 아래에 있는 Next.js 관련 변수를 확인할 수 있습니다
         </Tip>
     ```bash
     NEXT_PUBLIC_SUPABASE_URL="<your supabase url>"
     NEXT_PUBLIC_SUPABASE_ANON_KEY="<your supabase anon key>"
     ```
     </Step>
-    <Step title="Enable Authentication Providers">
-        Enable Google authentication in your Supabase project, or set `NEXT_PUBLIC_GOOGLE_AUTH_DISABLED=true` in your environment variables to disable showing Google as an authentication option in the UI.
+    <Step title="인증 공급자 활성화">
+        Supabase 프로젝트에서 Google 인증을 활성화하거나, UI에서 Google을 인증 옵션으로 표시하지 않으려면 환경 변수에 `NEXT_PUBLIC_GOOGLE_AUTH_DISABLED=true`를 설정합니다.
     </Step>
 </Steps>
 
-## 3. Deploying Agents
+## 3. 에이전트 배포
 
-The next step in setting up Open Agent Platform is to deploy and configure your agents.
+Open Agent Platform을 설정하는 다음 단계는 에이전트를 배포하고 구성하는 것입니다.
 
 <Steps>
-    <Step title="Clone Pre-built Agents">
-    We've released three pre-built agents specifically for Open Agent Platform:
+    <Step title="사전 구축된 에이전트 클론">
+    Open Agent Platform 전용으로 세 가지 사전 구축된 에이전트를 제공합니다:
     - [Tools Agent](https://github.com/langchain-ai/oap-langgraph-tools-agent)
     - [Supervisor Agent](https://github.com/langchain-ai/oap-agent-supervisor)
     - [Deep Research Agent](https://github.com/langchain-ai/oap-deep-researcher)
     </Step>
-    <Step title="Follow Agent Setup Instructions">
-    For each agent repository:
-    1. Clone the repository
-    2. Follow the instructions in the README
-    3. Deploy the agents to LangSmith, or run `langgraph dev` to run the agents locally. Optionally pass `--port <port>` to use a custom port. This is useful if running multiple graphs locally.
+    <Step title="에이전트 설정 지침 따르기">
+    각 에이전트 리포지토리에 대해:
+    1. 리포지토리를 클론합니다
+    2. README의 지침을 따릅니다
+    3. 에이전트를 LangSmith에 배포하거나, 로컬에서 실행하려면 `langgraph dev`를 실행합니다. 필요에 따라 `--port <port>`를 전달하여 사용자 지정 포트를 사용할 수 있습니다. 이는 여러 그래프를 로컬에서 실행할 때 유용합니다.
     </Step>
-    <Step title="Configure Environment Variables">
-    After deployment, create a configuration object for each agent (for the next step):
+    <Step title="환경 변수 구성">
+    배포 후, 각 에이전트에 대한 구성 객체를 생성합니다 (다음 단계를 위해):
     ```json
     {
-      "id": "The project ID of the deployment",
-      "tenantId": "The tenant ID of your LangSmith account",
-      "deploymentUrl": "The API URL to your deployment",
-      "name": "A custom name for your deployment",
-      "isDefault": "Whether this deployment is the default deployment (only one can be default)",
-      "defaultGraphId": "The graph ID of the default graph (optional, only required if isDefault is true)"
+      "id": "배포의 프로젝트 ID",
+      "tenantId": "LangSmith 계정의 테넌트 ID",
+      "deploymentUrl": "배포에 대한 API URL",
+      "name": "배포의 사용자 지정 이름",
+      "isDefault": "이 배포가 기본 배포인지 여부 (하나만 기본값으로 설정 가능)",
+      "defaultGraphId": "기본 그래프의 그래프 ID (선택사항, isDefault가 true인 경우에만 필요)"
     }
     ```
 
-    You can find your project & tenant IDs with a GET request to the `/info` endpoint on your LangSmith deployment.
+    LangSmith 배포의 `/info` 엔드포인트에 대한 GET 요청을 통해 프로젝트 및 테넌트 ID를 확인할 수 있습니다.
 
         <Tip>
-        If you are running agents locally via `langgraph dev`, the `id` (project ID), and `tenantId` should be any valid UUID version 4, such as those generated by `uuid.uuid4()`. Ensure each graph has a unique `id`, and all graphs share the same `tenantId`.
+        `langgraph dev`를 통해 로컬에서 에이전트를 실행하는 경우, `id` (프로젝트 ID)와 `tenantId`는 `uuid.uuid4()`로 생성된 것과 같은 유효한 UUID 버전 4여야 합니다. 각 그래프는 고유한 `id`를 가져야 하며, 모든 그래프는 동일한 `tenantId`를 공유해야 합니다.
         </Tip>
     </Step>
-    <Step title="Set Environment Variables">
-    Combine your agent configurations into a JSON array and set the `NEXT_PUBLIC_DEPLOYMENTS` environment variable inside the `apps/web/` directory:
+    <Step title="환경 변수 설정">
+    에이전트 구성을 JSON 배열로 결합하고 `apps/web/` 디렉토리 내에서 `NEXT_PUBLIC_DEPLOYMENTS` 환경 변수를 설정합니다:
 
     ```bash
     NEXT_PUBLIC_DEPLOYMENTS=[{"id":"bf63dc89-1de7-4a65-8336-af9ecda479d6","deploymentUrl":"http://localhost:2024","tenantId":"42d732b3-1324-4226-9fe9-513044dceb58","name":"Local deployment","isDefault":true,"defaultGraphId":"agent"}]
@@ -100,58 +100,58 @@ The next step in setting up Open Agent Platform is to deploy and configure your 
     </Step>
 </Steps>
 
-## 4. RAG Server Setup
+## 4. RAG 서버 설정
 
 <Steps>
-    <Step title="Deploy LangConnect">
-    Follow the instructions in the [LangConnect README](https://github.com/langchain-ai/langconnect) to set up and deploy a LangConnect RAG server.
+    <Step title="LangConnect 배포">
+    [LangConnect README](https://github.com/langchain-ai/langconnect)의 지침에 따라 LangConnect RAG 서버를 설정하고 배포합니다.
     </Step>
-    <Step title="Configure Environment Variables">
-    Set the RAG server URL inside the `apps/web/` directory:
+    <Step title="환경 변수 구성">
+    `apps/web/` 디렉토리 내에서 RAG 서버 URL을 설정합니다:
     ```bash
     NEXT_PUBLIC_RAG_API_URL="http://localhost:8080"
     ```
     </Step>
 </Steps>
 
-## 5. MCP Server Setup
+## 5. MCP 서버 설정
 
 <Tip>
-Open Agent Platform only supports connecting to MCP servers which support Streamable HTTP requests.
-If you don't have an MCP server set up yet, you can use [Arcade](https://docs.arcade.dev/home/mcp-desktop-clients/vscode-client)'s public beta MCP server.
+Open Agent Platform은 스트리밍 가능한 HTTP 요청을 지원하는 MCP 서버에만 연결할 수 있습니다.
+아직 MCP 서버를 설정하지 않았다면 [Arcade](https://docs.arcade.dev/home/mcp-desktop-clients/vscode-client)의 공개 베타 MCP 서버를 사용할 수 있습니다.
 </Tip>
 
 <Steps>
-    <Step title="Configure MCP Server URL">
-    Set your MCP server URL inside the `apps/web/` directory (ensure it does not end with `/mcp`. This will be auto-applied by OAP):
+    <Step title="MCP 서버 URL 구성">
+    `apps/web/` 디렉토리 내에서 MCP 서버 URL을 설정합니다 (`/mcp`로 끝나지 않도록 확인하세요. OAP에서 자동으로 적용됩니다):
     ```bash
     NEXT_PUBLIC_MCP_SERVER_URL="https://api.arcade.dev/v1/mcps/arcade-anon/"
     ```
     </Step>
-    <Step title="Configure Authentication (if required)">
-    For authenticated MCP servers:
+    <Step title="인증 구성 (필요한 경우)">
+    인증이 필요한 MCP 서버의 경우:
     ```bash
     NEXT_PUBLIC_MCP_AUTH_REQUIRED=true
     ```
     </Step>
 </Steps>
 
-## 6. Run Your Platform
+## 6. 플랫폼 실행
 
-Start the application with your configured environment variables:
+구성된 환경 변수로 애플리케이션을 시작합니다:
 
 ```bash
-# Navigate to the web app directory
+# 웹 앱 디렉토리로 이동
 cd apps/web
 
-# Install dependencies
+# 의존성 설치
 yarn install
 
-# Start the development server
+# 개발 서버 시작
 yarn dev
 ```
 
-Your Open Agent Platform should now be running at http://localhost:3000!
+이제 Open Agent Platform이 http://localhost:3000에서 실행됩니다!
 
 ---
 

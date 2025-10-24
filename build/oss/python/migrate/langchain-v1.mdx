@@ -7,47 +7,61 @@ sidebarTitle: 마이그레이션 가이드
 
 ## 간소화된 패키지
 
-`langchain` 패키지 네임스페이스는 v1에서 에이전트의 필수 구성 요소에 집중하도록 대폭 축소되었습니다. 간소화된 패키지를 통해 핵심 기능을 더 쉽게 찾고 사용할 수 있습니다.
+`langchain` 패키지의 네임스페이스는 v1에서 에이전트를 위한 필수 빌딩 블록에 집중하도록 대폭 축소되었습니다. 간소화된 패키지를 통해 핵심 기능을 더욱 쉽게 발견하고 사용할 수 있습니다.
 
 ### 네임스페이스
 
-| 모듈                    | 사용 가능한 항목                               | 비고                             |
+| 모듈                    | 사용 가능한 항목                                | 설명                              |
 |-------------------------|------------------------------------------------|-----------------------------------|
-| `langchain.agents`      | `create_agent`, `AgentState`                   | 핵심 에이전트 생성 기능 |
-| `langchain.messages`    | 메시지 타입, 콘텐츠 블록, `trim_messages` | `langchain-core`에서 재내보냄 |
-| `langchain.tools`       | `tool`, `BaseTool`, 주입 헬퍼          | `langchain-core`에서 재내보냄 |
-| `langchain.chat_models` | `init_chat_model`, `BaseChatModel`             | 통합 모델 초기화      |
-| `langchain.embeddings`  | `init_embeddings`, `Embeddings`                | 임베딩 모델                  |
+| [`langchain.agents`](https://reference.langchain.com/python/langchain/agents)      | [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent), [`AgentState`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.AgentState)                   | 핵심 에이전트 생성 기능           |
+| [`langchain.messages`](https://reference.langchain.com/python/langchain/messages)    | Message 타입, [content blocks](https://reference.langchain.com/python/langchain/messages/#langchain.messages.ContentBlock), [`trim_messages`](https://reference.langchain.com/python/langchain/messages/#langchain.messages.trim_messages) | `langchain-core`에서 재내보내기   |
+| [`langchain.tools`](https://reference.langchain.com/python/langchain/tools)       | [`@tool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool), [`BaseTool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.BaseTool), injection 헬퍼         | `langchain-core`에서 재내보내기   |
+| [`langchain.chat_models`](https://reference.langchain.com/python/langchain/models) | [`init_chat_model`](https://reference.langchain.com/python/langchain/models/#langchain.chat_models.init_chat_model), [`BaseChatModel`](https://reference.langchain.com/python/langchain_core/language_models/#langchain_core.language_models.chat_models.BaseChatModel)             | 통합된 모델 초기화                |
+| [`langchain.embeddings`](https://reference.langchain.com/python/langchain/embeddings)  | [`init_embeddings`](https://reference.langchain.com/python/langchain_core/embeddings/#langchain_core.embeddings.embeddings.Embeddings), [`Embeddings`](https://reference.langchain.com/python/langchain_core/embeddings/#langchain_core.embeddings.embeddings.Embeddings)                | 임베딩 모델                       |
 
 ### `langchain-classic`
 
-`langchain` 패키지에서 다음 중 하나를 사용하고 있었다면 [`langchain-classic`](https://pypi.org/project/langchain-classic/)을 설치하고 import를 업데이트해야 합니다:
+`langchain` 패키지에서 다음 항목 중 하나라도 사용하고 있었다면, [`langchain-classic`](https://pypi.org/project/langchain-classic/)을 설치하고 import를 업데이트해야 합니다:
 
-- 레거시 체인 (`LLMChain`, `ConversationChain` 등)
-- 인덱싱 API
+- 레거시 체인(`LLMChain`, `ConversationChain` 등)
+- Retriever(예: `MultiQueryRetriever` 또는 이전 `langchain.retrievers` 모듈의 모든 항목)
+- Indexing API
+- Hub 모듈(프롬프트를 프로그래밍 방식으로 관리)
+- Embeddings 모듈(예: `CacheBackedEmbeddings` 및 커뮤니티 임베딩)
 - [`langchain-community`](https://pypi.org/project/langchain-community) 재내보내기
 - 기타 더 이상 사용되지 않는 기능
 
 <CodeGroup>
-```python v1 (new)
-# 레거시 체인의 경우
-from langchain_classic.chains import LLMChain
+    ```python v1 (new)
+    # Chains
+    from langchain_classic.chains import LLMChain
 
-# 인덱싱의 경우
-from langchain_classic.indexes import ...
-```
+    # Retrievers
+    from langchain_classic.retrievers import ...
 
-```python v0 (old)
-# 체인
-from langchain.chains import LLMChain
+    # Indexing
+    from langchain_classic.indexes import ...
 
-# 인덱싱
-from langchain.indexes import ...
-```
+    # Hub
+    from langchain_classic import hub
+    ```
+
+    ```python v0 (old)
+    # Chains
+    from langchain.chains import LLMChain
+
+    # Retrievers
+    from langchain.retrievers import ...
+
+    # Indexing
+    from langchain.indexes import ...
+
+    # Hub
+    from langchain import hub
+    ```
 </CodeGroup>
 
-
-다음과 같이 설치합니다:
+설치 방법:
 
 <CodeGroup>
 ```bash pip
@@ -63,49 +77,50 @@ uv add langchain-classic
 
 ## `create_agent`로 마이그레이션
 
-v1.0 이전에는 에이전트를 구축하기 위해 `langgraph.prebuilt.create_react_agent`를 사용하는 것을 권장했습니다.
-이제는 에이전트를 구축하기 위해 `langchain.agents.create_agent`를 사용하는 것을 권장합니다.
+v1.0 이전에는 에이전트를 구축할 때 `langgraph.prebuilt.create_react_agent`를 사용하도록 권장했습니다.
+이제는 에이전트를 구축할 때 [`langchain.agents.create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)를 사용하도록 권장합니다.
 
-아래 표는 `create_react_agent`에서 `create_agent`로 변경된 기능을 요약합니다:
+아래 표는 `create_react_agent`에서 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)로 변경된 기능을 요약합니다:
 
 | 섹션 | 요약 - 변경 사항 |
 |---------|--------------|
 | [Import 경로](#import-path) | 패키지가 `langgraph.prebuilt`에서 `langchain.agents`로 이동 |
-| [프롬프트](#prompts) | 매개변수가 `system_prompt`로 이름 변경, 동적 프롬프트는 미들웨어 사용 |
-| [Pre-model 훅](#pre-model-hook) | `before_model` 메서드가 있는 미들웨어로 대체 |
-| [Post-model 훅](#post-model-hook) | `after_model` 메서드가 있는 미들웨어로 대체 |
-| [커스텀 상태](#custom-state) | 미들웨어에서 정의, `TypedDict`만 사용 |
-| [모델](#model) | 미들웨어를 통한 동적 선택, 사전 바인딩된 모델 미지원 |
-| [도구](#tools) | 도구 오류 처리가 `wrap_tool_call`이 있는 미들웨어로 이동 |
+| [프롬프트](#prompts) | 파라미터가 [`system_prompt`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent(system_prompt))로 변경, 동적 프롬프트는 미들웨어 사용 |
+| [Pre-model hook](#pre-model-hook) | `before_model` 메서드를 가진 미들웨어로 대체 |
+| [Post-model hook](#post-model-hook) | `after_model` 메서드를 가진 미들웨어로 대체 |
+| [커스텀 state](#custom-state) | `TypedDict`만 가능, [`state_schema`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.AgentMiddleware.state_schema) 또는 미들웨어를 통해 정의 |
+| [모델](#model) | 미들웨어를 통한 동적 선택, 사전 바인딩된 모델은 지원되지 않음 |
+| [도구](#tools) | 도구 에러 처리가 `wrap_tool_call`이 있는 미들웨어로 이동 |
 | [구조화된 출력](#structured-output) | 프롬프트 출력 제거, `ToolStrategy`/`ProviderStrategy` 사용 |
 | [스트리밍 노드 이름](#streaming-node-name-rename) | 노드 이름이 `"agent"`에서 `"model"`로 변경 |
-| [런타임 컨텍스트](#runtime-context) | `config["configurable"]` 대신 `context` 인수를 통한 의존성 주입 |
-| [네임스페이스](#simplified-namespace) | 에이전트 구성 요소에 집중하도록 간소화, 레거시 코드는 `langchain-classic`으로 이동 |
+| [런타임 컨텍스트](#runtime-context) | `config["configurable"]` 대신 `context` 인자를 통한 의존성 주입 |
+| [네임스페이스](#simplified-namespace) | 에이전트 빌딩 블록에 집중하도록 간소화, 레거시 코드는 `langchain-classic`으로 이동 |
 
 ### Import 경로
 
 에이전트 사전 빌드의 import 경로가 `langgraph.prebuilt`에서 `langchain.agents`로 변경되었습니다.
-함수 이름이 `create_react_agent`에서 `create_agent`로 변경되었습니다:
+함수 이름은 `create_react_agent`에서 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)로 변경되었습니다:
 
 ```python
 from langgraph.prebuilt import create_react_agent # [!code --]
 from langchain.agents import create_agent # [!code ++]
 ```
 
-자세한 내용은 [에이전트](/oss/python/python/langchain/agents)를 참조하세요.
+자세한 내용은 [Agents](/oss/python/langchain/agents)를 참조하세요.
 
 ### 프롬프트
 
 #### 정적 프롬프트 이름 변경
 
-`prompt` 매개변수가 `system_prompt`로 이름이 변경되었습니다:
+`prompt` 파라미터가 [`system_prompt`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent(system_prompt))로 이름이 변경되었습니다:
 
 <CodeGroup>
 ```python v1 (new)
 from langchain.agents import create_agent
 
+
 agent = create_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[check_weather],
     system_prompt="You are a helpful assistant"  # [!code highlight]
 )
@@ -114,7 +129,7 @@ agent = create_agent(
 from langgraph.prebuilt import create_react_agent
 
 agent = create_react_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[check_weather],
     prompt="You are a helpful assistant"  # [!code highlight]
 )
@@ -123,14 +138,15 @@ agent = create_react_agent(
 
 #### `SystemMessage`를 문자열로
 
-시스템 프롬프트에서 `SystemMessage` 객체를 사용하는 경우, 문자열 콘텐츠를 추출합니다:
+시스템 프롬프트에서 [`SystemMessage`](https://reference.langchain.com/python/langchain/messages/#langchain.messages.SystemMessage) 객체를 사용하는 경우, 문자열 내용을 추출하세요:
 
 <CodeGroup>
 ```python v1 (new)
 from langchain.agents import create_agent
 
+
 agent = create_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[check_weather],
     system_prompt="You are a helpful assistant"  # [!code highlight]
 )
@@ -140,7 +156,7 @@ from langchain.messages import SystemMessage
 from langgraph.prebuilt import create_react_agent
 
 agent = create_react_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[check_weather],
     prompt=SystemMessage(content="You are a helpful assistant")  # [!code highlight]
 )
@@ -149,7 +165,7 @@ agent = create_react_agent(
 
 #### 동적 프롬프트
 
-동적 프롬프트는 핵심 컨텍스트 엔지니어링 패턴입니다. 현재 대화 상태에 따라 모델에 전달하는 내용을 조정합니다. 이를 위해 `@dynamic_prompt` 데코레이터를 사용합니다:
+동적 프롬프트는 핵심 컨텍스트 엔지니어링 패턴입니다. 현재 대화 상태에 따라 모델에게 전달하는 내용을 조정합니다. 이를 위해 [`@dynamic_prompt`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.dynamic_prompt) 데코레이터를 사용하세요:
 
 <CodeGroup>
 ```python v1 (new)
@@ -158,6 +174,7 @@ from dataclasses import dataclass
 from langchain.agents import create_agent
 from langchain.agents.middleware import dynamic_prompt, ModelRequest
 from langgraph.runtime import Runtime
+
 
 @dataclass
 class Context:  # [!code highlight]
@@ -232,16 +249,16 @@ agent.invoke(
 </CodeGroup>
 
 
-### Pre-model 훅
+### Pre-model hook
 
-Pre-model 훅은 이제 `before_model` 메서드가 있는 미들웨어로 구현됩니다.
-이 새로운 패턴은 더 확장 가능합니다. 모델이 호출되기 전에 실행할 여러 미들웨어를 정의하여
-여러 에이전트에서 공통 패턴을 재사용할 수 있습니다.
+Pre-model hook은 이제 `before_model` 메서드를 가진 미들웨어로 구현됩니다.
+이 새로운 패턴은 더욱 확장 가능합니다. 모델이 호출되기 전에 실행될 여러 미들웨어를 정의하고,
+서로 다른 에이전트 간에 공통 패턴을 재사용할 수 있습니다.
 
 일반적인 사용 사례는 다음과 같습니다:
 * 대화 기록 요약
-* 메시지 트리밍
-* PII 편집과 같은 입력 가드레일
+* 메시지 정리
+* PII 제거와 같은 입력 가드레일
 
 v1에는 이제 요약 미들웨어가 내장 옵션으로 제공됩니다:
 
@@ -250,12 +267,13 @@ v1에는 이제 요약 미들웨어가 내장 옵션으로 제공됩니다:
 from langchain.agents import create_agent
 from langchain.agents.middleware import SummarizationMiddleware
 
+
 agent = create_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=tools,
     middleware=[
         SummarizationMiddleware(  # [!code highlight]
-            model="anthropic:claude-sonnet-4-5-20250929",  # [!code highlight]
+            model="anthropic:claude-sonnet-4-5",  # [!code highlight]
             max_tokens_before_summary=1000  # [!code highlight]
         )  # [!code highlight]
     ]  # [!code highlight]
@@ -269,18 +287,18 @@ def custom_summarization_function(state: AgentState):
     ...
 
 agent = create_react_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=tools,
     pre_model_hook=custom_summarization_function
 )
 ```
 </CodeGroup>
 
-### Post-model 훅
+### Post-model hook
 
-Post-model 훅은 이제 `after_model` 메서드가 있는 미들웨어로 구현됩니다.
-이 새로운 패턴은 더 확장 가능합니다. 모델이 호출된 후에 실행할 여러 미들웨어를 정의하여
-여러 에이전트에서 공통 패턴을 재사용할 수 있습니다.
+Post-model hook은 이제 `after_model` 메서드를 가진 미들웨어로 구현됩니다.
+이 새로운 패턴은 더욱 확장 가능합니다. 모델이 호출된 후 실행될 여러 미들웨어를 정의하고,
+서로 다른 에이전트 간에 공통 패턴을 재사용할 수 있습니다.
 
 일반적인 사용 사례는 다음과 같습니다:
 * [Human in the loop](/oss/python/langchain/human-in-the-loop)
@@ -293,8 +311,9 @@ v1에는 도구 호출에 대한 human in the loop 승인을 위한 내장 미�
 from langchain.agents import create_agent
 from langchain.agents.middleware import HumanInTheLoopMiddleware
 
+
 agent = create_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[read_email, send_email],
     middleware=[HumanInTheLoopMiddleware(
         interrupt_on={
@@ -314,45 +333,52 @@ def custom_human_in_the_loop_hook(state: AgentState):
     ...
 
 agent = create_react_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[read_email, send_email],
     post_model_hook=custom_human_in_the_loop_hook
 )
 ```
 </CodeGroup>
 
-### 커스텀 상태
+### 커스텀 state
 
-커스텀 상태는 이제 `state_schema` 속성을 사용하여 미들웨어에서 정의됩니다:
+커스텀 state는 기본 에이전트 state를 추가 필드로 확장합니다. 커스텀 state는 두 가지 방법으로 정의할 수 있습니다:
+
+1. **[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)의 [`state_schema`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.AgentMiddleware.state_schema)를 통해** - 도구에서 사용되는 state에 가장 적합
+2. **미들웨어를 통해** - 특정 미들웨어 hook과 해당 미들웨어에 연결된 도구에서 관리되는 state에 가장 적합
+
+<Note>
+미들웨어를 통한 커스텀 state 정의는 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)의 [`state_schema`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.AgentMiddleware.state_schema)를 통한 정의보다 선호됩니다. 관련 미들웨어와 도구에 개념적으로 범위를 지정하여 state 확장을 유지할 수 있기 때문입니다.
+
+`state_schema`는 `create_agent`에서 하위 호환성을 위해 여전히 지원됩니다.
+</Note>
+
+#### `state_schema`를 통한 state 정의
+
+커스텀 state가 도구에서 액세스되어야 하는 경우 [`state_schema`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.AgentMiddleware.state_schema) 파라미터를 사용하세요:
 
 <CodeGroup>
 ```python v1 (new)
-from typing import Annotated
-from langchain.tools import tool
-from langchain.agents import create_agent  # [!code highlight]
-from langchain.agents.middleware import AgentMiddleware, AgentState  # [!code highlight]
-from langgraph.prebuilt import InjectedState
+from langchain.tools import tool, ToolRuntime
+from langchain.agents import create_agent, AgentState  # [!code highlight]
 
-# AgentState를 확장하는 커스텀 상태 정의
+
+# Define custom state extending AgentState
 class CustomState(AgentState):
     user_name: str
 
-# 커스텀 상태를 관리하는 미들웨어 생성
-class UserStateMiddleware(AgentMiddleware[CustomState]):  # [!code highlight]
-    state_schema = CustomState  # [!code highlight]
-
 @tool  # [!code highlight]
 def greet(
-    state: Annotated[CustomState, InjectedState]
+    runtime: ToolRuntime[CustomState]
 ) -> str:
-    """사용자 이름으로 인사하는 데 사용합니다."""
-    user_name = state.get("user_name", "Unknown")  # [!code highlight]
+    """Use this to greet the user by name."""
+    user_name = runtime.state.get("user_name", "Unknown")  # [!code highlight]
     return f"Hello {user_name}!"
 
 agent = create_agent(  # [!code highlight]
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[greet],
-    middleware=[UserStateMiddleware()]  # [!code highlight]
+    state_schema=CustomState  # [!code highlight]
 )
 ```
 ```python v0 (old)
@@ -366,42 +392,68 @@ class CustomState(AgentState):
 def greet(
     state: Annotated[CustomState, InjectedState]
 ) -> str:
-    """사용자 이름으로 인사하는 데 사용합니다."""
+    """Use this to greet the user by name."""
     user_name = state["user_name"]
     return f"Hello {user_name}!"
 
 agent = create_react_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[greet],
     state_schema=CustomState
 )
 ```
 </CodeGroup>
 
-<Note>
-    커스텀 상태는 `AgentState`를 확장하는 클래스를 생성하고 이를 미들웨어의 `state_schema` 속성에 할당하여 정의됩니다.
-</Note>
+#### 미들웨어를 통한 state 정의
 
-#### 상태 타입 제한
+미들웨어는 [`state_schema`](https://reference.langchain.com/python/langchain/middleware/#langchain.agents.middleware.AgentMiddleware.state_schema) 속성을 설정하여 커스텀 state를 정의할 수도 있습니다.
+이를 통해 관련 미들웨어와 도구에 개념적으로 범위가 지정된 state 확장을 유지할 수 있습니다.
 
-`create_agent`는 이제 상태 스키마에 대해 `TypedDict`만 지원합니다. Pydantic 모델과 dataclass는 더 이상 지원되지 않습니다.
+```python
+from langchain.agents.middleware import AgentState, AgentMiddleware
+from typing_extensions import NotRequired
+from typing import Any
+
+class CustomState(AgentState):
+    model_call_count: NotRequired[int]
+
+class CallCounterMiddleware(AgentMiddleware[CustomState]):
+    state_schema = CustomState  # [!code highlight]
+
+    def before_model(self, state: CustomState, runtime) -> dict[str, Any] | None:
+        count = state.get("model_call_count", 0)
+        if count > 10:
+            return {"jump_to": "end"}
+        return None
+
+    def after_model(self, state: CustomState, runtime) -> dict[str, Any] | None:
+        return {"model_call_count": state.get("model_call_count", 0) + 1}
+
+agent = create_agent(
+    model="anthropic:claude-sonnet-4-5",
+    tools=[...],
+    middleware=[CallCounterMiddleware()]  # [!code highlight]
+)
+```
+
+미들웨어를 통한 커스텀 state 정의에 대한 자세한 내용은 [middleware documentation](/oss/python/langchain/middleware#custom-state-schema)을 참조하세요.
+
+#### State 타입 제한
+
+[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 state 스키마에 대해 `TypedDict`만 지원합니다. Pydantic 모델과 dataclass는 더 이상 지원되지 않습니다.
 
 <CodeGroup>
 ```python v1 (new)
-from langchain.agents import AgentState
-from langchain.agents.middleware import AgentMiddleware
+from langchain.agents import AgentState, create_agent
 
-# AgentState는 TypedDict입니다
+# AgentState is a TypedDict
 class CustomAgentState(AgentState):  # [!code highlight]
     user_id: str
 
-class CustomAgentMiddleware(AgentMiddleware[CustomAgentState]):
-    state_schema = CustomAgentState
-
 agent = create_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=tools,
-    middleware=[CustomAgentMiddleware()]
+    state_schema=CustomAgentState  # [!code highlight]
 )
 ```
 
@@ -419,20 +471,19 @@ class AgentState(BaseModel):  # [!code highlight]
     user_id: str
 
 agent = create_react_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=tools,
     state_schema=AgentState
 )
 ```
 </CodeGroup>
 
-`BaseModel`이나 `dataclass` 데코레이터 대신 `langchain.agents.AgentState`를 상속하기만 하면 됩니다.
-검증이 필요한 경우, 대신 미들웨어 훅에서 처리하세요.
+`BaseModel`을 상속하거나 `dataclass`로 데코레이팅하는 대신 `langchain.agents.AgentState`를 상속하세요.
+검증이 필요한 경우, 미들웨어 hook에서 처리하세요.
 
 ### 모델
 
-동적 모델 선택을 사용하면 런타임 컨텍스트(예: 작업 복잡도, 비용 제약 또는 사용자 선호도)에 따라 다른 모델을 선택할 수 있습니다. [`langgraph-prebuilt`](https://pypi.org/project/langgraph-prebuilt) v0.6에서 릴리스된 `create_react_agent`는
-`model` 매개변수에 전달된 callable을 통해 동적 모델 및 도구 선택을 지원했습니다.
+동적 모델 선택을 통해 런타임 컨텍스트(예: 작업 복잡도, 비용 제약 또는 사용자 선호도)에 따라 서로 다른 모델을 선택할 수 있습니다. [`langgraph-prebuilt`](https://pypi.org/project/langgraph-prebuilt)의 v0.6에서 출시된 `create_react_agent`는 `model` 파라미터에 전달되는 callable을 통해 동적 모델 및 도구 선택을 지원했습니다.
 
 이 기능은 v1에서 미들웨어 인터페이스로 포팅되었습니다.
 
@@ -446,6 +497,7 @@ from langchain.agents.middleware import (
 )
 from langchain.messages import AIMessage
 from langchain_openai import ChatOpenAI
+
 
 basic_model = ChatOpenAI(model="gpt-5-nano")
 advanced_model = ChatOpenAI(model="gpt-5")
@@ -491,7 +543,7 @@ agent = create_react_agent(
 
 #### 사전 바인딩된 모델
 
-구조화된 출력을 더 잘 지원하기 위해 `create_agent`는 더 이상 도구나 구성이 포함된 사전 바인딩된 모델을 허용하지 않습니다:
+구조화된 출력을 더욱 잘 지원하기 위해 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 더 이상 도구나 구성이 사전 바인딩된 모델을 허용하지 않습니다:
 
 ```python
 # 더 이상 지원되지 않음
@@ -503,48 +555,50 @@ agent = create_agent("openai:gpt-4o-mini", tools=[some_tool])
 ```
 
 <Note>
-동적 모델 함수는 구조화된 출력이 사용되지 *않는* 경우 사전 바인딩된 모델을 반환할 수 있습니다.
+구조화된 출력이 사용되지 *않는* 경우, 동적 모델 함수는 사전 바인딩된 모델을 반환할 수 있습니다.
 </Note>
 
 ### 도구
 
-`create_agent`의 `tools` 인수는 다음 목록을 허용합니다:
+[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)의 [`tools`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent(tools)) 인자는 다음 목록을 허용합니다:
 
-* LangChain `BaseTool` 인스턴스 (`@tool`로 데코레이팅된 함수)
-* 적절한 타입 힌트와 docstring이 있는 호출 가능 객체(함수)
+* LangChain [`BaseTool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.BaseTool) 인스턴스([`@tool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool)로 데코레이팅된 함수)
+* 적절한 타입 힌트와 docstring이 있는 Callable 객체(함수)
 * 내장 프로바이더 도구를 나타내는 `dict`
 
-이 인수는 더 이상 `ToolNode` 인스턴스를 허용하지 않습니다.
+이 인자는 더 이상 `ToolNode` 인스턴스를 허용하지 않습니다.
 
 <CodeGroup>
 ```python v1 (new)
 from langchain.agents import create_agent
 
+
 agent = create_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=[check_weather, search_web]
 )
 ```
 ```python v0 (old)
 from langgraph.prebuilt import create_react_agent, ToolNode
 
+
 agent = create_react_agent(
-    model="anthropic:claude-sonnet-4-5-20250929",
+    model="anthropic:claude-sonnet-4-5",
     tools=ToolNode([check_weather, search_web]) # [!code highlight]
 )
 ```
 </CodeGroup>
 
-#### 도구 오류 처리
+#### 도구 에러 처리
 
-이제 `wrap_tool_call` 메서드를 구현하는 미들웨어를 사용하여 도구 오류 처리를 구성할 수 있습니다.
+이제 `wrap_tool_call` 메서드를 구현하는 미들웨어를 사용하여 도구 에러 처리를 구성할 수 있습니다.
 
 <CodeGroup>
 ```python v1 (new)
-# 예제 곧 제공 예정
+# 예제가 곧 제공됩니다
 ```
 ```python v0 (old)
-# 예제 곧 제공 예정
+# 예제가 곧 제공됩니다
 ```
 </CodeGroup>
 
@@ -552,14 +606,14 @@ agent = create_react_agent(
 
 #### 노드 변경
 
-구조화된 출력은 이전에 메인 에이전트와 별도의 노드에서 생성되었습니다. 이제는 더 이상 그렇지 않습니다.
+구조화된 출력은 이전에는 메인 에이전트와 별도의 노드에서 생성되었습니다. 이제는 더 이상 그렇지 않습니다.
 메인 루프에서 구조화된 출력을 생성하여 비용과 지연 시간을 줄입니다.
 
 #### 도구 및 프로바이더 전략
 
 v1에는 두 가지 새로운 구조화된 출력 전략이 있습니다:
 
-* `ToolStrategy`는 인위적인 도구 호출을 사용하여 구조화된 출력을 생성합니다
+* `ToolStrategy`는 인공 도구 호출을 사용하여 구조화된 출력을 생성합니다
 * `ProviderStrategy`는 프로바이더 네이티브 구조화된 출력 생성을 사용합니다
 
 <CodeGroup>
@@ -567,6 +621,7 @@ v1에는 두 가지 새로운 구조화된 출력 전략이 있습니다:
 from langchain.agents import create_agent
 from langchain.agents.structured_output import ToolStrategy, ProviderStrategy
 from pydantic import BaseModel
+
 
 class OutputSchema(BaseModel):
     summary: str
@@ -609,27 +664,28 @@ agent = create_react_agent(
 
 #### 프롬프트 출력 제거
 
-**프롬프트 출력**은 더 이상 `response_format` 인수를 통해 지원되지 않습니다. 인위적인 도구 호출 및 프로바이더 네이티브 구조화된 출력과 같은 전략과 비교할 때, 프롬프트 출력은 특별히 신뢰할 만하지 않은 것으로 입증되었습니다.
+**프롬프트 출력**은 더 이상 `response_format` 인자를 통해 지원되지 않습니다. 인공 도구 호출 및 프로바이더 네이티브 구조화된 출력과 같은 전략과 비교했을 때, 프롬프트 출력은 특별히 신뢰할 만한 것으로 입증되지 않았습니다.
 
 ### 스트리밍 노드 이름 변경
 
-에이전트에서 이벤트를 스트리밍할 때 노드 이름이 `"agent"`에서 `"model"`로 변경되어 노드의 목적을 더 잘 반영합니다.
+에이전트에서 이벤트를 스트리밍할 때, 노드 이름이 노드의 목적을 더 잘 반영하도록 `"agent"`에서 `"model"`로 변경되었습니다.
 
 {/* TODO: add diagrams */}
 
 ### 런타임 컨텍스트
 
-에이전트를 호출할 때 두 가지 유형의 데이터를 전달하려는 경우가 많습니다:
-* 대화 전체에 걸쳐 변경되는 동적 상태(예: 메시지 기록)
+에이전트를 호출할 때, 두 가지 유형의 데이터를 전달하고자 하는 경우가 많습니다:
+* 대화 전반에 걸쳐 변경되는 동적 state(예: 메시지 기록)
 * 대화 중에 변경되지 않는 정적 컨텍스트(예: 사용자 메타데이터)
 
-v1에서는 `invoke` 및 `stream`에 `context` 매개변수를 설정하여 정적 컨텍스트를 지원합니다.
+v1에서는 `invoke`와 `stream`의 `context` 파라미터를 설정하여 정적 컨텍스트를 지원합니다.
 
 <CodeGroup>
 ```python v1 (new)
 from dataclasses import dataclass
 
 from langchain.agents import create_agent
+
 
 @dataclass
 class Context:
@@ -650,6 +706,7 @@ result = agent.invoke(
 ```python v0 (old)
 from langgraph.prebuilt import create_react_agent
 
+
 agent = create_react_agent(model, tools)
 
 # Pass context via configurable
@@ -666,20 +723,20 @@ result = agent.invoke(
 </CodeGroup>
 
 <Note>
-    The old `config["configurable"]` pattern still works for backward compatibility, but using the new `context` parameter is recommended for new applications or applications migrating to v1.
+    이전의 `config["configurable"]` 패턴은 하위 호환성을 위해 여전히 작동하지만, 새 애플리케이션이나 v1으로 마이그레이션하는 애플리케이션에서는 새로운 `context` 파라미터를 사용하는 것이 권장됩니다.
 </Note>
 
 ---
 
 ## 표준 콘텐츠
 
-v1에서는 메시지가 프로바이더에 구애받지 않는 표준 콘텐츠 블록을 얻습니다. `message.content_blocks`를 통해 프로바이더 전체에서 일관되고 타입이 지정된 뷰에 액세스할 수 있습니다. 기존 `message.content` 필드는 문자열 또는 프로바이더 네이티브 구조에 대해 변경되지 않습니다.
+v1에서는 메시지가 프로바이더에 구애받지 않는 표준 콘텐츠 블록을 얻습니다. @[`message.content_blocks`][content_blocks]를 통해 프로바이더 간에 일관되고 타입이 지정된 뷰로 액세스하세요. 기존의 [`message.content`](https://reference.langchain.com/python/langchain_core/language_models/#langchain_core.messages.BaseMessage.content_blocks) 필드는 문자열이나 프로바이더 네이티브 구조에 대해 변경되지 않습니다.
 
-### 변경 사항
+### 변경된 사항
 
-- 정규화된 콘텐츠를 위한 메시지의 새로운 `content_blocks` 속성
-- [메시지](/oss/python/langchain/messages#standard-content-blocks)에 문서화된 표준화된 블록 형태
-- `LC_OUTPUT_VERSION=v1` 또는 `output_version="v1"`을 통해 `content`에 표준 블록의 선택적 직렬화
+- 정규화된 콘텐츠를 위한 메시지의 새로운 [`content_blocks`](https://reference.langchain.com/python/langchain_core/language_models/#langchain_core.messages.BaseMessage.content_blocks) 속성
+- [Messages](/oss/python/langchain/messages#standard-content-blocks)에 문서화된 표준화된 블록 형태
+- `LC_OUTPUT_VERSION=v1` 또는 `output_version="v1"`을 통한 표준 블록의 `content`로의 선택적 직렬화
 
 ### 표준화된 콘텐츠 읽기
 
@@ -697,15 +754,15 @@ for block in response.content_blocks:
         print(block.get("text"))
 ```
 ```python v0 (old)
-# 프로바이더 네이티브 형식은 다양합니다. 프로바이더별 처리가 필요했습니다
+# Provider-native formats vary; you needed per-provider handling
 response = model.invoke("Explain AI")
 for item in response.content:
     if item.get("type") == "reasoning":
-        ...  # OpenAI 스타일 추론
+        ...  # OpenAI-style reasoning
     elif item.get("type") == "thinking":
-        ...  # Anthropic 스타일 사고
+        ...  # Anthropic-style thinking
     elif item.get("type") == "text":
-        ...  # 텍스트
+        ...  # Text
 ```
 </CodeGroup>
 
@@ -725,7 +782,7 @@ res = model.invoke([message])
 from langchain.messages import HumanMessage
 
 message = HumanMessage(content=[
-    # 프로바이더 네이티브 구조
+    # Provider-native structure
     {"type": "text", "text": "Describe this image."},
     {"type": "image_url", "image_url": {"url": "https://example.com/image.jpg"}},
 ])
@@ -733,7 +790,7 @@ res = model.invoke([message])
 ```
 </CodeGroup>
 
-### 블록 형태 예제
+### 예제 블록 형태
 
 ```python
 # 텍스트 블록
@@ -750,17 +807,18 @@ image_block = {
 }
 ```
 
-자세한 내용은 콘텐츠 블록 [참조](/oss/python/langchain/messages#content-block-reference)를 참조하세요.
+자세한 내용은 content blocks [reference](/oss/python/langchain/messages#content-block-reference)를 참조하세요.
 
 ### 표준 콘텐츠 직렬화
 
-표준 콘텐츠 블록은 기본적으로 `content` 속성에 **직렬화되지 않습니다**. `content` 속성의 표준 콘텐츠 블록에 액세스해야 하는 경우(예: 클라이언트에 메시지를 보낼 때), `content`에 직렬화하도록 선택할 수 있습니다.
+표준 콘텐츠 블록은 기본적으로 `content` 속성으로 **직렬화되지 않습니다**. `content` 속성에서 표준 콘텐츠 블록에 액세스해야 하는 경우(예: 클라이언트에 메시지를 보낼 때), `content`로 직렬화하는 것을 선택할 수 있습니다.
 
 <CodeGroup>
-```bash
+```bash Environment variable
 export LC_OUTPUT_VERSION=v1
 ```
-```python
+
+```python Initialization parameter
 from langchain.chat_models import init_chat_model
 
 model = init_chat_model(
@@ -771,47 +829,65 @@ model = init_chat_model(
 </CodeGroup>
 
 <Note>
-    자세히 알아보기: [메시지](/oss/python/langchain/messages#content), [표준 콘텐츠 블록](/oss/python/langchain/messages#standard-content-blocks), [멀티모달](/oss/python/langchain/messages#multimodal).
+    자세히 알아보기: [Messages](/oss/python/langchain/messages#message-content), [Standard content blocks](/oss/python/langchain/messages#standard-content-blocks), [Multimodal](/oss/python/langchain/messages#multimodal).
 </Note>
 
 ---
 
 ## 간소화된 패키지
 
-`langchain` 패키지 네임스페이스는 v1에서 에이전트의 필수 구성 요소에 집중하도록 대폭 축소되었습니다. 간소화된 패키지를 통해 핵심 기능을 더 쉽게 찾고 사용할 수 있습니다.
+`langchain` 패키지의 네임스페이스는 v1에서 에이전트를 위한 필수 빌딩 블록에 집중하도록 대폭 축소되었습니다. 간소화된 패키지를 통해 핵심 기능을 더욱 쉽게 발견하고 사용할 수 있습니다.
 
 ### 네임스페이스
 
-| 모듈 | 사용 가능한 항목 | 비고 |
-|--------|------------------|-------|
-| `langchain.agents` | `create_agent`, `AgentState` | 핵심 에이전트 생성 기능 |
-| `langchain.messages` | 메시지 타입, 콘텐츠 블록, `trim_messages` | `langchain-core`에서 재내보냄 |
-| `langchain.tools` | `tool`, `BaseTool`, 주입 헬퍼 | `langchain-core`에서 재내보냄 |
-| `langchain.chat_models` | `init_chat_model`, `BaseChatModel` | 통합 모델 초기화 |
-| `langchain.embeddings` | `Embeddings`, `init_embeddings`, | 임베딩 모델 |
+| 모듈                    | 사용 가능한 항목                                | 설명                              |
+|-------------------------|------------------------------------------------|-----------------------------------|
+| [`langchain.agents`](https://reference.langchain.com/python/langchain/agents)      | [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent), [`AgentState`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.AgentState)                   | 핵심 에이전트 생성 기능           |
+| [`langchain.messages`](https://reference.langchain.com/python/langchain/messages)    | Message 타입, [content blocks](https://reference.langchain.com/python/langchain/messages/#langchain.messages.ContentBlock), [`trim_messages`](https://reference.langchain.com/python/langchain/messages/#langchain.messages.trim_messages) | `langchain-core`에서 재내보내기   |
+| [`langchain.tools`](https://reference.langchain.com/python/langchain/tools)       | [`@tool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool), [`BaseTool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.BaseTool), injection 헬퍼         | `langchain-core`에서 재내보내기   |
+| [`langchain.chat_models`](https://reference.langchain.com/python/langchain/models) | [`init_chat_model`](https://reference.langchain.com/python/langchain/models/#langchain.chat_models.init_chat_model), [`BaseChatModel`](https://reference.langchain.com/python/langchain_core/language_models/#langchain_core.language_models.chat_models.BaseChatModel)             | 통합된 모델 초기화                |
+| [`langchain.embeddings`](https://reference.langchain.com/python/langchain/embeddings)  | [`init_embeddings`](https://reference.langchain.com/python/langchain_core/embeddings/#langchain_core.embeddings.embeddings.Embeddings), [`Embeddings`](https://reference.langchain.com/python/langchain_core/embeddings/#langchain_core.embeddings.embeddings.Embeddings)                | 임베딩 모델                       |
 
 ### `langchain-classic`
 
-`langchain` 패키지에서 다음 중 하나를 사용하고 있었다면 `langchain-classic`을 설치하고 import를 업데이트해야 합니다:
+`langchain` 패키지에서 다음 항목 중 하나라도 사용하고 있었다면, [`langchain-classic`](https://pypi.org/project/langchain-classic/)을 설치하고 import를 업데이트해야 합니다:
 
-- 레거시 체인 (`LLMChain`, `ConversationChain` 등)
-- 인덱싱 API
-- `langchain-community` 재내보내기
+- 레거시 체인(`LLMChain`, `ConversationChain` 등)
+- Retriever(예: `MultiQueryRetriever` 또는 이전 `langchain.retrievers` 모듈의 모든 항목)
+- Indexing API
+- Hub 모듈(프롬프트를 프로그래밍 방식으로 관리)
+- Embeddings 모듈(예: `CacheBackedEmbeddings` 및 커뮤니티 임베딩)
+- [`langchain-community`](https://pypi.org/project/langchain-community) 재내보내기
 - 기타 더 이상 사용되지 않는 기능
 
 <CodeGroup>
-```python v1 (new)
-# 레거시 체인의 경우
-from langchain_classic.chains import LLMChain
+    ```python v1 (new)
+    # Chains
+    from langchain_classic.chains import LLMChain
 
-# 인덱싱의 경우
-from langchain_classic.indexes import ...
-```
+    # Retrievers
+    from langchain_classic.retrievers import ...
 
-```python v0 (old)
-from langchain.chains import LLMChain
-from langchain.indexes import ...
-```
+    # Indexing
+    from langchain_classic.indexes import ...
+
+    # Hub
+    from langchain_classic import hub
+    ```
+
+    ```python v0 (old)
+    # Chains
+    from langchain.chains import LLMChain
+
+    # Retrievers
+    from langchain.retrievers import ...
+
+    # Indexing
+    from langchain.indexes import ...
+
+    # Hub
+    from langchain import hub
+    ```
 </CodeGroup>
 
 **설치**:
@@ -821,28 +897,32 @@ uv pip install langchain-classic
 
 ---
 
-## Breaking changes
+## 중단(Breaking) 변경 사항
 
 ### Python 3.9 지원 중단
 
-모든 LangChain 패키지는 이제 **Python 3.10 이상**을 요구합니다. Python 3.9는 2025년 10월에 [수명 종료](https://devguide.python.org/versions/)됩니다.
+모든 LangChain 패키지는 이제 **Python 3.10 이상**을 요구합니다. Python 3.9는 2025년 10월에 [수명이 종료](https://devguide.python.org/versions/)됩니다.
 
 ### 채팅 모델의 반환 타입 업데이트
 
-채팅 모델 호출의 반환 타입 시그니처가 `BaseMessage`에서 `AIMessage`로 수정되었습니다. `bind_tools`를 구현하는 커스텀 채팅 모델은 반환 시그니처를 업데이트해야 합니다:
+채팅 모델 호출의 반환 타입 시그니처가 [`BaseMessage`](https://reference.langchain.com/python/langchain_core/language_models/#langchain_core.messages.BaseMessage)에서 [`AIMessage`](https://reference.langchain.com/python/langchain/messages/#langchain.messages.AIMessage)로 수정되었습니다. [`bind_tools`](https://reference.langchain.com/python/langchain_core/language_models/#langchain_core.language_models.chat_models.BaseChatModel.bind_tools)를 구현하는 커스텀 채팅 모델은 반환 시그니처를 업데이트해야 합니다:
 
 <CodeGroup>
 ```python v1 (new)
-Runnable[LanguageModelInput, AIMessage]
+def bind_tools(
+        ...
+    ) -> Runnable[LanguageModelInput, AIMessage]:
 ```
 ```python v0 (old)
-Runnable[LanguageModelInput, BaseMessage]
+def bind_tools(
+        ...
+    ) -> Runnable[LanguageModelInput, BaseMessage]:
 ```
 </CodeGroup>
 
 ### OpenAI Responses API의 기본 메시지 형식
 
-Responses API와 상호 작용할 때 `langchain-openai`는 이제 기본적으로 응답 항목을 메시지 `content`에 저장합니다. 이전 동작을 복원하려면 `LC_OUTPUT_VERSION` 환경 변수를 `v0`으로 설정하거나, `ChatOpenAI`를 인스턴스화할 때 `output_version="v0"`을 지정하세요.
+Responses API와 상호 작용할 때, `langchain-openai`는 이제 기본적으로 응답 항목을 메시지 `content`에 저장합니다. 이전 동작을 복원하려면 `LC_OUTPUT_VERSION` 환경 변수를 `v0`으로 설정하거나 [`ChatOpenAI`](https://reference.langchain.com/python/integrations/langchain_openai/ChatOpenAI/)를 인스턴스화할 때 `output_version="v0"`을 지정하세요.
 
 ```python
 # output_version 플래그로 이전 동작 강제
@@ -851,34 +931,29 @@ model = ChatOpenAI(model="gpt-4o-mini", output_version="v0")
 
 ### `langchain-anthropic`의 기본 `max_tokens`
 
-`max_tokens` 매개변수는 이제 이전 기본값인 `1024` 대신 선택한 모델에 따라 더 높은 값으로 기본 설정됩니다. 이전 기본값에 의존했다면 명시적으로 `max_tokens=1024`를 설정하세요.
+`langchain-anthropic`의 `max_tokens` 파라미터는 이제 이전 기본값인 `1024` 대신 선택한 모델에 따라 더 높은 값으로 기본 설정됩니다. 이전 기본값을 사용하려면 명시적으로 `max_tokens=1024`를 설정하세요.
 
-### 레거시 코드가 `langchain-classic`으로 이동
+### `langchain-classic`으로 이동된 레거시 코드
 
-표준 인터페이스와 에이전트의 초점을 벗어난 기존 기능은 [`langchain-classic`](https://pypi.org/project/langchain-classic) 패키지로 이동되었습니다. 핵심 `langchain` 패키지에서 사용할 수 있는 것과 `langchain-classic`으로 이동한 것에 대한 자세한 내용은 [간소화된 네임스페이스](#simplified-namespace) 섹션을 참조하세요.
+표준 인터페이스와 에이전트의 초점 범위를 벗어나는 기존 기능은 [`langchain-classic`](https://pypi.org/project/langchain-classic) 패키지로 이동되었습니다. 핵심 `langchain` 패키지에서 사용 가능한 항목과 `langchain-classic`으로 이동된 항목에 대한 자세한 내용은 [Simplified namespace](#simplified-namespace) 섹션을 참조하세요.
 
 ### 더 이상 사용되지 않는 API 제거
 
-이미 더 이상 사용되지 않으며 1.0에서 제거될 예정이었던 메서드, 함수 및 기타 객체가 삭제되었습니다. 대체 API는 이전 버전의 [사용 중단 공지](https://python.langchain.com/docs/versions/migrating_chains)를 확인하세요.
+이미 더 이상 사용되지 않으며 1.0에서 제거될 예정이었던 메서드, 함수 및 기타 객체는 삭제되었습니다. 대체 API에 대해서는 이전 버전의 [deprecation notices](https://python.langchain.com/docs/versions/migrating_chains)를 확인하세요.
 
 ### `.text()`가 이제 속성임
 
 메시지 객체의 `.text()` 메서드 사용 시 괄호를 제거해야 합니다:
 
-<CodeGroup>
-```python v1 (new)
+```python
 # 속성 액세스
 text = response.text
 
 # 더 이상 사용되지 않는 메서드 호출
 text = response.text()
 ```
-```python v0 (old)
-text = response.text()
-```
-</CodeGroup>
 
-기존 사용 패턴(즉, `.text()`)은 계속 작동하지만 이제 경고를 표시합니다.
+기존 사용 패턴(즉, `.text()`)은 계속 작동하지만 이제 경고를 출력합니다.
 
 ---
 

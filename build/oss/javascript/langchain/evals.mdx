@@ -1,9 +1,10 @@
 ---
-title: agent 성능 평가하기
+title: 에이전트 성능 평가
 ---
 
 
-agent 성능을 평가하려면 `LangSmith` [evaluations](https://docs.smith.langchain.com/evaluation)을 사용할 수 있습니다. 먼저 최종 출력이나 trajectory와 같은 agent 결과를 판단하는 evaluator 함수를 정의해야 합니다. 평가 기법에 따라 참조 출력이 필요할 수도 있고 필요하지 않을 수도 있습니다:
+
+에이전트의 성능을 평가하려면 `LangSmith` [평가](https://docs.smith.langchain.com/evaluation)를 사용할 수 있습니다. 먼저 최종 출력이나 실행 궤적과 같은 에이전트의 결과를 판단할 평가자 함수를 정의해야 합니다. 평가 기법에 따라 참조 출력이 필요할 수도 있고 필요하지 않을 수도 있습니다:
 
 
 
@@ -23,7 +24,7 @@ function evaluator({ outputs, referenceOutputs }: EvaluatorParams) {
 ```
 
 
-시작하려면 `AgentEvals` 패키지의 사전 제작된 evaluator를 사용할 수 있습니다:
+시작하려면 `AgentEvals` 패키지의 사전 구축된 평가자를 사용할 수 있습니다:
 
 
 
@@ -32,9 +33,9 @@ npm install agentevals
 ```
 
 
-## evaluator 생성하기
+## 평가자 생성
 
-agent 성능을 평가하는 일반적인 방법은 agent의 trajectory(도구를 호출하는 순서)를 참조 trajectory와 비교하는 것입니다:
+에이전트 성능을 평가하는 일반적인 방법은 에이전트의 실행 궤적(도구를 호출하는 순서)을 참조 궤적과 비교하는 것입니다:
 
 
 
@@ -89,13 +90,13 @@ const result = evaluator({
 ```
 
 
-1. trajectory를 비교하는 방법을 지정합니다. `superset`은 출력 trajectory가 참조 trajectory의 상위 집합인 경우 유효한 것으로 인정합니다. 다른 옵션으로는 [strict](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#strict-match), [unordered](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#unordered-match), [subset](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#subset-and-superset-match)이 있습니다.
+1. 궤적을 비교할 방식을 지정합니다. `superset`은 출력 궤적이 참조 궤적의 상위 집합일 경우 유효한 것으로 인정합니다. 다른 옵션으로는 [strict](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#strict-match), [unordered](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#unordered-match), [subset](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#subset-and-superset-match)이 있습니다.
 
-다음 단계로 [trajectory match evaluator 커스터마이징](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#agent-trajectory-match) 방법에 대해 자세히 알아보세요.
+다음 단계로 [궤적 매치 평가자 사용자 정의](https://github.com/langchain-ai/agentevals?tab=readme-ov-file#agent-trajectory-match) 방법에 대해 자세히 알아보세요.
 
 ### LLM-as-a-judge
 
-LLM을 사용하여 trajectory를 참조 출력과 비교하고 점수를 출력하는 LLM-as-a-judge evaluator를 사용할 수 있습니다:
+LLM을 사용하여 궤적을 참조 출력과 비교하고 점수를 출력하는 LLM-as-a-judge 평가자를 사용할 수 있습니다:
 
 
 
@@ -112,12 +113,12 @@ const evaluator = createTrajectoryLlmAsJudge({
 ```
 
 
-## evaluator 실행하기
+## 평가자 실행
 
-evaluator를 실행하려면 먼저 [LangSmith dataset](https://docs.smith.langchain.com/evaluation/concepts#datasets)을 생성해야 합니다. 사전 제작된 AgentEvals evaluator를 사용하려면 다음 스키마를 가진 dataset이 필요합니다:
+평가자를 실행하려면 먼저 [LangSmith 데이터셋](https://docs.smith.langchain.com/evaluation/concepts#datasets)을 생성해야 합니다. 사전 구축된 AgentEvals 평가자를 사용하려면 다음 스키마를 가진 데이터셋이 필요합니다:
 
-* **input**: `{"messages": [...]}` agent를 호출할 입력 메시지입니다.
-* **output**: `{"messages": [...]}` agent 출력에서 예상되는 메시지 기록입니다. trajectory 평가의 경우 assistant 메시지만 유지하도록 선택할 수 있습니다.
+* **input**: `{"messages": [...]}` 에이전트를 호출할 입력 메시지입니다.
+* **output**: `{"messages": [...]}` 에이전트 출력에서 예상되는 메시지 기록입니다. 궤적 평가의 경우 어시스턴트 메시지만 유지하도록 선택할 수 있습니다.
 
 
 

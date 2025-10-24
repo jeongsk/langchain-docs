@@ -2,20 +2,20 @@
 title: Open City Data
 ---
 
-[Socrata](https://dev.socrata.com/foundry/data.sfgov.org/vw6y-z8j6)는 도시 오픈 데이터를 위한 API를 제공합니다.
+[Socrata](https://dev.socrata.com/foundry/data.sfgov.org/vw6y-z8j6) provides an API for city open data.
 
-[SF crime](https://data.sfgov.org/Public-Safety/Police-Department-Incident-Reports-Historical-2003/tmnf-yvry)과 같은 데이터셋의 경우 오른쪽 상단의 `API` 탭을 참조하세요.
+For a dataset such as [SF crime](https://data.sfgov.org/Public-Safety/Police-Department-Incident-Reports-Historical-2003/tmnf-yvry), see the `API` tab on top right.
 
-여기서 `dataset identifier`를 제공받을 수 있습니다.
+That provides you with the `dataset identifier`.
 
-데이터셋 식별자를 사용하여 주어진 city_id(`data.sfgov.org`)에 대한 특정 테이블을 가져옵니다 -
+Use the dataset identifier to grab specific tables for a given city_id (`data.sfgov.org`) -
 
-예: [SF 311 데이터](https://dev.socrata.com/foundry/data.sfgov.org/vw6y-z8j6)의 경우 `vw6y-z8j6`.
+E.g., `vw6y-z8j6` for [SF 311 data](https://dev.socrata.com/foundry/data.sfgov.org/vw6y-z8j6).
 
-예: [SF Police 데이터](https://dev.socrata.com/foundry/data.sfgov.org/tmnf-yvry)의 경우 `tmnf-yvry`.
+E.g., `tmnf-yvry` for [SF Police data](https://dev.socrata.com/foundry/data.sfgov.org/tmnf-yvry).
 
 ```python
-%pip install -qU  sodapy
+pip install -qU  sodapy
 ```
 
 ```python

@@ -1,29 +1,29 @@
-이 가이드에서는 **LangGraph Studio**를 사용하여 에이전트를 로컬에서 시각화하고, 상호작용하며, 디버깅하는 방법을 안내합니다.
+이 가이드는 **Studio**를 사용하여 로컬에서 에이전트를 시각화하고, 상호작용하며, 디버깅하는 방법을 안내합니다.
 
-LangGraph Studio는 무료로 사용할 수 있는 강력한 에이전트 IDE로, [LangSmith](/langsmith/home)와 통합되어 추적, 평가 및 프롬프트 엔지니어링을 지원합니다. 에이전트가 어떻게 사고하는지 정확히 확인하고, 모든 결정을 추적하며, 더 스마트하고 신뢰할 수 있는 에이전트를 출시하세요.
+Studio는 무료로 사용할 수 있는 강력한 에이전트 IDE로, [LangSmith](/langsmith/home)와 통합되어 추적, 평가 및 프롬프트 엔지니어링을 지원합니다. 에이전트의 사고 과정을 정확하게 확인하고, 모든 결정을 추적하며, 더 스마트하고 안정적인 에이전트를 배포할 수 있습니다.
 
 <Frame>
 <iframe
   className="w-full aspect-video rounded-xl"
   src="https://www.youtube.com/embed/Mi1gSlHwZLM?si=zA47TNuTC5aH0ahd"
-  title="LangGraph Studio"
+  title="Studio"
   frameBorder="0"
   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
   allowFullScreen
 ></iframe>
 </Frame>
 
-## 사전 준비사항
+## 사전 요구사항
 
-시작하기 전에 다음 사항을 준비하세요:
-* [LangSmith](https://smith.langchain.com/settings) API 키 (무료 가입 가능)
+시작하기 전에 다음 사항을 확인하세요:
+* [LangSmith](https://smith.langchain.com/settings) API 키 (가입 무료)
 
 ## 로컬 LangGraph 서버 설정
 
 ### 1. LangGraph CLI 설치
 
 ```shell
-# Python >= 3.11 버전이 필요합니다.
+# Python >= 3.11 필요.
 pip install --upgrade "langgraph-cli[inmem]"
 ```
 
@@ -32,34 +32,32 @@ pip install --upgrade "langgraph-cli[inmem]"
 
 ### 2. 에이전트 준비
 
-다음 간단한 에이전트를 예제로 사용하겠습니다:
+다음과 같은 간단한 에이전트를 예시로 사용하겠습니다:
 
 ```python title="agent.py"
 from langchain.agents import create_agent
 
-model = ChatOpenAI(model="gpt-4o")
-
 def send_email(to: str, subject: str, body: str):
-    """이메일 전송"""
+    """Send an email"""
     email = {
         "to": to,
         "subject": subject,
         "body": body
     }
-    # ... 이메일 전송 로직
+    # ... email sending logic
 
     return f"Email sent to {to}"
 
 agent = create_agent(
     "openai:gpt-4o",
     tools=[send_email],
-    prompt="You are an email assistant. Always use the send_email tool.",
+    system_prompt="You are an email assistant. Always use the send_email tool.",
 )
 ```
 
-### 3. 환경 변수 설정
+### 3. 환경 변수
 
-프로젝트 루트에 `.env` 파일을 생성하고 필요한 API 키를 입력하세요. [LangSmith](https://smith.langchain.com/settings)에서 받은 API 키로 `LANGSMITH_API_KEY` 환경 변수를 설정해야 합니다.
+프로젝트 루트에 `.env` 파일을 생성하고 필요한 API 키를 입력합니다. [LangSmith](https://smith.langchain.com/settings)에서 받은 API 키를 `LANGSMITH_API_KEY` 환경 변수로 설정해야 합니다.
 
 <Warning>
     `.env` 파일을 Git과 같은 버전 관리 시스템에 커밋하지 않도록 주의하세요!
@@ -71,7 +69,7 @@ LANGSMITH_API_KEY=lsv2...
 
 ### 4. LangGraph 설정 파일 생성
 
-앱 디렉토리 내에 `langgraph.json` 설정 파일을 생성하세요:
+앱의 디렉터리 내에 `langgraph.json` 설정 파일을 생성합니다:
 
 ```json title="langgraph.json"
 {
@@ -83,13 +81,13 @@ LANGSMITH_API_KEY=lsv2...
 }
 ```
 
-`create_agent()`는 자동으로 컴파일된 LangGraph 그래프를 반환하므로, 설정 파일의 `graphs` 키에 전달할 수 있습니다.
+[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)는 자동으로 컴파일된 LangGraph 그래프를 반환하며, 이를 설정 파일의 `graphs` 키에 전달할 수 있습니다.
 
 <Info>
-설정 파일의 JSON 객체에 포함된 각 키에 대한 자세한 설명은 [LangGraph 설정 파일 참조](/langgraph-platform/cli#configuration-file)를 참조하세요.
+설정 파일의 JSON 객체에서 각 키에 대한 자세한 설명은 [LangGraph 설정 파일 참조](/langsmith/cli#configuration-file)를 확인하세요.
 </Info>
 
-지금까지의 프로젝트 구조는 다음과 같습니다:
+지금까지 프로젝트 구조는 다음과 같습니다:
 
 ```bash
 my-app/
@@ -101,7 +99,7 @@ my-app/
 
 ### 5. 의존성 설치
 
-새로운 LangGraph 앱의 루트에서 의존성을 설치하세요:
+새로운 LangGraph 앱의 루트에서 의존성을 설치합니다:
 
 <CodeGroup>
 ```shell pip
@@ -115,9 +113,9 @@ uv sync
 
 
 
-### 6. Studio에서 에이전트 확인
+### 6. Studio에서 에이전트 보기
 
-LangGraph 서버를 시작하세요:
+LangGraph 서버를 시작합니다:
 
 ```shell
 langgraph dev
@@ -127,21 +125,21 @@ langgraph dev
 
 
 <Warning>
-Safari는 Studio로의 `localhost` 연결을 차단합니다. 이를 해결하려면 위 명령에 `--tunnel` 옵션을 추가하여 보안 터널을 통해 Studio에 접근하세요.
+Safari는 Studio에 대한 `localhost` 연결을 차단합니다. 이 문제를 해결하려면 위 명령을 `--tunnel` 옵션과 함께 실행하여 보안 터널을 통해 Studio에 접근하세요.
 </Warning>
 
 에이전트는 API(`http://127.0.0.1:2024`)와 Studio UI `https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024`를 통해 접근할 수 있습니다:
 
 <Frame>
-![Agent view in LangGraph studio UI](/oss/images/studio_create-agent.png)
+![Agent view in the Studio UI](/oss/images/studio_create-agent.png)
 </Frame>
 
-Studio는 에이전트의 각 단계를 쉽게 관찰할 수 있게 만듭니다. 모든 입력을 다시 실행하고 정확한 프롬프트, 도구 인자, 반환 값, 토큰/지연 시간 메트릭을 검사할 수 있습니다. 도구가 예외를 발생시키면 Studio는 주변 상태와 함께 기록하므로 디버깅 시간을 줄일 수 있습니다.
+Studio는 에이전트의 각 단계를 쉽게 관찰할 수 있게 합니다. 모든 입력을 재생하고 정확한 프롬프트, 도구 인자, 반환 값, 토큰/지연 시간 메트릭을 검사할 수 있습니다. 도구에서 예외가 발생하면 Studio가 주변 상태와 함께 기록하므로 디버깅 시간을 줄일 수 있습니다.
 
-개발 서버를 계속 실행한 상태에서 프롬프트나 도구 시그니처를 편집하면 Studio가 핫 리로드됩니다. 대화 스레드를 어느 단계에서든 다시 실행하여 동작 변경을 확인할 수 있습니다. 자세한 내용은 [스레드 관리](/langgraph-platform/use-studio#manage-threads#edit-thread-history)를 참조하세요.
+개발 서버를 실행한 상태로 프롬프트나 도구 시그니처를 편집하면 Studio가 자동으로 다시 로드됩니다. 대화 스레드를 어느 단계에서든 다시 실행하여 동작 변경을 확인할 수 있습니다. 자세한 내용은 [스레드 관리](/langsmith/use-studio#edit-thread-history)를 참조하세요.
 
-에이전트가 성장함에 따라 동일한 뷰가 단일 도구 데모에서 다중 노드 그래프까지 확장되며, 결정을 명확하고 재현 가능하게 유지합니다.
+에이전트가 성장함에 따라 동일한 뷰가 단일 도구 데모부터 다중 노드 그래프까지 확장되며, 결정을 명확하고 재현 가능하게 유지합니다.
 
 <Tip>
-LangGraph Studio에 대한 심층적인 내용은 포괄적인 [LangGraph Studio 개요](/langgraph-platform/langgraph-studio)를 확인하세요.
+Studio에 대한 심층적인 내용은 [개요 페이지](/langsmith/studio)를 확인하세요.
 </Tip>

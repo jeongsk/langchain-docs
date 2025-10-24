@@ -6,11 +6,12 @@ sidebarTitle: SQL 에이전트
 import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
 import ChatModelTabsJS from '/snippets/chat-model-tabs-js.mdx';
 
+
 ## 개요
 
 이 튜토리얼에서는 LangChain [에이전트](/oss/python/langchain/agents)를 사용하여 SQL 데이터베이스에 대한 질문에 답변할 수 있는 에이전트를 구축하는 방법을 배웁니다.
 
-높은 수준에서 에이전트는 다음을 수행합니다:
+높은 수준에서 에이전트는 다음 작업을 수행합니다:
 
 <Steps>
 <Step title="데이터베이스에서 사용 가능한 테이블과 스키마 가져오기" />
@@ -18,22 +19,22 @@ import ChatModelTabsJS from '/snippets/chat-model-tabs-js.mdx';
 <Step title="관련 테이블의 스키마 가져오기" />
 <Step title="질문과 스키마 정보를 기반으로 쿼리 생성하기" />
 <Step title="LLM을 사용하여 일반적인 실수가 있는지 쿼리 재확인하기" />
-<Step title="쿼리 실행 및 결과 반환하기" />
+<Step title="쿼리 실행하고 결과 반환하기" />
 <Step title="쿼리가 성공할 때까지 데이터베이스 엔진에서 발생한 오류 수정하기" />
-<Step title="결과를 바탕으로 응답 작성하기" />
+<Step title="결과를 기반으로 응답 작성하기" />
 </Steps>
 
 <Warning>
-SQL 데이터베이스의 Q&A 시스템을 구축하려면 모델이 생성한 SQL 쿼리를 실행해야 합니다. 이에는 본질적인 위험이 있습니다. 데이터베이스 연결 권한이 항상 에이전트의 필요에 맞게 가능한 한 좁게 범위가 지정되어 있는지 확인하세요. 이는 모델 기반 시스템 구축의 위험을 완화하지만 제거하지는 못합니다.
+SQL 데이터베이스에 대한 Q&A 시스템을 구축하려면 모델이 생성한 SQL 쿼리를 실행해야 합니다. 이 작업에는 본질적인 위험이 있습니다. 에이전트의 필요에 따라 데이터베이스 연결 권한을 항상 가능한 한 좁게 범위를 지정해야 합니다. 이렇게 하면 모델 기반 시스템 구축의 위험을 완전히 제거할 수는 없지만 완화할 수 있습니다.
 </Warning>
 
 ### 개념
 
-다음 개념을 다룰 것입니다:
+다음 개념을 다룹니다:
 
 - SQL 데이터베이스에서 읽기 위한 [도구](/oss/python/langchain/tools)
 - LangChain [에이전트](/oss/python/langchain/agents)
-- [휴먼 인 더 루프](/oss/python/langchain/human-in-the-loop) 프로세스
+- [Human-in-the-loop](/oss/python/langchain/human-in-the-loop) 프로세스
 
 
 ## 설정
@@ -49,14 +50,14 @@ SQL 데이터베이스의 Q&A 시스템을 구축하려면 모델이 생성한 S
 
 
 ### LangSmith
-체인이나 에이전트 내부에서 발생하는 일을 검사하려면 [LangSmith](https://smith.langchain.com)를 설정하세요. 그런 다음 다음 환경 변수를 설정하세요:
+[LangSmith](https://smith.langchain.com)를 설정하여 체인이나 에이전트 내부에서 어떤 일이 발생하는지 검사하세요. 그런 다음 다음 환경 변수를 설정합니다:
 
     ```shell
     export LANGSMITH_TRACING="true"
     export LANGSMITH_API_KEY="..."
     ```
 
-## 1. LLM 선택
+## 1. LLM 선택하기
 
 [도구 호출](/oss/python/integrations/providers/overview)을 지원하는 모델을 선택하세요:
 
@@ -66,9 +67,9 @@ SQL 데이터베이스의 Q&A 시스템을 구축하려면 모델이 생성한 S
 
 아래 예제에 표시된 출력은 OpenAI를 사용했습니다.
 
-## 2. 데이터베이스 구성
+## 2. 데이터베이스 구성하기
 
-이 튜토리얼에서는 [SQLite 데이터베이스](https://www.sqlitetutorial.net/sqlite-sample-database/)를 생성할 것입니다. SQLite는 설정하고 사용하기 쉬운 경량 데이터베이스입니다. 디지털 미디어 스토어를 나타내는 샘플 데이터베이스인 `chinook` 데이터베이스를 로드할 것입니다.
+이 튜토리얼에서는 [SQLite 데이터베이스](https://www.sqlitetutorial.net/sqlite-sample-database/)를 생성합니다. SQLite는 설정하고 사용하기 쉬운 경량 데이터베이스입니다. 디지털 미디어 스토어를 나타내는 샘플 데이터베이스인 `chinook` 데이터베이스를 로드합니다.
 
 편의를 위해 공개 GCS 버킷에 데이터베이스(`Chinook.db`)를 호스팅했습니다.
 
@@ -90,7 +91,7 @@ else:
 ```
 
 
-`langchain_community` 패키지에서 제공하는 편리한 SQL 데이터베이스 래퍼를 사용하여 데이터베이스와 상호작용합니다. 이 래퍼는 SQL 쿼리를 실행하고 결과를 가져오는 간단한 인터페이스를 제공합니다:
+데이터베이스와 상호작용하기 위해 `langchain_community` 패키지에서 제공하는 편리한 SQL 데이터베이스 래퍼를 사용합니다. 이 래퍼는 SQL 쿼리를 실행하고 결과를 가져오는 간단한 인터페이스를 제공합니다:
 
 ```python
 from langchain_community.utilities import SQLDatabase
@@ -108,13 +109,13 @@ Sample output: [(1, 'AC/DC'), (2, 'Accept'), (3, 'Aerosmith'), (4, 'Alanis Moris
 ```
 
 
-## 3. 데이터베이스 상호작용을 위한 도구 추가
-`langchain_community` 패키지에서 제공하는 `SQLDatabase` 래퍼를 사용하여 데이터베이스와 상호작용합니다. 이 래퍼는 SQL 쿼리를 실행하고 결과를 가져오는 간단한 인터페이스를 제공합니다:
+## 3. 데이터베이스 상호작용을 위한 도구 추가하기
+데이터베이스와 상호작용하기 위해 `langchain_community` 패키지에서 제공하는 `SQLDatabase` 래퍼를 사용합니다. 이 래퍼는 SQL 쿼리를 실행하고 결과를 가져오는 간단한 인터페이스를 제공합니다:
 
 ```python
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 
-toolkit = SQLDatabaseToolkit(db=db, llm=llm)
+toolkit = SQLDatabaseToolkit(db=db, llm=model)
 
 tools = toolkit.get_tools()
 
@@ -133,11 +134,11 @@ sql_db_query_checker: Use this tool to double check if your query is correct bef
 
 
 
-## 5. `create_agent` 사용
+## 5. `create_agent` 사용하기
 
-[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)를 사용하여 최소한의 코드로 [ReAct 에이전트](https://arxiv.org/pdf/2210.03629)를 구축하세요. 에이전트는 요청을 해석하고 SQL 명령을 생성하며, 도구가 이를 실행합니다. 명령에 오류가 있으면 오류 메시지가 모델로 반환됩니다. 그러면 모델은 원래 요청과 새로운 오류 메시지를 검토하고 새 명령을 생성할 수 있습니다. 이는 LLM이 명령을 성공적으로 생성하거나 종료 횟수에 도달할 때까지 계속될 수 있습니다. 모델에 피드백(이 경우 오류 메시지)을 제공하는 이 패턴은 매우 강력합니다.
+[`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)를 사용하여 최소한의 코드로 [ReAct 에이전트](https://arxiv.org/pdf/2210.03629)를 구축합니다. 에이전트는 요청을 해석하고 SQL 명령을 생성하며, 도구가 이를 실행합니다. 명령에 오류가 있으면 오류 메시지가 모델로 반환됩니다. 그러면 모델은 원래 요청과 새 오류 메시지를 검토하고 새 명령을 생성할 수 있습니다. 이는 LLM이 명령을 성공적으로 생성하거나 종료 횟수에 도달할 때까지 계속될 수 있습니다. 이 경우 오류 메시지와 같은 피드백을 모델에 제공하는 패턴은 매우 강력합니다.
 
-에이전트의 동작을 사용자 정의하기 위해 설명적인 시스템 프롬프트로 초기화하세요:
+에이전트의 동작을 사용자 정의하기 위해 설명적인 시스템 프롬프트로 에이전트를 초기화합니다:
 
 ```python
 system_prompt = """
@@ -167,21 +168,22 @@ Then you should query the schema of the most relevant tables.
 )
 ```
 
-이제 모델, 도구, 프롬프트로 에이전트를 생성하세요:
+이제 모델, 도구 및 프롬프트로 에이전트를 생성합니다:
 
 ```python
 from langchain.agents import create_agent
 
+
 agent = create_agent(
-    llm,
+    model,
     tools,
     system_prompt=system_prompt,
 )
 ```
 
-## 6. 에이전트 실행
+## 6. 에이전트 실행하기
 
-샘플 쿼리에서 에이전트를 실행하고 동작을 관찰하세요:
+샘플 쿼리에서 에이전트를 실행하고 동작을 관찰합니다:
 
 ```python
 question = "Which genre on average has the longest tracks?"
@@ -279,24 +281,24 @@ Name: sql_db_query
 On average, the genre with the longest tracks is "Sci Fi & Fantasy" with an average track length of approximately 2,911,783 milliseconds. This is followed by "Science Fiction," "Drama," "TV Shows," and "Comedy."
 ```
 
-에이전트가 쿼리를 올바르게 작성하고, 쿼리를 확인하고, 실행하여 최종 응답을 제공했습니다.
+에이전트는 쿼리를 올바르게 작성하고, 쿼리를 확인하고, 실행하여 최종 응답을 알렸습니다.
 
 <Note>
-    수행된 단계, 호출된 도구, LLM이 본 프롬프트 등을 포함하여 위 실행의 모든 측면을 [LangSmith 추적](https://smith.langchain.com/public/cd2ce887-388a-4bb1-a29d-48208ce50d15/r)에서 검사할 수 있습니다.
+    위 실행의 모든 측면(수행된 단계, 호출된 도구, LLM이 본 프롬프트 등)을 [LangSmith 트레이스](https://smith.langchain.com/public/cd2ce887-388a-4bb1-a29d-48208ce50d15/r)에서 검사할 수 있습니다.
 </Note>
 
-### (선택 사항) Studio 사용
+### (선택 사항) Studio 사용하기
 
-[Studio](/langsmith/studio)는 "클라이언트 측" 루프와 메모리를 제공하므로 채팅 인터페이스로 실행하고 데이터베이스를 쿼리할 수 있습니다. "데이터베이스 스키마 알려주세요" 또는 "상위 5명의 고객에 대한 송장 보여주세요"와 같은 질문을 할 수 있습니다. 생성된 SQL 명령과 결과 출력을 볼 수 있습니다. 시작하는 방법에 대한 세부 정보는 아래에 있습니다.
-<Accordion title="Studio에서 에이전트 실행">
+[Studio](/langsmith/studio)는 "클라이언트 측" 루프와 메모리를 제공하므로 이를 채팅 인터페이스로 실행하고 데이터베이스를 쿼리할 수 있습니다. "데이터베이스 스키마를 알려주세요" 또는 "상위 5명의 고객에 대한 인보이스를 보여주세요"와 같은 질문을 할 수 있습니다. 생성된 SQL 명령과 결과 출력이 표시됩니다. 시작 방법에 대한 자세한 내용은 아래를 참조하세요.
+<Accordion title="Studio에서 에이전트 실행하기">
 
-앞서 언급한 패키지 외에도 다음을 설치해야 합니다:
+이전에 언급한 패키지 외에도 다음이 필요합니다:
 
 ```shell
 pip install -U langgraph-cli[inmem]>=0.4.0
 ```
 
-실행할 디렉토리에 다음 내용을 포함하는 `langgraph.json` 파일이 필요합니다:
+실행할 디렉토리에 다음 내용으로 `langgraph.json` 파일이 필요합니다:
 
 ```json
 {
@@ -309,7 +311,7 @@ pip install -U langgraph-cli[inmem]>=0.4.0
 }
 ```
 
-`sql_agent.py` 파일을 생성하고 다음을 삽입하세요:
+`sql_agent.py` 파일을 생성하고 다음을 삽입합니다:
 
 ```python
 #sql_agent.py for studio
@@ -322,8 +324,8 @@ from langchain_community.utilities import SQLDatabase
 import requests
 
 
-# initialize an LLM
-llm = init_chat_model("openai:gpt-4.1")
+# Initialize an LLM
+model = init_chat_model("openai:gpt-4.1")
 
 # Get the database, store it locally
 url = "https://storage.googleapis.com/benchmarks-artifacts/chinook/Chinook.db"
@@ -342,7 +344,7 @@ else:
 db = SQLDatabase.from_uri("sqlite:///Chinook.db")
 
 # Create the tools
-toolkit = SQLDatabaseToolkit(db=db, llm=llm)
+toolkit = SQLDatabaseToolkit(db=db, llm=model)
 
 tools = toolkit.get_tools()
 
@@ -377,7 +379,7 @@ Then you should query the schema of the most relevant tables.
 )
 
 agent = create_agent(
-    llm,
+    model,
     tools,
     system_prompt=system_prompt,
 )
@@ -386,19 +388,20 @@ agent = create_agent(
 
 
 
-## 6. 휴먼 인 더 루프 검토 구현
+## 6. Human-in-the-loop 검토 구현하기
 
-에이전트의 SQL 쿼리가 실행되기 전에 의도하지 않은 작업이나 비효율성이 있는지 확인하는 것이 신중할 수 있습니다.
+에이전트의 SQL 쿼리가 실행되기 전에 의도하지 않은 작업이나 비효율성이 있는지 확인하는 것이 현명할 수 있습니다.
 
-LangChain 에이전트는 에이전트 도구 호출에 감독을 추가하기 위한 내장 [휴먼 인 더 루프 미들웨어](/oss/python/langchain/human-in-the-loop) 지원 기능을 제공합니다. `sql_db_query` 도구 호출 시 사람의 검토를 위해 일시 중지하도록 에이전트를 구성해보겠습니다:
+LangChain 에이전트는 에이전트 도구 호출에 대한 감독을 추가하기 위해 내장된 [human-in-the-loop 미들웨어](/oss/python/langchain/human-in-the-loop)를 지원합니다. `sql_db_query` 도구 호출 시 사람의 검토를 위해 일시 중지하도록 에이전트를 구성해 보겠습니다:
 
 ```python
 from langchain.agents import create_agent
 from langchain.agents.middleware import HumanInTheLoopMiddleware # [!code highlight]
 from langgraph.checkpoint.memory import InMemorySaver # [!code highlight]
 
+
 agent = create_agent(
-    llm,
+    model,
     tools,
     system_prompt=system_prompt,
     middleware=[ # [!code highlight]
@@ -411,7 +414,7 @@ agent = create_agent(
 )
 ```
 <Note>
-실행을 일시 중지하고 재개할 수 있도록 에이전트에 [체크포인터](/oss/python/langchain/short-term-memory)를 추가했습니다. 이에 대한 자세한 내용과 사용 가능한 미들웨어 구성은 [휴먼 인 더 루프 가이드](/oss/python/langchain/human-in-the-loop)를 참조하세요.
+에이전트에 [체크포인터](/oss/python/langchain/short-term-memory)를 추가하여 실행을 일시 중지하고 재개할 수 있습니다. 이에 대한 자세한 내용과 사용 가능한 미들웨어 구성은 [human-in-the-loop 가이드](/oss/python/langchain/human-in-the-loop)를 참조하세요.
 </Note>
 
 에이전트를 실행하면 이제 `sql_db_query` 도구를 실행하기 전에 검토를 위해 일시 중지됩니다:
@@ -443,7 +446,7 @@ Tool execution pending approval
 Tool: sql_db_query
 Args: {'query': 'SELECT g.Name AS Genre, AVG(t.Milliseconds) AS AvgTrackLength FROM Track t JOIN Genre g ON t.GenreId = g.GenreId GROUP BY g.Name ORDER BY AvgTrackLength DESC LIMIT 1;'}
 ```
-이 경우 쿼리를 승인하여 [Command](/oss/python/langgraph/use-graph-api#combine-control-flow-and-state-updates-with-command)를 사용하여 실행을 재개할 수 있습니다:
+[Command](/oss/python/langgraph/use-graph-api#combine-control-flow-and-state-updates-with-command)를 사용하여 이 경우 쿼리를 수락하고 실행을 재개할 수 있습니다:
 ```python
 from langgraph.types import Command # [!code highlight]
 
@@ -478,13 +481,13 @@ Name: sql_db_query
 The genre with the longest average track length is "Sci Fi & Fantasy" with an average duration of about 2,911,783 milliseconds, followed by "Science Fiction" and "Drama."
 ```
 
-자세한 내용은 [휴먼 인 더 루프 가이드](/oss/python/langchain/human-in-the-loop)를 참조하세요.
+자세한 내용은 [human-in-the-loop 가이드](/oss/python/langchain/human-in-the-loop)를 참조하세요.
 
 
 
 ## 다음 단계
 
-더 깊은 사용자 정의를 원한다면 LangGraph 프리미티브를 사용하여 SQL 에이전트를 직접 구현하는 [이 튜토리얼](/oss/python/langgraph/sql-agent)을 확인하세요.
+더 깊은 사용자 정의를 위해 LangGraph 프리미티브를 사용하여 직접 SQL 에이전트를 구현하는 [이 튜토리얼](/oss/python/langgraph/sql-agent)을 확인하세요.
 
 ---
 

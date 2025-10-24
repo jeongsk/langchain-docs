@@ -1,44 +1,37 @@
 ---
-title: Context overview
-sidebarTitle: Context
+title: 컨텍스트 개요
+sidebarTitle: 컨텍스트
 ---
 
-import AlphaCalloutPy from '/snippets/alpha-lg-callout-py.mdx';
-import AlphaCalloutJS from '/snippets/alpha-lg-callout-js.mdx';
+**컨텍스트 엔지니어링**은 AI 애플리케이션이 작업을 수행할 수 있도록 올바른 정보와 도구를 적절한 형식으로 제공하는 동적 시스템을 구축하는 방법입니다. 컨텍스트는 두 가지 주요 차원으로 특징지을 수 있습니다:
 
-<AlphaCalloutPy />
-
-
-
-**Context engineering**은 AI 애플리케이션이 작업을 수행할 수 있도록 적절한 정보와 도구를 올바른 형식으로 제공하는 동적 시스템을 구축하는 실무 방법론입니다. Context는 두 가지 주요 차원으로 특징지을 수 있습니다:
-
-1. **가변성(mutability)** 기준:
-  * **Static context**: 실행 중에 변경되지 않는 불변 데이터 (예: 사용자 메타데이터, 데이터베이스 연결, 도구)
-  * **Dynamic context**: 애플리케이션 실행 중 진화하는 가변 데이터 (예: 대화 기록, 중간 결과, 도구 호출 관찰)
-2. **수명(lifetime)** 기준:
-  * **Runtime context**: 단일 실행 또는 호출에 범위가 지정된 데이터
-  * **Cross-conversation context**: 여러 대화 또는 세션에 걸쳐 지속되는 데이터
+1. **가변성**에 따라:
+  * **정적 컨텍스트**: 실행 중에 변경되지 않는 불변 데이터 (예: 사용자 메타데이터, 데이터베이스 연결, 도구)
+  * **동적 컨텍스트**: 애플리케이션이 실행되면서 진화하는 가변 데이터 (예: 대화 기록, 중간 결과, 도구 호출 관찰)
+2. **수명**에 따라:
+  * **런타임 컨텍스트**: 단일 실행 또는 호출로 범위가 제한된 데이터
+  * **대화 간 컨텍스트**: 여러 대화 또는 세션에 걸쳐 지속되는 데이터
 
 <Tip>
-Runtime context는 로컬 context를 의미합니다: 코드 실행에 필요한 데이터와 종속성을 가리킵니다. 다음과 **구분**됩니다:
+    런타임 컨텍스트는 로컬 컨텍스트를 의미합니다: 코드가 실행되는 데 필요한 데이터와 종속성을 말합니다. 다음과 같은 것을 의미하지 **않습니다**:
 
-* LLM context: LLM의 프롬프트에 전달되는 데이터
-* Context window: LLM에 전달할 수 있는 최대 토큰 수
+    * LLM 프롬프트에 전달되는 데이터인 LLM 컨텍스트
+    * LLM에 전달할 수 있는 최대 토큰 수인 "컨텍스트 윈도우"
 
-Runtime context는 LLM context를 최적화하는 데 사용할 수 있습니다. 예를 들어, runtime context의 사용자 메타데이터를 사용하여 사용자 선호도를 가져와 context window에 제공할 수 있습니다.
+    런타임 컨텍스트를 사용하여 LLM 컨텍스트를 최적화할 수 있습니다. 예를 들어, 런타임 컨텍스트의 사용자 메타데이터를 사용하여 사용자 선호도를 가져와 컨텍스트 윈도우에 전달할 수 있습니다.
 </Tip>
 
-LangGraph는 가변성과 수명 차원을 결합하여 context를 관리하는 세 가지 방법을 제공합니다:
+LangGraph는 가변성과 수명 차원을 결합하여 컨텍스트를 관리하는 세 가지 방법을 제공합니다:
 
-| Context 유형                                                                                | 설명                                            | 가변성  | 수명           | 접근 방법                           |
+| 컨텍스트 유형                                                                                | 설명                                            | 가변성 | 수명           | 접근 방법                           |
 | ------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ---------- | ------------------ | --------------------------------------- |
-| [**Static runtime context**](#static-runtime-context)                                       | 시작 시 전달되는 사용자 메타데이터, 도구, 데이터베이스 연결 | Static     | Single run         | `invoke`/`stream`의 `context` 인수 |
-| [**Dynamic runtime context (state)**](#dynamic-runtime-context-state)                       | 단일 실행 중 진화하는 가변 데이터          | Dynamic    | Single run         | LangGraph state 객체                  |
-| [**Dynamic cross-conversation context (store)**](#dynamic-cross-conversation-context-store) | 대화 간에 공유되는 영구 데이터            | Dynamic    | Cross-conversation | LangGraph store                         |
+| [**정적 런타임 컨텍스트**](#static-runtime-context)                                       | 시작 시 전달되는 사용자 메타데이터, 도구, 데이터베이스 연결 | 정적     | 단일 실행         | `invoke`/`stream`의 `context` 인자 |
+| [**동적 런타임 컨텍스트 (상태)**](#dynamic-runtime-context-state)                       | 단일 실행 중 진화하는 가변 데이터          | 동적    | 단일 실행         | LangGraph 상태 객체                  |
+| [**동적 대화 간 컨텍스트 (스토어)**](#dynamic-cross-conversation-context-store) | 대화 간에 공유되는 영구 데이터            | 동적    | 대화 간 | LangGraph 스토어                         |
 
-## Static runtime context
+## 정적 런타임 컨텍스트
 
-**Static runtime context**는 `invoke`/`stream`의 `context` 인수를 통해 실행 시작 시 애플리케이션에 전달되는 사용자 메타데이터, 도구, 데이터베이스 연결과 같은 불변 데이터를 나타냅니다. 이 데이터는 실행 중에 변경되지 않습니다.
+**정적 런타임 컨텍스트**는 `invoke`/`stream`의 `context` 인자를 통해 실행 시작 시 애플리케이션에 전달되는 사용자 메타데이터, 도구, 데이터베이스 연결과 같은 불변 데이터를 나타냅니다. 이 데이터는 실행 중에 변경되지 않습니다.
 
 ```python
 @dataclass
@@ -52,34 +45,38 @@ graph.invoke(
 ```
 
 <Tabs>
-    <Tab title="Agent prompt">
+    <Tab title="에이전트 프롬프트">
     ```python
-    from langchain.messages import AnyMessage
-    from langgraph.runtime import get_runtime
-    from langgraph.prebuilt.chat_agent_executor import AgentState
-    from langgraph.prebuilt import create_react_agent
+    from dataclasses import dataclass
+    from langchain.agents import create_agent
+    from langchain.agents.middleware import dynamic_prompt, ModelRequest
 
-    def prompt(state: AgentState) -> list[AnyMessage]:  # [!code highlight]
-        runtime = get_runtime(ContextSchema)
-        system_msg = f"You are a helpful assistant. Address the user as {runtime.context.user_name}."
-        return [{"role": "system", "content": system_msg}] + state["messages"]
 
-    agent = create_react_agent(
-        model="anthropic:claude-3-7-sonnet-latest",
+    @dataclass
+    class ContextSchema:
+        user_name: str
+
+    @dynamic_prompt  # [!code highlight]
+    def personalized_prompt(request: ModelRequest) -> str:  # [!code highlight]
+        user_name = request.runtime.context.user_name
+        return f"You are a helpful assistant. Address the user as {user_name}."
+
+    agent = create_agent(
+        model="anthropic:claude-sonnet-4-5",
         tools=[get_weather],
-        prompt=prompt,
+        middleware=[personalized_prompt],
         context_schema=ContextSchema
     )
 
     agent.invoke(
         {"messages": [{"role": "user", "content": "what is the weather in sf"}]},
-        context={"user_name": "John Smith"}  # [!code highlight]
+        context=ContextSchema(user_name="John Smith")  # [!code highlight]
     )
 ```
 
-    * 자세한 내용은 [Agents](/oss/python/langchain/agents)를 참조하세요.
+    자세한 내용은 [에이전트](/oss/python/langchain/agents)를 참조하세요.
     </Tab>
-    <Tab title="Workflow node">
+    <Tab title="워크플로우 노드">
     ```python
     from langgraph.runtime import Runtime
 
@@ -88,48 +85,48 @@ graph.invoke(
         ...
 ```
 
-    * 자세한 내용은 [Graph API](/oss/python/langgraph/graph-api#add-runtime-configuration)를 참조하세요.
+    * 자세한 내용은 [그래프 API](/oss/python/langgraph/graph-api#add-runtime-configuration)를 참조하세요.
     </Tab>
-    <Tab title="In a tool">
+    <Tab title="도구에서">
     ```python
-    from langgraph.runtime import get_runtime
+    from langchain.tools import tool, ToolRuntime
 
     @tool
-    def get_user_email() -> str:
+    def get_user_email(runtime: ToolRuntime[ContextSchema]) -> str:
         """Retrieve user information based on user ID."""
         # simulate fetching user info from a database
-        runtime = get_runtime(ContextSchema)  # [!code highlight]
-        email = get_user_email_from_db(runtime.context.user_name)
+        email = get_user_email_from_db(runtime.context.user_name)  # [!code highlight]
         return email
 ```
 
-    자세한 내용은 [tool calling guide](/oss/python/langchain/tools#configuration)를 참조하세요.
+    자세한 내용은 [도구 호출 가이드](/oss/python/langchain/tools#configuration)를 참조하세요.
     </Tab>
 </Tabs>
 
 <Tip>
-`Runtime` 객체는 static context와 활성 store, stream writer와 같은 다른 유틸리티에 접근하는 데 사용할 수 있습니다.
-자세한 내용은 [Runtime][langgraph.runtime.Runtime] 문서를 참조하세요.
+    `Runtime` 객체를 사용하여 정적 컨텍스트와 활성 스토어 및 스트림 라이터와 같은 기타 유틸리티에 접근할 수 있습니다.
+    자세한 내용은 @[`Runtime`][langgraph.runtime.Runtime] 문서를 참조하세요.
 </Tip>
 
 
 
 
 <a id="state"></a>
-## Dynamic runtime context
+## 동적 런타임 컨텍스트
 
-**Dynamic runtime context**는 단일 실행 중에 진화할 수 있는 가변 데이터를 나타내며, LangGraph state 객체를 통해 관리됩니다. 여기에는 대화 기록, 중간 결과, 도구 또는 LLM 출력에서 파생된 값이 포함됩니다. LangGraph에서 state 객체는 실행 중 [단기 메모리](/oss/python/concepts/memory) 역할을 합니다.
+**동적 런타임 컨텍스트**는 단일 실행 중에 진화할 수 있는 가변 데이터를 나타내며 LangGraph 상태 객체를 통해 관리됩니다. 여기에는 대화 기록, 중간 결과, 도구나 LLM 출력에서 파생된 값이 포함됩니다. LangGraph에서 상태 객체는 실행 중 [단기 메모리](/oss/python/concepts/memory) 역할을 합니다.
 
 <Tabs>
-    <Tab title="In an agent">
-    예제는 agent **프롬프트**에 state를 통합하는 방법을 보여줍니다.
+    <Tab title="에이전트에서">
+    예제는 에이전트 **프롬프트**에 상태를 통합하는 방법을 보여줍니다.
 
-    State는 agent의 **도구**에서도 접근할 수 있으며, 필요에 따라 state를 읽거나 업데이트할 수 있습니다. 자세한 내용은 [tool calling guide](/oss/python/langchain/tools#short-term-memory)를 참조하세요.
+    상태는 에이전트의 **도구**에서도 접근할 수 있으며, 필요에 따라 상태를 읽거나 업데이트할 수 있습니다. 자세한 내용은 [도구 호출 가이드](/oss/python/langchain/tools#short-term-memory)를 참조하세요.
 
     ```python
     from langchain.agents import create_agent
     from langchain.agents.middleware import dynamic_prompt, ModelRequest
-    from langgraph.prebuilt.chat_agent_executor import AgentState
+    from langchain.agents import AgentState
+
 
     class CustomState(AgentState):  # [!code highlight]
         user_name: str
@@ -140,7 +137,7 @@ graph.invoke(
         return f"You are a helpful assistant. User's name is {user_name}"
 
     agent = create_agent(
-        model="anthropic:claude-3-7-sonnet-latest",
+        model="anthropic:claude-sonnet-4-5",
         tools=[...],
         state_schema=CustomState,  # [!code highlight]
         middleware=[personalized_prompt],  # [!code highlight]
@@ -155,7 +152,7 @@ graph.invoke(
 
 
     </Tab>
-    <Tab title="In a workflow">
+    <Tab title="워크플로우에서">
     ```python
     from typing_extensions import TypedDict
     from langchain.messages import AnyMessage
@@ -176,7 +173,7 @@ graph.invoke(
     builder.add_node(node)
     builder.set_entry_point("node")
     graph = builder.compile()
-```
+    ```
 
 
 
@@ -184,21 +181,22 @@ graph.invoke(
 </Tabs>
 
 <Tip>
-**메모리 활성화**
-메모리를 활성화하는 방법에 대한 자세한 내용은 [memory guide](/oss/python/langgraph/add-memory)를 참조하세요. 이 강력한 기능을 사용하면 여러 호출에 걸쳐 agent의 state를 유지할 수 있습니다. 그렇지 않으면 state는 단일 실행에만 범위가 지정됩니다.
+    **메모리 활성화하기**
+    메모리를 활성화하는 방법에 대한 자세한 내용은 [메모리 가이드](/oss/python/langgraph/add-memory)를 참조하세요. 이는 여러 호출에 걸쳐 에이전트의 상태를 유지할 수 있는 강력한 기능입니다. 그렇지 않으면 상태는 단일 실행으로만 범위가 제한됩니다.
 </Tip>
 
 <a id="store"></a>
-## Dynamic cross-conversation context
 
-**Dynamic cross-conversation context**는 여러 대화 또는 세션에 걸쳐 지속되는 영구적이고 가변적인 데이터를 나타내며, LangGraph store를 통해 관리됩니다. 여기에는 사용자 프로필, 선호도, 과거 상호작용이 포함됩니다. LangGraph store는 여러 실행에 걸친 [장기 메모리](/oss/python/concepts/memory#long-term-memory) 역할을 합니다. 이를 사용하여 영구적인 사실(예: 사용자 프로필, 선호도, 이전 상호작용)을 읽거나 업데이트할 수 있습니다.
+## 동적 대화 간 컨텍스트
 
-## See also
+**동적 대화 간 컨텍스트**는 여러 대화 또는 세션에 걸쳐 지속되는 영구적이고 가변적인 데이터를 나타내며 LangGraph 스토어를 통해 관리됩니다. 여기에는 사용자 프로필, 선호도, 과거 상호작용이 포함됩니다. LangGraph 스토어는 여러 실행에 걸친 [장기 메모리](/oss/python/concepts/memory#long-term-memory) 역할을 합니다. 이는 영구적인 사실(예: 사용자 프로필, 선호도, 이전 상호작용)을 읽거나 업데이트하는 데 사용할 수 있습니다.
 
-- [Memory conceptual overview](/oss/python/concepts/memory)
-- [Short-term memory in LangChain](/oss/python/langchain/short-term-memory)
-- [Long-term memory in LangChain](/oss/python/langchain/long-term-memory)
-- [Memory in LangGraph](/oss/python/langgraph/add-memory)
+## 참고
+
+- [메모리 개념 개요](/oss/python/concepts/memory)
+- [LangChain의 단기 메모리](/oss/python/langchain/short-term-memory)
+- [LangChain의 장기 메모리](/oss/python/langchain/long-term-memory)
+- [LangGraph의 메모리](/oss/python/langgraph/add-memory)
 
 ---
 

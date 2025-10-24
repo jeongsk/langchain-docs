@@ -1,10 +1,10 @@
-LangChain은 [`create_agent`](/oss/python/langchain/agents)를 사용하여 생성된 에이전트와 원활하게 작동하는 강력한 사전 구축 사용자 인터페이스를 제공합니다. 이 UI는 로컬 환경이든 배포된 환경([LangSmith](/langsmith/) 등)이든 관계없이 최소한의 설정만으로 에이전트를 위한 풍부하고 상호작용적인 경험을 제공하도록 설계되었습니다.
+LangChain은 [`create_agent`](/oss/python/langchain/agents)를 사용하여 생성된 에이전트와 원활하게 작동하는 강력한 사전 구축 사용자 인터페이스를 제공합니다. 이 UI는 로컬에서 실행하든 [LangSmith](/langsmith/)와 같은 배포 환경에서 실행하든, 최소한의 설정으로 에이전트를 위한 풍부하고 인터랙티브한 경험을 제공하도록 설계되었습니다.
 
 ## Agent Chat UI
 
 [Agent Chat UI](https://github.com/langchain-ai/agent-chat-ui)는 모든 LangChain 에이전트와 상호작용할 수 있는 대화형 인터페이스를 제공하는 Next.js 애플리케이션입니다. 실시간 채팅, 도구 시각화, 타임 트래블 디버깅 및 상태 포크와 같은 고급 기능을 지원합니다.
 
-Agent Chat UI는 오픈 소스이며 애플리케이션 요구사항에 맞게 조정할 수 있습니다.
+Agent Chat UI는 오픈 소스이며 애플리케이션 요구 사항에 맞게 조정할 수 있습니다.
 
 <Frame>
 <iframe
@@ -16,33 +16,33 @@ Agent Chat UI는 오픈 소스이며 애플리케이션 요구사항에 맞게 �
 />
 </Frame>
 
-### 주요 기능
+### 기능
 
 <Accordion title="도구 시각화">
-Studio는 도구 호출과 결과를 직관적인 인터페이스로 자동으로 렌더링합니다.
+Studio는 도구 호출과 결과를 직관적인 인터페이스로 자동 렌더링합니다.
 <Frame>
-![Studio의 도구 시각화](/oss/images/studio_tools.gif)
+![Tool visualization in Studio](/oss/images/studio_tools.gif)
 </Frame>
 </Accordion>
 
 <Accordion title="타임 트래블 디버깅">
-대화 기록을 탐색하고 임의의 시점에서 분기할 수 있습니다
+대화 기록을 탐색하고 임의의 시점에서 포크할 수 있습니다
 <Frame>
-![Studio의 타임 트래블 디버깅](/oss/images/studio_fork.gif)
+![Time-travel debugging in Studio](/oss/images/studio_fork.gif)
 </Frame>
 </Accordion>
 
 <Accordion title="상태 검사">
 실행 중 임의의 시점에서 에이전트 상태를 확인하고 수정할 수 있습니다
 <Frame>
-![Studio의 상태 검사](/oss/images/studio_state.gif)
+![State inspection in Studio](/oss/images/studio_state.gif)
 </Frame>
 </Accordion>
 
 <Accordion title="Human-in-the-loop">
-에이전트 요청을 검토하고 응답하기 위한 내장 지원
+에이전트 요청을 검토하고 응답하기 위한 기본 제공 지원
 <Frame>
-![Studio의 Human-in-the-Loop](/oss/images/studio_hitl.gif)
+![Human-in-the-Loop in Studio](/oss/images/studio_hitl.gif)
 </Frame>
 </Accordion>
 
@@ -53,23 +53,23 @@ Agent Chat UI에서 생성형 UI를 사용할 수 있습니다. 자세한 내용
 
 ### 빠른 시작
 
-호스팅된 버전을 사용하는 것이 가장 빠른 시작 방법입니다:
+가장 빠르게 시작하는 방법은 호스팅된 버전을 사용하는 것입니다:
 
-1. **[Agent Chat UI](https://agentchat.vercel.app) 방문하기**
-2. **에이전트 연결하기** - 배포 URL 또는 로컬 서버 주소를 입력합니다
-3. **채팅 시작하기** - UI가 도구 호출과 인터럽트를 자동으로 감지하고 렌더링합니다
+1. **[Agent Chat UI](https://agentchat.vercel.app)를 방문하세요**
+2. **배포 URL 또는 로컬 서버 주소를 입력하여 에이전트를 연결하세요**
+3. **채팅을 시작하세요** - UI가 도구 호출과 인터럽트를 자동으로 감지하고 렌더링합니다
 
 ### 로컬 개발
 
-커스터마이징이나 로컬 개발을 위해 Agent Chat UI를 로컬에서 실행할 수 있습니다:
+사용자 정의 또는 로컬 개발을 위해 Agent Chat UI를 로컬에서 실행할 수 있습니다:
 
 <CodeGroup>
 ```bash Use npx
-# 새로운 Agent Chat UI 프로젝트 생성
-npx create-agent-chat-app my-chat-ui
+# 새 Agent Chat UI 프로젝트 생성
+npx create-agent-chat-app --project-name my-chat-ui
 cd my-chat-ui
 
-# 종속성 설치 및 시작
+# 의존성 설치 및 시작
 pnpm install
 pnpm dev
 ```
@@ -78,9 +78,8 @@ pnpm dev
 git clone https://github.com/langchain-ai/agent-chat-ui.git
 cd agent-chat-ui
 
-# 종속성 설치 및 시작
+# 의존성 설치 및 시작
 pnpm install
 pnpm dev
 ```
 </CodeGroup>
-

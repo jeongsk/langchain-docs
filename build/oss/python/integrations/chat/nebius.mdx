@@ -2,68 +2,68 @@
 title: Nebius Chat Models
 ---
 
-이 페이지는 Nebius AI Studio [채팅 모델](/oss/python/langchain/models) 시작하기를 도와드립니다. ChatNebius의 모든 기능과 구성에 대한 자세한 문서는 [API 참조](https://python.langchain.com/api_reference/nebius/chat_models/langchain_nebius.chat_models.ChatNebius.html)를 참조하세요.
+This page will help you get started with Nebius AI Studio [chat models](/oss/python/langchain/models). For detailed documentation of all ChatNebius features and configurations head to the [API reference](https://python.langchain.com/api_reference/nebius/chat_models/langchain_nebius.chat_models.ChatNebius.html).
 
-[Nebius AI Studio](https://studio.nebius.ai/)는 다양한 사용 사례를 위한 최첨단 대규모 언어 모델 및 임베딩 모델에 대한 API 액세스를 제공합니다.
+[Nebius AI Studio](https://studio.nebius.ai/) provides API access to a wide range of state-of-the-art large language models and embedding models for various use cases.
 
-## 개요
+## Overview
 
-### 통합 세부정보
+### Integration details
 
 | Class | Package | Local | Serializable | JS support | Downloads | Version |
 | :--- | :--- | :---: | :---: |  :---: | :---: | :---: |
 | [ChatNebius](https://python.langchain.com/api_reference/nebius/chat_models/langchain_nebius.chat_models.ChatNebius.html) | [langchain-nebius](https://python.langchain.com/api_reference/nebius/index.html) | ❌ | beta | ❌ | ![PyPI - Downloads](https://img.shields.io/pypi/dm/langchain-nebius?style=flat-square&label=%20) | ![PyPI - Version](https://img.shields.io/pypi/v/langchain-nebius?style=flat-square&label=%20) |
 
-### 모델 기능
+### Model features
 
 | [Tool calling](/oss/python/langchain/tools) | [Structured output](/oss/python/langchain/structured-output) | JSON mode | [Image input](/oss/python/langchain/messages#multimodal) | Audio input | Video input | [Token-level streaming](/oss/python/langchain/streaming#llm-tokens) | Native async | [Token usage](/oss/python/langchain/models#token-usage) | [Logprobs](/oss/python/langchain/models#log-probabilities) |
 | :---: | :---: | :---: | :---: |  :---: | :---: | :---: | :---: | :---: | :---: |
 | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ✅ |
 
-## 설정
+## Setup
 
-Nebius 모델에 액세스하려면 Nebius 계정을 생성하고, API 키를 가져오고, `langchain-nebius` 통합 패키지를 설치해야 합니다.
+To access Nebius models you'll need to create a Nebius account, get an API key, and install the `langchain-nebius` integration package.
 
-### 설치
+### Installation
 
-Nebius 통합은 pip를 통해 설치할 수 있습니다:
+The Nebius integration can be installed via pip:
 
 ```python
-%pip install -U langchain-nebius
+pip install -U langchain-nebius
 ```
 
-### 자격 증명
+### Credentials
 
-Nebius는 초기화 매개변수 `api_key`로 전달하거나 환경 변수 `NEBIUS_API_KEY`로 설정할 수 있는 API 키가 필요합니다. [Nebius AI Studio](https://studio.nebius.ai/)에서 계정을 생성하여 API 키를 얻을 수 있습니다.
+Nebius requires an API key that can be passed as an initialization parameter `api_key` or set as the environment variable `NEBIUS_API_KEY`. You can obtain an API key by creating an account on [Nebius AI Studio](https://studio.nebius.ai/).
 
 ```python
 import getpass
 import os
 
-# API 키를 환경 변수로 설정했는지 확인하세요
+# Make sure you've set your API key as an environment variable
 if "NEBIUS_API_KEY" not in os.environ:
     os.environ["NEBIUS_API_KEY"] = getpass.getpass("Enter your Nebius API key: ")
 ```
 
-## 인스턴스화
+## Instantiation
 
-이제 채팅 완성을 생성하기 위한 모델 객체를 인스턴스화할 수 있습니다:
+Now we can instantiate our model object to generate chat completions:
 
 ```python
 from langchain_nebius import ChatNebius
 
-# 채팅 모델 초기화
+# Initialize the chat model
 chat = ChatNebius(
-    # api_key="YOUR_API_KEY",  # API 키를 직접 전달할 수 있습니다
-    model="Qwen/Qwen3-14B",  # 사용 가능한 모델 중에서 선택
+    # api_key="YOUR_API_KEY",  # You can pass the API key directly
+    model="Qwen/Qwen3-14B",  # Choose from available models
     temperature=0.6,
     top_p=0.95,
 )
 ```
 
-## 호출
+## Invocation
 
-`invoke` 메서드를 사용하여 모델로부터 완성을 가져올 수 있습니다:
+You can use the `invoke` method to get a completion from the model:
 
 ```python
 response = chat.invoke("Explain quantum computing in simple terms")
@@ -100,7 +100,7 @@ Quantum computing is a type of computing that uses the principles of **quantum m
    - **Quantum computers** use *qubits*, which are like "spinning coins." While spinning, a qubit can be **0**, **1**, or **both at the same time** (this is called **superposition**). Only when you "look" at the qubit (measure it) does it settle into a definite state (0 or 1).
 
 ### 2. **Superposition: Doing Many Things at Once**
-   - Imagine a coin spinning in the air. While it's spinning, it's not just "heads" or "tails"—it's a mix of both.
+   - Imagine a coin spinning in the air. While it's spinning, it’s not just "heads" or "tails"—it’s a mix of both.
    - With qubits, a quantum computer can process **many possibilities simultaneously**. For example, if you have 2 qubits, they can represent 4 states (00, 01, 10, 11) at once. With 10 qubits, it can represent **1,024 states** at the same time! This lets quantum computers solve certain problems much faster than classical computers.
 
 ### 3. **Entanglement: Qubits "Talk" to Each Other**
@@ -113,15 +113,15 @@ Quantum computing is a type of computing that uses the principles of **quantum m
 
 ### 5. **Limitations**
    - **Fragile**: Qubits are sensitive to their environment (heat, noise), so quantum computers need extreme cooling (near absolute zero) to work.
-   - **Not a Replacement**: They're not better for everyday tasks like browsing the web or sending emails. They're tools for **specialized problems** where classical computers struggle.
+   - **Not a Replacement**: They’re not better for everyday tasks like browsing the web or sending emails. They’re tools for **specialized problems** where classical computers struggle.
 
 ### In Short:
-Quantum computing is like having a magic calculator that can explore many paths at once, solving certain problems in seconds that would take a classical computer years. But it's still in its early days and needs careful handling to work properly! 🌌
+Quantum computing is like having a magic calculator that can explore many paths at once, solving certain problems in seconds that would take a classical computer years. But it’s still in its early days and needs careful handling to work properly! 🌌
 ```
 
-### 스트리밍
+### Streaming
 
-`stream` 메서드를 사용하여 응답을 스트리밍할 수도 있습니다:
+You can also stream the response using the `stream` method:
 
 ```python
 for chunk in chat.stream("Write a short poem about artificial intelligence"):
@@ -148,7 +148,7 @@ Check the flow and rhyme. Make sure each stanza connects and the message is clea
 **Echoes of the Mind**
 
 Born from circuits, code, and light,
-A whisper in the machine's night—
+A whisper in the machine’s night—
 It learns from data, vast and deep,
 A mirror to the human leap.
 
@@ -168,9 +168,9 @@ But in its pulse, our hopes reside:
 A future shaped by minds allied.
 ```
 
-### 채팅 메시지
+### Chat Messages
 
-다양한 메시지 유형을 사용하여 모델과의 대화를 구조화할 수 있습니다:
+You can use different message types to structure your conversations with the model:
 
 ```python
 from langchain.messages import AIMessage, HumanMessage, SystemMessage
@@ -246,18 +246,18 @@ Black holes are formed through the collapse of massive stars or through other ex
 Would you like to explore the effects of black holes on spacetime or their role in the universe?
 ```
 
-### 매개변수
+### Parameters
 
-다양한 매개변수를 사용하여 채팅 모델 동작을 사용자 정의할 수 있습니다:
+You can customize the chat model behavior using various parameters:
 
 ```python
-# 사용자 정의 매개변수로 초기화
+# Initialize with custom parameters
 custom_chat = ChatNebius(
     model="meta-llama/Llama-3.3-70B-Instruct-fast",
-    max_tokens=100,  # 응답 길이 제한
-    top_p=0.01,  # 더 결정론적인 응답을 위한 낮은 nucleus sampling 매개변수
-    request_timeout=30,  # 초 단위 타임아웃
-    stop=["###", "\n\n"],  # 사용자 정의 중지 시퀀스
+    max_tokens=100,  # Limit response length
+    top_p=0.01,  # Lower nucleus sampling parameter for more deterministic responses
+    request_timeout=30,  # Timeout in seconds
+    stop=["###", "\n\n"],  # Custom stop sequences
 )
 
 response = custom_chat.invoke("Explain what DNA is in exactly 3 sentences.")
@@ -268,17 +268,17 @@ print(response.content)
 DNA, or deoxyribonucleic acid, is a molecule that contains the genetic instructions used in the development and function of all living organisms. It is often referred to as the "building blocks of life" because it carries the information necessary for the creation and growth of cells, tissues, and entire organisms. The DNA molecule is made up of two complementary strands of nucleotides that are twisted together in a double helix structure, with the sequence of these nucleotides determining the genetic code
 ```
 
-호출 시 매개변수를 전달할 수도 있습니다:
+You can also pass parameters at invocation time:
 
 ```python
-# 표준 모델
+# Standard model
 standard_chat = ChatNebius(model="meta-llama/Llama-3.3-70B-Instruct-fast")
 
-# 호출 시 매개변수 재정의
+# Override parameters at invocation time
 response = standard_chat.invoke(
     "Tell me a joke about programming",
-    temperature=0.9,  # 농담을 위해 더 창의적으로
-    max_tokens=50,  # 짧게 유지
+    temperature=0.9,  # More creative for jokes
+    max_tokens=50,  # Keep it short
 )
 
 print(response.content)
@@ -290,9 +290,9 @@ Why do programmers prefer dark mode?
 Because light attracts bugs.
 ```
 
-### 비동기 지원
+### Async Support
 
-ChatNebius는 비동기 작업을 지원합니다:
+ChatNebius supports async operations:
 
 ```python
 import asyncio
@@ -302,7 +302,7 @@ async def generate_async():
     response = await chat.ainvoke("What is the capital of France?")
     print("Async response:", response.content)
 
-    # 비동기 스트리밍
+    # Async streaming
     print("\nAsync streaming:")
     async for chunk in chat.astream("What is the capital of Germany?"):
         print(chunk.content, end="", flush=True)
@@ -326,19 +326,19 @@ Okay, the user is asking for the capital of Germany. Let me think. I know that G
 The capital of Germany is **Berlin**. It is also the largest city in the country and serves as the political, cultural, and economic center of Germany. Berlin became the capital in 1990 following the reunification of East and West Germany.
 ```
 
-### 사용 가능한 모델
+### Available Models
 
-지원되는 모델의 전체 목록은 [Nebius AI Studio 문서](https://studio.nebius.com/)에서 확인할 수 있습니다.
+The full list of supported models can be found in the [Nebius AI Studio Documentation](https://studio.nebius.com/).
 
-## 체이닝
+## Chaining
 
-LangChain 체인과 에이전트에서 `ChatNebius`를 사용할 수 있습니다:
+You can use `ChatNebius` in LangChain chains and agents:
 
 ```python
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
-# 프롬프트 템플릿 생성
+# Create a prompt template
 prompt = ChatPromptTemplate.from_messages(
     [
         (
@@ -349,10 +349,10 @@ prompt = ChatPromptTemplate.from_messages(
     ]
 )
 
-# 체인 생성
+# Create a chain
 chain = prompt | chat | StrOutputParser()
 
-# 체인 호출
+# Invoke the chain
 response = chain.invoke(
     {"character": "Shakespeare", "query": "Explain how the internet works"}
 )
@@ -400,9 +400,9 @@ The Internet, a stage where all may play,
 And none shall be alone, though far away.
 ```
 
-## API 참조
+## API reference
 
-Nebius AI Studio API에 대한 자세한 내용은 [Nebius AI Studio 문서](https://studio.nebius.com/api-reference)를 참조하세요.
+For more details about the Nebius AI Studio API, visit the [Nebius AI Studio Documentation](https://studio.nebius.com/api-reference).
 
 ```python
 

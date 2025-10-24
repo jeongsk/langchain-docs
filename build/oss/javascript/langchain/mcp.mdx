@@ -4,7 +4,8 @@ title: Model Context Protocol (MCP)
 
 
 
-[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction)은 애플리케이션이 LLM에 도구와 컨텍스트를 제공하는 방법을 표준화하는 오픈 프로토콜입니다. LangChain 에이전트는 [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-mcp-adapters/adapters) 라이브러리를 사용하여 MCP 서버에 정의된 도구를 사용할 수 있습니다.
+
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction)은 애플리케이션이 LLM에 도구와 컨텍스트를 제공하는 방식을 표준화하는 개방형 프로토콜입니다. LangChain 에이전트는 [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-mcp-adapters/adapters) 라이브러리를 사용하여 MCP 서버에 정의된 도구를 사용할 수 있습니다.
 
 
 ## 설치
@@ -32,21 +33,21 @@ bun add @langchain/mcp-adapters
 </CodeGroup>
 
 
-## 전송 타입
+## 전송 유형
 
 MCP는 클라이언트-서버 통신을 위한 다양한 전송 메커니즘을 지원합니다:
 
-- stdio: 클라이언트가 서버를 서브프로세스로 실행하고 표준 입출력을 통해 통신합니다. 로컬 도구와 간단한 설정에 가장 적합합니다.
-- Streamable HTTP: 서버가 HTTP 요청을 처리하는 독립 프로세스로 실행됩니다. 원격 연결과 다중 클라이언트를 지원합니다.
+- stdio: 클라이언트가 서버를 서브프로세스로 실행하고 표준 입력/출력을 통해 통신합니다. 로컬 도구와 간단한 설정에 가장 적합합니다.
+- Streamable HTTP: 서버가 독립적인 프로세스로 실행되어 HTTP 요청을 처리합니다. 원격 연결과 여러 클라이언트를 지원합니다.
 - Server-Sent Events (SSE): 실시간 스트리밍 통신에 최적화된 streamable HTTP의 변형입니다.
 
 ## MCP 도구 사용
 
 
 
-`@langchain/mcp-adapters`는 에이전트가 하나 이상의 MCP 서버에 정의된 도구를 사용할 수 있게 합니다.
+`@langchain/mcp-adapters`는 에이전트가 하나 이상의 MCP 서버에 정의된 도구를 사용할 수 있도록 합니다.
 
-```ts Accessing multiple MCP servers icon="server"
+```ts 여러 MCP 서버 접근 icon="server"
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";  // [!code highlight]
 import { ChatAnthropic } from "@langchain/anthropic";
 import { createAgent } from "langchain";
@@ -67,7 +68,7 @@ const client = new MultiServerMCPClient({  // [!code highlight]
 
 const tools = await client.getTools();  // [!code highlight]
 const agent = createAgent({
-    model: "anthropic:claude-sonnet-4-5-20250929",
+    model: "anthropic:claude-sonnet-4-5",
     tools,  // [!code highlight]
 });
 
@@ -82,14 +83,14 @@ const weatherResponse = await agent.invoke({
 
 
 <Note>
-    `MultiServerMCPClient`는 **기본적으로 상태를 유지하지 않습니다**. 각 도구 호출은 새로운 MCP `ClientSession`을 생성하고, 도구를 실행한 후 정리합니다.
+    `MultiServerMCPClient` is **stateless by default**. Each tool invocation creates a fresh MCP `ClientSession`, executes the tool, and then cleans up.
 </Note>
 
-## 커스텀 MCP 서버
+## Custom MCP servers
 
 
 
-자체 MCP 서버를 만들려면 `@modelcontextprotocol/sdk` 라이브러리를 사용할 수 있습니다. 이 라이브러리는 [도구](https://modelcontextprotocol.io/docs/learn/server-concepts#tools-ai-actions)를 정의하고 서버로 실행하는 간단한 방법을 제공합니다.
+To create your own MCP servers, you can use the `@modelcontextprotocol/sdk` library. This library provides a simple way to define [tools](https://modelcontextprotocol.io/docs/learn/server-concepts#tools-ai-actions) and run them as servers.
 
 <CodeGroup>
 ```bash npm
@@ -110,7 +111,7 @@ bun add @modelcontextprotocol/sdk
 </CodeGroup>
 
 
-다음 참조 구현을 사용하여 MCP 도구 서버로 에이전트를 테스트하세요.
+Use the following reference implementations to test your agent with MCP tool servers.
 
 
 
@@ -290,9 +291,9 @@ app.listen(PORT, () => {
 ```
 
 
-## 상태 유지 도구 사용
+## Stateful tool usage
 
-도구 호출 간에 컨텍스트를 유지하는 상태 유지 서버의 경우, `client.session()`을 사용하여 영구적인 `ClientSession`을 생성하세요.
+For stateful servers that maintain context between tool calls, use `client.session()` to create a persistent `ClientSession`.
 
 
 
@@ -305,10 +306,10 @@ const tools = await loadMCPTools(session);
 ```
 
 
-## 추가 자료
+## Additional resources
 
-* [MCP 문서](https://modelcontextprotocol.io/introduction)
-* [MCP Transport 문서](https://modelcontextprotocol.io/docs/concepts/transports)
+* [MCP documentation](https://modelcontextprotocol.io/introduction)
+* [MCP Transport documentation](https://modelcontextprotocol.io/docs/concepts/transports)
 
 * [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-mcp-adapters/)
 

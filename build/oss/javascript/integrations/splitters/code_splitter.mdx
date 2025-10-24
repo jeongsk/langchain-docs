@@ -2,11 +2,11 @@
 title: 코드 분할
 ---
 
-@[RecursiveCharacterTextSplitter]는 특정 프로그래밍 언어로 작성된 [텍스트를 분할](/oss/javascript/integrations/splitters/)하는 데 유용한 사전 구성된 구분자 목록을 포함하고 있습니다.
+@[RecursiveCharacterTextSplitter]는 특정 프로그래밍 언어로 작성된 [텍스트를 분할](/oss/javascript/integrations/splitters/)하는 데 유용한 구분자 목록을 사전에 포함하고 있습니다.
 
 
 
-지원되는 언어는 `SupportedTextSplitterLanguages` 타입에 포함되어 있습니다. 포함된 언어는 다음과 같습니다:
+지원되는 언어는 `SupportedTextSplitterLanguages` 타입에 저장되어 있습니다. 포함되는 언어는 다음과 같습니다:
 
 ```
 "cpp",
@@ -27,18 +27,18 @@ title: 코드 분할
 "sol",
 ```
 
-특정 언어의 구분자 목록을 확인하려면 이 열거형의 값을 다음 메서드에 전달하세요:
+특정 언어에 대한 구분자 목록을 확인하려면 이 열거형의 값을 다음 메서드에 전달하세요:
 ```ts
 RecursiveCharacterTextSplitter.getSeparatorsForLanguage()
 ```
 
-특정 언어에 맞춤화된 분할기를 생성하려면 열거형의 값을 다음 메서드에 전달하세요:
+특정 언어에 맞춤화된 분할기를 인스턴스화하려면 열거형의 값을 다음 메서드에 전달하세요:
 ```ts
 RecursiveCharacterTextSplitter.fromLanguage()
 ```
 
 
-아래에서 다양한 언어에 대한 예제를 확인할 수 있습니다.
+아래에서는 다양한 언어에 대한 예제를 제시합니다.
 
 
 <CodeGroup>

@@ -2,26 +2,27 @@
 title: Etherscan
 ---
 
->[Etherscan](https://docs.etherscan.io/)은 Ethereum, 즉 분산형 스마트 계약 플랫폼을 위한 선도적인 블록체인 탐색기, 검색, API 및 분석 플랫폼입니다.
+>[Etherscan](https://docs.etherscan.io/)  is the leading blockchain explorer, search, API and analytics platform for Ethereum,
+a decentralized smart contracts platform.
 
-## 개요
+## Overview
 
-`Etherscan` 로더는 `Etherscan API`를 사용하여 `Ethereum Mainnet`의 특정 계정에 대한 거래 내역을 로드합니다.
+The `Etherscan` loader use `Etherscan API` to load transactions histories under specific account on `Ethereum Mainnet`.
 
-계속하려면 `Etherscan api key`가 필요합니다. 무료 API 키는 초당 5회 호출 할당량을 가집니다.
+You will need a `Etherscan api key` to proceed. The free api key has 5 calls per seconds quota.
 
-로더는 다음 6가지 기능을 지원합니다:
+The loader supports the following six functionalities:
 
-* Ethereum Mainet에서 특정 계정의 일반 거래 검색
-* Ethereum Mainet에서 특정 계정의 내부 거래 검색
-* Ethereum Mainet에서 특정 계정의 erc20 거래 검색
-* Ethereum Mainet에서 특정 계정의 erc721 거래 검색
-* Ethereum Mainet에서 특정 계정의 erc1155 거래 검색
-* Ethereum Mainet에서 특정 계정의 wei 단위 이더리움 잔액 검색
+* Retrieve normal transactions under specific account on Ethereum Mainet
+* Retrieve internal transactions under specific account on Ethereum Mainet
+* Retrieve erc20 transactions under specific account on Ethereum Mainet
+* Retrieve erc721 transactions under specific account on Ethereum Mainet
+* Retrieve erc1155 transactions under specific account on Ethereum Mainet
+* Retrieve ethereum balance in wei under specific account on Ethereum Mainet
 
-계정에 해당 거래가 없는 경우 로더는 하나의 문서가 포함된 목록을 반환합니다. 문서의 내용은 ''입니다.
+If the account does not have corresponding transactions, the loader will a list with one document. The content of document is ''.
 
-위에서 언급한 다양한 기능에 액세스하기 위해 로더에 다른 필터를 전달할 수 있습니다:
+You can pass different filters to loader to access different functionalities we mentioned above:
 
 * "normal_transaction"
 * "internal_transaction"
@@ -29,22 +30,22 @@ title: Etherscan
 * "eth_balance"
 * "erc721_transaction"
 * "erc1155_transaction"
-필터는 기본적으로 normal_transaction으로 설정됩니다
+The filter is default to normal_transaction
 
-질문이 있으시면 [Etherscan API Doc](https://etherscan.io/tx/0x0ffa32c787b1398f44303f731cb06678e086e4f82ce07cebf75e99bb7c079c77)에 액세스하거나 [i@inevitable.tech](mailto:i@inevitable.tech)로 문의하세요.
+If you have any questions, you can access [Etherscan API Doc](https://etherscan.io/tx/0x0ffa32c787b1398f44303f731cb06678e086e4f82ce07cebf75e99bb7c079c77) or contact me via [i@inevitable.tech](mailto:i@inevitable.tech).
 
-거래 내역과 관련된 모든 함수는 Etherscan 제한으로 인해 최대 1000개의 내역으로 제한됩니다. 필요한 거래 내역을 찾기 위해 다음 매개변수를 사용할 수 있습니다:
+All functions related to transactions histories are restricted 1000 histories maximum because of Etherscan limit. You can use the following parameters to find the transaction histories you need:
 
-* offset: 기본값은 20입니다. 한 번에 20개의 거래를 표시합니다
-* page: 기본값은 1입니다. 페이지네이션을 제어합니다.
-* start_block: 기본값은 0입니다. 거래 내역은 0 블록부터 시작합니다.
-* end_block: 기본값은 99999999입니다. 거래 내역은 99999999 블록에서 시작합니다
-* sort: "desc" 또는 "asc". 최신 거래를 얻으려면 기본값으로 "desc"로 설정합니다.
+* offset: default to 20. Shows 20 transactions for one time
+* page: default to 1. This controls pagination.
+* start_block: Default to 0. The transaction histories starts from 0 block.
+* end_block: Default to 99999999. The transaction histories starts from 99999999 block
+* sort: "desc" or "asc". Set default to "desc" to get latest transactions.
 
-## 설정
+## Setup
 
 ```python
-%pip install -qU  langchain -q
+pip install -qU  langchain -q
 ```
 
 ```python
@@ -61,7 +62,7 @@ from langchain_community.document_loaders import EtherscanLoader
 os.environ["ETHERSCAN_API_KEY"] = etherscanAPIKey
 ```
 
-## ERC20 거래 로더 생성하기
+## Create a ERC20 transaction loader
 
 ```python
 account_address = "0x9dd134d14d1e65f84b706d6f205cd5b1cd03a46b"
@@ -92,7 +93,7 @@ eval(result[0].page_content)
  'confirmations': '4492277'}
 ```
 
-## 사용자 정의 매개변수로 일반 거래 로더 생성하기
+## Create a normal transaction loader with customized parameters
 
 ```python
 loader = EtherscanLoader(
