@@ -1,10 +1,10 @@
-LangChain provides a powerful prebuilt user interface that work seamlessly with agents created using [`create_agent`](/oss/python/langchain/agents). This UI is designed to provide rich, interactive experiences for your agents with minimal setup, whether you're running locally or in a deployed context (such as [LangSmith](/langsmith/)).
+LangChain은 [`create_agent`](/oss/python/langchain/agents)를 사용하여 생성된 에이전트와 원활하게 작동하는 강력한 사전 구축 사용자 인터페이스를 제공합니다. 이 UI는 로컬에서 실행하든 [LangSmith](/langsmith/)와 같은 배포 환경에서 실행하든, 최소한의 설정으로 에이전트를 위한 풍부하고 인터랙티브한 경험을 제공하도록 설계되었습니다.
 
 ## Agent Chat UI
 
-[Agent Chat UI](https://github.com/langchain-ai/agent-chat-ui) is a Next.js application that provides a conversational interface for interacting with any LangChain agent. It supports real-time chat, tool visualization, and advanced features like time-travel debugging and state forking.
+[Agent Chat UI](https://github.com/langchain-ai/agent-chat-ui)는 모든 LangChain 에이전트와 상호작용할 수 있는 대화형 인터페이스를 제공하는 Next.js 애플리케이션입니다. 실시간 채팅, 도구 시각화, 타임 트래블 디버깅 및 상태 포크와 같은 고급 기능을 지원합니다.
 
-Agent Chat UI is open source and can be adapted to your application needs.
+Agent Chat UI는 오픈 소스이며 애플리케이션 요구 사항에 맞게 조정할 수 있습니다.
 
 <Frame>
 <iframe
@@ -16,71 +16,70 @@ Agent Chat UI is open source and can be adapted to your application needs.
 />
 </Frame>
 
-### Features
+### 기능
 
-<Accordion title="Tool visualization">
-Studio automatically renders tool calls and results in an intuitive interface.
+<Accordion title="도구 시각화">
+Studio는 도구 호출과 결과를 직관적인 인터페이스로 자동 렌더링합니다.
 <Frame>
 ![Tool visualization in Studio](/oss/images/studio_tools.gif)
 </Frame>
 </Accordion>
 
-<Accordion title="Time-travel debugging">
-Navigate through conversation history and fork from any point
+<Accordion title="타임 트래블 디버깅">
+대화 기록을 탐색하고 임의의 시점에서 포크할 수 있습니다
 <Frame>
 ![Time-travel debugging in Studio](/oss/images/studio_fork.gif)
 </Frame>
 </Accordion>
 
-<Accordion title="State inspection">
-View and modify agent state at any point during execution
+<Accordion title="상태 검사">
+실행 중 임의의 시점에서 에이전트 상태를 확인하고 수정할 수 있습니다
 <Frame>
 ![State inspection in Studio](/oss/images/studio_state.gif)
 </Frame>
 </Accordion>
 
 <Accordion title="Human-in-the-loop">
-Built-in support for reviewing and responding to agent requests
+에이전트 요청을 검토하고 응답하기 위한 기본 제공 지원
 <Frame>
 ![Human-in-the-Loop in Studio](/oss/images/studio_hitl.gif)
 </Frame>
 </Accordion>
 
 <Tip>
-You can use generative UI in the Agent Chat UI. For more information, see [Implement generative user interfaces with LangGraph](/langsmith/generative-ui-react).
+Agent Chat UI에서 생성형 UI를 사용할 수 있습니다. 자세한 내용은 [LangGraph로 생성형 사용자 인터페이스 구현하기](/langsmith/generative-ui-react)를 참조하세요.
 </Tip>
 
 
-### Quick start
+### 빠른 시작
 
-The fastest way to get started is using the hosted version:
+가장 빠르게 시작하는 방법은 호스팅된 버전을 사용하는 것입니다:
 
-1. **Visit [Agent Chat UI](https://agentchat.vercel.app)**
-2. **Connect your agent** by entering your deployment URL or local server address
-3. **Start chatting** - the UI will automatically detect and render tool calls and interrupts
+1. **[Agent Chat UI](https://agentchat.vercel.app)를 방문하세요**
+2. **배포 URL 또는 로컬 서버 주소를 입력하여 에이전트를 연결하세요**
+3. **채팅을 시작하세요** - UI가 도구 호출과 인터럽트를 자동으로 감지하고 렌더링합니다
 
-### Local development
+### 로컬 개발
 
-For customization or local development, you can run Agent Chat UI locally:
+사용자 정의 또는 로컬 개발을 위해 Agent Chat UI를 로컬에서 실행할 수 있습니다:
 
 <CodeGroup>
 ```bash Use npx
-# Create a new Agent Chat UI project
+# 새 Agent Chat UI 프로젝트 생성
 npx create-agent-chat-app --project-name my-chat-ui
 cd my-chat-ui
 
-# Install dependencies and start
+# 의존성 설치 및 시작
 pnpm install
 pnpm dev
 ```
 ```bash Clone repository
-# Clone the repository
+# 저장소 클론
 git clone https://github.com/langchain-ai/agent-chat-ui.git
 cd agent-chat-ui
 
-# Install dependencies and start
+# 의존성 설치 및 시작
 pnpm install
 pnpm dev
 ```
 </CodeGroup>
-

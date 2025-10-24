@@ -1,90 +1,90 @@
 ---
-title: "Vector stores"
+title: "벡터 스토어"
 ---
 
-## Overview
+## 개요
 
-A vector store stores [embedded](/oss/integrations/text_embedding) data and performs similarity search.
+벡터 스토어는 [임베딩된](/oss/integrations/text_embedding) 데이터를 저장하고 유사도 검색을 수행합니다.
 
 ```mermaid
 flowchart LR
 
-    subgraph "📥 Indexing phase (store)"
-        A[📄 Documents] --> B[🔢 Embedding model]
-        B --> C[🔘 Embedding vectors]
-        C --> D[(Vector store)]
+    subgraph "📥 인덱싱 단계 (저장)"
+        A[📄 문서] --> B[🔢 임베딩 모델]
+        B --> C[🔘 임베딩 벡터]
+        C --> D[(벡터 스토어)]
     end
 
-    subgraph "📤 Query phase (retrieval)"
-        E[❓ Query text] --> F[🔢 Embedding model]
-        F --> G[🔘 Query vector]
-        G --> H[🔍 Similarity search]
+    subgraph "📤 쿼리 단계 (검색)"
+        E[❓ 쿼리 텍스트] --> F[🔢 임베딩 모델]
+        F --> G[🔘 쿼리 벡터]
+        G --> H[🔍 유사도 검색]
         H --> D
-        D --> I[📄 Top-k results]
+        D --> I[📄 상위 k개 결과]
     end
 ```
 
-### Interface
+### 인터페이스
 
-LangChain provides a unified interface for vector stores, allowing you to:
+LangChain은 벡터 스토어를 위한 통합 인터페이스를 제공하여 다음과 같은 작업을 수행할 수 있습니다:
 
-- `add_documents` - Add documents to the store.
-- `delete` - Remove stored documents by ID.
-- `similarity_search` - Query for semantically similar documents.
+- `add_documents` - 스토어에 문서를 추가합니다.
+- `delete` - ID로 저장된 문서를 삭제합니다.
+- `similarity_search` - 의미적으로 유사한 문서를 쿼리합니다.
 
-This abstraction lets you switch between different implementations without altering your application logic.
+이러한 추상화를 통해 애플리케이션 로직을 변경하지 않고도 다양한 구현체 간에 전환할 수 있습니다.
 
-### Initialization
+### 초기화
 
-To initialize a vector store, provide it with an embedding model:
+벡터 스토어를 초기화하려면 임베딩 모델을 제공해야 합니다:
 
 ```python
 from langchain_core.vectorstores import InMemoryVectorStore
 vector_store = InMemoryVectorStore(embedding=SomeEmbeddingModel())
 ```
 
-### Adding documents
+### 문서 추가
 
-Add @[`Document`] objects (holding `page_content` and optional metadata) like so:
+다음과 같이 `page_content`와 선택적 메타데이터를 포함하는 @[`Document`] 객체를 추가합니다:
 
 ```python
 vector_store.add_documents(documents=[doc1, doc2], ids=["id1", "id2"])
 ```
 
-### Deleting documents
+### 문서 삭제
 
-Delete by specifying IDs:
+ID를 지정하여 삭제합니다:
 
 ```python
 vector_store.delete(ids=["id1"])
 ```
 
-### Similarity search
+### 유사도 검색
 
-Issue a semantic query using `similarity_search`, which returns the closest embedded documents:
+`similarity_search`를 사용하여 의미적 쿼리를 실행하면 가장 가까운 임베딩된 문서가 반환됩니다:
 
 ```python
 similar_docs = vector_store.similarity_search("your query here")
 ```
 
-Many vector stores support parameters like:
+많은 벡터 스토어는 다음과 같은 매개변수를 지원합니다:
 
-* `k` — number of results to return
-* `filter` — conditional filtering based on metadata
+* `k` — 반환할 결과 수
+* `filter` — 메타데이터 기반 조건부 필터링
 
-### Similarity metrics & indexing
+### 유사도 메트릭 및 인덱싱
 
-Embedding similarity may be computed using:
+임베딩 유사도는 다음을 사용하여 계산될 수 있습니다:
 
-* **Cosine similarity**
-* **Euclidean distance**
-* **Dot product**
+* **코사인 유사도**
+* **유클리드 거리**
+* **내적**
 
-Efficient search often employs indexing methods such as HNSW (Hierarchical Navigable Small World), though specifics depend on the vector store.
+효율적인 검색은 종종 HNSW(Hierarchical Navigable Small World)와 같은 인덱싱 방법을 사용하지만, 세부 사항은 벡터 스토어에 따라 다릅니다.
 
-### Metadata filtering
+### 메타데이터 필터링
 
-Filtering by metadata (e.g., source, date) can refine search results:
+메타데이터(예: 출처, 날짜)로 필터링하면 검색 결과를 정제할 수 있습니다:
 
 ```python
 vector_store.similarity_search(
@@ -95,14 +95,14 @@ vector_store.similarity_search(
 ```
 
 <important>
-Support for metadata-based filtering varies between implementations.
-Check the documentation of your chosen vector store for details.
+메타데이터 기반 필터링 지원은 구현체마다 다릅니다.
+자세한 내용은 선택한 벡터 스토어의 문서를 확인하세요.
 </important>
 
 
-## Top integrations
+## 주요 통합
 
-**Select embedding model:**
+**임베딩 모델 선택:**
 
 <AccordionGroup>
 <Accordion title="OpenAI">
@@ -364,7 +364,7 @@ model = init_chat_model("deepseek-chat", model_provider="deepseek")
 </Accordion>
 </AccordionGroup>
 
-**Select vector store:**
+**벡터 스토어 선택:**
 
 <AccordionGroup>
 <Accordion title="In-memory">
@@ -667,124 +667,124 @@ vector_store = QdrantVectorStore(
 | [`SQLServer`](/oss/integrations/vectorstores/sqlserver) | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ✅ |
 | [`ZeusDB`](/oss/integrations/vectorstores/zeusdb) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ |
 
-## All vector stores
+## 전체 벡터 스토어
 
 <Columns cols={3}>
-<Card title="Activeloop Deep Lake" icon="link" href="/oss/integrations/vectorstores/activeloop_deeplake" arrow="true" cta="View guide"/>
-<Card title="Alibaba Cloud OpenSearch" icon="link" href="/oss/integrations/vectorstores/alibabacloud_opensearch" arrow="true" cta="View guide"/>
-<Card title="AnalyticDB" icon="link" href="/oss/integrations/vectorstores/analyticdb" arrow="true" cta="View guide"/>
-<Card title="Annoy" icon="link" href="/oss/integrations/vectorstores/annoy" arrow="true" cta="View guide"/>
-<Card title="Apache Doris" icon="link" href="/oss/integrations/vectorstores/apache_doris" arrow="true" cta="View guide"/>
-<Card title="ApertureDB" icon="link" href="/oss/integrations/vectorstores/aperturedb" arrow="true" cta="View guide"/>
-<Card title="Astra DB Vector Store" icon="link" href="/oss/integrations/vectorstores/astradb" arrow="true" cta="View guide"/>
-<Card title="Atlas" icon="link" href="/oss/integrations/vectorstores/atlas" arrow="true" cta="View guide"/>
-<Card title="AwaDB" icon="link" href="/oss/integrations/vectorstores/awadb" arrow="true" cta="View guide"/>
-<Card title="Azure Cosmos DB Mongo vCore" icon="link" href="/oss/integrations/vectorstores/azure_cosmos_db_mongo_vcore" arrow="true" cta="View guide"/>
-<Card title="Azure Cosmos DB No SQL" icon="link" href="/oss/integrations/vectorstores/azure_cosmos_db_no_sql" arrow="true" cta="View guide"/>
-<Card title="Azure AI Search" icon="link" href="/oss/integrations/vectorstores/azuresearch" arrow="true" cta="View guide"/>
-<Card title="Bagel" icon="link" href="/oss/integrations/vectorstores/bagel" arrow="true" cta="View guide"/>
-<Card title="BagelDB" icon="link" href="/oss/integrations/vectorstores/bageldb" arrow="true" cta="View guide"/>
-<Card title="Baidu Cloud ElasticSearch VectorSearch" icon="link" href="/oss/integrations/vectorstores/baiducloud_vector_search" arrow="true" cta="View guide"/>
-<Card title="Baidu VectorDB" icon="link" href="/oss/integrations/vectorstores/baiduvectordb" arrow="true" cta="View guide"/>
-<Card title="Apache Cassandra" icon="link" href="/oss/integrations/vectorstores/cassandra" arrow="true" cta="View guide"/>
-<Card title="Chroma" icon="link" href="/oss/integrations/vectorstores/chroma" arrow="true" cta="View guide"/>
-<Card title="Clarifai" icon="link" href="/oss/integrations/vectorstores/clarifai" arrow="true" cta="View guide"/>
-<Card title="ClickHouse" icon="link" href="/oss/integrations/vectorstores/clickhouse" arrow="true" cta="View guide"/>
-<Card title="Couchbase" icon="link" href="/oss/integrations/vectorstores/couchbase" arrow="true" cta="View guide"/>
-<Card title="DashVector" icon="link" href="/oss/integrations/vectorstores/dashvector" arrow="true" cta="View guide"/>
-<Card title="Databricks" icon="link" href="/oss/integrations/vectorstores/databricks_vector_search" arrow="true" cta="View guide"/>
-<Card title="IBM Db2" icon="link" href="/oss/integrations/vectorstores/db2" arrow="true" cta="View guide"/>
-<Card title="DingoDB" icon="link" href="/oss/integrations/vectorstores/dingo" arrow="true" cta="View guide"/>
-<Card title="DocArray HnswSearch" icon="link" href="/oss/integrations/vectorstores/docarray_hnsw" arrow="true" cta="View guide"/>
-<Card title="DocArray InMemorySearch" icon="link" href="/oss/integrations/vectorstores/docarray_in_memory" arrow="true" cta="View guide"/>
-<Card title="Amazon Document DB" icon="link" href="/oss/integrations/vectorstores/documentdb" arrow="true" cta="View guide"/>
-<Card title="DuckDB" icon="link" href="/oss/integrations/vectorstores/duckdb" arrow="true" cta="View guide"/>
-<Card title="China Mobile ECloud ElasticSearch" icon="link" href="/oss/integrations/vectorstores/ecloud_vector_search" arrow="true" cta="View guide"/>
-<Card title="Elasticsearch" icon="link" href="/oss/integrations/vectorstores/elasticsearch" arrow="true" cta="View guide"/>
-<Card title="Epsilla" icon="link" href="/oss/integrations/vectorstores/epsilla" arrow="true" cta="View guide"/>
-<Card title="Faiss" icon="link" href="/oss/integrations/vectorstores/faiss" arrow="true" cta="View guide"/>
-<Card title="Faiss (Async)" icon="link" href="/oss/integrations/vectorstores/faiss_async" arrow="true" cta="View guide"/>
-<Card title="FalkorDB" icon="link" href="/oss/integrations/vectorstores/falkordbvector" arrow="true" cta="View guide"/>
-<Card title="Gel" icon="link" href="/oss/integrations/vectorstores/gel" arrow="true" cta="View guide"/>
-<Card title="Google AlloyDB" icon="link" href="/oss/integrations/vectorstores/google_alloydb" arrow="true" cta="View guide"/>
-<Card title="Google BigQuery Vector Search" icon="link" href="/oss/integrations/vectorstores/google_bigquery_vector_search" arrow="true" cta="View guide"/>
-<Card title="Google Cloud SQL for MySQL" icon="link" href="/oss/integrations/vectorstores/google_cloud_sql_mysql" arrow="true" cta="View guide"/>
-<Card title="Google Cloud SQL for PostgreSQL" icon="link" href="/oss/integrations/vectorstores/google_cloud_sql_pg" arrow="true" cta="View guide"/>
-<Card title="Firestore" icon="link" href="/oss/integrations/vectorstores/google_firestore" arrow="true" cta="View guide"/>
-<Card title="Google Memorystore for Redis" icon="link" href="/oss/integrations/vectorstores/google_memorystore_redis" arrow="true" cta="View guide"/>
-<Card title="Google Spanner" icon="link" href="/oss/integrations/vectorstores/google_spanner" arrow="true" cta="View guide"/>
-<Card title="Google Vertex AI Feature Store" icon="link" href="/oss/integrations/vectorstores/google_vertex_ai_feature_store" arrow="true" cta="View guide"/>
-<Card title="Google Vertex AI Vector Search" icon="link" href="/oss/integrations/vectorstores/google_vertex_ai_vector_search" arrow="true" cta="View guide"/>
-<Card title="Hippo" icon="link" href="/oss/integrations/vectorstores/hippo" arrow="true" cta="View guide"/>
-<Card title="Hologres" icon="link" href="/oss/integrations/vectorstores/hologres" arrow="true" cta="View guide"/>
-<Card title="Jaguar Vector Database" icon="link" href="/oss/integrations/vectorstores/jaguar" arrow="true" cta="View guide"/>
-<Card title="Kinetica" icon="link" href="/oss/integrations/vectorstores/kinetica" arrow="true" cta="View guide"/>
-<Card title="LanceDB" icon="link" href="/oss/integrations/vectorstores/lancedb" arrow="true" cta="View guide"/>
-<Card title="Lantern" icon="link" href="/oss/integrations/vectorstores/lantern" arrow="true" cta="View guide"/>
-<Card title="Lindorm" icon="link" href="/oss/integrations/vectorstores/lindorm" arrow="true" cta="View guide"/>
-<Card title="LLMRails" icon="link" href="/oss/integrations/vectorstores/llm_rails" arrow="true" cta="View guide"/>
-<Card title="ManticoreSearch" icon="link" href="/oss/integrations/vectorstores/manticore_search" arrow="true" cta="View guide"/>
-<Card title="MariaDB" icon="link" href="/oss/integrations/vectorstores/mariadb" arrow="true" cta="View guide"/>
-<Card title="Marqo" icon="link" href="/oss/integrations/vectorstores/marqo" arrow="true" cta="View guide"/>
-<Card title="Meilisearch" icon="link" href="/oss/integrations/vectorstores/meilisearch" arrow="true" cta="View guide"/>
-<Card title="Amazon MemoryDB" icon="link" href="/oss/integrations/vectorstores/memorydb" arrow="true" cta="View guide"/>
-<Card title="Milvus" icon="link" href="/oss/integrations/vectorstores/milvus" arrow="true" cta="View guide"/>
-<Card title="Momento Vector Index" icon="link" href="/oss/integrations/vectorstores/momento_vector_index" arrow="true" cta="View guide"/>
-<Card title="Moorcheh" icon="link" href="/oss/integrations/vectorstores/moorcheh" arrow="true" cta="View guide"/>
-<Card title="MongoDB Atlas" icon="link" href="/oss/integrations/vectorstores/mongodb_atlas" arrow="true" cta="View guide"/>
-<Card title="MyScale" icon="link" href="/oss/integrations/vectorstores/myscale" arrow="true" cta="View guide"/>
-<Card title="Neo4j Vector Index" icon="link" href="/oss/integrations/vectorstores/neo4jvector" arrow="true" cta="View guide"/>
-<Card title="NucliaDB" icon="link" href="/oss/integrations/vectorstores/nucliadb" arrow="true" cta="View guide"/>
-<Card title="Oceanbase" icon="link" href="/oss/integrations/vectorstores/oceanbase" arrow="true" cta="View guide"/>
-<Card title="openGauss" icon="link" href="/oss/integrations/vectorstores/opengauss" arrow="true" cta="View guide"/>
-<Card title="OpenSearch" icon="link" href="/oss/integrations/vectorstores/opensearch" arrow="true" cta="View guide"/>
-<Card title="Oracle AI Vector Search" icon="link" href="/oss/integrations/vectorstores/oracle" arrow="true" cta="View guide"/>
-<Card title="Pathway" icon="link" href="/oss/integrations/vectorstores/pathway" arrow="true" cta="View guide"/>
-<Card title="Postgres Embedding" icon="link" href="/oss/integrations/vectorstores/pgembedding" arrow="true" cta="View guide"/>
-<Card title="PGVecto.rs" icon="link" href="/oss/integrations/vectorstores/pgvecto_rs" arrow="true" cta="View guide"/>
-<Card title="PGVector" icon="link" href="/oss/integrations/vectorstores/pgvector" arrow="true" cta="View guide"/>
-<Card title="PGVectorStore" icon="link" href="/oss/integrations/vectorstores/pgvectorstore" arrow="true" cta="View guide"/>
-<Card title="Pinecone" icon="link" href="/oss/integrations/vectorstores/pinecone" arrow="true" cta="View guide"/>
-<Card title="Pinecone (sparse)" icon="link" href="/oss/integrations/vectorstores/pinecone_sparse" arrow="true" cta="View guide"/>
-<Card title="Qdrant" icon="link" href="/oss/integrations/vectorstores/qdrant" arrow="true" cta="View guide"/>
-<Card title="Relyt" icon="link" href="/oss/integrations/vectorstores/relyt" arrow="true" cta="View guide"/>
-<Card title="Rockset" icon="link" href="/oss/integrations/vectorstores/rockset" arrow="true" cta="View guide"/>
-<Card title="SAP HANA Cloud Vector Engine" icon="link" href="/oss/integrations/vectorstores/sap_hanavector" arrow="true" cta="View guide"/>
-<Card title="ScaNN" icon="link" href="/oss/integrations/vectorstores/scann" arrow="true" cta="View guide"/>
-<Card title="SemaDB" icon="link" href="/oss/integrations/vectorstores/semadb" arrow="true" cta="View guide"/>
-<Card title="SingleStore" icon="link" href="/oss/integrations/vectorstores/singlestore" arrow="true" cta="View guide"/>
-<Card title="scikit-learn" icon="link" href="/oss/integrations/vectorstores/sklearn" arrow="true" cta="View guide"/>
-<Card title="SQLiteVec" icon="link" href="/oss/integrations/vectorstores/sqlitevec" arrow="true" cta="View guide"/>
-<Card title="SQLite-VSS" icon="link" href="/oss/integrations/vectorstores/sqlitevss" arrow="true" cta="View guide"/>
-<Card title="SQLServer" icon="link" href="/oss/integrations/vectorstores/sqlserver" arrow="true" cta="View guide"/>
-<Card title="StarRocks" icon="link" href="/oss/integrations/vectorstores/starrocks" arrow="true" cta="View guide"/>
-<Card title="Supabase" icon="link" href="/oss/integrations/vectorstores/supabase" arrow="true" cta="View guide"/>
-<Card title="SurrealDB" icon="link" href="/oss/integrations/vectorstores/surrealdb" arrow="true" cta="View guide"/>
-<Card title="Tablestore" icon="link" href="/oss/integrations/vectorstores/tablestore" arrow="true" cta="View guide"/>
-<Card title="Tair" icon="link" href="/oss/integrations/vectorstores/tair" arrow="true" cta="View guide"/>
-<Card title="Tencent Cloud VectorDB" icon="link" href="/oss/integrations/vectorstores/tencentvectordb" arrow="true" cta="View guide"/>
-<Card title="ThirdAI NeuralDB" icon="link" href="/oss/integrations/vectorstores/thirdai_neuraldb" arrow="true" cta="View guide"/>
-<Card title="TiDB Vector" icon="link" href="/oss/integrations/vectorstores/tidb_vector" arrow="true" cta="View guide"/>
-<Card title="Tigris" icon="link" href="/oss/integrations/vectorstores/tigris" arrow="true" cta="View guide"/>
-<Card title="TileDB" icon="link" href="/oss/integrations/vectorstores/tiledb" arrow="true" cta="View guide"/>
-<Card title="Timescale Vector" icon="link" href="/oss/integrations/vectorstores/timescalevector" arrow="true" cta="View guide"/>
-<Card title="Typesense" icon="link" href="/oss/integrations/vectorstores/typesense" arrow="true" cta="View guide"/>
-<Card title="Upstash Vector" icon="link" href="/oss/integrations/vectorstores/upstash" arrow="true" cta="View guide"/>
-<Card title="USearch" icon="link" href="/oss/integrations/vectorstores/usearch" arrow="true" cta="View guide"/>
-<Card title="Vald" icon="link" href="/oss/integrations/vectorstores/vald" arrow="true" cta="View guide"/>
-<Card title="VDMS" icon="link" href="/oss/integrations/vectorstores/vdms" arrow="true" cta="View guide"/>
-<Card title="Vearch" icon="link" href="/oss/integrations/vectorstores/vearch" arrow="true" cta="View guide"/>
-<Card title="Vectara" icon="link" href="/oss/integrations/vectorstores/vectara" arrow="true" cta="View guide"/>
-<Card title="Vespa" icon="link" href="/oss/integrations/vectorstores/vespa" arrow="true" cta="View guide"/>
-<Card title="viking DB" icon="link" href="/oss/integrations/vectorstores/vikingdb" arrow="true" cta="View guide"/>
-<Card title="vlite" icon="link" href="/oss/integrations/vectorstores/vlite" arrow="true" cta="View guide"/>
-<Card title="Weaviate" icon="link" href="/oss/integrations/vectorstores/weaviate" arrow="true" cta="View guide"/>
-<Card title="Xata" icon="link" href="/oss/integrations/vectorstores/xata" arrow="true" cta="View guide"/>
-<Card title="YDB" icon="link" href="/oss/integrations/vectorstores/ydb" arrow="true" cta="View guide"/>
-<Card title="Yellowbrick" icon="link" href="/oss/integrations/vectorstores/yellowbrick" arrow="true" cta="View guide"/>
-<Card title="Zep" icon="link" href="/oss/integrations/vectorstores/zep" arrow="true" cta="View guide"/>
-<Card title="Zep Cloud" icon="link" href="/oss/integrations/vectorstores/zep_cloud" arrow="true" cta="View guide"/>
-<Card title="ZeusDB" icon="link" href="/oss/integrations/vectorstores/zeusdb" arrow="true" cta="View guide"/>
-<Card title="Zilliz" icon="link" href="/oss/integrations/vectorstores/zilliz" arrow="true" cta="View guide"/>
+<Card title="Activeloop Deep Lake" icon="link" href="/oss/integrations/vectorstores/activeloop_deeplake" arrow="true" cta="가이드 보기"/>
+<Card title="Alibaba Cloud OpenSearch" icon="link" href="/oss/integrations/vectorstores/alibabacloud_opensearch" arrow="true" cta="가이드 보기"/>
+<Card title="AnalyticDB" icon="link" href="/oss/integrations/vectorstores/analyticdb" arrow="true" cta="가이드 보기"/>
+<Card title="Annoy" icon="link" href="/oss/integrations/vectorstores/annoy" arrow="true" cta="가이드 보기"/>
+<Card title="Apache Doris" icon="link" href="/oss/integrations/vectorstores/apache_doris" arrow="true" cta="가이드 보기"/>
+<Card title="ApertureDB" icon="link" href="/oss/integrations/vectorstores/aperturedb" arrow="true" cta="가이드 보기"/>
+<Card title="Astra DB Vector Store" icon="link" href="/oss/integrations/vectorstores/astradb" arrow="true" cta="가이드 보기"/>
+<Card title="Atlas" icon="link" href="/oss/integrations/vectorstores/atlas" arrow="true" cta="가이드 보기"/>
+<Card title="AwaDB" icon="link" href="/oss/integrations/vectorstores/awadb" arrow="true" cta="가이드 보기"/>
+<Card title="Azure Cosmos DB Mongo vCore" icon="link" href="/oss/integrations/vectorstores/azure_cosmos_db_mongo_vcore" arrow="true" cta="가이드 보기"/>
+<Card title="Azure Cosmos DB No SQL" icon="link" href="/oss/integrations/vectorstores/azure_cosmos_db_no_sql" arrow="true" cta="가이드 보기"/>
+<Card title="Azure AI Search" icon="link" href="/oss/integrations/vectorstores/azuresearch" arrow="true" cta="가이드 보기"/>
+<Card title="Bagel" icon="link" href="/oss/integrations/vectorstores/bagel" arrow="true" cta="가이드 보기"/>
+<Card title="BagelDB" icon="link" href="/oss/integrations/vectorstores/bageldb" arrow="true" cta="가이드 보기"/>
+<Card title="Baidu Cloud ElasticSearch VectorSearch" icon="link" href="/oss/integrations/vectorstores/baiducloud_vector_search" arrow="true" cta="가이드 보기"/>
+<Card title="Baidu VectorDB" icon="link" href="/oss/integrations/vectorstores/baiduvectordb" arrow="true" cta="가이드 보기"/>
+<Card title="Apache Cassandra" icon="link" href="/oss/integrations/vectorstores/cassandra" arrow="true" cta="가이드 보기"/>
+<Card title="Chroma" icon="link" href="/oss/integrations/vectorstores/chroma" arrow="true" cta="가이드 보기"/>
+<Card title="Clarifai" icon="link" href="/oss/integrations/vectorstores/clarifai" arrow="true" cta="가이드 보기"/>
+<Card title="ClickHouse" icon="link" href="/oss/integrations/vectorstores/clickhouse" arrow="true" cta="가이드 보기"/>
+<Card title="Couchbase" icon="link" href="/oss/integrations/vectorstores/couchbase" arrow="true" cta="가이드 보기"/>
+<Card title="DashVector" icon="link" href="/oss/integrations/vectorstores/dashvector" arrow="true" cta="가이드 보기"/>
+<Card title="Databricks" icon="link" href="/oss/integrations/vectorstores/databricks_vector_search" arrow="true" cta="가이드 보기"/>
+<Card title="IBM Db2" icon="link" href="/oss/integrations/vectorstores/db2" arrow="true" cta="가이드 보기"/>
+<Card title="DingoDB" icon="link" href="/oss/integrations/vectorstores/dingo" arrow="true" cta="가이드 보기"/>
+<Card title="DocArray HnswSearch" icon="link" href="/oss/integrations/vectorstores/docarray_hnsw" arrow="true" cta="가이드 보기"/>
+<Card title="DocArray InMemorySearch" icon="link" href="/oss/integrations/vectorstores/docarray_in_memory" arrow="true" cta="가이드 보기"/>
+<Card title="Amazon Document DB" icon="link" href="/oss/integrations/vectorstores/documentdb" arrow="true" cta="가이드 보기"/>
+<Card title="DuckDB" icon="link" href="/oss/integrations/vectorstores/duckdb" arrow="true" cta="가이드 보기"/>
+<Card title="China Mobile ECloud ElasticSearch" icon="link" href="/oss/integrations/vectorstores/ecloud_vector_search" arrow="true" cta="가이드 보기"/>
+<Card title="Elasticsearch" icon="link" href="/oss/integrations/vectorstores/elasticsearch" arrow="true" cta="가이드 보기"/>
+<Card title="Epsilla" icon="link" href="/oss/integrations/vectorstores/epsilla" arrow="true" cta="가이드 보기"/>
+<Card title="Faiss" icon="link" href="/oss/integrations/vectorstores/faiss" arrow="true" cta="가이드 보기"/>
+<Card title="Faiss (Async)" icon="link" href="/oss/integrations/vectorstores/faiss_async" arrow="true" cta="가이드 보기"/>
+<Card title="FalkorDB" icon="link" href="/oss/integrations/vectorstores/falkordbvector" arrow="true" cta="가이드 보기"/>
+<Card title="Gel" icon="link" href="/oss/integrations/vectorstores/gel" arrow="true" cta="가이드 보기"/>
+<Card title="Google AlloyDB" icon="link" href="/oss/integrations/vectorstores/google_alloydb" arrow="true" cta="가이드 보기"/>
+<Card title="Google BigQuery Vector Search" icon="link" href="/oss/integrations/vectorstores/google_bigquery_vector_search" arrow="true" cta="가이드 보기"/>
+<Card title="Google Cloud SQL for MySQL" icon="link" href="/oss/integrations/vectorstores/google_cloud_sql_mysql" arrow="true" cta="가이드 보기"/>
+<Card title="Google Cloud SQL for PostgreSQL" icon="link" href="/oss/integrations/vectorstores/google_cloud_sql_pg" arrow="true" cta="가이드 보기"/>
+<Card title="Firestore" icon="link" href="/oss/integrations/vectorstores/google_firestore" arrow="true" cta="가이드 보기"/>
+<Card title="Google Memorystore for Redis" icon="link" href="/oss/integrations/vectorstores/google_memorystore_redis" arrow="true" cta="가이드 보기"/>
+<Card title="Google Spanner" icon="link" href="/oss/integrations/vectorstores/google_spanner" arrow="true" cta="가이드 보기"/>
+<Card title="Google Vertex AI Feature Store" icon="link" href="/oss/integrations/vectorstores/google_vertex_ai_feature_store" arrow="true" cta="가이드 보기"/>
+<Card title="Google Vertex AI Vector Search" icon="link" href="/oss/integrations/vectorstores/google_vertex_ai_vector_search" arrow="true" cta="가이드 보기"/>
+<Card title="Hippo" icon="link" href="/oss/integrations/vectorstores/hippo" arrow="true" cta="가이드 보기"/>
+<Card title="Hologres" icon="link" href="/oss/integrations/vectorstores/hologres" arrow="true" cta="가이드 보기"/>
+<Card title="Jaguar Vector Database" icon="link" href="/oss/integrations/vectorstores/jaguar" arrow="true" cta="가이드 보기"/>
+<Card title="Kinetica" icon="link" href="/oss/integrations/vectorstores/kinetica" arrow="true" cta="가이드 보기"/>
+<Card title="LanceDB" icon="link" href="/oss/integrations/vectorstores/lancedb" arrow="true" cta="가이드 보기"/>
+<Card title="Lantern" icon="link" href="/oss/integrations/vectorstores/lantern" arrow="true" cta="가이드 보기"/>
+<Card title="Lindorm" icon="link" href="/oss/integrations/vectorstores/lindorm" arrow="true" cta="가이드 보기"/>
+<Card title="LLMRails" icon="link" href="/oss/integrations/vectorstores/llm_rails" arrow="true" cta="가이드 보기"/>
+<Card title="ManticoreSearch" icon="link" href="/oss/integrations/vectorstores/manticore_search" arrow="true" cta="가이드 보기"/>
+<Card title="MariaDB" icon="link" href="/oss/integrations/vectorstores/mariadb" arrow="true" cta="가이드 보기"/>
+<Card title="Marqo" icon="link" href="/oss/integrations/vectorstores/marqo" arrow="true" cta="가이드 보기"/>
+<Card title="Meilisearch" icon="link" href="/oss/integrations/vectorstores/meilisearch" arrow="true" cta="가이드 보기"/>
+<Card title="Amazon MemoryDB" icon="link" href="/oss/integrations/vectorstores/memorydb" arrow="true" cta="가이드 보기"/>
+<Card title="Milvus" icon="link" href="/oss/integrations/vectorstores/milvus" arrow="true" cta="가이드 보기"/>
+<Card title="Momento Vector Index" icon="link" href="/oss/integrations/vectorstores/momento_vector_index" arrow="true" cta="가이드 보기"/>
+<Card title="Moorcheh" icon="link" href="/oss/integrations/vectorstores/moorcheh" arrow="true" cta="가이드 보기"/>
+<Card title="MongoDB Atlas" icon="link" href="/oss/integrations/vectorstores/mongodb_atlas" arrow="true" cta="가이드 보기"/>
+<Card title="MyScale" icon="link" href="/oss/integrations/vectorstores/myscale" arrow="true" cta="가이드 보기"/>
+<Card title="Neo4j Vector Index" icon="link" href="/oss/integrations/vectorstores/neo4jvector" arrow="true" cta="가이드 보기"/>
+<Card title="NucliaDB" icon="link" href="/oss/integrations/vectorstores/nucliadb" arrow="true" cta="가이드 보기"/>
+<Card title="Oceanbase" icon="link" href="/oss/integrations/vectorstores/oceanbase" arrow="true" cta="가이드 보기"/>
+<Card title="openGauss" icon="link" href="/oss/integrations/vectorstores/opengauss" arrow="true" cta="가이드 보기"/>
+<Card title="OpenSearch" icon="link" href="/oss/integrations/vectorstores/opensearch" arrow="true" cta="가이드 보기"/>
+<Card title="Oracle AI Vector Search" icon="link" href="/oss/integrations/vectorstores/oracle" arrow="true" cta="가이드 보기"/>
+<Card title="Pathway" icon="link" href="/oss/integrations/vectorstores/pathway" arrow="true" cta="가이드 보기"/>
+<Card title="Postgres Embedding" icon="link" href="/oss/integrations/vectorstores/pgembedding" arrow="true" cta="가이드 보기"/>
+<Card title="PGVecto.rs" icon="link" href="/oss/integrations/vectorstores/pgvecto_rs" arrow="true" cta="가이드 보기"/>
+<Card title="PGVector" icon="link" href="/oss/integrations/vectorstores/pgvector" arrow="true" cta="가이드 보기"/>
+<Card title="PGVectorStore" icon="link" href="/oss/integrations/vectorstores/pgvectorstore" arrow="true" cta="가이드 보기"/>
+<Card title="Pinecone" icon="link" href="/oss/integrations/vectorstores/pinecone" arrow="true" cta="가이드 보기"/>
+<Card title="Pinecone (sparse)" icon="link" href="/oss/integrations/vectorstores/pinecone_sparse" arrow="true" cta="가이드 보기"/>
+<Card title="Qdrant" icon="link" href="/oss/integrations/vectorstores/qdrant" arrow="true" cta="가이드 보기"/>
+<Card title="Relyt" icon="link" href="/oss/integrations/vectorstores/relyt" arrow="true" cta="가이드 보기"/>
+<Card title="Rockset" icon="link" href="/oss/integrations/vectorstores/rockset" arrow="true" cta="가이드 보기"/>
+<Card title="SAP HANA Cloud Vector Engine" icon="link" href="/oss/integrations/vectorstores/sap_hanavector" arrow="true" cta="가이드 보기"/>
+<Card title="ScaNN" icon="link" href="/oss/integrations/vectorstores/scann" arrow="true" cta="가이드 보기"/>
+<Card title="SemaDB" icon="link" href="/oss/integrations/vectorstores/semadb" arrow="true" cta="가이드 보기"/>
+<Card title="SingleStore" icon="link" href="/oss/integrations/vectorstores/singlestore" arrow="true" cta="가이드 보기"/>
+<Card title="scikit-learn" icon="link" href="/oss/integrations/vectorstores/sklearn" arrow="true" cta="가이드 보기"/>
+<Card title="SQLiteVec" icon="link" href="/oss/integrations/vectorstores/sqlitevec" arrow="true" cta="가이드 보기"/>
+<Card title="SQLite-VSS" icon="link" href="/oss/integrations/vectorstores/sqlitevss" arrow="true" cta="가이드 보기"/>
+<Card title="SQLServer" icon="link" href="/oss/integrations/vectorstores/sqlserver" arrow="true" cta="가이드 보기"/>
+<Card title="StarRocks" icon="link" href="/oss/integrations/vectorstores/starrocks" arrow="true" cta="가이드 보기"/>
+<Card title="Supabase" icon="link" href="/oss/integrations/vectorstores/supabase" arrow="true" cta="가이드 보기"/>
+<Card title="SurrealDB" icon="link" href="/oss/integrations/vectorstores/surrealdb" arrow="true" cta="가이드 보기"/>
+<Card title="Tablestore" icon="link" href="/oss/integrations/vectorstores/tablestore" arrow="true" cta="가이드 보기"/>
+<Card title="Tair" icon="link" href="/oss/integrations/vectorstores/tair" arrow="true" cta="가이드 보기"/>
+<Card title="Tencent Cloud VectorDB" icon="link" href="/oss/integrations/vectorstores/tencentvectordb" arrow="true" cta="가이드 보기"/>
+<Card title="ThirdAI NeuralDB" icon="link" href="/oss/integrations/vectorstores/thirdai_neuraldb" arrow="true" cta="가이드 보기"/>
+<Card title="TiDB Vector" icon="link" href="/oss/integrations/vectorstores/tidb_vector" arrow="true" cta="가이드 보기"/>
+<Card title="Tigris" icon="link" href="/oss/integrations/vectorstores/tigris" arrow="true" cta="가이드 보기"/>
+<Card title="TileDB" icon="link" href="/oss/integrations/vectorstores/tiledb" arrow="true" cta="가이드 보기"/>
+<Card title="Timescale Vector" icon="link" href="/oss/integrations/vectorstores/timescalevector" arrow="true" cta="가이드 보기"/>
+<Card title="Typesense" icon="link" href="/oss/integrations/vectorstores/typesense" arrow="true" cta="가이드 보기"/>
+<Card title="Upstash Vector" icon="link" href="/oss/integrations/vectorstores/upstash" arrow="true" cta="가이드 보기"/>
+<Card title="USearch" icon="link" href="/oss/integrations/vectorstores/usearch" arrow="true" cta="가이드 보기"/>
+<Card title="Vald" icon="link" href="/oss/integrations/vectorstores/vald" arrow="true" cta="가이드 보기"/>
+<Card title="VDMS" icon="link" href="/oss/integrations/vectorstores/vdms" arrow="true" cta="가이드 보기"/>
+<Card title="Vearch" icon="link" href="/oss/integrations/vectorstores/vearch" arrow="true" cta="가이드 보기"/>
+<Card title="Vectara" icon="link" href="/oss/integrations/vectorstores/vectara" arrow="true" cta="가이드 보기"/>
+<Card title="Vespa" icon="link" href="/oss/integrations/vectorstores/vespa" arrow="true" cta="가이드 보기"/>
+<Card title="viking DB" icon="link" href="/oss/integrations/vectorstores/vikingdb" arrow="true" cta="가이드 보기"/>
+<Card title="vlite" icon="link" href="/oss/integrations/vectorstores/vlite" arrow="true" cta="가이드 보기"/>
+<Card title="Weaviate" icon="link" href="/oss/integrations/vectorstores/weaviate" arrow="true" cta="가이드 보기"/>
+<Card title="Xata" icon="link" href="/oss/integrations/vectorstores/xata" arrow="true" cta="가이드 보기"/>
+<Card title="YDB" icon="link" href="/oss/integrations/vectorstores/ydb" arrow="true" cta="가이드 보기"/>
+<Card title="Yellowbrick" icon="link" href="/oss/integrations/vectorstores/yellowbrick" arrow="true" cta="가이드 보기"/>
+<Card title="Zep" icon="link" href="/oss/integrations/vectorstores/zep" arrow="true" cta="가이드 보기"/>
+<Card title="Zep Cloud" icon="link" href="/oss/integrations/vectorstores/zep_cloud" arrow="true" cta="가이드 보기"/>
+<Card title="ZeusDB" icon="link" href="/oss/integrations/vectorstores/zeusdb" arrow="true" cta="가이드 보기"/>
+<Card title="Zilliz" icon="link" href="/oss/integrations/vectorstores/zilliz" arrow="true" cta="가이드 보기"/>
 </Columns>
 
