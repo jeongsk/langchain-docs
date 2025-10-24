@@ -1,224 +1,209 @@
 ---
-title: "From the UI"
-description: "How to use Open SWE from the UI"
+title: "UI에서 사용하기"
+description: "UI에서 Open SWE를 사용하는 방법"
 ---
 
-Open SWE provides a powerful web interface that allows you to interact with the coding agent through a chat-like experience. The UI supports both automated and manual workflows, giving you control over how the agent processes your requests.
+Open SWE는 채팅과 유사한 경험을 통해 코딩 에이전트와 상호작용할 수 있는 강력한 웹 인터페이스를 제공합니다. UI는 자동 및 수동 워크플로우를 모두 지원하여 에이전트가 요청을 처리하는 방식을 제어할 수 있습니다.
 
-## Auto vs Manual Mode
+## 자동 모드 vs 수동 모드
 
-The UI offers two distinct modes for handling your coding requests:
+UI는 코딩 요청을 처리하기 위한 두 가지 고유한 모드를 제공합니다:
 
 <Note>
-  You can toggle between auto and manual mode using the checklist icon in the
-  main input area.
+  메인 입력 영역의 체크리스트 아이콘을 사용하여 자동 모드와 수동 모드를 전환할 수 있습니다.
 </Note>
 
-### Auto Mode
+### 자동 모드
 
-When **Auto Mode** is enabled (checklist icon is highlighted):
+**자동 모드**가 활성화된 경우(체크리스트 아이콘이 강조 표시됨):
 
-- Plans are automatically accepted and executed without user intervention
-- The agent proceeds directly from planning to implementation
-- Ideal for straightforward requests where you trust the agent's planning
+- 계획이 사용자 개입 없이 자동으로 승인되고 실행됩니다
+- 에이전트가 계획 단계에서 구현 단계로 직접 진행합니다
+- 에이전트의 계획을 신뢰할 수 있는 간단한 요청에 이상적입니다
 
-### Manual Mode
+### 수동 모드
 
-When **Manual Mode** is active (checklist icon is not highlighted):
+**수동 모드**가 활성화된 경우(체크리스트 아이콘이 강조 표시되지 않음):
 
-- You must manually review and accept proposed plans before execution
-- Provides opportunity to edit, modify, or reject plans
-- Allows for more control over the implementation approach
+- 실행 전에 제안된 계획을 수동으로 검토하고 승인해야 합니다
+- 계획을 편집, 수정 또는 거부할 수 있는 기회를 제공합니다
+- 구현 접근 방식에 대한 더 많은 제어권을 허용합니다
 
 <Tip>
-  Start with manual mode for important changes to review the agent's approach
-  before execution.
+  중요한 변경 사항의 경우 수동 모드로 시작하여 실행 전에 에이전트의 접근 방식을 검토하세요.
 </Tip>
 
-## Manager Agent Capabilities
+## 매니저 에이전트 기능
 
-The Manager agent acts as the central orchestrator, intelligently routing your messages and managing the overall workflow. Here's what the Manager can and cannot do:
+매니저 에이전트는 중앙 오케스트레이터 역할을 하며, 메시지를 지능적으로 라우팅하고 전체 워크플로우를 관리합니다. 다음은 매니저가 할 수 있는 것과 할 수 없는 것입니다:
 
-### What the manager _can_ do
+### 매니저가 _할 수 있는_ 것
 
 <Steps>
-  <Step title="Respond to User Messages">
-    Provides contextual responses and status updates about ongoing operations.
-    You can ask the manager what it can do, what the status of different agents
-    is, etc.
+  <Step title="사용자 메시지에 응답">
+    진행 중인 작업에 대한 상황별 응답과 상태 업데이트를 제공합니다.
+    매니저에게 무엇을 할 수 있는지, 다양한 에이전트의 상태가 어떤지 등을 물어볼 수 있습니다.
   </Step>
-  <Step title="Create New Planning Runs">
-    Initiates new planning sessions when you submit coding requests. If your
-    message contains a coding request, the manager will create a new planning
-    session & corresponding GitHub issue.
+  <Step title="새로운 계획 실행 생성">
+    코딩 요청을 제출할 때 새로운 계획 세션을 시작합니다. 메시지에 코딩 요청이 포함되어 있으면,
+    매니저가 새로운 계획 세션과 해당 GitHub 이슈를 생성합니다.
   </Step>
-  <Step title="Send Messages to Active Planning Runs">
-    Forwards additional context or requirements to running planner sessions. If
-    you send a message while the planner is running, the manager can forward
-    that message to the planner, without interrupting its flow.
+  <Step title="활성 계획 실행에 메시지 전송">
+    실행 중인 플래너 세션에 추가 컨텍스트나 요구 사항을 전달합니다. 플래너가 실행 중일 때
+    메시지를 보내면, 매니저가 플래너의 흐름을 중단하지 않고 해당 메시지를 플래너에 전달할 수 있습니다.
   </Step>
-  <Step title="Resume Interrupted Planners">
-    Resumes planner sessions that were paused for the user to accept or reject
-    plans. If the planner has paused for plan acceptance, you can message the
-    manager with feedback about the plan. This will be forwarded to the planner,
-    and it will continue its flow based on your feedback.
+  <Step title="중단된 플래너 재개">
+    사용자가 계획을 승인하거나 거부하기 위해 일시 중지된 플래너 세션을 재개합니다. 플래너가
+    계획 승인을 위해 일시 중지된 경우, 계획에 대한 피드백과 함께 매니저에게 메시지를 보낼 수 있습니다.
+    이는 플래너에 전달되고, 플래너는 피드백을 기반으로 흐름을 계속합니다.
   </Step>
-  <Step title="Send Messages to Active Programmer Runs">
-    Provides additional context or instructions to running implementation
-    sessions. If you send a message while the programmer is running, the manager
-    can forward that message to the programmer, without interrupting its flow.
+  <Step title="활성 프로그래머 실행에 메시지 전송">
+    실행 중인 구현 세션에 추가 컨텍스트나 지침을 제공합니다. 프로그래머가 실행 중일 때 메시지를
+    보내면, 매니저가 프로그래머의 흐름을 중단하지 않고 해당 메시지를 프로그래머에 전달할 수 있습니다.
   </Step>
-  <Step title="Create new tasks">
-    Creates new tasks, independent of the current request. If you send a message
-    to the manager with a request for a task that is unrelated to the current
-    request, or can be implemented in parallel via a different session, the
-    manager will create a new GitHub issue, and initiate a new planning session
-    for that issue.
+  <Step title="새로운 작업 생성">
+    현재 요청과 독립적인 새로운 작업을 생성합니다. 현재 요청과 관련이 없거나 다른 세션을 통해
+    병렬로 구현할 수 있는 작업 요청과 함께 매니저에게 메시지를 보내면, 매니저가 새로운 GitHub 이슈를
+    생성하고 해당 이슈에 대한 새로운 계획 세션을 시작합니다.
   </Step>
 </Steps>
 
-### What the Manager _cannot_ Do
+### 매니저가 _할 수 없는_ 것
 
 <Note>
-  The Manager has several important limitations to ensure proper workflow
-  control:
+  매니저는 적절한 워크플로우 제어를 보장하기 위해 몇 가지 중요한 제한 사항이 있습니다:
 </Note>
 
-- **Cannot create new Programmer runs** - This only happens after plan acceptance or in auto mode.
-- **Cannot stop running Planner/Programmer sessions** - To stop a session, you must click the cancel button in the UI.
-- **Cannot re-plan while Programmer is running** - Once the programmer session has started, you can not go back to the planner. However, you can send a message to the manager which can be forwarded to the programmer.
-- **Cannot open Pull Requests directly** - PRs are created automatically after Programmer completion (and changes are automatically committed anytime a file is modified).
-- **Cannot accept plans in manual mode** - You must manually click accept for plan approval.
+- **새로운 프로그래머 실행을 생성할 수 없음** - 이는 계획 승인 후 또는 자동 모드에서만 발생합니다.
+- **실행 중인 플래너/프로그래머 세션을 중지할 수 없음** - 세션을 중지하려면 UI에서 취소 버튼을 클릭해야 합니다.
+- **프로그래머가 실행 중일 때 재계획할 수 없음** - 프로그래머 세션이 시작되면 플래너로 돌아갈 수 없습니다. 그러나 매니저에게 메시지를 보낼 수 있으며, 이는 프로그래머에게 전달될 수 있습니다.
+- **Pull Request를 직접 열 수 없음** - PR은 프로그래머 완료 후 자동으로 생성됩니다(파일이 수정될 때마다 변경 사항이 자동으로 커밋됨).
+- **수동 모드에서 계획을 승인할 수 없음** - 계획 승인을 위해 수동으로 승인 버튼을 클릭해야 합니다.
 
-## Message Handling and Routing
+## 메시지 처리 및 라우팅
 
-The Manager intelligently classifies your messages and routes them to the appropriate component:
+매니저는 메시지를 지능적으로 분류하고 적절한 구성 요소로 라우팅합니다:
 
-### Message Classification
+### 메시지 분류
 
-When you send a message, the Manager analyzes:
+메시지를 보낼 때 매니저는 다음을 분석합니다:
 
-- Current status of Planner and Programmer graphs
-- Content and intent of your message
-- Existing conversation context
-- Active plans and tasks
+- 플래너 및 프로그래머 그래프의 현재 상태
+- 메시지의 내용과 의도
+- 기존 대화 컨텍스트
+- 활성 계획 및 작업
 
-### Routing Options
+### 라우팅 옵션
 
-Based on the analysis, messages are routed to:
+분석을 기반으로 메시지는 다음으로 라우팅됩니다:
 
-- **Start Planner**: For new coding requests requiring planning
-- **Update Planner**: To add context to active planning sessions
-- **Resume Planner**: To continue interrupted planning with new information
-- **Update Programmer**: To provide context to active implementation sessions
-- **Create New Issue**: For independent requests that should be separate GitHub issues
-- **No Operation**: For messages that don't require specific routing
+- **플래너 시작**: 계획이 필요한 새로운 코딩 요청
+- **플래너 업데이트**: 활성 계획 세션에 컨텍스트 추가
+- **플래너 재개**: 새로운 정보로 중단된 계획 계속
+- **프로그래머 업데이트**: 활성 구현 세션에 컨텍스트 제공
+- **새 이슈 생성**: 별도의 GitHub 이슈여야 하는 독립적인 요청
+- **작업 없음**: 특정 라우팅이 필요하지 않은 메시지
 
-## Planning Runs
+## 계획 실행
 
-Planning runs are handled by the Planner graph, which creates detailed execution plans for your requests.
+계획 실행은 요청에 대한 상세한 실행 계획을 생성하는 플래너 그래프에 의해 처리됩니다.
 
-### Planning Process
+### 계획 프로세스
 
 <Steps>
-  <Step title="Context Gathering">
-    The Planner analyzes your repository and gathers relevant context about the
-    codebase
+  <Step title="컨텍스트 수집">
+    플래너가 리포지토리를 분석하고 코드베이스에 대한 관련 컨텍스트를 수집합니다
   </Step>
-  <Step title="Plan Generation">
-    Creates a structured plan with specific, actionable steps
+  <Step title="계획 생성">
+    구체적이고 실행 가능한 단계로 구조화된 계획을 생성합니다
   </Step>
-  <Step title="Plan Presentation">
-    Presents the proposed plan for review (in manual mode) or automatic
-    acceptance (in auto mode)
+  <Step title="계획 제시">
+    검토를 위해 제안된 계획을 제시합니다(수동 모드) 또는 자동 승인합니다(자동 모드)
   </Step>
 </Steps>
 
-### Plan Interruption
+### 계획 중단
 
-Plans are presented as interruptions that require user response:
+계획은 사용자 응답이 필요한 중단으로 제시됩니다:
 
-- **Manual Mode**: You must explicitly accept or reject the plan
-- **Auto Mode**: Plans are automatically accepted and execution begins
-- **Plan Editing**: You can modify proposed plans before acceptance
-- **Feedback**: You can provide feedback to the manager if you want the plan to be changed in some way
+- **수동 모드**: 계획을 명시적으로 승인하거나 거부해야 합니다
+- **자동 모드**: 계획이 자동으로 승인되고 실행이 시작됩니다
+- **계획 편집**: 승인 전에 제안된 계획을 수정할 수 있습니다
+- **피드백**: 계획을 특정 방식으로 변경하려는 경우 매니저에게 피드백을 제공할 수 있습니다
 
-### Automatic Approval
+### 자동 승인
 
-When auto mode is enabled, plans are automatically accepted and implementation begins immediately after plan generation.
+자동 모드가 활성화되면 계획 생성 직후 계획이 자동으로 승인되고 구현이 즉시 시작됩니다.
 
-## Programmer Runs
+## 프로그래머 실행
 
-Once a plan is accepted, the Programmer graph executes the implementation.
+계획이 승인되면 프로그래머 그래프가 구현을 실행합니다.
 
-### Programming Process
+### 프로그래밍 프로세스
 
 <Steps>
-  <Step title="Plan Execution">
-    Works through each step of the accepted plan systematically
+  <Step title="계획 실행">
+    승인된 계획의 각 단계를 체계적으로 진행합니다
   </Step>
-  <Step title="Code Implementation">
-    Makes actual changes to files in your repository
+  <Step title="코드 구현">
+    리포지토리의 파일을 실제로 변경합니다
   </Step>
-  <Step title="Progress Tracking">
-    Updates plan status and provides summaries of completed work
+  <Step title="진행 상황 추적">
+    계획 상태를 업데이트하고 완료된 작업의 요약을 제공합니다
   </Step>
-  <Step title="Pull Request Creation">
-    Automatically opens a PR with all changes when implementation is complete
+  <Step title="Pull Request 생성">
+    구현이 완료되면 모든 변경 사항과 함께 PR을 자동으로 엽니다
   </Step>
 </Steps>
 
 <Note>
-  The Programmer automatically commits changes after each step, ensuring your
-  work is preserved even if the session is interrupted.
+  프로그래머는 각 단계 후에 변경 사항을 자동으로 커밋하여 세션이 중단되더라도 작업이 보존되도록 합니다.
 </Note>
 
-## LangGraph Engineer Toggle
+## LangGraph Engineer 토글
 
-The UI includes a **LangGraph Engineer** toggle button that optimizes the agent's performance when working with LangGraph code:
+UI에는 LangGraph 코드로 작업할 때 에이전트의 성능을 최적화하는 **LangGraph Engineer** 토글 버튼이 포함되어 있습니다:
 
 <Note>
-  The LangGraph Engineer toggle is located in the main input area, represented by the Open SWE icon.
+  LangGraph Engineer 토글은 메인 입력 영역에 있으며, Open SWE 아이콘으로 표시됩니다.
 </Note>
 
-### When to Enable LangGraph Engineer
+### LangGraph Engineer를 활성화해야 하는 경우
 
-Enable this toggle when your request involves creating or modifying LangGraph agents or workflows. It is very useful for building LLM apps from scratch.
+요청이 LangGraph 에이전트 또는 워크플로우 생성 또는 수정과 관련된 경우 이 토글을 활성화하세요. 처음부터 LLM 앱을 구축하는 데 매우 유용합니다.
 
-### What LangGraph Engineer Does
+### LangGraph Engineer가 하는 일
 
-When enabled, the toggle:
+활성화되면 토글은 다음을 수행합니다:
 
-- **Provides specific prompts**: Adds LangGraph-specific guidance and best practices to all agent prompts
-- **Includes documentation access**: Agents can automatically fetch up-to-date LangGraph documentation during planning and implementation through an MCP server.
-- **Follows LangGraph patterns**: Ensures agents use proper LangGraph structure, primitives, and deployment methods.
+- **특정 프롬프트 제공**: 모든 에이전트 프롬프트에 LangGraph 특정 가이드 및 모범 사례를 추가합니다
+- **문서 액세스 포함**: 에이전트가 MCP 서버를 통해 계획 및 구현 중에 최신 LangGraph 문서를 자동으로 가져올 수 있습니다.
+- **LangGraph 패턴 준수**: 에이전트가 적절한 LangGraph 구조, 프리미티브 및 배포 방법을 사용하도록 보장합니다.
 
 <Tip>
-  Enable LangGraph Engineer for any project that imports from `@langchain/langgraph` or `langgraph` to get the best results.
+  `@langchain/langgraph` 또는 `langgraph`에서 가져오는 모든 프로젝트에 대해 LangGraph Engineer를 활성화하여 최상의 결과를 얻으세요.
 </Tip>
 
-## Getting Started
+## 시작하기
 
-To begin using the Open SWE UI:
+Open SWE UI 사용을 시작하려면:
 
 <Steps>
-  <Step title="Select Repository">
-    Choose your GitHub repository and branch using the repository selector
+  <Step title="리포지토리 선택">
+    리포지토리 선택기를 사용하여 GitHub 리포지토리와 브랜치를 선택합니다
   </Step>
-  <Step title="Choose Mode">
-    Toggle auto/manual mode based on your preference for plan approval
+  <Step title="모드 선택">
+    계획 승인에 대한 선호도에 따라 자동/수동 모드를 토글합니다
   </Step>
-  <Step title="Submit Request">
-    Type your coding request in the terminal input and press Cmd+Enter to send
+  <Step title="요청 제출">
+    터미널 입력에 코딩 요청을 입력하고 Cmd+Enter를 눌러 전송합니다
   </Step>
-  <Step title="Monitor Progress">
-    Watch as the Manager routes your request and coordinates the planning and
-    implementation
+  <Step title="진행 상황 모니터링">
+    매니저가 요청을 라우팅하고 계획 및 구현을 조정하는 것을 관찰합니다
   </Step>
 </Steps>
 
 <Note>
-  Make sure you have properly configured your GitHub App and authentication
-  before using the UI. See the [Development Setup](/labs/swe/setup/development)
-  guide for details.
+  UI를 사용하기 전에 GitHub App 및 인증을 올바르게 구성했는지 확인하세요.
+  자세한 내용은 [개발 설정](/labs/swe/setup/development) 가이드를 참조하세요.
 </Note>
