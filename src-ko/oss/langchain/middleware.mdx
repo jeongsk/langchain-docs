@@ -1,50 +1,50 @@
 ---
-title: Middleware
-description: Control and customize agent execution at every step
+title: 미들웨어
+description: 에이전트 실행의 모든 단계를 제어하고 커스터마이징합니다
 ---
 
 
 
-Middleware provides a way to more tightly control what happens inside the agent.
+미들웨어는 에이전트 내부에서 발생하는 동작을 더욱 정밀하게 제어할 수 있는 방법을 제공합니다.
 
-The core agent loop involves calling a model, letting it choose tools to execute, and then finishing when it calls no more tools:
+핵심 에이전트 루프는 모델 호출, 모델이 실행할 도구 선택, 그리고 더 이상 도구를 호출하지 않을 때 종료되는 과정을 포함합니다:
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <img
     src="/oss/images/core_agent_loop.png"
-    alt="Core agent loop diagram"
+    alt="핵심 에이전트 루프 다이어그램"
     className="rounded-lg"
   />
 </div>
 
-Middleware exposes hooks before and after each of those steps:
+미들웨어는 이러한 각 단계의 전후에 훅을 노출합니다:
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <img
     src="/oss/images/middleware_final.png"
-    alt="Middleware flow diagram"
+    alt="미들웨어 흐름 다이어그램"
     className="rounded-lg"
   />
 </div>
 
-## What can middleware do?
+## 미들웨어로 할 수 있는 일
 
 <CardGroup cols={2}>
-  <Card title="Monitor" icon="chart-line">
-    Track agent behavior with logging, analytics, and debugging
+  <Card title="모니터링" icon="chart-line">
+    로깅, 분석 및 디버깅을 통해 에이전트 동작을 추적합니다
   </Card>
-  <Card title="Modify" icon="pencil">
-    Transform prompts, tool selection, and output formatting
+  <Card title="수정" icon="pencil">
+    프롬프트, 도구 선택 및 출력 형식을 변환합니다
   </Card>
-  <Card title="Control" icon="sliders">
-    Add retries, fallbacks, and early termination logic
+  <Card title="제어" icon="sliders">
+    재시도, 폴백 및 조기 종료 로직을 추가합니다
   </Card>
-  <Card title="Enforce" icon="shield">
-    Apply rate limits, guardrails, and PII detection
+  <Card title="강제" icon="shield">
+    속도 제한, 가드레일 및 PII 탐지를 적용합니다
   </Card>
 </CardGroup>
 
-Add middleware by passing it to @[`create_agent`]:
+@[`create_agent`]에 미들웨어를 전달하여 추가합니다:
 
 :::python
 ```python
@@ -76,19 +76,19 @@ const agent = createAgent({
 ```
 :::
 
-## Built-in middleware
+## 내장 미들웨어
 
-LangChain provides prebuilt middleware for common use cases:
+LangChain은 일반적인 사용 사례를 위한 사전 구축된 미들웨어를 제공합니다:
 
-### Summarization
+### 요약
 
-Automatically summarize conversation history when approaching token limits.
+토큰 제한에 근접할 때 대화 기록을 자동으로 요약합니다.
 
 <Tip>
-**Perfect for:**
-- Long-running conversations that exceed context windows
-- Multi-turn dialogues with extensive history
-- Applications where preserving full conversation context matters
+**다음과 같은 경우에 적합:**
+- 컨텍스트 창을 초과하는 장기 실행 대화
+- 광범위한 기록이 있는 다중 턴 대화
+- 전체 대화 컨텍스트 보존이 중요한 애플리케이션
 </Tip>
 
 :::python
@@ -103,9 +103,9 @@ agent = create_agent(
     middleware=[
         SummarizationMiddleware(
             model="openai:gpt-4o-mini",
-            max_tokens_before_summary=4000,  # Trigger summarization at 4000 tokens
-            messages_to_keep=20,  # Keep last 20 messages after summary
-            summary_prompt="Custom prompt for summarization...",  # Optional
+            max_tokens_before_summary=4000,  # 4000 토큰에서 요약 트리거
+            messages_to_keep=20,  # 요약 후 마지막 20개 메시지 유지
+            summary_prompt="Custom prompt for summarization...",  # 선택사항
         ),
     ],
 )
@@ -122,80 +122,80 @@ const agent = createAgent({
   middleware: [
     summarizationMiddleware({
       model: "openai:gpt-4o-mini",
-      maxTokensBeforeSummary: 4000, // Trigger summarization at 4000 tokens
-      messagesToKeep: 20, // Keep last 20 messages after summary
-      summaryPrompt: "Custom prompt for summarization...", // Optional
+      maxTokensBeforeSummary: 4000, // 4000 토큰에서 요약 트리거
+      messagesToKeep: 20, // 요약 후 마지막 20개 메시지 유지
+      summaryPrompt: "Custom prompt for summarization...", // 선택사항
     }),
   ],
 });
 ```
 :::
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 :::python
 <ParamField body="model" type="string" required>
-  Model for generating summaries
+  요약 생성을 위한 모델
 </ParamField>
 
 <ParamField body="max_tokens_before_summary" type="number">
-  Token threshold for triggering summarization
+  요약을 트리거하는 토큰 임계값
 </ParamField>
 
 <ParamField body="messages_to_keep" type="number" default="20">
-  Recent messages to preserve
+  보존할 최근 메시지 수
 </ParamField>
 
 <ParamField body="token_counter" type="function">
-  Custom token counting function. Defaults to character-based counting.
+  사용자 정의 토큰 카운팅 함수. 기본값은 문자 기반 카운팅입니다.
 </ParamField>
 
 <ParamField body="summary_prompt" type="string">
-  Custom prompt template. Uses built-in template if not specified.
+  사용자 정의 프롬프트 템플릿. 지정되지 않으면 내장 템플릿을 사용합니다.
 </ParamField>
 
 <ParamField body="summary_prefix" type="string" default="## Previous conversation summary:">
-  Prefix for summary messages
+  요약 메시지의 접두사
 </ParamField>
 :::
 
 :::js
 <ParamField body="model" type="string" required>
-  Model for generating summaries
+  요약 생성을 위한 모델
 </ParamField>
 
 <ParamField body="maxTokensBeforeSummary" type="number">
-  Token threshold for triggering summarization
+  요약을 트리거하는 토큰 임계값
 </ParamField>
 
 <ParamField body="messagesToKeep" type="number" default="20">
-  Recent messages to preserve
+  보존할 최근 메시지 수
 </ParamField>
 
 <ParamField body="tokenCounter" type="function">
-  Custom token counting function. Defaults to character-based counting.
+  사용자 정의 토큰 카운팅 함수. 기본값은 문자 기반 카운팅입니다.
 </ParamField>
 
 <ParamField body="summaryPrompt" type="string">
-  Custom prompt template. Uses built-in template if not specified.
+  사용자 정의 프롬프트 템플릿. 지정되지 않으면 내장 템플릿을 사용합니다.
 </ParamField>
 
 <ParamField body="summaryPrefix" type="string" default="## Previous conversation summary:">
-  Prefix for summary messages
+  요약 메시지의 접두사
 </ParamField>
 :::
 
 </Accordion>
 
-### Human-in-the-loop
+### 휴먼 인 더 루프
 
-Pause agent execution for human approval, editing, or rejection of tool calls before they execute.
+도구 호출이 실행되기 전에 사람의 승인, 편집 또는 거부를 위해 에이전트 실행을 일시 중지합니다.
 
 <Tip>
-**Perfect for:**
-- High-stakes operations requiring human approval (database writes, financial transactions)
-- Compliance workflows where human oversight is mandatory
-- Long running conversations where human feedback is used to guide the agent
+**다음과 같은 경우에 적합:**
+- 사람의 승인이 필요한 고위험 작업(데이터베이스 쓰기, 금융 거래)
+- 사람의 감독이 필수인 규정 준수 워크플로
+- 에이전트 가이드를 위해 사람의 피드백이 사용되는 장기 실행 대화
 </Tip>
 
 :::python
@@ -212,11 +212,11 @@ agent = create_agent(
     middleware=[
         HumanInTheLoopMiddleware(
             interrupt_on={
-                # Require approval, editing, or rejection for sending emails
+                # 이메일 전송에 대한 승인, 편집 또는 거부 필요
                 "send_email_tool": {
                     "allowed_decisions": ["approve", "edit", "reject"],
                 },
-                # Auto-approve reading emails
+                # 이메일 읽기 자동 승인
                 "read_email_tool": False,
             }
         ),
@@ -235,13 +235,13 @@ const agent = createAgent({
   middleware: [
     humanInTheLoopMiddleware({
       interruptOn: {
-        // Require approval, editing, or rejection for sending emails
+        // 이메일 전송에 대한 승인, 편집 또는 거부 필요
         send_email: {
           allowAccept: true,
           allowEdit: true,
           allowRespond: true,
         },
-        // Auto-approve reading emails
+        // 이메일 읽기 자동 승인
         read_email: false,
       }
     })
@@ -250,69 +250,69 @@ const agent = createAgent({
 ```
 :::
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 :::python
 <ParamField body="interrupt_on" type="dict" required>
-  Mapping of tool names to approval configs. Values can be `True` (interrupt with default config), `False` (auto-approve), or an `InterruptOnConfig` object.
+  도구 이름을 승인 설정에 매핑합니다. 값은 `True`(기본 설정으로 중단), `False`(자동 승인) 또는 `InterruptOnConfig` 객체일 수 있습니다.
 </ParamField>
 
 <ParamField body="description_prefix" type="string" default="Tool execution requires approval">
-  Prefix for action request descriptions
+  작업 요청 설명의 접두사
 </ParamField>
 
-**`InterruptOnConfig` options:**
+**`InterruptOnConfig` 옵션:**
 
 <ParamField body="allowed_decisions" type="list[string]">
-  List of allowed decisions: `"approve"`, `"edit"`, or `"reject"`
+  허용되는 결정 목록: `"approve"`, `"edit"` 또는 `"reject"`
 </ParamField>
 
 <ParamField body="description" type="string | callable">
-  Static string or callable function for custom description
+  사용자 정의 설명을 위한 정적 문자열 또는 호출 가능 함수
 </ParamField>
 :::
 
 :::js
 <ParamField body="interruptOn" type="object" required>
-  Mapping of tool names to approval configs
+  도구 이름을 승인 설정에 매핑
 </ParamField>
 
-**Tool approval config options:**
+**도구 승인 설정 옵션:**
 
 <ParamField body="allowAccept" type="boolean" default="false">
-  Whether approval is allowed
+  승인 허용 여부
 </ParamField>
 
 <ParamField body="allowEdit" type="boolean" default="false">
-  Whether editing is allowed
+  편집 허용 여부
 </ParamField>
 
 <ParamField body="allowRespond" type="boolean" default="false">
-  Whether responding/rejection is allowed
+  응답/거부 허용 여부
 </ParamField>
 :::
 
 </Accordion>
 
 <Note>
-**Important:** Human-in-the-loop middleware requires a [checkpointer](/oss/langgraph/persistence#checkpoints) to maintain state across interruptions.
+**중요:** 휴먼 인 더 루프 미들웨어는 중단 간 상태를 유지하기 위해 [체크포인터](/oss/langgraph/persistence#checkpoints)가 필요합니다.
 
-See the [human-in-the-loop documentation](/oss/langchain/human-in-the-loop) for complete examples and integration patterns.
+전체 예제 및 통합 패턴은 [휴먼 인 더 루프 문서](/oss/langchain/human-in-the-loop)를 참조하세요.
 </Note>
 
-### Anthropic prompt caching
+### Anthropic 프롬프트 캐싱
 
-Reduce costs by caching repetitive prompt prefixes with Anthropic models.
+Anthropic 모델로 반복적인 프롬프트 접두사를 캐싱하여 비용을 절감합니다.
 
 <Tip>
-**Perfect for:**
-- Applications with long, repeated system prompts
-- Agents that reuse the same context across invocations
-- Reducing API costs for high-volume deployments
+**다음과 같은 경우에 적합:**
+- 길고 반복되는 시스템 프롬프트가 있는 애플리케이션
+- 호출 간 동일한 컨텍스트를 재사용하는 에이전트
+- 대량 배포를 위한 API 비용 절감
 </Tip>
 
 <Info>
-Learn more about [Anthropic Prompt Caching](https://docs.claude.com/en/docs/build-with-claude/prompt-caching#cache-limitations) strategies and limitations.
+[Anthropic 프롬프트 캐싱](https://docs.claude.com/en/docs/build-with-claude/prompt-caching#cache-limitations) 전략 및 제한 사항에 대해 자세히 알아보세요.
 </Info>
 
 :::python
@@ -334,10 +334,10 @@ agent = create_agent(
     middleware=[AnthropicPromptCachingMiddleware(ttl="5m")],
 )
 
-# cache store
+# 캐시 저장
 agent.invoke({"messages": [HumanMessage("Hi, my name is Bob")]})
 
-# cache hit, system prompt is cached
+# 캐시 히트, 시스템 프롬프트가 캐싱됨
 agent.invoke({"messages": [HumanMessage("What's my name?")]})
 ```
 :::
@@ -358,55 +358,55 @@ const agent = createAgent({
   middleware: [anthropicPromptCachingMiddleware({ ttl: "5m" })],
 });
 
-// cache store
+// 캐시 저장
 await agent.invoke({
   messages: [new HumanMessage("Hi, my name is Bob")]
 });
 
-// cache hit, system prompt is cached
+// 캐시 히트, 시스템 프롬프트가 캐싱됨
 const result = await agent.invoke({
   messages: [new HumanMessage("What's my name?")]
 });
 ```
 :::
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 :::python
 <ParamField body="type" type="string" default="ephemeral">
-  Cache type. Only `"ephemeral"` is currently supported.
+  캐시 유형. 현재 `"ephemeral"`만 지원됩니다.
 </ParamField>
 
 <ParamField body="ttl" type="string" default="5m">
-  Time to live for cached content. Valid values: `"5m"` or `"1h"`
+  캐시된 콘텐츠의 유지 시간. 유효한 값: `"5m"` 또는 `"1h"`
 </ParamField>
 
 <ParamField body="min_messages_to_cache" type="number" default="0">
-  Minimum number of messages before caching starts
+  캐싱이 시작되기 전 최소 메시지 수
 </ParamField>
 
 <ParamField body="unsupported_model_behavior" type="string" default="warn">
-  Behavior when using non-Anthropic models. Options: `"ignore"`, `"warn"`, or `"raise"`
+  Anthropic이 아닌 모델 사용 시 동작. 옵션: `"ignore"`, `"warn"` 또는 `"raise"`
 </ParamField>
 :::
 
 :::js
 <ParamField body="ttl" type="string" default="5m">
-  Time to live for cached content. Valid values: `"5m"` or `"1h"`
+  캐시된 콘텐츠의 유지 시간. 유효한 값: `"5m"` 또는 `"1h"`
 </ParamField>
 :::
 
 </Accordion>
 
-### Model call limit
+### 모델 호출 제한
 
-Limit the number of model calls to prevent infinite loops or excessive costs.
+무한 루프나 과도한 비용을 방지하기 위해 모델 호출 수를 제한합니다.
 
 <Tip>
-**Perfect for:**
-- Preventing runaway agents from making too many API calls
-- Enforcing cost controls on production deployments
-- Testing agent behavior within specific call budgets
+**다음과 같은 경우에 적합:**
+- 너무 많은 API 호출을 하는 에이전트 방지
+- 프로덕션 배포에 대한 비용 제어 강제
+- 특정 호출 예산 내에서 에이전트 동작 테스트
 </Tip>
 
 :::python
@@ -420,9 +420,9 @@ agent = create_agent(
     tools=[...],
     middleware=[
         ModelCallLimitMiddleware(
-            thread_limit=10,  # Max 10 calls per thread (across runs)
-            run_limit=5,  # Max 5 calls per run (single invocation)
-            exit_behavior="end",  # Or "error" to raise exception
+            thread_limit=10,  # 스레드당 최대 10회 호출(실행 간)
+            run_limit=5,  # 실행당 최대 5회 호출(단일 호출)
+            exit_behavior="end",  # 또는 "error"로 예외 발생
         ),
     ],
 )
@@ -438,56 +438,56 @@ const agent = createAgent({
   tools: [...],
   middleware: [
     modelCallLimitMiddleware({
-      threadLimit: 10, // Max 10 calls per thread (across runs)
-      runLimit: 5, // Max 5 calls per run (single invocation)
-      exitBehavior: "end", // Or "error" to throw exception
+      threadLimit: 10, // 스레드당 최대 10회 호출(실행 간)
+      runLimit: 5, // 실행당 최대 5회 호출(단일 호출)
+      exitBehavior: "end", // 또는 "error"로 예외 발생
     }),
   ],
 });
 ```
 :::
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 :::python
 <ParamField body="thread_limit" type="number">
-  Maximum model calls across all runs in a thread. Defaults to no limit.
+  스레드의 모든 실행에 걸친 최대 모델 호출 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="run_limit" type="number">
-  Maximum model calls per single invocation. Defaults to no limit.
+  단일 호출당 최대 모델 호출 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="exit_behavior" type="string" default="end">
-  Behavior when limit is reached. Options: `"end"` (graceful termination) or `"error"` (raise exception)
+  제한 도달 시 동작. 옵션: `"end"`(정상 종료) 또는 `"error"`(예외 발생)
 </ParamField>
 :::
 
 :::js
 <ParamField body="threadLimit" type="number">
-  Maximum model calls across all runs in a thread. Defaults to no limit.
+  스레드의 모든 실행에 걸친 최대 모델 호출 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="runLimit" type="number">
-  Maximum model calls per single invocation. Defaults to no limit.
+  단일 호출당 최대 모델 호출 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="exitBehavior" type="string" default="end">
-  Behavior when limit is reached. Options: `"end"` (graceful termination) or `"error"` (throw exception)
+  제한 도달 시 동작. 옵션: `"end"`(정상 종료) 또는 `"error"`(예외 발생)
 </ParamField>
 :::
 
 </Accordion>
 
-### Tool call limit
+### 도구 호출 제한
 
-Limit the number of tool calls to specific tools or all tools.
+특정 도구 또는 모든 도구에 대한 도구 호출 수를 제한합니다.
 
 <Tip>
-**Perfect for:**
-- Preventing excessive calls to expensive external APIs
-- Limiting web searches or database queries
-- Enforcing rate limits on specific tool usage
+**다음과 같은 경우에 적합:**
+- 비용이 많이 드는 외부 API에 대한 과도한 호출 방지
+- 웹 검색 또는 데이터베이스 쿼리 제한
+- 특정 도구 사용에 대한 속도 제한 강제
 </Tip>
 
 :::python
@@ -496,10 +496,10 @@ from langchain.agents import create_agent
 from langchain.agents.middleware import ToolCallLimitMiddleware
 
 
-# Limit all tool calls
+# 모든 도구 호출 제한
 global_limiter = ToolCallLimitMiddleware(thread_limit=20, run_limit=10)
 
-# Limit specific tool
+# 특정 도구 제한
 search_limiter = ToolCallLimitMiddleware(
     tool_name="search",
     thread_limit=5,
@@ -518,10 +518,10 @@ agent = create_agent(
 ```typescript
 import { createAgent, toolCallLimitMiddleware } from "langchain";
 
-// Limit all tool calls
+// 모든 도구 호출 제한
 const globalLimiter = toolCallLimitMiddleware({ threadLimit: 20, runLimit: 10 });
 
-// Limit specific tool
+// 특정 도구 제한
 const searchLimiter = toolCallLimitMiddleware({
   toolName: "search",
   threadLimit: 5,
@@ -536,55 +536,55 @@ const agent = createAgent({
 ```
 :::
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 :::python
 <ParamField body="tool_name" type="string">
-  Specific tool to limit. If not provided, limits apply to all tools.
+  제한할 특정 도구. 제공되지 않으면 모든 도구에 제한이 적용됩니다.
 </ParamField>
 
 <ParamField body="thread_limit" type="number">
-  Maximum tool calls across all runs in a thread. Defaults to no limit.
+  스레드의 모든 실행에 걸친 최대 도구 호출 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="run_limit" type="number">
-  Maximum tool calls per single invocation. Defaults to no limit.
+  단일 호출당 최대 도구 호출 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="exit_behavior" type="string" default="end">
-  Behavior when limit is reached. Options: `"end"` (graceful termination) or `"error"` (raise exception)
+  제한 도달 시 동작. 옵션: `"end"`(정상 종료) 또는 `"error"`(예외 발생)
 </ParamField>
 :::
 
 :::js
 <ParamField body="toolName" type="string">
-  Specific tool to limit. If not provided, limits apply to all tools.
+  제한할 특정 도구. 제공되지 않으면 모든 도구에 제한이 적용됩니다.
 </ParamField>
 
 <ParamField body="threadLimit" type="number">
-  Maximum tool calls across all runs in a thread. Defaults to no limit.
+  스레드의 모든 실행에 걸친 최대 도구 호출 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="runLimit" type="number">
-  Maximum tool calls per single invocation. Defaults to no limit.
+  단일 호출당 최대 도구 호출 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="exitBehavior" type="string" default="end">
-  Behavior when limit is reached. Options: `"end"` (graceful termination) or `"error"` (throw exception)
+  제한 도달 시 동작. 옵션: `"end"`(정상 종료) 또는 `"error"`(예외 발생)
 </ParamField>
 :::
 
 </Accordion>
 
-### Model fallback
+### 모델 폴백
 
-Automatically fallback to alternative models when the primary model fails.
+기본 모델이 실패할 때 대체 모델로 자동 폴백합니다.
 
 <Tip>
-**Perfect for:**
-- Building resilient agents that handle model outages
-- Cost optimization by falling back to cheaper models
-- Provider redundancy across OpenAI, Anthropic, etc.
+**다음과 같은 경우에 적합:**
+- 모델 중단을 처리하는 복원력 있는 에이전트 구축
+- 더 저렴한 모델로 폴백하여 비용 최적화
+- OpenAI, Anthropic 등의 제공업체 중복성
 </Tip>
 
 :::python
@@ -594,12 +594,12 @@ from langchain.agents.middleware import ModelFallbackMiddleware
 
 
 agent = create_agent(
-    model="openai:gpt-4o",  # Primary model
+    model="openai:gpt-4o",  # 기본 모델
     tools=[...],
     middleware=[
         ModelFallbackMiddleware(
-            "openai:gpt-4o-mini",  # Try first on error
-            "anthropic:claude-3-5-sonnet-20241022",  # Then this
+            "openai:gpt-4o-mini",  # 오류 시 첫 번째 시도
+            "anthropic:claude-3-5-sonnet-20241022",  # 그 다음 이것
         ),
     ],
 )
@@ -611,41 +611,41 @@ agent = create_agent(
 import { createAgent, modelFallbackMiddleware } from "langchain";
 
 const agent = createAgent({
-  model: "openai:gpt-4o", // Primary model
+  model: "openai:gpt-4o", // 기본 모델
   tools: [...],
   middleware: [
     modelFallbackMiddleware(
-      "openai:gpt-4o-mini", // Try first on error
-      "anthropic:claude-3-5-sonnet-20241022" // Then this
+      "openai:gpt-4o-mini", // 오류 시 첫 번째 시도
+      "anthropic:claude-3-5-sonnet-20241022" // 그 다음 이것
     ),
   ],
 });
 ```
 :::
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 :::python
 <ParamField body="first_model" type="string | BaseChatModel" required>
-  First fallback model to try when the primary model fails. Can be a model string (e.g., `"openai:gpt-4o-mini"`) or a `BaseChatModel` instance.
+  기본 모델이 실패할 때 시도할 첫 번째 폴백 모델. 모델 문자열(예: `"openai:gpt-4o-mini"`) 또는 `BaseChatModel` 인스턴스일 수 있습니다.
 </ParamField>
 
 <ParamField body="*additional_models" type="string | BaseChatModel">
-  Additional fallback models to try in order if previous models fail
+  이전 모델이 실패할 경우 순서대로 시도할 추가 폴백 모델
 </ParamField>
 :::
 
 :::js
-The middleware accepts a variable number of string arguments representing fallback models in order:
+미들웨어는 폴백 모델을 나타내는 가변 개수의 문자열 인수를 순서대로 받습니다:
 
 <ParamField body="...models" type="string[]" required>
-  One or more fallback model strings to try in order when the primary model fails
+  기본 모델이 실패할 때 순서대로 시도할 하나 이상의 폴백 모델 문자열
 
   ```typescript
   modelFallbackMiddleware(
     "first-fallback-model",
     "second-fallback-model",
-    // ... more models
+    // ... 더 많은 모델
   )
   ```
 </ParamField>
@@ -653,15 +653,15 @@ The middleware accepts a variable number of string arguments representing fallba
 
 </Accordion>
 
-### PII detection
+### PII 탐지
 
-Detect and handle Personally Identifiable Information in conversations.
+대화에서 개인 식별 정보를 탐지하고 처리합니다.
 
 <Tip>
-**Perfect for:**
-- Healthcare and financial applications with compliance requirements
-- Customer service agents that need to sanitize logs
-- Any application handling sensitive user data
+**다음과 같은 경우에 적합:**
+- 규정 준수 요구 사항이 있는 의료 및 금융 애플리케이션
+- 로그를 정제해야 하는 고객 서비스 에이전트
+- 민감한 사용자 데이터를 처리하는 모든 애플리케이션
 </Tip>
 
 :::python
@@ -674,15 +674,15 @@ agent = create_agent(
     model="openai:gpt-4o",
     tools=[...],
     middleware=[
-        # Redact emails in user input
+        # 사용자 입력에서 이메일 수정
         PIIMiddleware("email", strategy="redact", apply_to_input=True),
-        # Mask credit cards (show last 4 digits)
+        # 신용카드 마스킹(마지막 4자리 표시)
         PIIMiddleware("credit_card", strategy="mask", apply_to_input=True),
-        # Custom PII type with regex
+        # 정규식으로 사용자 정의 PII 유형
         PIIMiddleware(
             "api_key",
             detector=r"sk-[a-zA-Z0-9]{32}",
-            strategy="block",  # Raise error if detected
+            strategy="block",  # 탐지되면 오류 발생
         ),
     ],
 )
@@ -697,99 +697,99 @@ const agent = createAgent({
   model: "openai:gpt-4o",
   tools: [...],
   middleware: [
-    // Redact emails in user input
+    // 사용자 입력에서 이메일 수정
     piiRedactionMiddleware({
       piiType: "email",
       strategy: "redact",
       applyToInput: true,
     }),
-    // Mask credit cards (show last 4 digits)
+    // 신용카드 마스킹(마지막 4자리 표시)
     piiRedactionMiddleware({
       piiType: "credit_card",
       strategy: "mask",
       applyToInput: true,
     }),
-    // Custom PII type with regex
+    // 정규식으로 사용자 정의 PII 유형
     piiRedactionMiddleware({
       piiType: "api_key",
       detector: /sk-[a-zA-Z0-9]{32}/,
-      strategy: "block", // Throw error if detected
+      strategy: "block", // 탐지되면 오류 발생
     }),
   ],
 });
 ```
 :::
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 :::python
 <ParamField body="pii_type" type="string" required>
-  Type of PII to detect. Can be a built-in type (`email`, `credit_card`, `ip`, `mac_address`, `url`) or a custom type name.
+  탐지할 PII 유형. 내장 유형(`email`, `credit_card`, `ip`, `mac_address`, `url`) 또는 사용자 정의 유형 이름일 수 있습니다.
 </ParamField>
 
 <ParamField body="strategy" type="string" default="redact">
-  How to handle detected PII. Options:
-  - `"block"` - Raise exception when detected
-  - `"redact"` - Replace with `[REDACTED_TYPE]`
-  - `"mask"` - Partially mask (e.g., `****-****-****-1234`)
-  - `"hash"` - Replace with deterministic hash
+  탐지된 PII 처리 방법. 옵션:
+  - `"block"` - 탐지 시 예외 발생
+  - `"redact"` - `[REDACTED_TYPE]`으로 대체
+  - `"mask"` - 부분 마스킹(예: `****-****-****-1234`)
+  - `"hash"` - 결정적 해시로 대체
 </ParamField>
 
 <ParamField body="detector" type="function | regex">
-  Custom detector function or regex pattern. If not provided, uses built-in detector for the PII type.
+  사용자 정의 탐지기 함수 또는 정규식 패턴. 제공되지 않으면 PII 유형에 대한 내장 탐지기를 사용합니다.
 </ParamField>
 
 <ParamField body="apply_to_input" type="boolean" default="True">
-  Check user messages before model call
+  모델 호출 전 사용자 메시지 검사
 </ParamField>
 
 <ParamField body="apply_to_output" type="boolean" default="False">
-  Check AI messages after model call
+  모델 호출 후 AI 메시지 검사
 </ParamField>
 
 <ParamField body="apply_to_tool_results" type="boolean" default="False">
-  Check tool result messages after execution
+  실행 후 도구 결과 메시지 검사
 </ParamField>
 :::
 
 :::js
 <ParamField body="piiType" type="string" required>
-  Type of PII to detect. Can be a built-in type (`email`, `credit_card`, `ip`, `mac_address`, `url`) or a custom type name.
+  탐지할 PII 유형. 내장 유형(`email`, `credit_card`, `ip`, `mac_address`, `url`) 또는 사용자 정의 유형 이름일 수 있습니다.
 </ParamField>
 
 <ParamField body="strategy" type="string" default="redact">
-  How to handle detected PII. Options:
-  - `"block"` - Throw error when detected
-  - `"redact"` - Replace with `[REDACTED_TYPE]`
-  - `"mask"` - Partially mask (e.g., `****-****-****-1234`)
-  - `"hash"` - Replace with deterministic hash
+  탐지된 PII 처리 방법. 옵션:
+  - `"block"` - 탐지 시 오류 발생
+  - `"redact"` - `[REDACTED_TYPE]`으로 대체
+  - `"mask"` - 부분 마스킹(예: `****-****-****-1234`)
+  - `"hash"` - 결정적 해시로 대체
 </ParamField>
 
 <ParamField body="detector" type="RegExp">
-  Custom detector regex pattern. If not provided, uses built-in detector for the PII type.
+  사용자 정의 탐지기 정규식 패턴. 제공되지 않으면 PII 유형에 대한 내장 탐지기를 사용합니다.
 </ParamField>
 
 <ParamField body="applyToInput" type="boolean" default="true">
-  Check user messages before model call
+  모델 호출 전 사용자 메시지 검사
 </ParamField>
 
 <ParamField body="applyToOutput" type="boolean" default="false">
-  Check AI messages after model call
+  모델 호출 후 AI 메시지 검사
 </ParamField>
 
 <ParamField body="applyToToolResults" type="boolean" default="false">
-  Check tool result messages after execution
+  실행 후 도구 결과 메시지 검사
 </ParamField>
 :::
 
 </Accordion>
 
-### Planning
+### 계획
 
-Add todo list management capabilities for complex multi-step tasks.
+복잡한 다단계 작업을 위한 할 일 목록 관리 기능을 추가합니다.
 
 <Note>
-This middleware automatically provides agents with a `write_todos` tool and system prompts to guide effective task planning.
+이 미들웨어는 에이전트에게 `write_todos` 도구와 효과적인 작업 계획을 안내하는 시스템 프롬프트를 자동으로 제공합니다.
 </Note>
 
 :::python
@@ -806,7 +806,7 @@ agent = create_agent(
 )
 
 result = agent.invoke({"messages": [HumanMessage("Help me refactor my codebase")]})
-print(result["todos"])  # Array of todo items with status tracking
+print(result["todos"])  # 상태 추적이 있는 할 일 항목 배열
 ```
 :::
 
@@ -825,37 +825,37 @@ const agent = createAgent({
 const result = await agent.invoke({
   messages: [new HumanMessage("Help me refactor my codebase")],
 });
-console.log(result.todos); // Array of todo items with status tracking
+console.log(result.todos); // 상태 추적이 있는 할 일 항목 배열
 ```
 :::
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 :::python
 <ParamField body="system_prompt" type="string">
-  Custom system prompt for guiding todo usage. Uses built-in prompt if not specified.
+  할 일 사용을 안내하는 사용자 정의 시스템 프롬프트. 지정되지 않으면 내장 프롬프트를 사용합니다.
 </ParamField>
 
 <ParamField body="tool_description" type="string">
-  Custom description for the `write_todos` tool. Uses built-in description if not specified.
+  `write_todos` 도구에 대한 사용자 정의 설명. 지정되지 않으면 내장 설명을 사용합니다.
 </ParamField>
 :::
 
 :::js
-No configuration options available (uses defaults).
+사용 가능한 설정 옵션이 없습니다(기본값 사용).
 :::
 
 </Accordion>
 
-### LLM tool selector
+### LLM 도구 선택기
 
-Use an LLM to intelligently select relevant tools before calling the main model.
+메인 모델을 호출하기 전에 LLM을 사용하여 관련 도구를 지능적으로 선택합니다.
 
 <Tip>
-**Perfect for:**
-- Agents with many tools (10+) where most aren't relevant per query
-- Reducing token usage by filtering irrelevant tools
-- Improving model focus and accuracy
+**다음과 같은 경우에 적합:**
+- 대부분이 쿼리당 관련이 없는 많은 도구(10개 이상)가 있는 에이전트
+- 관련 없는 도구를 필터링하여 토큰 사용량 줄이기
+- 모델 집중도 및 정확도 향상
 </Tip>
 
 :::python
@@ -866,12 +866,12 @@ from langchain.agents.middleware import LLMToolSelectorMiddleware
 
 agent = create_agent(
     model="openai:gpt-4o",
-    tools=[tool1, tool2, tool3, tool4, tool5, ...],  # Many tools
+    tools=[tool1, tool2, tool3, tool4, tool5, ...],  # 많은 도구
     middleware=[
         LLMToolSelectorMiddleware(
-            model="openai:gpt-4o-mini",  # Use cheaper model for selection
-            max_tools=3,  # Limit to 3 most relevant tools
-            always_include=["search"],  # Always include certain tools
+            model="openai:gpt-4o-mini",  # 선택에 더 저렴한 모델 사용
+            max_tools=3,  # 가장 관련성 높은 도구 3개로 제한
+            always_include=["search"],  # 특정 도구 항상 포함
         ),
     ],
 )
@@ -884,49 +884,49 @@ import { createAgent, llmToolSelectorMiddleware } from "langchain";
 
 const agent = createAgent({
   model: "openai:gpt-4o",
-  tools: [tool1, tool2, tool3, tool4, tool5, ...], // Many tools
+  tools: [tool1, tool2, tool3, tool4, tool5, ...], // 많은 도구
   middleware: [
     llmToolSelectorMiddleware({
-      model: "openai:gpt-4o-mini", // Use cheaper model for selection
-      maxTools: 3, // Limit to 3 most relevant tools
-      alwaysInclude: ["search"], // Always include certain tools
+      model: "openai:gpt-4o-mini", // 선택에 더 저렴한 모델 사용
+      maxTools: 3, // 가장 관련성 높은 도구 3개로 제한
+      alwaysInclude: ["search"], // 특정 도구 항상 포함
     }),
   ],
 });
 ```
 :::
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 :::python
 <ParamField body="model" type="string | BaseChatModel">
-  Model for tool selection. Can be a model string or `BaseChatModel` instance. Defaults to the agent's main model.
+  도구 선택을 위한 모델. 모델 문자열 또는 `BaseChatModel` 인스턴스일 수 있습니다. 기본값은 에이전트의 메인 모델입니다.
 </ParamField>
 
 <ParamField body="system_prompt" type="string">
-  Instructions for the selection model. Uses built-in prompt if not specified.
+  선택 모델을 위한 지침. 지정되지 않으면 내장 프롬프트를 사용합니다.
 </ParamField>
 
 <ParamField body="max_tools" type="number">
-  Maximum number of tools to select. Defaults to no limit.
+  선택할 최대 도구 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="always_include" type="list[string]">
-  List of tool names to always include in the selection
+  선택에 항상 포함할 도구 이름 목록
 </ParamField>
 :::
 
 :::js
 <ParamField body="model" type="string">
-  Model for tool selection. Defaults to the agent's main model.
+  도구 선택을 위한 모델. 기본값은 에이전트의 메인 모델입니다.
 </ParamField>
 
 <ParamField body="maxTools" type="number">
-  Maximum number of tools to select. Defaults to no limit.
+  선택할 최대 도구 수. 기본값은 제한 없음입니다.
 </ParamField>
 
 <ParamField body="alwaysInclude" type="string[]">
-  Array of tool names to always include in the selection
+  선택에 항상 포함할 도구 이름 배열
 </ParamField>
 :::
 
@@ -934,15 +934,15 @@ const agent = createAgent({
 
 :::python
 
-### Tool retry
+### 도구 재시도
 
-Automatically retry failed tool calls with configurable exponential backoff.
+설정 가능한 지수 백오프로 실패한 도구 호출을 자동으로 재시도합니다.
 
 <Tip>
-**Perfect for:**
-- Handling transient failures in external API calls
-- Improving reliability of network-dependent tools
-- Building resilient agents that gracefully handle temporary errors
+**다음과 같은 경우에 적합:**
+- 외부 API 호출에서 일시적인 실패 처리
+- 네트워크 의존 도구의 신뢰성 향상
+- 일시적인 오류를 우아하게 처리하는 복원력 있는 에이전트 구축
 </Tip>
 
 ```python
@@ -955,51 +955,51 @@ agent = create_agent(
     tools=[search_tool, database_tool],
     middleware=[
         ToolRetryMiddleware(
-            max_retries=3,  # Retry up to 3 times
-            backoff_factor=2.0,  # Exponential backoff multiplier
-            initial_delay=1.0,  # Start with 1 second delay
-            max_delay=60.0,  # Cap delays at 60 seconds
-            jitter=True,  # Add random jitter to avoid thundering herd
+            max_retries=3,  # 최대 3회 재시도
+            backoff_factor=2.0,  # 지수 백오프 배수
+            initial_delay=1.0,  # 1초 지연으로 시작
+            max_delay=60.0,  # 최대 60초로 지연 제한
+            jitter=True,  # 썬더링 허드 방지를 위한 무작위 지터 추가
         ),
     ],
 )
 ```
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 <ParamField body="max_retries" type="number" default="2">
-  Maximum number of retry attempts after the initial call (3 total attempts with default)
+  초기 호출 후 최대 재시도 횟수(기본값으로 총 3회 시도)
 </ParamField>
 
 <ParamField body="tools" type="list[BaseTool | str]">
-  Optional list of tools or tool names to apply retry logic to. If `None`, applies to all tools.
+  재시도 로직을 적용할 도구 또는 도구 이름의 선택적 목록. `None`이면 모든 도구에 적용됩니다.
 </ParamField>
 
 <ParamField body="retry_on" type="tuple[type[Exception], ...] | callable" default="(Exception,)">
-  Either a tuple of exception types to retry on, or a callable that takes an exception and returns `True` if it should be retried.
+  재시도할 예외 유형의 튜플 또는 예외를 받아 재시도 여부를 반환하는 호출 가능 함수.
 </ParamField>
 
 <ParamField body="on_failure" type="string | callable" default="return_message">
-  Behavior when all retries are exhausted. Options:
-  - `"return_message"` - Return a ToolMessage with error details (allows LLM to handle failure)
-  - `"raise"` - Re-raise the exception (stops agent execution)
-  - Custom callable - Function that takes the exception and returns a string for the ToolMessage content
+  모든 재시도가 소진되었을 때의 동작. 옵션:
+  - `"return_message"` - 오류 세부 정보가 있는 ToolMessage 반환(LLM이 실패를 처리하도록 허용)
+  - `"raise"` - 예외 다시 발생(에이전트 실행 중지)
+  - 사용자 정의 호출 가능 - 예외를 받아 ToolMessage 콘텐츠에 대한 문자열을 반환하는 함수
 </ParamField>
 
 <ParamField body="backoff_factor" type="number" default="2.0">
-  Multiplier for exponential backoff. Each retry waits `initial_delay * (backoff_factor ** retry_number)` seconds. Set to 0.0 for constant delay.
+  지수 백오프를 위한 배수. 각 재시도는 `initial_delay * (backoff_factor ** retry_number)` 초를 기다립니다. 일정한 지연을 위해 0.0으로 설정합니다.
 </ParamField>
 
 <ParamField body="initial_delay" type="number" default="1.0">
-  Initial delay in seconds before first retry
+  첫 번째 재시도 전 초기 지연(초)
 </ParamField>
 
 <ParamField body="max_delay" type="number" default="60.0">
-  Maximum delay in seconds between retries (caps exponential backoff growth)
+  재시도 간 최대 지연(초)(지수 백오프 성장 제한)
 </ParamField>
 
 <ParamField body="jitter" type="boolean" default="true">
-  Whether to add random jitter (±25%) to delay to avoid thundering herd
+  썬더링 허드를 방지하기 위해 지연에 무작위 지터(±25%)를 추가할지 여부
 </ParamField>
 
 </Accordion>
@@ -1008,15 +1008,15 @@ agent = create_agent(
 
 :::python
 
-### LLM tool emulator
+### LLM 도구 에뮬레이터
 
-Emulate tool execution using an LLM for testing purposes, replacing actual tool calls with AI-generated responses.
+테스트 목적으로 LLM을 사용하여 도구 실행을 에뮬레이트하고, 실제 도구 호출을 AI가 생성한 응답으로 대체합니다.
 
 <Tip>
-**Perfect for:**
-- Testing agent behavior without executing real tools
-- Developing agents when external tools are unavailable or expensive
-- Prototyping agent workflows before implementing actual tools
+**다음과 같은 경우에 적합:**
+- 실제 도구를 실행하지 않고 에이전트 동작 테스트
+- 외부 도구를 사용할 수 없거나 비용이 많이 드는 경우 에이전트 개발
+- 실제 도구를 구현하기 전에 에이전트 워크플로 프로토타이핑
 </Tip>
 
 ```python
@@ -1028,41 +1028,41 @@ agent = create_agent(
     model="openai:gpt-4o",
     tools=[get_weather, search_database, send_email],
     middleware=[
-        # Emulate all tools by default
+        # 기본적으로 모든 도구 에뮬레이트
         LLMToolEmulator(),
 
-        # Or emulate specific tools
+        # 또는 특정 도구 에뮬레이트
         # LLMToolEmulator(tools=["get_weather", "search_database"]),
 
-        # Or use a custom model for emulation
+        # 또는 에뮬레이션을 위한 사용자 정의 모델 사용
         # LLMToolEmulator(model="anthropic:claude-3-5-sonnet-latest"),
     ],
 )
 ```
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 <ParamField body="tools" type="list[str | BaseTool]">
-  List of tool names (str) or BaseTool instances to emulate. If `None` (default), ALL tools will be emulated. If empty list, no tools will be emulated.
+  에뮬레이트할 도구 이름(str) 또는 BaseTool 인스턴스의 목록. `None`(기본값)이면 모든 도구가 에뮬레이트됩니다. 빈 목록이면 도구가 에뮬레이트되지 않습니다.
 </ParamField>
 
 <ParamField body="model" type="string | BaseChatModel" default="anthropic:claude-3-5-sonnet-latest">
-  Model to use for generating emulated tool responses. Can be a model identifier string or BaseChatModel instance.
+  에뮬레이트된 도구 응답을 생성하는 데 사용할 모델. 모델 식별자 문자열 또는 BaseChatModel 인스턴스일 수 있습니다.
 </ParamField>
 
 </Accordion>
 
 :::
 
-### Context editing
+### 컨텍스트 편집
 
-Manage conversation context by trimming, summarizing, or clearing tool uses.
+도구 사용을 트리밍, 요약 또는 지우는 방식으로 대화 컨텍스트를 관리합니다.
 
 <Tip>
-**Perfect for:**
-- Long conversations that need periodic context cleanup
-- Removing failed tool attempts from context
-- Custom context management strategies
+**다음과 같은 경우에 적합:**
+- 정기적인 컨텍스트 정리가 필요한 긴 대화
+- 컨텍스트에서 실패한 도구 시도 제거
+- 사용자 정의 컨텍스트 관리 전략
 </Tip>
 
 :::python
@@ -1077,7 +1077,7 @@ agent = create_agent(
     middleware=[
         ContextEditingMiddleware(
             edits=[
-                ClearToolUsesEdit(max_tokens=1000),  # Clear old tool uses
+                ClearToolUsesEdit(max_tokens=1000),  # 오래된 도구 사용 지우기
             ],
         ),
     ],
@@ -1095,7 +1095,7 @@ const agent = createAgent({
   middleware: [
     contextEditingMiddleware({
       edits: [
-        new ClearToolUsesEdit({ maxTokens: 1000 }), // Clear old tool uses
+        new ClearToolUsesEdit({ maxTokens: 1000 }), // 오래된 도구 사용 지우기
       ],
     }),
   ],
@@ -1103,71 +1103,71 @@ const agent = createAgent({
 ```
 :::
 
-<Accordion title="Configuration options">
+<Accordion title="설정 옵션">
 
 :::python
 <ParamField body="edits" type="list[ContextEdit]" default="[ClearToolUsesEdit()]">
-  List of `ContextEdit` strategies to apply
+  적용할 `ContextEdit` 전략 목록
 </ParamField>
 
 <ParamField body="token_count_method" type="string" default="approximate">
-  Token counting method. Options: `"approximate"` or `"model"`
+  토큰 카운팅 방법. 옵션: `"approximate"` 또는 `"model"`
 </ParamField>
 
-**@[`ClearToolUsesEdit`] options:**
+**@[`ClearToolUsesEdit`] 옵션:**
 
 <ParamField body="trigger" type="number" default="100000">
-  Token count that triggers the edit
+  편집을 트리거하는 토큰 수
 </ParamField>
 
 <ParamField body="clear_at_least" type="number" default="0">
-  Minimum tokens to reclaim
+  회수할 최소 토큰 수
 </ParamField>
 
 <ParamField body="keep" type="number" default="3">
-  Number of recent tool results to preserve
+  보존할 최근 도구 결과 수
 </ParamField>
 
 <ParamField body="clear_tool_inputs" type="boolean" default="False">
-  Whether to clear tool call parameters
+  도구 호출 매개변수를 지울지 여부
 </ParamField>
 
 <ParamField body="exclude_tools" type="list[string]" default="()">
-  List of tool names to exclude from clearing
+  지우기에서 제외할 도구 이름 목록
 </ParamField>
 
 <ParamField body="placeholder" type="string" default="[cleared]">
-  Placeholder text for cleared outputs
+  지워진 출력에 대한 플레이스홀더 텍스트
 </ParamField>
 :::
 
 :::js
 <ParamField body="edits" type="ContextEdit[]" default="[new ClearToolUsesEdit()]">
-  Array of `ContextEdit` strategies to apply
+  적용할 `ContextEdit` 전략 배열
 </ParamField>
 
-**@[`ClearToolUsesEdit`] options:**
+**@[`ClearToolUsesEdit`] 옵션:**
 
 <ParamField body="maxTokens" type="number" default="1000">
-  Token count that triggers the edit
+  편집을 트리거하는 토큰 수
 </ParamField>
 :::
 
 </Accordion>
 
-## Custom middleware
+## 사용자 정의 미들웨어
 
-Build custom middleware by implementing hooks that run at specific points in the agent execution flow.
+에이전트 실행 흐름의 특정 지점에서 실행되는 훅을 구현하여 사용자 정의 미들웨어를 구축합니다.
 
 :::python
 
-You can create middleware in two ways:
-1. **Decorator-based** - Quick and simple for single-hook middleware
-2. **Class-based** - More powerful for complex middleware with multiple hooks
+미들웨어를 두 가지 방법으로 생성할 수 있습니다:
+1. **데코레이터 기반** - 단일 훅 미들웨어에 빠르고 간단함
+2. **클래스 기반** - 여러 훅을 사용하는 복잡한 미들웨어에 더 강력함
 
-## Decorator-based middleware
+## 데코레이터 기반 미들웨어
 
-For simple middleware that only needs a single hook, decorators provide the quickest way to add functionality:
+단일 훅만 필요한 간단한 미들웨어의 경우, 데코레이터가 기능을 추가하는 가장 빠른 방법을 제공합니다:
 
 ```python
 from langchain.agents.middleware import before_model, after_model, wrap_model_call
@@ -1178,13 +1178,13 @@ from langgraph.runtime import Runtime
 from typing import Any, Callable
 
 
-# Node-style: logging before model calls
+# 노드 스타일: 모델 호출 전 로깅
 @before_model
 def log_before_model(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
     print(f"About to call model with {len(state['messages'])} messages")
     return None
 
-# Node-style: validation after model calls
+# 노드 스타일: 모델 호출 후 유효성 검사
 @after_model(can_jump_to=["end"])
 def validate_output(state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
     last_message = state["messages"][-1]
@@ -1195,7 +1195,7 @@ def validate_output(state: AgentState, runtime: Runtime) -> dict[str, Any] | Non
         }
     return None
 
-# Wrap-style: retry logic
+# 랩 스타일: 재시도 로직
 @wrap_model_call
 def retry_model(
     request: ModelRequest,
@@ -1209,13 +1209,13 @@ def retry_model(
                 raise
             print(f"Retry {attempt + 1}/3 after error: {e}")
 
-# Wrap-style: dynamic prompts
+# 랩 스타일: 동적 프롬프트
 @dynamic_prompt
 def personalized_prompt(request: ModelRequest) -> str:
     user_id = request.runtime.context.get("user_id", "guest")
     return f"You are a helpful assistant for user {user_id}. Be concise and friendly."
 
-# Use decorators in agent
+# 에이전트에서 데코레이터 사용
 agent = create_agent(
     model="openai:gpt-4o",
     middleware=[log_before_model, validate_output, retry_model, personalized_prompt],
@@ -1223,69 +1223,69 @@ agent = create_agent(
 )
 ```
 
-### Available decorators
+### 사용 가능한 데코레이터
 
-**Node-style** (run at specific execution points):
-- `@before_agent` - Before agent starts (once per invocation)
-- @[`@before_model`] - Before each model call
-- @[`@after_model`] - After each model response
-- `@after_agent` - After agent completes (once per invocation)
+**노드 스타일** (특정 실행 지점에서 실행):
+- `@before_agent` - 에이전트 시작 전(호출당 한 번)
+- @[`@before_model`] - 각 모델 호출 전
+- @[`@after_model`] - 각 모델 응답 후
+- `@after_agent` - 에이전트 완료 후(호출당 한 번)
 
-**Wrap-style** (intercept and control execution):
-- @[`@wrap_model_call`] - Around each model call
-- @[`@wrap_tool_call`] - Around each tool call
+**랩 스타일** (실행을 가로채고 제어):
+- @[`@wrap_model_call`] - 각 모델 호출 주변
+- @[`@wrap_tool_call`] - 각 도구 호출 주변
 
-**Convenience decorators**:
-- @[`@dynamic_prompt`] - Generates dynamic system prompts (equivalent to @[`@wrap_model_call`] that modifies the prompt)
+**편의 데코레이터**:
+- @[`@dynamic_prompt`] - 동적 시스템 프롬프트 생성(프롬프트를 수정하는 @[`@wrap_model_call`]과 동등)
 
-### When to use decorators
+### 데코레이터 사용 시기
 
 <CardGroup cols={2}>
-    <Card title="Use decorators when" icon="check">
-        • You need a single hook<br/>
-        • No complex configuration
+    <Card title="데코레이터 사용 시" icon="check">
+        • 단일 훅 필요<br/>
+        • 복잡한 설정 불필요
     </Card>
-    <Card title="Use classes when" icon="code">
-        • Multiple hooks needed<br/>
-        • Complex configuration<br/>
-        • Reuse across projects (config on init)
+    <Card title="클래스 사용 시" icon="code">
+        • 여러 훅 필요<br/>
+        • 복잡한 설정<br/>
+        • 프로젝트 간 재사용(초기화 시 설정)
     </Card>
 </CardGroup>
 
 :::
 
-## Class-based middleware
+## 클래스 기반 미들웨어
 
-### Two hook styles
+### 두 가지 훅 스타일
 
 <CardGroup cols={2}>
-    <Card title="Node-style hooks" icon="diagram-project">
-        Run sequentially at specific execution points. Use for logging, validation, and state updates.
+    <Card title="노드 스타일 훅" icon="diagram-project">
+        특정 실행 지점에서 순차적으로 실행됩니다. 로깅, 유효성 검사 및 상태 업데이트에 사용합니다.
     </Card>
-    <Card title="Wrap-style hooks" icon="arrows-rotate">
-        Intercept execution with full control over handler calls. Use for retries, caching, and transformation.
+    <Card title="랩 스타일 훅" icon="arrows-rotate">
+        핸들러 호출을 완전히 제어하여 실행을 가로챕니다. 재시도, 캐싱 및 변환에 사용합니다.
     </Card>
 </CardGroup>
 
-#### Node-style hooks
+#### 노드 스타일 훅
 
-Run at specific points in the execution flow:
+실행 흐름의 특정 지점에서 실행됩니다:
 
 :::python
-- `before_agent` - Before agent starts (once per invocation)
-- `before_model` - Before each model call
-- `after_model` - After each model response
-- `after_agent` - After agent completes (up to once per invocation)
+- `before_agent` - 에이전트 시작 전(호출당 한 번)
+- `before_model` - 각 모델 호출 전
+- `after_model` - 각 모델 응답 후
+- `after_agent` - 에이전트 완료 후(호출당 최대 한 번)
 :::
 
 :::js
-- `beforeAgent` - Before agent starts (once per invocation)
-- `beforeModel` - Before each model call
-- `afterModel` - After each model response
-- `afterAgent` - After agent completes (up to once per invocation)
+- `beforeAgent` - 에이전트 시작 전(호출당 한 번)
+- `beforeModel` - 각 모델 호출 전
+- `afterModel` - 각 모델 응답 후
+- `afterAgent` - 에이전트 완료 후(호출당 최대 한 번)
 :::
 
-**Example: Logging middleware**
+**예제: 로깅 미들웨어**
 
 :::python
 ```python
@@ -1323,7 +1323,7 @@ const loggingMiddleware = createMiddleware({
 ```
 :::
 
-**Example: Conversation length limit**
+**예제: 대화 길이 제한**
 
 :::python
 ```python
@@ -1368,23 +1368,23 @@ const createMessageLimitMiddleware = (maxMessages: number = 50) => {
 ```
 :::
 
-#### Wrap-style hooks
+#### 랩 스타일 훅
 
-Intercept execution and control when the handler is called:
+실행을 가로채고 핸들러 호출 시점을 제어합니다:
 
 :::python
-- `wrap_model_call` - Around each model call
-- `wrap_tool_call` - Around each tool call
+- `wrap_model_call` - 각 모델 호출 주변
+- `wrap_tool_call` - 각 도구 호출 주변
 :::
 
 :::js
-- `wrapModelCall` - Around each model call
-- `wrapToolCall` - Around each tool call
+- `wrapModelCall` - 각 모델 호출 주변
+- `wrapToolCall` - 각 도구 호출 주변
 :::
 
-You decide if the handler is called zero times (short-circuit), once (normal flow), or multiple times (retry logic).
+핸들러를 0회(단락), 1회(정상 흐름) 또는 여러 번(재시도 로직) 호출할지 결정합니다.
 
-**Example: Model retry middleware**
+**예제: 모델 재시도 미들웨어**
 
 :::python
 ```python
@@ -1436,7 +1436,7 @@ const createRetryMiddleware = (maxRetries: number = 3) => {
 ```
 :::
 
-**Example: Dynamic model selection**
+**예제: 동적 모델 선택**
 
 :::python
 ```python
@@ -1450,7 +1450,7 @@ class DynamicModelMiddleware(AgentMiddleware):
         request: ModelRequest,
         handler: Callable[[ModelRequest], ModelResponse],
     ) -> ModelResponse:
-        # Use different model based on conversation length
+        # 대화 길이에 따라 다른 모델 사용
         if len(request.messages) > 10:
             request.model = init_chat_model("openai:gpt-4o")
         else:
@@ -1467,7 +1467,7 @@ import { createMiddleware, initChatModel } from "langchain";
 const dynamicModelMiddleware = createMiddleware({
   name: "DynamicModelMiddleware",
   wrapModelCall: (request, handler) => {
-    // Use different model based on conversation length
+    // 대화 길이에 따라 다른 모델 사용
     const modifiedRequest = { ...request };
     if (request.messages.length > 10) {
       modifiedRequest.model = initChatModel("openai:gpt-4o");
@@ -1480,7 +1480,7 @@ const dynamicModelMiddleware = createMiddleware({
 ```
 :::
 
-**Example: Tool call monitoring**
+**예제: 도구 호출 모니터링**
 
 :::python
 ```python
@@ -1532,9 +1532,9 @@ const toolMonitoringMiddleware = createMiddleware({
 ```
 :::
 
-### Custom state schema
+### 사용자 정의 상태 스키마
 
-Middleware can extend the agent's state with custom properties. Define a custom state type and set it as the `state_schema`:
+미들웨어는 사용자 정의 속성으로 에이전트의 상태를 확장할 수 있습니다. 사용자 정의 상태 타입을 정의하고 `state_schema`로 설정합니다:
 
 :::python
 ```python
@@ -1550,7 +1550,7 @@ class CallCounterMiddleware(AgentMiddleware[CustomState]):
     state_schema = CustomState
 
     def before_model(self, state: CustomState, runtime) -> dict[str, Any] | None:
-        # Access custom state properties
+        # 사용자 정의 상태 속성 접근
         count = state.get("model_call_count", 0)
 
         if count > 10:
@@ -1559,7 +1559,7 @@ class CallCounterMiddleware(AgentMiddleware[CustomState]):
         return None
 
     def after_model(self, state: CustomState, runtime) -> dict[str, Any] | None:
-        # Update custom state
+        # 사용자 정의 상태 업데이트
         return {"model_call_count": state.get("model_call_count", 0) + 1}
 ```
 :::
@@ -1569,7 +1569,7 @@ class CallCounterMiddleware(AgentMiddleware[CustomState]):
 import { createMiddleware, createAgent, HumanMessage } from "langchain";
 import * as z from "zod";
 
-// Middleware with custom state requirements
+// 사용자 정의 상태 요구 사항이 있는 미들웨어
 const callCounterMiddleware = createMiddleware({
   name: "CallCounterMiddleware",
   stateSchema: z.object({
@@ -1577,14 +1577,14 @@ const callCounterMiddleware = createMiddleware({
     userId: z.string().optional(),
   }),
   beforeModel: (state) => {
-    // Access custom state properties
+    // 사용자 정의 상태 속성 접근
     if (state.modelCallCount > 10) {
       return { jumpTo: "end" };
     }
     return;
   },
   afterModel: (state) => {
-    // Update custom state
+    // 사용자 정의 상태 업데이트
     return { modelCallCount: state.modelCallCount + 1 };
   },
 });
@@ -1599,7 +1599,7 @@ agent = create_agent(
     tools=[...],
 )
 
-# Invoke with custom state
+# 사용자 정의 상태로 호출
 result = agent.invoke({
     "messages": [HumanMessage("Hello")],
     "model_call_count": 0,
@@ -1616,23 +1616,23 @@ const agent = createAgent({
   middleware: [callCounterMiddleware] as const,
 });
 
-// TypeScript enforces required state properties
+// TypeScript가 필요한 상태 속성을 강제합니다
 const result = await agent.invoke({
   messages: [new HumanMessage("Hello")],
-  modelCallCount: 0, // Optional due to default value
-  userId: "user-123", // Optional
+  modelCallCount: 0, // 기본값으로 인해 선택사항
+  userId: "user-123", // 선택사항
 });
 ```
 :::
 
 
 :::js
-### Context extension
+### 컨텍스트 확장
 
-Context properties are configuration values passed through the runnable config. Unlike state, context is read-only and typically used for configuration that doesn't change during execution.
+컨텍스트 속성은 실행 가능 설정을 통해 전달되는 설정 값입니다. 상태와 달리 컨텍스트는 읽기 전용이며 일반적으로 실행 중에 변경되지 않는 설정에 사용됩니다.
 
 
-Middleware can define context requirements that must be satisfied through the agent's configuration:
+미들웨어는 에이전트의 설정을 통해 충족되어야 하는 컨텍스트 요구 사항을 정의할 수 있습니다:
 
 ```typescript
 import * as z from "zod";
@@ -1645,10 +1645,10 @@ const rateLimitMiddleware = createMiddleware({
     apiKey: z.string(),
   }),
   beforeModel: async (state, runtime) => {
-    // Access context through runtime
+    // 런타임을 통해 컨텍스트 접근
     const { maxRequestsPerMinute, apiKey } = runtime.context;
 
-    // Implement rate limiting logic
+    // 속도 제한 로직 구현
     const allowed = await checkRateLimit(apiKey, maxRequestsPerMinute);
     if (!allowed) {
       return { jumpTo: "END" };
@@ -1658,7 +1658,7 @@ const rateLimitMiddleware = createMiddleware({
   },
 });
 
-// Context is provided through config
+// 컨텍스트는 설정을 통해 제공됩니다
 await agent.invoke(
   { messages: [new HumanMessage("Process data")] },
   {
@@ -1671,9 +1671,9 @@ await agent.invoke(
 ```
 :::
 
-### Execution order
+### 실행 순서
 
-When using multiple middleware, understanding execution order is important:
+여러 미들웨어를 사용할 때 실행 순서를 이해하는 것이 중요합니다:
 
 :::python
 ```python
@@ -1695,31 +1695,31 @@ const agent = createAgent({
 ```
 :::
 
-<Accordion title="Execution flow (click to expand)">
+<Accordion title="실행 흐름(펼치려면 클릭)">
 
-**Before hooks run in order:**
+**Before 훅은 순서대로 실행됩니다:**
 
 1. `middleware1.before_agent()`
 2. `middleware2.before_agent()`
 3. `middleware3.before_agent()`
 
-__Agent loop starts__
+__에이전트 루프 시작__
 
 5. `middleware1.before_model()`
 6. `middleware2.before_model()`
 7. `middleware3.before_model()`
 
-**Wrap hooks nest like function calls:**
+**Wrap 훅은 함수 호출처럼 중첩됩니다:**
 
 8. `middleware1.wrap_model_call()` → `middleware2.wrap_model_call()` → `middleware3.wrap_model_call()` → model
 
-**After hooks run in reverse order:**
+**After 훅은 역순으로 실행됩니다:**
 
 9. `middleware3.after_model()`
 10. `middleware2.after_model()`
 11. `middleware1.after_model()`
 
-__Agent loop ends__
+__에이전트 루프 종료__
 
 13. `middleware3.after_agent()`
 14. `middleware2.after_agent()`
@@ -1727,20 +1727,20 @@ __Agent loop ends__
 
 </Accordion>
 
-**Key rules:**
-- `before_*` hooks: First to last
-- `after_*` hooks: Last to first (reverse)
-- `wrap_*` hooks: Nested (first middleware wraps all others)
+**주요 규칙:**
+- `before_*` 훅: 처음부터 마지막까지
+- `after_*` 훅: 마지막부터 처음까지(역순)
+- `wrap_*` 훅: 중첩됨(첫 번째 미들웨어가 다른 모든 미들웨어를 감쌈)
 
-### Agent jumps
+### 에이전트 점프
 
-To exit early from middleware, return a dictionary with `jump_to`:
+미들웨어에서 조기에 종료하려면 `jump_to`가 포함된 딕셔너리를 반환합니다:
 
 :::python
 ```python
 class EarlyExitMiddleware(AgentMiddleware):
     def before_model(self, state: AgentState, runtime) -> dict[str, Any] | None:
-        # Check some condition
+        # 조건 확인
         if should_exit(state):
             return {
                 "messages": [AIMessage("Exiting early due to condition.")],
@@ -1757,7 +1757,7 @@ import { createMiddleware, AIMessage } from "langchain";
 const earlyExitMiddleware = createMiddleware({
   name: "EarlyExitMiddleware",
   beforeModel: (state) => {
-    // Check some condition
+    // 조건 확인
     if (shouldExit(state)) {
       return {
         messages: [new AIMessage("Exiting early due to condition.")],
@@ -1770,15 +1770,15 @@ const earlyExitMiddleware = createMiddleware({
 ```
 :::
 
-Available jump targets:
+사용 가능한 점프 대상:
 
-- `"end"`: Jump to the end of the agent execution
-- `"tools"`: Jump to the tools node
-- `"model"`: Jump to the model node (or the first `before_model` hook)
+- `"end"`: 에이전트 실행의 끝으로 점프
+- `"tools"`: 도구 노드로 점프
+- `"model"`: 모델 노드로 점프(또는 첫 번째 `before_model` 훅)
 
-**Important:** When jumping from `before_model` or `after_model`, jumping to `"model"` will cause all `before_model` middleware to run again.
+**중요:** `before_model` 또는 `after_model`에서 점프할 때, `"model"`로 점프하면 모든 `before_model` 미들웨어가 다시 실행됩니다.
 
-To enable jumping, decorate your hook with `@hook_config(can_jump_to=[...])`:
+점프를 활성화하려면 훅을 `@hook_config(can_jump_to=[...])`로 장식합니다:
 
 :::python
 ```python
@@ -1810,29 +1810,29 @@ const conditionalMiddleware = createMiddleware({
 ```
 :::
 
-### Best practices
+### 모범 사례
 
-1. Keep middleware focused - each should do one thing well
-2. Handle errors gracefully - don't let middleware errors crash the agent
-3. **Use appropriate hook types**:
-    - Node-style for sequential logic (logging, validation)
-    - Wrap-style for control flow (retry, fallback, caching)
-4. Clearly document any custom state properties
-5. Unit test middleware independently before integrating
-6. Consider execution order - place critical middleware first in the list
-7. Use built-in middleware when possible, don't reinvent the wheel :)
+1. 미들웨어를 집중적으로 유지 - 각각 한 가지 일을 잘 수행해야 함
+2. 오류를 우아하게 처리 - 미들웨어 오류로 인해 에이전트가 중단되지 않도록 함
+3. **적절한 훅 타입 사용**:
+    - 순차적 로직(로깅, 유효성 검사)에는 노드 스타일
+    - 제어 흐름(재시도, 폴백, 캐싱)에는 랩 스타일
+4. 사용자 정의 상태 속성을 명확하게 문서화
+5. 통합하기 전에 미들웨어를 독립적으로 단위 테스트
+6. 실행 순서 고려 - 중요한 미들웨어를 목록의 첫 번째에 배치
+7. 가능한 경우 내장 미들웨어 사용, 바퀴를 재발명하지 마세요 :)
 
-## Examples
+## 예제
 
-### Dynamically selecting tools
+### 도구 동적 선택
 
-Select relevant tools at runtime to improve performance and accuracy.
+성능 및 정확도를 향상시키기 위해 런타임에 관련 도구를 선택합니다.
 
 <Tip>
-**Benefits:**
-- **Shorter prompts** - Reduce complexity by exposing only relevant tools
-- **Better accuracy** - Models choose correctly from fewer options
-- **Permission control** - Dynamically filter tools based on user access
+**이점:**
+- **더 짧은 프롬프트** - 관련 도구만 노출하여 복잡성 감소
+- **더 나은 정확도** - 모델이 더 적은 옵션에서 올바르게 선택
+- **권한 제어** - 사용자 액세스에 따라 도구를 동적으로 필터링
 </Tip>
 
 :::python
@@ -1848,16 +1848,16 @@ class ToolSelectorMiddleware(AgentMiddleware):
         request: ModelRequest,
         handler: Callable[[ModelRequest], ModelResponse],
     ) -> ModelResponse:
-        """Middleware to select relevant tools based on state/context."""
-        # Select a small, relevant subset of tools based on state/context
+        """상태/컨텍스트에 따라 관련 도구를 선택하는 미들웨어."""
+        # 상태/컨텍스트에 따라 작고 관련성 높은 도구 하위 집합 선택
         relevant_tools = select_relevant_tools(request.state, request.runtime)
         request.tools = relevant_tools
         return handler(request)
 
 agent = create_agent(
     model="openai:gpt-4o",
-    tools=all_tools,  # All available tools need to be registered upfront
-    # Middleware can be used to select a smaller subset that's relevant for the given run.
+    tools=all_tools,  # 사용 가능한 모든 도구를 미리 등록해야 함
+    # 미들웨어를 사용하여 주어진 실행에 관련된 더 작은 하위 집합을 선택할 수 있습니다.
     middleware=[ToolSelectorMiddleware()],
 )
 ```
@@ -1870,7 +1870,7 @@ import { createAgent, createMiddleware } from "langchain";
 const toolSelectorMiddleware = createMiddleware({
   name: "ToolSelector",
   wrapModelCall: (request, handler) => {
-    // Select a small, relevant subset of tools based on state/context
+    // 상태/컨텍스트에 따라 작고 관련성 높은 도구 하위 집합 선택
     const relevantTools = selectRelevantTools(request.state, request.runtime);
     const modifiedRequest = { ...request, tools: relevantTools };
     return handler(modifiedRequest);
@@ -1879,14 +1879,14 @@ const toolSelectorMiddleware = createMiddleware({
 
 const agent = createAgent({
   model: "openai:gpt-4o",
-  tools: allTools, // All available tools need to be registered upfront
-  // Middleware can be used to select a smaller subset that's relevant for the given run.
+  tools: allTools, // 사용 가능한 모든 도구를 미리 등록해야 함
+  // 미들웨어를 사용하여 주어진 실행에 관련된 더 작은 하위 집합을 선택할 수 있습니다.
   middleware: [toolSelectorMiddleware],
 });
 ```
 :::
 
-<Expandable title="Extended example: GitHub vs GitLab tool selection">
+<Expandable title="확장 예제: GitHub vs GitLab 도구 선택">
 
 :::python
 ```python
@@ -1900,12 +1900,12 @@ from langchain_core.tools import tool
 
 @tool
 def github_create_issue(repo: str, title: str) -> dict:
-    """Create an issue in a GitHub repository."""
+    """GitHub 저장소에 이슈를 생성합니다."""
     return {"url": f"https://github.com/{repo}/issues/1", "title": title}
 
 @tool
 def gitlab_create_issue(project: str, title: str) -> dict:
-    """Create an issue in a GitLab project."""
+    """GitLab 프로젝트에 이슈를 생성합니다."""
     return {"url": f"https://gitlab.com/{project}/-/issues/1", "title": title}
 
 all_tools = [github_create_issue, gitlab_create_issue]
@@ -1920,7 +1920,7 @@ class ToolSelectorMiddleware(AgentMiddleware):
         request: ModelRequest,
         handler: Callable[[ModelRequest], ModelResponse],
     ) -> ModelResponse:
-        """Select tools based on the VCS provider."""
+        """VCS 제공업체에 따라 도구를 선택합니다."""
         provider = request.runtime.context.provider
 
         if provider == "gitlab":
@@ -1938,7 +1938,7 @@ agent = create_agent(
     context_schema=Context,
 )
 
-# Invoke with GitHub context
+# GitHub 컨텍스트로 호출
 agent.invoke(
     {
         "messages": [{"role": "user", "content": "Open an issue titled 'Bug: where are the cats' in the repository `its-a-cats-game`"}]
@@ -1997,7 +1997,7 @@ const agent = createAgent({
   middleware: [toolSelector],
 });
 
-// Invoke with GitHub context
+// GitHub 컨텍스트로 호출
 await agent.invoke(
   {
     messages: [
@@ -2012,23 +2012,23 @@ await agent.invoke(
 :::
 
 :::python
-**Key points:**
-- Register all tools upfront
-- Middleware selects the relevant subset per request
-- Use `context_schema` for configuration requirements
+**주요 포인트:**
+- 모든 도구를 미리 등록
+- 미들웨어가 요청당 관련 하위 집합 선택
+- 설정 요구 사항에 `context_schema` 사용
 :::
 
 :::js
-**Key points:**
-- Register all tools upfront
-- Middleware selects the relevant subset per request
-- Use `contextSchema` for configuration requirements
+**주요 포인트:**
+- 모든 도구를 미리 등록
+- 미들웨어가 요청당 관련 하위 집합 선택
+- 설정 요구 사항에 `contextSchema` 사용
 :::
 
 </Expandable>
 
-## Additional resources
+## 추가 리소스
 
-- [Middleware API reference](https://reference.langchain.com/python/langchain/middleware/) - Complete guide to custom middleware
-- [Human-in-the-loop](/oss/langchain/human-in-the-loop) - Add human review for sensitive operations
-- [Testing agents](/oss/langchain/test) - Strategies for testing safety mechanisms
+- [미들웨어 API 레퍼런스](https://reference.langchain.com/python/langchain/middleware/) - 사용자 정의 미들웨어 전체 가이드
+- [휴먼 인 더 루프](/oss/langchain/human-in-the-loop) - 민감한 작업에 대한 사람의 검토 추가
+- [에이전트 테스트](/oss/langchain/test) - 안전 메커니즘 테스트 전략

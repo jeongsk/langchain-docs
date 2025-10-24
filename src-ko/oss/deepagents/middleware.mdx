@@ -1,40 +1,40 @@
 ---
-title: Deep Agents Middleware
-sidebarTitle: Middleware
-description: Understand the middleware that powers deep agents
+title: Deep Agents 미들웨어
+sidebarTitle: 미들웨어
+description: Deep agent를 구동하는 미들웨어에 대해 알아보세요
 ---
 
-Deep agents are built with a modular middleware architecture. Deep agents have access to:
+Deep agent는 모듈식 미들웨어 아키텍처로 구축됩니다. Deep agent는 다음과 같은 기능에 접근할 수 있습니다:
 
-1. A planning tool
-2. A filesystem for storing context and long-term memories
-3. The ability to spawn subagents
+1. 계획 도구
+2. 컨텍스트와 장기 메모리를 저장하기 위한 파일시스템
+3. 서브에이전트를 생성하는 기능
 
-Each feature is implemented as separate middleware. When you create a deep agent with `create_deep_agent`, we automatically attach `TodoListMiddleware`, `FilesystemMiddleware`, and `SubAgentMiddleware` to your agent.
+각 기능은 별도의 미들웨어로 구현됩니다. `create_deep_agent`로 deep agent를 생성하면, `TodoListMiddleware`, `FilesystemMiddleware`, `SubAgentMiddleware`가 자동으로 에이전트에 연결됩니다.
 
-Middleware is composable—you can add as many or as few middleware to an agent as needed. You can use any middleware independently.
+미들웨어는 조합 가능합니다—필요에 따라 원하는 만큼 많거나 적은 미들웨어를 에이전트에 추가할 수 있습니다. 각 미들웨어는 독립적으로 사용할 수 있습니다.
 
-The following sections explain what each middleware provides.
+다음 섹션에서는 각 미들웨어가 제공하는 기능을 설명합니다.
 
-## Planning middleware
+## 계획 미들웨어
 
-Planning is integral to solving complex problems. If you've used Claude Code recently, you'll notice how it writes out a to-do list before tackling complex, multi-part tasks. You'll also notice how it can adapt and update this to-do list on the fly as more information comes in.
+계획은 복잡한 문제를 해결하는 데 필수적입니다. 최근에 Claude Code를 사용해보셨다면, 복잡한 다단계 작업을 처리하기 전에 할 일 목록을 작성하는 것을 보셨을 것입니다. 또한 더 많은 정보가 들어옴에 따라 이 할 일 목록을 즉석에서 조정하고 업데이트할 수 있는 것도 확인하셨을 것입니다.
 
-`TodoListMiddleware` provides your agent with a tool specifically for updating this to-do list. Before and while it executes a multi-part task, the agent is prompted to use the `write_todos` tool to keep track of what it's doing and what still needs to be done.
+`TodoListMiddleware`는 이 할 일 목록을 업데이트하기 위한 전용 도구를 에이전트에 제공합니다. 다단계 작업을 실행하기 전과 실행하는 동안, 에이전트는 `write_todos` 도구를 사용하여 현재 수행 중인 작업과 아직 완료해야 할 작업을 추적하도록 프롬프트됩니다.
 
 :::python
 ```python
 from langchain.agents import create_agent
 from langchain.agents.middleware import TodoListMiddleware
 
-# TodoListMiddleware is included by default in create_deep_agent
-# You can customize it if building a custom agent
+# TodoListMiddleware는 create_deep_agent에 기본으로 포함됩니다
+# 커스텀 에이전트를 구축할 때 커스터마이징할 수 있습니다
 agent = create_agent(
     model="anthropic:claude-sonnet-4-20250514",
-    # Custom planning instructions can be added via middleware
+    # 미들웨어를 통해 커스텀 계획 지침을 추가할 수 있습니다
     middleware=[
         TodoListMiddleware(
-            system_prompt="Use the write_todos tool to..."  # Optional: Custom addition to the system prompt
+            system_prompt="Use the write_todos tool to..."  # 선택사항: 시스템 프롬프트에 추가할 커스텀 내용
         ),
     ],
 )
@@ -47,41 +47,41 @@ agent = create_agent(
 ```
 :::
 
-## Filesystem middleware
+## 파일시스템 미들웨어
 
-Context engineering is a main challenge in building effective agents. This is particularly difficult when using tools that return variable-length results (for example, web_search and rag), as long tool results can quickly fill your context window.
+컨텍스트 엔지니어링은 효과적인 에이전트를 구축하는 데 있어 주요 과제입니다. 이는 가변 길이 결과를 반환하는 도구(예: web_search, rag)를 사용할 때 특히 어렵습니다. 긴 도구 결과가 컨텍스트 윈도우를 빠르게 채울 수 있기 때문입니다.
 
-`FilesystemMiddleware` provides four tools for interacting with both short-term and long-term memory:
+`FilesystemMiddleware`는 단기 메모리와 장기 메모리 모두와 상호작용하기 위한 네 가지 도구를 제공합니다:
 
-- **ls**: List the files in the filesystem
-- **read_file**: Read an entire file or a certain number of lines from a file
-- **write_file**: Write a new file to the filesystem
-- **edit_file**: Edit an existing file in the filesystem
+- **ls**: 파일시스템의 파일 목록을 표시합니다
+- **read_file**: 파일 전체 또는 파일의 특정 라인 수를 읽습니다
+- **write_file**: 파일시스템에 새 파일을 작성합니다
+- **edit_file**: 파일시스템의 기존 파일을 편집합니다
 
 ```python
 from langchain.agents import create_agent
 from deepagents.middleware.filesystem import FilesystemMiddleware
 
-# FilesystemMiddleware is included by default in create_deep_agent
-# You can customize it if building a custom agent
+# FilesystemMiddleware는 create_deep_agent에 기본으로 포함됩니다
+# 커스텀 에이전트를 구축할 때 커스터마이징할 수 있습니다
 agent = create_agent(
     model="anthropic:claude-sonnet-4-20250514",
     middleware=[
         FilesystemMiddleware(
-            long_term_memory=False,  # Enables access to long-term memory, defaults to False. You must attach a store to use long-term memory.
-            system_prompt="Write to the filesystem when...",  # Optional custom addition to the system prompt
+            long_term_memory=False,  # 장기 메모리 접근을 활성화합니다. 기본값은 False입니다. 장기 메모리를 사용하려면 스토어를 연결해야 합니다.
+            system_prompt="Write to the filesystem when...",  # 선택사항: 시스템 프롬프트에 추가할 커스텀 내용
             custom_tool_descriptions={
                 "ls": "Use the ls tool when...",
                 "read_file": "Use the read_file tool to..."
-            }  # Optional: Custom descriptions for filesystem tools
+            }  # 선택사항: 파일시스템 도구에 대한 커스텀 설명
         ),
     ],
 )
 ```
 
-### Short-term vs. long-term filesystem
+### 단기 파일시스템 vs. 장기 파일시스템
 
-By default, these tools write to a local "filesystem" in your graph state. If you provide a `Store` object to your agent runtime, you can also enable saving to long-term memory, which persists **across** different threads of your agent.
+기본적으로 이러한 도구는 그래프 상태의 로컬 "파일시스템"에 작성됩니다. 에이전트 런타임에 `Store` 객체를 제공하면 장기 메모리에 저장하는 기능도 활성화할 수 있으며, 이는 에이전트의 서로 다른 스레드 **간에** 지속됩니다.
 
 :::python
 ```python
@@ -100,7 +100,7 @@ agent = create_agent(
             custom_tool_descriptions={
                 "ls": "Use the ls tool when...",
                 "read_file": "Use the read_file tool to..."
-            }  # Optional: Custom descriptions for filesystem tools
+            }  # 선택사항: 파일시스템 도구에 대한 커스텀 설명
         ),
     ],
 )
@@ -113,13 +113,13 @@ agent = create_agent(
 ```
 :::
 
-If you enable `use_longterm_memory=True` and provide a `Store` in your agent runtime, then any files prefixed with **/memories/** are saved to the long-term memory store. Note that any agents deployed on LangGraph Platform are automatically provided with a long-term memory store.
+`use_longterm_memory=True`를 활성화하고 에이전트 런타임에 `Store`를 제공하면, **/memories/** 접두사가 붙은 모든 파일이 장기 메모리 스토어에 저장됩니다. LangGraph Platform에 배포된 모든 에이전트는 자동으로 장기 메모리 스토어가 제공됩니다.
 
-## Subagent middleware
+## 서브에이전트 미들웨어
 
-Handing off tasks to subagents isolates context, keeping the main (supervisor) agent's context window clean while still going deep on a task.
+작업을 서브에이전트에 위임하면 컨텍스트가 격리되어, 메인(수퍼바이저) 에이전트의 컨텍스트 윈도우를 깨끗하게 유지하면서도 작업에 깊이 파고들 수 있습니다.
 
-The subagents middleware allows you to supply subagents through a `task` tool.
+서브에이전트 미들웨어를 사용하면 `task` 도구를 통해 서브에이전트를 제공할 수 있습니다.
 
 ```python
 from langchain_core.tools import tool
@@ -153,9 +153,9 @@ agent = create_agent(
 )
 ```
 
-A subagent is defined with a **name**, **description**, **system prompt**, and **tools**. You can also provide a subagent with a custom **model**, or with additional **middleware**. This can be particularly useful when you want to give the subagent an additional state key to share with the main agent.
+서브에이전트는 **이름**, **설명**, **시스템 프롬프트**, **도구**로 정의됩니다. 서브에이전트에 커스텀 **모델**이나 추가 **미들웨어**를 제공할 수도 있습니다. 이는 서브에이전트에 추가 상태 키를 제공하여 메인 에이전트와 공유하려는 경우 특히 유용합니다.
 
-For more complex use cases, you can also provide your own pre-built LangGraph graph as a subagent.
+더 복잡한 사용 사례의 경우, 미리 구축된 자체 LangGraph 그래프를 서브에이전트로 제공할 수도 있습니다.
 
 :::python
 ```python
@@ -164,15 +164,15 @@ from deepagents.middleware.subagents import SubAgentMiddleware
 from deepagents import CompiledSubAgent
 from langgraph.graph import StateGraph
 
-# Create a custom LangGraph graph
+# 커스텀 LangGraph 그래프 생성
 def create_weather_graph():
     workflow = StateGraph(...)
-    # Build your custom graph
+    # 커스텀 그래프 구축
     return workflow.compile()
 
 weather_graph = create_weather_graph()
 
-# Wrap it in a CompiledSubAgent
+# CompiledSubAgent로 래핑
 weather_subagent = CompiledSubAgent(
     name="weather",
     description="This subagent can get weather in cities.",
@@ -198,4 +198,4 @@ agent = create_agent(
 ```
 :::
 
-In addition to any user-defined subagents, the main agent has access to a `general-purpose` subagent at all times. This subagent has the same instructions as the main agent and all the tools it has access to. The primary purpose of the `general-purpose` subagent is context isolation—the main agent can delegate a complex task to this subagent and get a concise answer back without bloat from intermediate tool calls.
+사용자 정의 서브에이전트 외에도, 메인 에이전트는 항상 `general-purpose` 서브에이전트에 접근할 수 있습니다. 이 서브에이전트는 메인 에이전트와 동일한 지침과 접근 가능한 모든 도구를 가지고 있습니다. `general-purpose` 서브에이전트의 주요 목적은 컨텍스트 격리입니다—메인 에이전트는 복잡한 작업을 이 서브에이전트에 위임하고, 중간 도구 호출로 인한 불필요한 내용 없이 간결한 답변을 받을 수 있습니다.
