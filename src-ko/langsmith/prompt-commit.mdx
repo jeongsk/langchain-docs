@@ -1,45 +1,45 @@
 ---
-title: How to sync prompts with GitHub
-sidebarTitle: Sync prompts with GitHub
+title: GitHub와 프롬프트를 동기화하는 방법
+sidebarTitle: GitHub와 프롬프트 동기화
 ---
 
-LangSmith provides a collaborative interface to create, test, and iterate on prompts.
+LangSmith는 프롬프트를 생성하고, 테스트하며, 반복 작업을 수행할 수 있는 협업 인터페이스를 제공합니다.
 
-While you can [dynamically fetch prompts](/langsmith/manage-prompts-programmatically#pull-a-prompt) from LangSmith into your application at runtime, you may prefer to sync prompts with your own database or version control system. To support this workflow, LangSmith allows you to receive notifications of prompt updates via webhooks.
+런타임에 애플리케이션으로 [프롬프트를 동적으로 가져올](/langsmith/manage-prompts-programmatically#pull-a-prompt) 수 있지만, 프롬프트를 자체 데이터베이스나 버전 관리 시스템과 동기화하는 것을 선호할 수도 있습니다. 이러한 워크플로우를 지원하기 위해 LangSmith는 웹훅을 통해 프롬프트 업데이트 알림을 받을 수 있습니다.
 
-**Why sync prompts with GitHub?**
+**GitHub와 프롬프트를 동기화하는 이유는 무엇인가요?**
 
-* **Version Control:** Keep your prompts versioned alongside your application code in a familiar system.
-* **CI/CD Integration:** Trigger automated staging or production deployments when critical prompts change.
+* **버전 관리:** 익숙한 시스템에서 애플리케이션 코드와 함께 프롬프트의 버전을 관리할 수 있습니다.
+* **CI/CD 통합:** 중요한 프롬프트가 변경될 때 자동화된 스테이징 또는 프로덕션 배포를 트리거할 수 있습니다.
 
 ![Prompt Webhook Diagram](/langsmith/images/prompt-excalidraw.png)
 
-## Prerequisites
+## 사전 준비사항
 
-Before we begin, ensure you have the following set up:
+시작하기 전에 다음 사항이 설정되어 있는지 확인하세요:
 
-1. **GitHub Account:** A standard GitHub account.
+1. **GitHub 계정:** 표준 GitHub 계정.
 
-2. **GitHub Repository:** Create a new (or choose an existing) repository where your LangSmith prompt manifests will be stored. This could be the same repository as your application code or a dedicated one for prompts.
+2. **GitHub 리포지토리:** LangSmith 프롬프트 매니페스트가 저장될 새 리포지토리를 생성하거나 기존 리포지토리를 선택합니다. 애플리케이션 코드와 동일한 리포지토리이거나 프롬프트 전용 리포지토리일 수 있습니다.
 
-3. **GitHub Personal Access Token (PAT):**
+3. **GitHub 개인 액세스 토큰(PAT):**
 
-   * LangSmith webhooks don't directly interact with GitHub—they call an intermediary server that *you* create.
-   * This server requires a GitHub PAT to authenticate and make commits to your repository.
-   * Must include the `repo` scope (`public_repo` is sufficient for public repositories).
-   * Go to **GitHub > Settings > Developer settings > Personal access tokens > Tokens (classic)**.
-   * Click **Generate new token (classic)**.
-   * Name it (e.g., "LangSmith Prompt Sync"), set an expiration, and select the required scopes.
-   * Click **Generate token** and **copy it immediately** — it won't be shown again.
-   * Store the token securely and provide it as an environment variable to your server.
+   * LangSmith 웹훅은 GitHub와 직접 상호작용하지 않으며, *사용자가* 생성한 중개 서버를 호출합니다.
+   * 이 서버는 리포지토리에 인증하고 커밋을 수행하기 위해 GitHub PAT가 필요합니다.
+   * `repo` 범위를 포함해야 합니다(공개 리포지토리의 경우 `public_repo`로 충분).
+   * **GitHub > Settings > Developer settings > Personal access tokens > Tokens (classic)**로 이동합니다.
+   * **Generate new token (classic)**을 클릭합니다.
+   * 이름을 지정하고(예: "LangSmith Prompt Sync"), 만료일을 설정하며, 필요한 범위를 선택합니다.
+   * **Generate token**을 클릭하고 **즉시 복사**하세요 — 다시 표시되지 않습니다.
+   * 토큰을 안전하게 저장하고 서버에 환경 변수로 제공합니다.
 
-## Understanding LangSmith "Prompt Commits" and Webhooks
+## LangSmith "프롬프트 커밋"과 웹훅 이해하기
 
-In LangSmith, when you save changes to a prompt, you're essentially creating a new version or a "Prompt Commit." These commits are what can trigger webhooks.
+LangSmith에서 프롬프트에 변경 사항을 저장하면 본질적으로 새로운 버전이나 "프롬프트 커밋"을 생성하는 것입니다. 이러한 커밋이 웹훅을 트리거할 수 있습니다.
 
-The webhook will send a JSON payload containing the new **prompt manifest**.
+웹훅은 새로운 **프롬프트 매니페스트**를 포함하는 JSON 페이로드를 전송합니다.
 
-<Accordion title="Sample Webhook Payload">
+<Accordion title="샘플 웹훅 페이로드">
   ```json
   {
     "prompt_id": "f33dcb51-eb17-47a5-83ca-64ac8a027a29",
@@ -149,27 +149,27 @@ The webhook will send a JSON payload containing the new **prompt manifest**.
 </Accordion>
 
 <Note>
-It's important to understand that LangSmith webhooks for prompt commits are generally triggered at the **workspace level**. This means if *any* prompt within your LangSmith workspace is modified and a "prompt commit" is saved, the webhook will fire and send the updated manifest of the prompt. The payloads are identifiable by prompt id. Your receiving server should be designed with this in mind.
+프롬프트 커밋에 대한 LangSmith 웹훅은 일반적으로 **워크스페이스 수준**에서 트리거된다는 점을 이해하는 것이 중요합니다. 즉, LangSmith 워크스페이스 내의 *모든* 프롬프트가 수정되고 "프롬프트 커밋"이 저장되면 웹훅이 실행되고 프롬프트의 업데이트된 매니페스트를 전송합니다. 페이로드는 프롬프트 ID로 식별할 수 있습니다. 수신 서버는 이를 염두에 두고 설계되어야 합니다.
 </Note>
 
-## Implementing a FastAPI Server for Webhook Reception
+## 웹훅 수신을 위한 FastAPI 서버 구현
 
-To effectively process webhook notifications from LangSmith when prompts are updated, an intermediary server application is necessary. This server will act as the receiver for HTTP POST requests sent by LangSmith. For demonstration purposes in this guide, we will outline the creation of a simple FastAPI application to fulfill this role.
+프롬프트가 업데이트될 때 LangSmith로부터 웹훅 알림을 효과적으로 처리하려면 중개 서버 애플리케이션이 필요합니다. 이 서버는 LangSmith가 보내는 HTTP POST 요청의 수신자 역할을 합니다. 이 가이드에서는 데모 목적으로 이 역할을 수행하기 위한 간단한 FastAPI 애플리케이션 생성을 개요로 설명합니다.
 
-This publicly accessible server will be responsible for:
+이 공개 액세스 가능한 서버는 다음을 담당합니다:
 
-1. **Receiving Webhook Requests:** Listening for incoming HTTP POST requests.
-2. **Parsing Payloads:** Extracting and interpreting the JSON-formatted prompt manifest from the request body.
-3. **Committing to GitHub:** Programmatically creating a new commit in your specified GitHub repository, containing the updated prompt manifest. This ensures your prompts remain version-controlled and synchronized with changes made in LangSmith.
+1. **웹훅 요청 수신:** 들어오는 HTTP POST 요청을 수신합니다.
+2. **페이로드 파싱:** 요청 본문에서 JSON 형식의 프롬프트 매니페스트를 추출하고 해석합니다.
+3. **GitHub에 커밋:** 업데이트된 프롬프트 매니페스트를 포함하여 지정된 GitHub 리포지토리에 프로그래밍 방식으로 새 커밋을 생성합니다. 이를 통해 프롬프트가 버전 관리되고 LangSmith에서 변경된 내용과 동기화됩니다.
 
-For deployment, platforms like [Render.com](https://render.com/) (offering a suitable free tier), Vercel, Fly.io, or other cloud providers (AWS, GCP, Azure) can be utilized to host the FastAPI application and obtain a public URL.
+배포를 위해 [Render.com](https://render.com/)(적합한 무료 티어 제공), Vercel, Fly.io 또는 기타 클라우드 제공업체(AWS, GCP, Azure)와 같은 플랫폼을 사용하여 FastAPI 애플리케이션을 호스팅하고 공개 URL을 얻을 수 있습니다.
 
-The server's core functionality will include an endpoint for webhook reception, logic for parsing the manifest, and integration with the GitHub API (using a Personal Access Token for authentication) to manage commits.
+서버의 핵심 기능에는 웹훅 수신을 위한 엔드포인트, 매니페스트 파싱을 위한 로직, 커밋을 관리하기 위한 GitHub API와의 통합(인증을 위해 개인 액세스 토큰 사용)이 포함됩니다.
 
-<Accordion title="Minimal FastAPI Server Code ()">
+<Accordion title="최소 FastAPI 서버 코드 ()">
   `main.py`
 
-  This server will listen for incoming webhooks from LangSmith and commit the received prompt manifest to your GitHub repository.
+  이 서버는 LangSmith로부터 들어오는 웹훅을 수신하고 수신된 프롬프트 매니페스트를 GitHub 리포지토리에 커밋합니다.
 
   ```python
   import base64
@@ -335,71 +335,71 @@ The server's core functionality will include an endpoint for webhook reception, 
   # 4. Deploy to a public platform like Render.com.
   ```
 
-  **Key aspects of this server:**
+  **이 서버의 주요 측면:**
 
-  * **Configuration (`.env`):** It expects a `.env` file with your `GITHUB_TOKEN`, `GITHUB_REPO_OWNER`, and `GITHUB_REPO_NAME`. You can also customize `GITHUB_FILE_PATH` (default: `LangSmith_prompt_manifest.json`) and `GITHUB_BRANCH` (default: `main`).
-  * **GitHub Interaction:** The `commit_manifest_to_github` function handles the logic of fetching the current file's SHA (to update it) and then committing the new manifest content.
-  * **Webhook Endpoint (`/webhook/commit`):** This is the URL path your LangSmith webhook will target.
-  * **Error Handling:** Basic error handling for GitHub API interactions is included.
+  * **구성(`.env`):** `GITHUB_TOKEN`, `GITHUB_REPO_OWNER`, `GITHUB_REPO_NAME`이 포함된 `.env` 파일이 필요합니다. `GITHUB_FILE_PATH`(기본값: `LangSmith_prompt_manifest.json`) 및 `GITHUB_BRANCH`(기본값: `main`)를 사용자 정의할 수도 있습니다.
+  * **GitHub 상호작용:** `commit_manifest_to_github` 함수는 현재 파일의 SHA를 가져오고(업데이트하기 위해) 새 매니페스트 콘텐츠를 커밋하는 로직을 처리합니다.
+  * **웹훅 엔드포인트(`/webhook/commit`):** LangSmith 웹훅이 대상으로 하는 URL 경로입니다.
+  * **오류 처리:** GitHub API 상호작용을 위한 기본 오류 처리가 포함되어 있습니다.
 
-  **Deploy this server to your chosen platform (e.g., Render) and note down its public URL (e.g., `https://prompt-commit-webhook.onrender.com`).**
+  **이 서버를 선택한 플랫폼(예: Render)에 배포하고 공개 URL(예: `https://prompt-commit-webhook.onrender.com`)을 기록해두세요.**
 </Accordion>
 
-## Configuring the Webhook in LangSmith
+## LangSmith에서 웹훅 구성하기
 
-Once your FastAPI server is deployed and you have its public URL, you can configure the webhook in LangSmith:
+FastAPI 서버가 배포되고 공개 URL이 있으면 LangSmith에서 웹훅을 구성할 수 있습니다:
 
-1. Navigate to your LangSmith workspace.
+1. LangSmith 워크스페이스로 이동합니다.
 
-2. Go to the **Prompts** section. Here you'll see a list of your prompts.
+2. **Prompts** 섹션으로 이동합니다. 여기에 프롬프트 목록이 표시됩니다.
 
    ![LangSmith Prompts section](/langsmith/images/prompt-commit-main.png)
 
-3. On the top right of the Prompts page, click the **+ Webhook** button.
+3. Prompts 페이지의 오른쪽 상단에서 **+ Webhook** 버튼을 클릭합니다.
 
-4. You'll be presented with a form to configure your webhook:
+4. 웹훅을 구성하는 양식이 표시됩니다:
 
    ![LangSmith Webhook configuration modal](/langsmith/images/prompt-commit-webhook.png)
 
-   * **Webhook URL:** Enter the full public URL of your deployed FastAPI server's endpoint. For our example server, this would be `https://prompt-commit-webhook.onrender.com/webhook/commit`.
-   * **Headers (Optional):**
-     * You can add custom headers that LangSmith will send with each webhook request.
+   * **Webhook URL:** 배포된 FastAPI 서버 엔드포인트의 전체 공개 URL을 입력합니다. 예제 서버의 경우 `https://prompt-commit-webhook.onrender.com/webhook/commit`이 됩니다.
+   * **Headers(선택 사항):**
+     * LangSmith가 각 웹훅 요청과 함께 전송할 사용자 정의 헤더를 추가할 수 있습니다.
 
-5. **Test the Webhook:** LangSmith provides a "Send Test Notification" button. Use this to send a sample payload to your server. Check your server logs (e.g., on Render) to ensure it receives the request and processes it successfully (or to debug any issues).
+5. **웹훅 테스트:** LangSmith는 "Send Test Notification" 버튼을 제공합니다. 이를 사용하여 서버로 샘플 페이로드를 전송하세요. 서버 로그(예: Render에서)를 확인하여 요청을 수신하고 성공적으로 처리하는지(또는 문제를 디버깅하기 위해) 확인하세요.
 
-6. **Save** the webhook configuration.
+6. 웹훅 구성을 **저장**합니다.
 
-## The Workflow in Action
+## 실제 워크플로우
 
 ![Workflow Diagram showing: User saves prompt in LangSmith, LangSmith sends webhook to FastAPI Server, which interacts with GitHub to update files](/langsmith/images/prompt-sequence-diagram.png)
 
-Now, with everything set up, here's what happens:
+이제 모든 것이 설정되었으므로 다음과 같이 진행됩니다:
 
-1. **Prompt Modification:** A user (developer or non-technical team member) modifies a prompt in the LangSmith UI and saves it, creating a new "prompt commit."
+1. **프롬프트 수정:** 사용자(개발자 또는 비기술 팀원)가 LangSmith UI에서 프롬프트를 수정하고 저장하여 새로운 "프롬프트 커밋"을 생성합니다.
 
-2. **Webhook Trigger:** LangSmith detects this new prompt commit and triggers the configured webhook.
+2. **웹훅 트리거:** LangSmith가 이 새로운 프롬프트 커밋을 감지하고 구성된 웹훅을 트리거합니다.
 
-3. **HTTP Request:** LangSmith sends an HTTP POST request to the public URL of your FastAPI server (e.g., `https://prompt-commit-webhook.onrender.com/webhook/commit`). The body of this request contains the JSON prompt manifest for the entire workspace.
+3. **HTTP 요청:** LangSmith가 FastAPI 서버의 공개 URL(예: `https://prompt-commit-webhook.onrender.com/webhook/commit`)로 HTTP POST 요청을 전송합니다. 이 요청의 본문에는 전체 워크스페이스에 대한 JSON 프롬프트 매니페스트가 포함됩니다.
 
-4. **Server Receives Payload:** Your FastAPI server's endpoint receives the request.
+4. **서버가 페이로드 수신:** FastAPI 서버의 엔드포인트가 요청을 수신합니다.
 
-5. **GitHub Commit:** The server parses the JSON manifest from the request body. It then uses the configured GitHub Personal Access Token, repository owner, repository name, file path, and branch to:
+5. **GitHub 커밋:** 서버가 요청 본문에서 JSON 매니페스트를 파싱합니다. 그런 다음 구성된 GitHub 개인 액세스 토큰, 리포지토리 소유자, 리포지토리 이름, 파일 경로 및 브랜치를 사용하여:
 
-   * Check if the manifest file already exists in the repository on the specified branch to get its SHA (this is necessary for updating an existing file).
-   * Create a new commit with the latest prompt manifest, either creating the file or updating it if it already exists. The commit message will indicate that it's an update from LangSmith.
+   * 지정된 브랜치의 리포지토리에 매니페스트 파일이 이미 존재하는지 확인하여 SHA를 가져옵니다(기존 파일을 업데이트하는 데 필요).
+   * 최신 프롬프트 매니페스트로 새 커밋을 생성하여 파일을 생성하거나 이미 존재하는 경우 업데이트합니다. 커밋 메시지는 LangSmith로부터의 업데이트임을 나타냅니다.
 
-6. **Confirmation:** You should see the new commit appear in your GitHub repository.
+6. **확인:** GitHub 리포지토리에 새 커밋이 나타나는 것을 확인할 수 있습니다.
 
    ![Manifest commited to Github](/langsmith/images/prompt-commit-github.png)
 
-You've now successfully synced your LangSmith prompts with GitHub!
+이제 LangSmith 프롬프트를 GitHub와 성공적으로 동기화했습니다!
 
-## Beyond a Simple Commit
+## 단순 커밋을 넘어서
 
-Our example FastAPI server performs a direct commit of the entire prompt manifest. However, this is just the starting point. You can extend the server's functionality to perform more sophisticated actions:
+예제 FastAPI 서버는 전체 프롬프트 매니페스트의 직접 커밋을 수행합니다. 그러나 이것은 시작점일 뿐입니다. 서버의 기능을 확장하여 더욱 정교한 작업을 수행할 수 있습니다:
 
-* **Granular Commits:** Parse the manifest and commit changes to individual prompt files if you prefer a more granular structure in your repository.
-* **Trigger CI/CD:** Instead of (or in addition to) committing, have the server trigger a CI/CD pipeline (e.g., Jenkins, GitHub Actions, GitLab CI) to deploy a staging environment, run tests, or build new application versions.
-* **Update Databases/Caches:** If your application loads prompts from a database or cache, update these stores directly.
-* **Notifications:** Send notifications to Slack, email, or other communication channels about prompt changes.
-* **Selective Processing:** Based on metadata within the LangSmith payload (if available, e.g., which specific prompt changed or by whom), you could apply different logic.
+* **세분화된 커밋:** 매니페스트를 파싱하고 리포지토리에서 더 세분화된 구조를 선호하는 경우 개별 프롬프트 파일에 변경 사항을 커밋합니다.
+* **CI/CD 트리거:** 커밋 대신(또는 커밋에 추가로) 서버가 스테이징 환경을 배포하거나 테스트를 실행하거나 새 애플리케이션 버전을 빌드하기 위해 CI/CD 파이프라인(예: Jenkins, GitHub Actions, GitLab CI)을 트리거하도록 합니다.
+* **데이터베이스/캐시 업데이트:** 애플리케이션이 데이터베이스나 캐시에서 프롬프트를 로드하는 경우 이러한 저장소를 직접 업데이트합니다.
+* **알림:** 프롬프트 변경 사항에 대해 Slack, 이메일 또는 기타 커뮤니케이션 채널로 알림을 전송합니다.
+* **선택적 처리:** LangSmith 페이로드 내의 메타데이터(사용 가능한 경우, 예: 어떤 특정 프롬프트가 변경되었는지 또는 누구에 의해 변경되었는지)를 기반으로 다른 로직을 적용할 수 있습니다.
