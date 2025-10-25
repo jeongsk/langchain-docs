@@ -1,31 +1,31 @@
 ---
-title: Log user feedback using the SDK
-sidebarTitle: Log user feedback using the SDK
+title: SDK를 사용하여 사용자 피드백 기록
+sidebarTitle: SDK를 사용하여 사용자 피드백 기록
 ---
 
 <Tip>
-**Key concepts**
-- [Conceptual guide on tracing and feedback](/langsmith/observability-concepts)
-- [Reference guide on feedback data format](/langsmith/feedback-data-format)
+**핵심 개념**
+- [추적 및 피드백에 대한 개념 가이드](/langsmith/observability-concepts)
+- [피드백 데이터 형식에 대한 참조 가이드](/langsmith/feedback-data-format)
 </Tip>
 
-LangSmith makes it easy to attach feedback to traces.
-This feedback can come from users, annotators, automated evaluators, etc., and is crucial for monitoring and evaluating applications.
+LangSmith를 사용하면 추적에 피드백을 쉽게 첨부할 수 있습니다.
+이 피드백은 사용자, 주석자, 자동화된 평가자 등으로부터 올 수 있으며 애플리케이션 모니터링 및 평가에 매우 중요합니다.
 
-## Use [create_feedback()](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.create_feedback) / [createFeedback()](https://docs.smith.langchain.com/reference/js/classes/client.Client#createfeedback)
+## [create_feedback()](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.create_feedback) / [createFeedback()](https://docs.smith.langchain.com/reference/js/classes/client.Client#createfeedback) 사용
 
-Here we'll walk through how to log feedback using the SDK.
+여기서는 SDK를 사용하여 피드백을 기록하는 방법을 안내합니다.
 
 <Info>
-**Child runs**
-You can attach user feedback to ANY child run of a trace, not just the trace (root run) itself.
-This is useful for critiquing specific steps of the LLM application, such as the retrieval step or generation step of a RAG pipeline.
+**자식 실행**
+추적(루트 실행) 자체뿐만 아니라 추적의 모든 자식 실행에 사용자 피드백을 첨부할 수 있습니다.
+이는 RAG 파이프라인의 검색 단계 또는 생성 단계와 같은 LLM 애플리케이션의 특정 단계를 비판하는 데 유용합니다.
 </Info>
 
 <Tip>
-**Non-blocking creation (Python only)**
-The Python client will automatically background feedback creation if you pass `trace_id=` to [create_feedback()](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.create_feedback).
-This is essential for low-latency environments, where you want to make sure your application isn't blocked on feedback creation.
+**논블로킹 생성(Python만 해당)**
+Python 클라이언트는 [create_feedback()](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.create_feedback)에 `trace_id=`를 전달하면 피드백 생성을 자동으로 백그라운드로 처리합니다.
+이는 애플리케이션이 피드백 생성으로 인해 차단되지 않도록 하려는 짧은 지연 시간 환경에 필수적입니다.
 </Tip>
 
 <CodeGroup>
@@ -51,7 +51,7 @@ from langsmith import trace, traceable, Client
         trace_id = root_run.id
         child_runs = root_run.child_runs
 
-    # Provide feedback for a trace (a.k.a. a root run)
+    # 추적(일명 루트 실행)에 대한 피드백 제공
     client.create_feedback(
         key="user_feedback",
         score=1,
@@ -59,14 +59,13 @@ from langsmith import trace, traceable, Client
         comment="the user said that ..."
     )
 
-# Provide feedback for a child run
+# 자식 실행에 대한 피드백 제공
 foo_run_id = [run for run in child_runs if run.name == "foo"][0].id
 client.create_feedback(
     key="correctness",
     score=0,
     run_id=foo_run_id,
-    # trace_id= is optional but recommended to enable batched and backgrounded
-    # feedback ingestion.
+    # trace_id=는 선택 사항이지만 일괄 처리 및 백그라운드 피드백 수집을 활성화하려면 권장됩니다.
     trace_id=trace_id,
 )
 ```
@@ -75,8 +74,8 @@ client.create_feedback(
 import { Client } from "langsmith";
 const client = new Client();
 
-    // ... Run your application and get the run_id...
-    // This information can be the result of a user-facing feedback form
+    // ... 애플리케이션을 실행하고 run_id를 가져옵니다...
+    // 이 정보는 사용자 대면 피드백 양식의 결과일 수 있습니다
 
 await client.createFeedback(
     runId,
@@ -90,9 +89,9 @@ await client.createFeedback(
 
 </CodeGroup>
 
-You can even log feedback for in-progress runs using `create_feedback() / createFeedback()`. See [this guide](/langsmith/access-current-span) for how to get the run ID of an in-progress run.
+`create_feedback() / createFeedback()`을 사용하여 진행 중인 실행에 대한 피드백도 기록할 수 있습니다. 진행 중인 실행의 실행 ID를 가져오는 방법은 [이 가이드](/langsmith/access-current-span)를 참조하세요.
 
-To learn more about how to filter traces based on various attributes, including user feedback, see [this guide](/langsmith/filter-traces-in-application).
+사용자 피드백을 포함한 다양한 속성을 기반으로 추적을 필터링하는 방법에 대해 자세히 알아보려면 [이 가이드](/langsmith/filter-traces-in-application)를 참조하세요.
 
 ---
 

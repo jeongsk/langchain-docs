@@ -1,18 +1,18 @@
 ---
-title: Add custom authentication
-sidebarTitle: Add custom authentication
+title: 사용자 정의 인증 추가
+sidebarTitle: 사용자 정의 인증 추가
 ---
 
-This guide shows you how to add custom authentication to your LangSmith application. The steps on this page apply to both [cloud](/langsmith/cloud) and [self-hosted](/langsmith/self-hosted) deployments. It does not apply to isolated usage of the [LangGraph open source library](/oss/python/langgraph/overview) in your own custom server.
+이 가이드는 LangSmith 애플리케이션에 사용자 정의 인증을 추가하는 방법을 보여줍니다. 이 페이지의 단계는 [cloud](/langsmith/cloud) 및 [self-hosted](/langsmith/self-hosted) 배포 모두에 적용됩니다. 자체 커스텀 서버에서 [LangGraph 오픈 소스 라이브러리](/oss/python/langgraph/overview)를 독립적으로 사용하는 경우에는 적용되지 않습니다.
 
-## Add custom authentication to your deployment
+## 배포에 사용자 정의 인증 추가
 
-To leverage custom authentication and access user-level metadata in your deployments, set up custom authentication to automatically populate the `config["configurable"]["langgraph_auth_user"]` object through a custom authentication handler. You can then access this object in your graph with the `langgraph_auth_user` key to [allow an agent to perform authenticated actions on behalf of the user](#enable-agent-authentication).
+배포에서 사용자 정의 인증을 활용하고 사용자 수준 메타데이터에 액세스하려면 사용자 정의 인증 핸들러를 통해 `config["configurable"]["langgraph_auth_user"]` 객체를 자동으로 채우도록 사용자 정의 인증을 설정하세요. 그런 다음 그래프에서 `langgraph_auth_user` 키로 이 객체에 액세스하여 [에이전트가 사용자를 대신하여 인증된 작업을 수행](#enable-agent-authentication)하도록 할 수 있습니다.
 
-1. Implement authentication:
+1. 인증 구현:
 
     <Note>
-    Without a custom `@auth.authenticate` handler, LangGraph sees only the API-key owner (usually the developer), so requests aren’t scoped to individual end-users. To propagate custom tokens, you must implement your own handler.
+    사용자 정의 `@auth.authenticate` 핸들러가 없으면 LangGraph는 API 키 소유자(일반적으로 개발자)만 인식하므로 요청이 개별 최종 사용자로 범위가 지정되지 않습니다. 사용자 정의 토큰을 전파하려면 자체 핸들러를 구현해야 합니다.
     </Note>
 
     ```python
@@ -41,10 +41,10 @@ To leverage custom authentication and access user-level metadata in your deploym
             # ... custom fields/secrets here
         }
     ```
-  - This handler receives the request (headers, etc.), validates the user, and returns a dictionary with at least an identity field.
-  - You can add any custom fields you want (e.g., OAuth tokens, roles, org IDs, etc.).
+  - 이 핸들러는 요청(헤더 등)을 수신하고 사용자를 검증한 다음 최소한 identity 필드가 있는 딕셔너리를 반환합니다.
+  - 원하는 사용자 정의 필드(예: OAuth 토큰, 역할, 조직 ID 등)를 추가할 수 있습니다.
 
-2. In your [`langgraph.json`](/langsmith/application-structure#configuration-file), add the path to your auth file:
+2. [`langgraph.json`](/langsmith/application-structure#configuration-file)에서 auth 파일 경로를 추가하세요:
 
     ```json highlight={7-9}
     {
@@ -58,7 +58,7 @@ To leverage custom authentication and access user-level metadata in your deploym
         }
     }
     ```
-3. Once you've set up authentication in your server, requests must include the required authorization information based on your chosen scheme. Assuming you are using JWT token authentication, you could access your deployments using any of the following methods:
+3. 서버에서 인증을 설정한 후에는 선택한 체계에 따라 요청에 필요한 인증 정보를 포함해야 합니다. JWT 토큰 인증을 사용한다고 가정하면 다음 방법 중 하나를 사용하여 배포에 액세스할 수 있습니다:
 
     <Tabs>
         <Tab title="Python Client">
@@ -118,13 +118,13 @@ To leverage custom authentication and access user-level metadata in your deploym
         </Tab>
     </Tabs>
 
-    For more details on RemoteGraph, refer to the [Use RemoteGraph](/langsmith/use-remote-graph) guide.
+    RemoteGraph에 대한 자세한 내용은 [Use RemoteGraph](/langsmith/use-remote-graph) 가이드를 참조하세요.
 
-## Enable agent authentication
+## 에이전트 인증 활성화
 
-After [authentication](#add-custom-authentication-to-your-deployment), the platform creates a special configuration object (`config`) that is passed to LangSmith deployment. This object contains information about the current user, including any custom fields you return from your `@auth.authenticate` handler.
+[인증](#add-custom-authentication-to-your-deployment) 후 플랫폼은 LangSmith 배포에 전달되는 특수 구성 객체(`config`)를 생성합니다. 이 객체에는 `@auth.authenticate` 핸들러에서 반환하는 사용자 정의 필드를 포함하여 현재 사용자에 대한 정보가 포함됩니다.
 
-To allow an agent to perform authenticated actions on behalf of the user, access this object in your graph with the `langgraph_auth_user` key:
+에이전트가 사용자를 대신하여 인증된 작업을 수행할 수 있도록 하려면 그래프에서 `langgraph_auth_user` 키로 이 객체에 액세스하세요:
 
 ```python
 def my_node(state, config):
@@ -135,15 +135,15 @@ def my_node(state, config):
 ```
 
 <Note>
-Fetch user credentials from a secure secret store. Storing secrets in graph state is not recommended.
+보안 시크릿 저장소에서 사용자 자격 증명을 가져오세요. 그래프 상태에 시크릿을 저장하는 것은 권장되지 않습니다.
 </Note>
 
-### Authorizing a user for Studio
+### Studio에 대한 사용자 권한 부여
 
-By default, if you add custom authorization on your resources, this will also apply to interactions made from [Studio](/langsmith/studio). If you want, you can handle logged-in Studio users differently by checking [is_studio_user()](https://langchain-ai.github.io/langgraph/cloud/reference/sdk/python_sdk_ref/#langgraph_sdk.auth.types.StudioUser).
+기본적으로 리소스에 사용자 정의 권한 부여를 추가하면 [Studio](/langsmith/studio)에서 수행된 상호작용에도 적용됩니다. 원하는 경우 [is_studio_user()](https://langchain-ai.github.io/langgraph/cloud/reference/sdk/python_sdk_ref/#langgraph_sdk.auth.types.StudioUser)를 확인하여 로그인한 Studio 사용자를 다르게 처리할 수 있습니다.
 
 <Note>
-`is_studio_user` was added in version 0.1.73 of the langgraph-sdk. If you're on an older version, you can still check whether `isinstance(ctx.user, StudioUser)`.
+`is_studio_user`는 langgraph-sdk 버전 0.1.73에 추가되었습니다. 이전 버전을 사용하는 경우 `isinstance(ctx.user, StudioUser)`를 확인할 수 있습니다.
 </Note>
 
 ```python
@@ -166,9 +166,9 @@ async def add_owner(
     return filters
 ```
 
-Only use this if you want to permit developer access to a graph deployed on the managed LangSmith SaaS.
+관리형 LangSmith SaaS에 배포된 그래프에 대한 개발자 액세스를 허용하려는 경우에만 이 기능을 사용하세요.
 
-## Learn more
+## 더 알아보기
 
 * [Authentication & Access Control](/langsmith/auth)
 * [Setting up custom authentication tutorial](/langsmith/set-up-custom-auth)

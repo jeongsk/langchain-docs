@@ -1,13 +1,13 @@
 ---
-title: Composite evaluators
-sidebarTitle: Composite evaluators
+title: 복합 평가자
+sidebarTitle: 복합 평가자
 ---
 
-_Composite evaluators_ are a way to combine multiple evaluator scores into a single [score](/langsmith/evaluation-concepts#evaluator-outputs). This is useful when you want to evaluate multiple aspects of your application and combine the results into a single result.
+_복합 평가자_는 여러 평가자 점수를 단일 [점수](/langsmith/evaluation-concepts#evaluator-outputs)로 결합하는 방법입니다. 애플리케이션의 여러 측면을 평가하고 결과를 단일 결과로 결합하려는 경우 유용합니다.
 
-## Create a composite evaluator using the UI
+## UI를 사용하여 복합 평가자 생성
 
-You can create composite evaluators on a [tracing project](/langsmith/observability-concepts#projects) (for [online evaluations](/langsmith/evaluation-concepts#online-evaluation)) or a [dataset](/langsmith/evaluation-concepts#datasets) (for [offline evaluations](/langsmith/evaluation-concepts#offline-evaluation)). With composite evaluators in the UI, you can compute a weighted average or weighted sum of multiple evaluator scores, with configurable weights.
+[추적 프로젝트](/langsmith/observability-concepts#projects)([온라인 평가](/langsmith/evaluation-concepts#online-evaluation)용) 또는 [데이터셋](/langsmith/evaluation-concepts#datasets)([오프라인 평가](/langsmith/evaluation-concepts#offline-evaluation)용)에서 복합 평가자를 생성할 수 있습니다. UI의 복합 평가자를 사용하면 구성 가능한 가중치로 여러 평가자 점수의 가중 평균 또는 가중 합계를 계산할 수 있습니다.
 
 <div style={{ textAlign: 'center' }}>
 <img
@@ -24,50 +24,50 @@ You can create composite evaluators on a [tracing project](/langsmith/observabil
 </div>
 
 
-### 1. Navigate to the tracing project or dataset
+### 1. 추적 프로젝트 또는 데이터셋으로 이동
 
-To start configuring a composite evaluator, navigate to the **Tracing Projects** or **Dataset & Experiments** tab and select a project or dataset.
-- From within a tracing project: **+ New** > **Evaluator** > **Composite score**
-- From within a dataset: **+ Evaluator** > **Composite score**
+복합 평가자 구성을 시작하려면 **Tracing Projects** 또는 **Dataset & Experiments** 탭으로 이동하여 프로젝트 또는 데이터셋을 선택합니다.
+- 추적 프로젝트 내에서: **+ New** > **Evaluator** > **Composite score**
+- 데이터셋 내에서: **+ Evaluator** > **Composite score**
 
-### 2. Configure the composite evaluator
+### 2. 복합 평가자 구성
 
-1. Name your evaluator.
-2. Select an aggregation method, either **Average** or **Sum**.
+1. 평가자 이름을 지정합니다.
+2. 집계 방법을 선택합니다. **Average** 또는 **Sum** 중 하나를 선택합니다.
     - **Average**: ∑(weight*score) / ∑(weight).
     - **Sum**: ∑(weight*score).
-3. Add the feedback keys you want to include in the composite score.
-4. Add the weights for the feedback keys. By default, the weights are equal for each feedback key. Adjust the weights to increase or decrease the importance of specific feedback keys in the final score.
-5. Click **Create** to save the evaluator.
+3. 복합 점수에 포함하려는 피드백 키를 추가합니다.
+4. 피드백 키의 가중치를 추가합니다. 기본적으로 각 피드백 키의 가중치는 동일합니다. 가중치를 조정하여 최종 점수에서 특정 피드백 키의 중요도를 높이거나 낮춥니다.
+5. **Create**를 클릭하여 평가자를 저장합니다.
 
-<Tip> If you need to adjust the weights for the composite scores, they can be updated after the evaluator is created. The resulting scores will be updated for all runs that have the evaluator configured. </Tip>
+<Tip> 복합 점수의 가중치를 조정해야 하는 경우 평가자가 생성된 후에 업데이트할 수 있습니다. 결과 점수는 평가자가 구성된 모든 실행에 대해 업데이트됩니다. </Tip>
 
-### 3. View composite evaluator results
-Composite scores are attached to a run as **feedback**, similarly to feedback from a single evaluator. How you can view them depends on where the evaluation was run:
+### 3. 복합 평가자 결과 보기
+복합 점수는 단일 평가자의 피드백과 유사하게 실행에 **피드백**으로 첨부됩니다. 보는 방법은 평가가 실행된 위치에 따라 다릅니다:
 
-**On a tracing project**:
-- Composite scores appear as feedback on runs.
-- [Filter for runs](/langsmith/filter-traces-in-application) with a composite score, or where the composite score meets a certain threshold.
-- [Create a chart](/langsmith/dashboards#custom-dashboards) to visualize trends in the composite score over time.
+**추적 프로젝트에서**:
+- 복합 점수는 실행에 피드백으로 표시됩니다.
+- 복합 점수가 있거나 복합 점수가 특정 임계값을 충족하는 [실행 필터링](/langsmith/filter-traces-in-application).
+- 시간 경과에 따른 복합 점수의 추세를 시각화하는 [차트 생성](/langsmith/dashboards#custom-dashboards).
 
-**On a dataset**:
-- View the composite scores in the experiments tab. You can also filter and sort experiments based on the average composite score of their runs.
-- Click into an experiment to view the composite score for each run.
+**데이터셋에서**:
+- 실험 탭에서 복합 점수를 봅니다. 실행의 평균 복합 점수를 기준으로 실험을 필터링하고 정렬할 수도 있습니다.
+- 실험을 클릭하여 각 실행의 복합 점수를 봅니다.
 
-<Note> If any of the constituent evaluators are not configured on the run, the composite score will not be calculated for that run. </Note>
+<Note> 구성 평가자 중 하나라도 실행에 구성되지 않은 경우 해당 실행에 대한 복합 점수는 계산되지 않습니다. </Note>
 
-## Create composite feedback with the SDK
+## SDK로 복합 피드백 생성
 
-This guide describes setting up an evaluation that uses multiple evaluators and combines their scores with a custom aggregation function.
+이 가이드는 여러 평가자를 사용하고 사용자 정의 집계 함수로 점수를 결합하는 평가 설정에 대해 설명합니다.
 
-<Note> Requires langsmith>=0.4.29 </Note>
+<Note> langsmith>=0.4.29 필요 </Note>
 
-### 1. Configure evaluators on a dataset
-Start by configuring your evaluators. In this example, the application generates a tweet from a blog introduction and uses three evaluators — summary, tone, and formatting — to assess the output.
+### 1. 데이터셋에서 평가자 구성
+평가자를 구성하는 것부터 시작합니다. 이 예제에서 애플리케이션은 블로그 소개에서 트윗을 생성하고 세 가지 평가자(요약, 어조 및 형식)를 사용하여 출력을 평가합니다.
 
-If you already have your own dataset with evaluators configured, you can skip this step.
+평가자가 구성된 자체 데이터셋이 이미 있는 경우 이 단계를 건너뛸 수 있습니다.
 
-<Accordion title="Configure evaluators on a dataset.">
+<Accordion title="데이터셋에서 평가자를 구성합니다.">
 
 ```python
 import os
@@ -92,10 +92,10 @@ oai_client = OpenAI()
 
 examples = [
   {
-    "inputs": {"blog_intro": "Today we’re excited to announce the general availability of LangSmith — our purpose-built infrastructure and management layer for deploying and scaling long-running, stateful agents. Since our beta last June, nearly 400 companies have used LangSmith to deploy their agents into production. Agent deployment is the next hard hurdle for shipping reliable agents, and LangSmith dramatically lowers this barrier with: 1-click deployment to go live in minutes, 30 API endpoints for designing custom user experiences that fit any interaction pattern, Horizontal scaling to handle bursty, long-running traffic, A persistence layer to support memory, conversational history, and async collaboration with human-in-the-loop or multi-agent workflows, Native Studio, the agent IDE, for easy debugging, visibility, and iteration "},
+    "inputs": {"blog_intro": "Today we're excited to announce the general availability of LangSmith — our purpose-built infrastructure and management layer for deploying and scaling long-running, stateful agents. Since our beta last June, nearly 400 companies have used LangSmith to deploy their agents into production. Agent deployment is the next hard hurdle for shipping reliable agents, and LangSmith dramatically lowers this barrier with: 1-click deployment to go live in minutes, 30 API endpoints for designing custom user experiences that fit any interaction pattern, Horizontal scaling to handle bursty, long-running traffic, A persistence layer to support memory, conversational history, and async collaboration with human-in-the-loop or multi-agent workflows, Native Studio, the agent IDE, for easy debugging, visibility, and iteration "},
   },
   {
-    "inputs": {"blog_intro": "Klarna has reshaped global commerce with its consumer-centric, AI-powered payment and shopping solutions. With over 85 million active users and 2.5 million daily transactions on its platform, Klarna is a fintech leader that simplifies shopping while empowering consumers with smarter, more flexible financial solutions. Klarna’s flagship AI Assistant is revolutionizing the shopping and payments experience. Built on LangGraph and powered by LangSmith, the AI Assistant handles tasks ranging from customer payments, to refunds, to other payment escalations. With 2.5 million conversations to date, the AI Assistant is more than just a chatbot; it’s a transformative agent that performs the work equivalent of 700 full-time staff, delivering results quickly and improving company efficiency."},
+    "inputs": {"blog_intro": "Klarna has reshaped global commerce with its consumer-centric, AI-powered payment and shopping solutions. With over 85 million active users and 2.5 million daily transactions on its platform, Klarna is a fintech leader that simplifies shopping while empowering consumers with smarter, more flexible financial solutions. Klarna's flagship AI Assistant is revolutionizing the shopping and payments experience. Built on LangGraph and powered by LangSmith, the AI Assistant handles tasks ranging from customer payments, to refunds, to other payment escalations. With 2.5 million conversations to date, the AI Assistant is more than just a chatbot; it's a transformative agent that performs the work equivalent of 700 full-time staff, delivering results quickly and improving company efficiency."},
   },
 ]
 
@@ -184,11 +184,11 @@ experiment_name = results.experiment_name
 ```
 </Accordion>
 
-### 2. Create composite feedback
+### 2. 복합 피드백 생성
 
-Create composite feedback that aggregates the individual evaluator scores using your custom function. This example uses a weighted average of the individual evaluator scores.
+사용자 정의 함수를 사용하여 개별 평가자 점수를 집계하는 복합 피드백을 생성합니다. 이 예제에서는 개별 평가자 점수의 가중 평균을 사용합니다.
 
-<Accordion title="Create a composite feedback.">
+<Accordion title="복합 피드백을 생성합니다.">
 
 ```python
 from typing import Dict

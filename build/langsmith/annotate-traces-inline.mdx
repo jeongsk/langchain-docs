@@ -1,29 +1,29 @@
 ---
-title: Annotate traces and runs inline
-sidebarTitle: Annotate traces and runs inline
+title: 추적 및 실행에 인라인으로 주석 달기
+sidebarTitle: 추적 및 실행에 인라인으로 주석 달기
 ---
 
-LangSmith allows you to manually annotate traces with feedback within the application. This can be useful for adding context to a trace, such as a user's comment or a note about a specific issue.
-You can annotate a trace either inline or by sending the trace to an annotation queue, which allows you to closely inspect and log feedbacks to runs one at a time.
-Feedback tags are associated with your [workspace](/langsmith/administration-overview#workspaces).
+LangSmith를 사용하면 애플리케이션 내에서 피드백으로 추적에 수동으로 주석을 달 수 있습니다. 이는 사용자의 댓글이나 특정 문제에 대한 메모와 같은 컨텍스트를 추적에 추가하는 데 유용할 수 있습니다.
+인라인으로 추적에 주석을 달거나 주석 큐로 추적을 보내 실행을 면밀히 검사하고 한 번에 하나씩 피드백을 기록할 수 있습니다.
+피드백 태그는 [워크스페이스](/langsmith/administration-overview#workspaces)와 연결됩니다.
 
 <Note>
-**You can attach user feedback to ANY intermediate run (span) of the trace, not just the root span.**
+**추적의 루트 스팬뿐만 아니라 추적의 모든 중간 실행(스팬)에 사용자 피드백을 첨부할 수 있습니다.**
 
-This is useful for critiquing specific parts of the LLM application, such as the retrieval step or generation step of the RAG pipeline.
+이는 RAG 파이프라인의 검색 단계 또는 생성 단계와 같은 LLM 애플리케이션의 특정 부분을 비판하는 데 유용합니다.
 
 </Note>
 
-To annotate a trace inline, click on the `Annotate` in the upper right corner of trace view for any particular run that is part of the trace.
+추적에 인라인으로 주석을 달려면 추적의 일부인 특정 실행의 추적 보기 오른쪽 상단에 있는 `Annotate`를 클릭합니다.
 
 ![](/langsmith/images/annotate-trace-inline.png)
 
-This will open up a pane that allows you to choose from feedback tags associated with your workspace and add a score for particular tags. You can also add a standalone comment. Follow [this guide](./set-up-feedback-criteria) to set up feedback tags for your workspace.
-You can also set up new feedback criteria from within the pane itself.
+그러면 워크스페이스와 연결된 피드백 태그 중에서 선택하고 특정 태그에 대한 점수를 추가할 수 있는 창이 열립니다. 독립적인 댓글을 추가할 수도 있습니다. 워크스페이스에 대한 피드백 태그를 설정하려면 [이 가이드](./set-up-feedback-criteria)를 따르세요.
+창 내에서 새로운 피드백 기준을 설정할 수도 있습니다.
 
 ![](/langsmith/images/annotation-sidebar.png)
 
-You can use the labeled keyboard shortcuts to streamline the annotation process.
+레이블이 지정된 키보드 단축키를 사용하여 주석 프로세스를 간소화할 수 있습니다.
 
 ---
 

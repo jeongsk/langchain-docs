@@ -1,23 +1,23 @@
 ---
-title: Connect to a custom model
-sidebarTitle: Custom model
+title: 커스텀 모델에 연결
+sidebarTitle: 커스텀 모델
 ---
 
-The LangSmith playground allows you to use your own custom models. You can deploy a model server that exposes your model's API via , an open source library for serving LangChain applications. Behind the scenes, the playground will interact with your model server to generate responses.
+LangSmith playground를 사용하면 자체 커스텀 모델을 사용할 수 있습니다. LangChain 애플리케이션을 서빙하기 위한 오픈 소스 라이브러리를 통해 모델의 API를 노출하는 모델 서버를 배포할 수 있습니다. 배후에서 playground는 모델 서버와 상호작용하여 응답을 생성합니다.
 
-## Deploy a custom model server
+## 커스텀 모델 서버 배포
 
-For your convenience, we have provided a sample model server that you can use as a reference. You can find the sample model server [here](https://github.com/langchain-ai/langsmith-model-server) We highly recommend using the sample model server as a starting point.
+편의를 위해 참고용으로 사용할 수 있는 샘플 모델 서버를 제공했습니다. 샘플 모델 서버는 [여기](https://github.com/langchain-ai/langsmith-model-server)에서 찾을 수 있습니다. 샘플 모델 서버를 시작점으로 사용하는 것을 적극 권장합니다.
 
-Depending on your model is an instruct-style or chat-style model, you will need to implement either `custom_model.py` or `custom_chat_model.py` respectively.
+모델이 instruct 스타일인지 chat 스타일인지에 따라 각각 `custom_model.py` 또는 `custom_chat_model.py`를 구현해야 합니다.
 
-## Adding configurable fields
+## 구성 가능한 필드 추가
 
-It is often useful to configure your model with different parameters. These might include temperature, model\_name, max\_tokens, etc.
+다양한 매개변수로 모델을 구성하는 것이 유용한 경우가 많습니다. 여기에는 temperature, model\_name, max\_tokens 등이 포함될 수 있습니다.
 
-To make your model configurable in the LangSmith playground, you need to add configurable fields to your model server. These fields can be used to change model parameters from the playground.
+LangSmith playground에서 모델을 구성 가능하게 만들려면 모델 서버에 구성 가능한 필드를 추가해야 합니다. 이러한 필드는 playground에서 모델 매개변수를 변경하는 데 사용할 수 있습니다.
 
-You can add configurable fields by implementing the `with_configurable_fields` function in the `config.py` file. You can
+`config.py` 파일에서 `with_configurable_fields` 함수를 구현하여 구성 가능한 필드를 추가할 수 있습니다:
 
 ```python
 def with_configurable_fields(self) -> Runnable:
@@ -30,17 +30,17 @@ def with_configurable_fields(self) -> Runnable:
     ))
 ```
 
-## Use the model in the LangSmith Playground
+## LangSmith Playground에서 모델 사용
 
-Once you have deployed a model server, you can use it in the LangSmith Playground. Enter the playground and select either the `ChatCustomModel` or the `CustomModel` provider for chat-style model or instruct-style models.
+모델 서버를 배포한 후 LangSmith Playground에서 사용할 수 있습니다. playground에 들어가서 chat 스타일 모델 또는 instruct 스타일 모델에 대해 `ChatCustomModel` 또는 `CustomModel` 공급자를 선택하세요.
 
-Enter the `URL`. The playground will automatically detect the available endpoints and configurable fields. You can then invoke the model with the desired parameters.
+`URL`을 입력하세요. playground는 사용 가능한 엔드포인트와 구성 가능한 필드를 자동으로 감지합니다. 그런 다음 원하는 매개변수로 모델을 호출할 수 있습니다.
 
 ![ChatCustomModel in Playground](/langsmith/images/playground-custom-model.png)
 
-If everything is set up correctly, you should see the model's response in the playground as well as the configurable fields specified in the `with_configurable_fields`.
+모든 것이 올바르게 설정되면 playground에서 모델의 응답과 `with_configurable_fields`에 지정된 구성 가능한 필드를 볼 수 있습니다.
 
-See how to store your model configuration for later use [here](/langsmith/managing-model-configurations).
+나중에 사용하기 위해 모델 구성을 저장하는 방법은 [여기](/langsmith/managing-model-configurations)를 참조하세요.
 
 ---
 

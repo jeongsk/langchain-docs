@@ -1,33 +1,33 @@
 ---
-title: Agent Builder setup
-description: Add required workspace secrets for models and tools used by Agent Builder.
-sidebarTitle: Setup
+title: Agent Builder 설정
+description: Agent Builder에서 사용하는 모델 및 도구에 필요한 워크스페이스 시크릿을 추가합니다.
+sidebarTitle: 설정
 mode: wide
 ---
 
-This page lists the workspace secrets you need to add before using Agent Builder. Add these in your LangSmith workspace settings under Secrets. Keep values scoped to your workspace and avoid placing credentials in prompts or code.
+이 페이지는 Agent Builder를 사용하기 전에 추가해야 하는 워크스페이스 시크릿을 나열합니다. LangSmith 워크스페이스 설정의 Secrets에서 추가하세요. 값의 범위를 워크스페이스로 유지하고 프롬프트나 코드에 자격 증명을 배치하지 마세요.
 
-## How to add workspace secrets
+## 워크스페이스 시크릿을 추가하는 방법
 
-In the [LangSmith UI](https://smith.langchain.com), ensure that your Anthropic API key is set as a [workspace secret](/langsmith/administration-overview#workspace-secrets).
+[LangSmith UI](https://smith.langchain.com)에서 Anthropic API 키가 [워크스페이스 시크릿](/langsmith/administration-overview#workspace-secrets)으로 설정되어 있는지 확인합니다.
 
-1. Navigate to <Icon icon="gear" /> **Settings** and then move to the **Secrets** tab.
-1. Select **Add secret** and enter the `ANTHROPIC_API_KEY` and your API key as the **Value**.
-1. Select **Save secret**.
+1. <Icon icon="gear" /> **Settings**로 이동한 다음 **Secrets** 탭으로 이동합니다.
+1. **Add secret**을 선택하고 `ANTHROPIC_API_KEY`와 API 키를 **Value**로 입력합니다.
+1. **Save secret**을 선택합니다.
 
-<Note> When adding workspace secrets in the LangSmith UI, make sure the secret keys match the environment variable names expected by your model provider.</Note>
+<Note> LangSmith UI에서 워크스페이스 시크릿을 추가할 때 시크릿 키가 모델 공급자가 예상하는 환경 변수 이름과 일치하는지 확인하세요.</Note>
 
-## Required model key
+## 필수 모델 키
 
-- `ANTHROPIC_API_KEY`: Required for Agent Builder models. The agent graphs load this key from workspace secrets for inference.
+- `ANTHROPIC_API_KEY`: Agent Builder 모델에 필요합니다. 에이전트 그래프는 추론을 위해 워크스페이스 시크릿에서 이 키를 로드합니다.
 
-## Optional tool keys
+## 선택적 도구 키
 
-Add keys for any tools you enable. These are read from workspace secrets at runtime.
+활성화하는 모든 도구에 대한 키를 추가합니다. 이는 런타임에 워크스페이스 시크릿에서 읽습니다.
 
-- `EXA_API_KEY`: Required for Exa search tools (general web and LinkedIn profile search).
-- `TAVILY_API_KEY`: Required for Tavily web search.
-- `TWITTER_API_KEY` and `TWITTER_API_KEY_SECRET`: Required for Twitter/X read operations (app‑only bearer). Posting/media upload is not enabled.
+- `EXA_API_KEY`: Exa 검색 도구(일반 웹 및 LinkedIn 프로필 검색)에 필요합니다.
+- `TAVILY_API_KEY`: Tavily 웹 검색에 필요합니다.
+- `TWITTER_API_KEY` 및 `TWITTER_API_KEY_SECRET`: Twitter/X 읽기 작업(앱 전용 베어러)에 필요합니다. 게시/미디어 업로드는 활성화되지 않습니다.
 
 ---
 
