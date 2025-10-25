@@ -1,129 +1,129 @@
 ---
-title: Self-host LangSmith with Docker
-sidebarTitle: Install on Docker
+title: Docker로 LangSmith 자체 호스팅하기
+sidebarTitle: Docker에 설치
 ---
 
 <Info>
-Self-hosting LangSmith is an add-on to the Enterprise Plan designed for our largest, most security-conscious customers. See our [pricing page](https://www.langchain.com/pricing) for more detail, and [contact our sales team](https://www.langchain.com/contact-sales) if you want to get a license key to trial LangSmith in your environment.
+LangSmith 자체 호스팅은 가장 규모가 크고 보안을 중시하는 고객을 위해 설계된 엔터프라이즈 플랜의 추가 기능입니다. 자세한 내용은 [가격 페이지](https://www.langchain.com/pricing)를 참조하고, 사용자의 환경에서 LangSmith를 시험해볼 수 있는 라이선스 키를 받으려면 [영업팀에 문의](https://www.langchain.com/contact-sales)하세요.
 </Info>
 
-This guide provides instructions for running the **LangSmith platform** locally using Docker for development and testing purposes.
+이 가이드는 개발 및 테스트 목적으로 Docker를 사용하여 **LangSmith 플랫폼**을 로컬에서 실행하는 방법을 안내합니다.
 
 <Warning>
-**For development/testing only**. Do not use Docker Compose for production. For production deployments, use [Kubernetes](/langsmith/kubernetes).
+**개발/테스트 전용입니다**. 프로덕션 환경에서는 Docker Compose를 사용하지 마세요. 프로덕션 배포에는 [Kubernetes](/langsmith/kubernetes)를 사용하세요.
 </Warning>
 
 <Note>
-This page describes how to install the base [LangSmith platform](/langsmith/self-hosted#langsmith) for local testing. It does **not** include deployment management features. For more details, review the [self-hosted options](/langsmith/self-hosted).
+이 페이지는 로컬 테스트를 위한 기본 [LangSmith 플랫폼](/langsmith/self-hosted#langsmith) 설치 방법을 설명합니다. 배포 관리 기능은 **포함되지 않습니다**. 자세한 내용은 [자체 호스팅 옵션](/langsmith/self-hosted)을 검토하세요.
 </Note>
 
-Note that Docker Compose is limited to local development environments only and does not extend support to container services such as AWS Elastic Container Service, Azure Container Instances, and Google Cloud Run.
+Docker Compose는 로컬 개발 환경으로만 제한되며, AWS Elastic Container Service, Azure Container Instances, Google Cloud Run과 같은 컨테이너 서비스는 지원하지 않습니다.
 
-## Prerequisites
+## 사전 요구사항
 
-1. Ensure Docker is installed and running on your system. You can verify this by running:
+1. 시스템에 Docker가 설치되어 있고 실행 중인지 확인합니다. 다음 명령으로 확인할 수 있습니다:
 
    ```bash
    docker info
    ```
 
-   If you don't see any server information in the output, make sure Docker is installed correctly and launch the Docker daemon.
+   출력에 서버 정보가 표시되지 않으면 Docker가 올바르게 설치되었는지 확인하고 Docker 데몬을 실행하세요.
 
-   1. Recommended: At least 4 vCPUs, 16GB Memory available on your machine.
-      * You may need to tune resource requests/limits for all of our different services based off of organization size/usage
-   2. Disk Space: LangSmith can potentially require a lot of disk space. Ensure you have enough disk space available.
+   1. 권장 사양: 최소 4 vCPU, 16GB 메모리
+      * 조직 규모/사용량에 따라 다양한 서비스의 리소스 요청/제한을 조정해야 할 수 있습니다
+   2. 디스크 공간: LangSmith는 많은 디스크 공간이 필요할 수 있습니다. 충분한 디스크 공간이 있는지 확인하세요.
 
-2. LangSmith License Key
-   1. You can get this from your LangChain representative. [Contact our sales team](https://www.langchain.com/contact-sales) for more information.
+2. LangSmith 라이선스 키
+   1. LangChain 담당자로부터 받을 수 있습니다. 자세한 정보는 [영업팀에 문의](https://www.langchain.com/contact-sales)하세요.
 
-3. Api Key Salt
+3. API 키 솔트(Salt)
 
-   1. This is a secret key that you can generate. It should be a random string of characters.
-   2. You can generate this using the following command:
+   1. 생성할 수 있는 비밀 키입니다. 무작위 문자열이어야 합니다.
+   2. 다음 명령으로 생성할 수 있습니다:
 
    ```bash
    openssl rand -base64 32
    ```
 
-4. Egress to `https://beacon.langchain.com` (if not running in offline mode)
-   1. LangSmith requires egress to `https://beacon.langchain.com` for license verification and usage reporting. This is required for LangSmith to function properly. You can find more information on egress requirements in the [Egress](/langsmith/self-host-egress) section.
+4. `https://beacon.langchain.com`에 대한 송신(Egress) (오프라인 모드가 아닌 경우)
+   1. LangSmith는 라이선스 검증 및 사용량 보고를 위해 `https://beacon.langchain.com`에 대한 송신이 필요합니다. 이는 LangSmith가 올바르게 작동하기 위해 필수입니다. 송신 요구사항에 대한 자세한 내용은 [송신](/langsmith/self-host-egress) 섹션을 참조하세요.
 
-5. Configuration
-   1. There are several configuration options that you can set in the `.env` file. You can find more information on the available configuration options in the [Configuration](/langsmith/self-host-scale) section.
+5. 구성
+   1. `.env` 파일에서 설정할 수 있는 여러 구성 옵션이 있습니다. 사용 가능한 구성 옵션에 대한 자세한 내용은 [구성](/langsmith/self-host-scale) 섹션을 참조하세요.
 
-## Running via Docker Compose
+## Docker Compose로 실행하기
 
-The following explains how to run the LangSmith using Docker Compose. This is the most flexible way to run LangSmith without Kubernetes. The default configuration for Docker Compose is intended for local testing only and not for instances where any services are exposed to the public internet. **In production, we highly recommend using a secured Kubernetes environment.**
+다음은 Docker Compose를 사용하여 LangSmith를 실행하는 방법을 설명합니다. 이는 Kubernetes 없이 LangSmith를 실행하는 가장 유연한 방법입니다. Docker Compose의 기본 구성은 로컬 테스트 전용으로 설계되었으며, 공용 인터넷에 노출되는 서비스에는 적합하지 않습니다. **프로덕션 환경에서는 보안이 강화된 Kubernetes 환경을 사용하는 것을 강력히 권장합니다.**
 
-### 1. Fetch the LangSmith `docker-compose.yml` file
+### 1. LangSmith `docker-compose.yml` 파일 가져오기
 
-You can find the `docker-compose.yml` file and related files in the LangSmith SDK repository here: [*LangSmith Docker Compose File*](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/docker-compose/docker-compose.yaml)
+`docker-compose.yml` 파일 및 관련 파일은 LangSmith SDK 저장소에서 찾을 수 있습니다: [*LangSmith Docker Compose 파일*](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/docker-compose/docker-compose.yaml)
 
-Copy the `docker-compose.yml` file and all files in that directory from the LangSmith SDK to your project directory.
+LangSmith SDK에서 `docker-compose.yml` 파일과 해당 디렉터리의 모든 파일을 프로젝트 디렉터리로 복사합니다.
 
-* Ensure that you copy the `users.xml` file as well.
+* `users.xml` 파일도 함께 복사해야 합니다.
 
-### 2. Configure environment variables
+### 2. 환경 변수 구성하기
 
-1. Copy the `.env.example` file from the LangSmith SDK to your project directory and rename it to `.env`.
-2. Configure the appropriate values in the `.env` file. You can find the available configuration options in the [Configuration](/langsmith/self-hosted) section.
+1. LangSmith SDK의 `.env.example` 파일을 프로젝트 디렉터리로 복사하고 `.env`로 이름을 변경합니다.
+2. `.env` 파일에서 적절한 값을 구성합니다. 사용 가능한 구성 옵션은 [구성](/langsmith/self-hosted) 섹션에서 찾을 수 있습니다.
 
-You can also set these environment variables in the `docker-compose.yml` file directly or export them in your terminal. We recommend setting them in the `.env` file.
+이러한 환경 변수를 `docker-compose.yml` 파일에 직접 설정하거나 터미널에서 내보낼 수도 있습니다. `.env` 파일에 설정하는 것을 권장합니다.
 
-### 3. Start server
+### 3. 서버 시작하기
 
-Start the LangSmith application by executing the following command in your terminal:
+터미널에서 다음 명령을 실행하여 LangSmith 애플리케이션을 시작합니다:
 
 ```bash
 docker-compose up
 ```
 
-You can also run the server in the background by running:
+다음 명령으로 백그라운드에서 서버를 실행할 수도 있습니다:
 
 ```bash
 docker-compose up -d
 ```
 
-### Validate your deployment:
+### 배포 검증하기:
 
-1. Curl the exposed port of the `cli-langchain-frontend-1` container:
+1. `cli-langchain-frontend-1` 컨테이너의 노출된 포트에 curl 요청 보내기:
 
    ```bash
    curl localhost:1980/info{"version":"0.5.7","license_expiration_time":"2033-05-20T20:08:06","batch_ingest_config":{"scale_up_qsize_trigger":1000,"scale_up_nthreads_limit":16,"scale_down_nempty_trigger":4,"size_limit":100,"size_limit_bytes":20971520}}
    ```
 
-2. Visit the exposed port of the `cli-langchain-frontend-1` container on your browser
+2. 브라우저에서 `cli-langchain-frontend-1` 컨테이너의 노출된 포트 방문하기
 
-   The LangSmith UI should be visible/operational at `http://localhost:1980`
+   LangSmith UI는 `http://localhost:1980`에서 표시되고 작동해야 합니다
 
    ![.langsmith\_ui.png](/langsmith/images/langsmith-ui.png)
 
-### Checking the logs
+### 로그 확인하기
 
-If, at any point, you want to check if the server is running and see the logs, run
+언제든지 서버가 실행 중인지 확인하고 로그를 보려면 다음을 실행합니다
 
 ```bash
 docker-compose logs
 ```
 
-### Stopping the server
+### 서버 중지하기
 
 ```bash
 docker-compose down
 ```
 
-## Using LangSmith
+## LangSmith 사용하기
 
-Now that LangSmith is running, you can start using it to trace your code. You can find more information on how to use self-hosted LangSmith in the [self-hosted usage guide](/langsmith/self-hosted).
+이제 LangSmith가 실행 중이므로 코드를 추적하는 데 사용할 수 있습니다. 자체 호스팅 LangSmith 사용 방법에 대한 자세한 내용은 [자체 호스팅 사용 가이드](/langsmith/self-hosted)를 참조하세요.
 
-Your LangSmith instance is now running but may not be fully setup yet.
+LangSmith 인스턴스가 실행 중이지만 아직 완전히 설정되지 않았을 수 있습니다.
 
-If you used one of the basic configs, you may have deployed a no-auth configuration. In this state, there is no authentication or concept of user accounts nor API keys and traces can be submitted directly without an API key so long as the hostname is passed to the LangChain tracer/LangSmith SDK.
+기본 구성 중 하나를 사용한 경우, 인증이 없는 구성을 배포했을 수 있습니다. 이 상태에서는 인증이나 사용자 계정 개념, API 키가 없으며, 호스트명이 LangChain tracer/LangSmith SDK에 전달되기만 하면 API 키 없이 직접 추적을 제출할 수 있습니다.
 
-As a next step, it is strongly recommended you work with your infrastructure administrators to:
+다음 단계로, 인프라 관리자와 협력하여 다음을 수행하는 것을 강력히 권장합니다:
 
-* Setup DNS for your LangSmith instance to enable easier access
-* Configure SSL to ensure in-transit encryption of traces submitted to LangSmith
-* Configure LangSmith for [oauth authentication](/langsmith/self-host-sso) or [basic authentication](/langsmith/self-host-basic-auth) to secure your LangSmith instance
-* Secure access to your Docker environment to limit access to only the LangSmith frontend and API
-* Connect LangSmith to secured Postgres and Redis instances
+* LangSmith 인스턴스에 대한 DNS 설정으로 더 쉽게 액세스 활성화
+* LangSmith에 제출되는 추적의 전송 중 암호화를 보장하도록 SSL 구성
+* LangSmith 인스턴스를 보호하기 위해 [OAuth 인증](/langsmith/self-host-sso) 또는 [기본 인증](/langsmith/self-host-basic-auth) 구성
+* LangSmith 프론트엔드 및 API에만 액세스를 제한하도록 Docker 환경에 대한 액세스 보안
+* 보안이 강화된 Postgres 및 Redis 인스턴스에 LangSmith 연결

@@ -1,61 +1,61 @@
 ---
-title: Export LangSmith telemetry to your observability backend
-sidebarTitle: Export LangSmith telemetry to your observability backend
+title: LangSmith 텔레메트리를 관측 가능성 백엔드로 내보내기
+sidebarTitle: LangSmith 텔레메트리를 관측 가능성 백엔드로 내보내기
 ---
 
 <Warning>
-**This section is only applicable for Kubernetes deployments.**
+**이 섹션은 Kubernetes 배포에만 적용됩니다.**
 </Warning>
 
-Self-Hosted LangSmith instances produce telemetry data in the form of logs, metrics and traces. This section will show you how to access and export that data to an observability collector or backend.
+Self-Hosted LangSmith 인스턴스는 로그, 메트릭, 트레이스 형태의 텔레메트리 데이터를 생성합니다. 이 섹션에서는 해당 데이터에 접근하고 관측 가능성 수집기나 백엔드로 내보내는 방법을 안내합니다.
 
-This section assumes that you have monitoring infrastructure set up already, or you will set up this infrastructure and want to know how to configure LangSmith to collect data from it.
+이 섹션은 모니터링 인프라가 이미 설정되어 있거나, 인프라를 설정할 예정이며 LangSmith가 데이터를 수집하도록 구성하는 방법을 알고자 하는 경우를 전제로 합니다.
 
-Infrastructure refers to:
+인프라는 다음을 의미합니다:
 
-* Collectors, such as [OpenTelemetry](https://opentelemetry.io/docs/collector/), [FluentBit](https://docs.fluentbit.io/manual) or [Prometheus](https://prometheus.io/).
-* Observability backends, such as [Datadog](https://www.datadoghq.com/) or the [Grafana](https://grafana.com/) ecosystem.
+* [OpenTelemetry](https://opentelemetry.io/docs/collector/), [FluentBit](https://docs.fluentbit.io/manual), [Prometheus](https://prometheus.io/)와 같은 수집기
+* [Datadog](https://www.datadoghq.com/) 또는 [Grafana](https://grafana.com/) 에코시스템과 같은 관측 가능성 백엔드
 
-# Logs: [OTel Example](/langsmith/langsmith-collector#logs)
+# 로그: [OTel 예제](/langsmith/langsmith-collector#logs)
 
-All services that are part of the LangSmith self-hosted deployment write logs to their node's filesystem and to stdout. In order to access these logs, you need to set up your collector to read from either the filesystem or stdout. Most popular collectors support reading logs from filesystems.
+LangSmith Self-Hosted 배포의 일부인 모든 서비스는 노드의 파일시스템과 stdout으로 로그를 작성합니다. 이러한 로그에 접근하려면 파일시스템 또는 stdout에서 읽도록 수집기를 설정해야 합니다. 대부분의 인기 있는 수집기는 파일시스템에서 로그 읽기를 지원합니다.
 
 * **OpenTelemetry**: [File Log Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/filelogreceiver)
 * **FluentBit**: [Tail Input](https://docs.fluentbit.io/manual/pipeline/inputs/tail)
 * **Datadog**: [Kubernetes Log Collection](https://docs.datadoghq.com/containers/kubernetes/log/?tab=datadogoperator)
 
-# Metrics: [OTel Example](/langsmith/langsmith-collector#metrics)
+# 메트릭: [OTel 예제](/langsmith/langsmith-collector#metrics)
 
-## LangSmith Services
+## LangSmith 서비스
 
-The following LangSmith services expose metrics at an endpoint, in the Prometheus metrics format. The frontend does not currently expose metrics.
+다음 LangSmith 서비스는 Prometheus 메트릭 형식으로 엔드포인트에서 메트릭을 노출합니다. 프론트엔드는 현재 메트릭을 노출하지 않습니다.
 
 * **Backend**: `http://<langsmith_release_name>-backend.<namespace>.svc.cluster.local:1984/metrics`
 * **Platform Backend**: `http://<langsmith_release_name>-platform-backend.<namespace>.svc.cluster.local:1986/metrics`
 * **Playground**: `http://<langsmith_release_name>-playground.<namespace>.svc.cluster.local:1988/metrics`
-* **(LangSmith Control Plane only) Host Backend**: `http://<langsmith_release_name>-host-backend.<namespace>.svc.cluster.local:1985/metrics`
+* **(LangSmith Control Plane 전용) Host Backend**: `http://<langsmith_release_name>-host-backend.<namespace>.svc.cluster.local:1985/metrics`
 
-You can use a [Prometheus](https://prometheus.io/docs/prometheus/latest/getting_started/#configure-prometheus-to-monitor-the-sample-targets) or [OpenTelemetry](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/prometheusreceiver) collector to scrape the endpoints, and export metrics to the backend of your choice.
+[Prometheus](https://prometheus.io/docs/prometheus/latest/getting_started/#configure-prometheus-to-monitor-the-sample-targets) 또는 [OpenTelemetry](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/prometheusreceiver) 수집기를 사용하여 엔드포인트를 스크랩하고, 선택한 백엔드로 메트릭을 내보낼 수 있습니다.
 
 ## Frontend Nginx
 
-The frontend service exposes its Nginx metrics at the following endpoint: `langsmith-frontend.langsmith.svc.cluster.local:80/nginx_status`. You can either scrape them yourself, or bring up a Prometheus Nginx exporter using the [LangSmith Observability Helm Chart](/langsmith/observability-stack)
+프론트엔드 서비스는 다음 엔드포인트에서 Nginx 메트릭을 노출합니다: `langsmith-frontend.langsmith.svc.cluster.local:80/nginx_status`. 직접 스크랩하거나, [LangSmith Observability Helm Chart](/langsmith/observability-stack)를 사용하여 Prometheus Nginx exporter를 실행할 수 있습니다.
 
 <Warning>
-**The following sections apply for in-cluster databases only. If you are using external databases, you will need to configure exposing and fetching metrics.**
+**다음 섹션은 클러스터 내 데이터베이스에만 적용됩니다. 외부 데이터베이스를 사용하는 경우 메트릭 노출 및 가져오기를 구성해야 합니다.**
 </Warning>
 
 ## Postgres + Redis
 
-If you are using in-cluster Postgres/Redis instances, you can use a Prometheus exporter to expose metrics from your instance. You can deploy your own, or if you would like, you can use the [LangSmith Observability Helm Chart](/langsmith/observability-stack) to deploy an exporter for you.
+클러스터 내 Postgres/Redis 인스턴스를 사용하는 경우, Prometheus exporter를 사용하여 인스턴스의 메트릭을 노출할 수 있습니다. 직접 배포하거나, 원하는 경우 [LangSmith Observability Helm Chart](/langsmith/observability-stack)를 사용하여 exporter를 배포할 수 있습니다.
 
 ## Clickhouse
 
-The in-cluster Clickhouse is configured to expose metrics without the need for an exporter. You can use your collector to scrape metrics at `http://<langsmith_release_name>-clickhouse.<namespace>.svc.cluster.local:9363/metrics`
+클러스터 내 Clickhouse는 exporter 없이 메트릭을 노출하도록 구성되어 있습니다. 수집기를 사용하여 `http://<langsmith_release_name>-clickhouse.<namespace>.svc.cluster.local:9363/metrics`에서 메트릭을 스크랩할 수 있습니다.
 
-# Traces: [OTel Example](/langsmith/langsmith-collector#traces)
+# 트레이스: [OTel 예제](/langsmith/langsmith-collector#traces)
 
-The LangSmith Backend, Platform Backend, Playground and LangSmith Queue deployments have been instrumented to emit [Otel](https://opentelemetry.io/do/langsmith/observability-concepts/signals/traces/) traces. Tracing is toggled off by default, and can be enabled for all LangSmith services with the following in your `langsmith_config.yaml` (or equivalent) file:
+LangSmith Backend, Platform Backend, Playground, LangSmith Queue 배포는 [Otel](https://opentelemetry.io/do/langsmith/observability-concepts/signals/traces/) 트레이스를 생성하도록 계측되어 있습니다. 트레이싱은 기본적으로 비활성화되어 있으며, `langsmith_config.yaml`(또는 동등한) 파일에 다음을 추가하여 모든 LangSmith 서비스에 대해 활성화할 수 있습니다:
 
 ```yaml
 config:
@@ -63,6 +63,6 @@ config:
     enabled: true
     endpoint: "<your_collector_endpoint>"
     useTls: true # / false
-    env: "ls_self_hosted" # This value will be set as an "env" attribute in your spans
-    exporter: "http" # must be either http or grpc
+    env: "ls_self_hosted" # 이 값은 스팬에 "env" 속성으로 설정됩니다
+    exporter: "http" # http 또는 grpc여야 합니다
 ```
