@@ -1,36 +1,36 @@
 ---
-title: How to print detailed logs (Python SDK)
-sidebarTitle: Print detailed logs (Python SDK)
+title: 상세 로그 출력 방법 (Python SDK)
+sidebarTitle: 상세 로그 출력 (Python SDK)
 ---
 
-The LangSmith package uses Python's built in  mechanism to output logs about its behavior to standard output.
+LangSmith 패키지는 Python의 내장 로깅 메커니즘을 사용하여 동작에 대한 로그를 표준 출력으로 출력합니다.
 
-## Ensure logging is configured
+## 로깅 설정 확인
 
 <Note>
-By default, Jupyter notebooks send logs to standard error instead of standard output, which means your logs will not show up in your notebook cell output unless you configure logging as we do below.
+기본적으로 Jupyter 노트북은 로그를 표준 출력 대신 표준 오류로 전송하므로, 아래와 같이 로깅을 설정하지 않으면 노트북 셀 출력에 로그가 표시되지 않습니다.
 </Note>
 
-If logging is not currently configured to send logs to standard output for your Python environment, you'll need to explicitly turn it on as follows:
+Python 환경에서 로깅이 표준 출력으로 로그를 전송하도록 설정되어 있지 않은 경우, 다음과 같이 명시적으로 활성화해야 합니다:
 
 ```python
 import logging
-# Note: this will affect _all_ packages that use python's built-in logging mechanism,
-#       so may increase your log volume. Pick the right log level for your use case.
+# 참고: 이 설정은 Python의 내장 로깅 메커니즘을 사용하는 _모든_ 패키지에 영향을 미치므로
+#       로그 양이 증가할 수 있습니다. 사용 사례에 맞는 적절한 로그 레벨을 선택하세요.
 logging.basicConfig(level=logging.WARNING)
 ```
 
-## Increase the logger's verbosity
+## 로거의 상세도 증가
 
-When debugging an issue, it's helpful to increase logs to a higher level verbosity so more info is outputted to standard output. Python loggers default to using `WARNING` log level, but you can choose different values to get different levels of verbosity. The values, from least verbose to most, are `ERROR`, `WARNING`, `INFO`, and `DEBUG`. You can set this as follows:
+문제를 디버깅할 때는 로그 레벨을 더 높은 상세도로 증가시켜 표준 출력에 더 많은 정보가 출력되도록 하는 것이 유용합니다. Python 로거는 기본적으로 `WARNING` 로그 레벨을 사용하지만, 다양한 상세도 수준을 얻기 위해 다른 값을 선택할 수 있습니다. 상세도가 낮은 순서부터 높은 순서로 `ERROR`, `WARNING`, `INFO`, `DEBUG`가 있습니다. 다음과 같이 설정할 수 있습니다:
 
 
 ```python
 import langsmith
 import logging
 
-# Loggers are hierarchical, so setting the log level on "langsmith" will
-# set it on all modules inside the "langsmith" package
+# 로거는 계층적이므로, "langsmith"의 로그 레벨을 설정하면
+# "langsmith" 패키지 내의 모든 모듈에 적용됩니다
 langsmith_logger = logging.getLogger("langsmith")
 langsmith_logger.setLevel(level=logging.DEBUG)
 ```

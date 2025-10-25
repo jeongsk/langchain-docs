@@ -1,21 +1,21 @@
 ---
-title: Configure your collector for LangSmith telemetry
-sidebarTitle: Configure your collector for telemetry
+title: LangSmith 텔레메트리를 위한 수집기 구성
+sidebarTitle: 텔레메트리를 위한 수집기 구성
 ---
 
-The various services in a LangSmith deployment emit telemetry data in the form of logs, metrics, and traces. You may already have telemetry collectors set up in your Kubernetes cluster, or would like to deploy one to monitor your application.
+LangSmith 배포의 다양한 서비스는 로그, 메트릭, 트레이스 형태의 텔레메트리 데이터를 생성합니다. Kubernetes 클러스터에 이미 텔레메트리 수집기를 설정해 두었거나, 애플리케이션을 모니터링하기 위해 수집기를 배포하려고 할 수 있습니다.
 
-This page describes how to configure an [OTel Collector](https://opentelemetry.io/docs/collector/configuration/) to gather telemetry data from LangSmith. Note that all of the concepts discussed below can be translated to other collectors such as [Fluentd](https://www.fluentd.org/) or [FluentBit](https://fluentbit.io/).
+이 페이지에서는 LangSmith에서 텔레메트리 데이터를 수집하기 위해 [OTel Collector](https://opentelemetry.io/docs/collector/configuration/)를 구성하는 방법을 설명합니다. 아래에서 다루는 모든 개념은 [Fluentd](https://www.fluentd.org/)나 [FluentBit](https://fluentbit.io/)와 같은 다른 수집기에도 적용할 수 있습니다.
 
 <Warning>
-**This section is only applicable for Kubernetes deployments.**
+**이 섹션은 Kubernetes 배포에만 적용됩니다.**
 </Warning>
 
 # Receivers
 
 ## Logs
 
-This is an example for a ***Sidecar*** collector to read logs from its own pod, excluding logs from non domain-specific containers. A Sidecar configuration is useful here because we require access to every container's filesystem. A DaemonSet can also be used.
+다음은 도메인별 컨테이너가 아닌 컨테이너의 로그를 제외하고 자체 파드에서 로그를 읽는 ***Sidecar*** 수집기의 예시입니다. Sidecar 구성은 모든 컨테이너의 파일시스템에 접근해야 하기 때문에 유용합니다. DaemonSet도 사용할 수 있습니다.
 
 ```yaml
 filelog:
@@ -55,12 +55,12 @@ volumeMounts:
 ```
 
 <Info>
-**This configuration requires 'get', 'list', and 'watch' permissions on pods in the given namespace.**
+**이 구성은 해당 네임스페이스의 파드에 대한 'get', 'list', 'watch' 권한이 필요합니다.**
 </Info>
 
 ## Metrics
 
-Metrics can be scraped using the Prometheus endpoints. A single instance ***Gateway*** collector can be be used to avoid duplication of queries when fetching metrics. The following config scrapes all of the default named LangSmith services:
+메트릭은 Prometheus 엔드포인트를 사용하여 스크랩할 수 있습니다. 메트릭을 가져올 때 쿼리 중복을 방지하기 위해 단일 인스턴스 ***Gateway*** 수집기를 사용할 수 있습니다. 다음 구성은 기본적으로 명명된 모든 LangSmith 서비스를 스크랩합니다:
 
 ```yaml
 prometheus:
@@ -94,12 +94,12 @@ prometheus:
 ```
 
 <Info>
-**This configuration requires 'get', 'list', and 'watch' permissions on pods, services and endpoints in the given namespace.**
+**이 구성은 해당 네임스페이스의 파드, 서비스, 엔드포인트에 대한 'get', 'list', 'watch' 권한이 필요합니다.**
 </Info>
 
 ### Traces
 
-For traces, you need to enable the OTLP receiver. The following configuration can be used to listen to HTTP traces on port 4318, and GRPC on port 4317:
+트레이스의 경우 OTLP 수신기를 활성화해야 합니다. 다음 구성을 사용하여 포트 4318에서 HTTP 트레이스를 수신하고, 포트 4317에서 GRPC를 수신할 수 있습니다:
 
 ```yaml
 otlp:
@@ -112,17 +112,17 @@ otlp:
 
 ## Processors
 
-### Recommended OTEL Processors
+### 권장 OTEL Processors
 
-The following processors are recommended when using the OTel collector:
+OTel 수집기를 사용할 때 다음 프로세서를 권장합니다:
 
-* [Batch Processor](https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/batchprocessor/README.md): Groups the data into batches before sending to exporters.
-* [Memory Limiter](https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/memorylimiterprocessor/README.md): Prevents the collector from using too much memory and crashing. When the soft limit is crossed, the collector stops accepting new data.
-* [Kubernetes Attributes Processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/k8sattributesprocessor): Adds Kubernetes metadata such as pod name into the telemetry data.
+* [Batch Processor](https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/batchprocessor/README.md): 데이터를 익스포터로 전송하기 전에 배치로 그룹화합니다.
+* [Memory Limiter](https://github.com/open-telemetry/opentelemetry-collector/blob/main/processor/memorylimiterprocessor/README.md): 수집기가 과도한 메모리를 사용하여 충돌하는 것을 방지합니다. 소프트 제한에 도달하면 수집기가 새 데이터 수신을 중지합니다.
+* [Kubernetes Attributes Processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/k8sattributesprocessor): 파드 이름과 같은 Kubernetes 메타데이터를 텔레메트리 데이터에 추가합니다.
 
 ## Exporters
 
-Exporters just need to point to an external endpoint of your liking. The following configuration allows you to configure a separate endpoint for logs, metrics and traces:
+익스포터는 원하는 외부 엔드포인트를 가리키기만 하면 됩니다. 다음 구성을 사용하면 로그, 메트릭, 트레이스에 대해 각각 별도의 엔드포인트를 구성할 수 있습니다:
 
 ```yaml
 otlphttp/logs:
@@ -134,10 +134,10 @@ otlphttp/traces:
 ```
 
 <Note>
-**The OTel Collector also supports exporting directly to a [Datadog](https://docs.datadoghq.com/opentelemetry/setup/collector_exporter) endpoint.**
+**OTel Collector는 [Datadog](https://docs.datadoghq.com/opentelemetry/setup/collector_exporter) 엔드포인트로 직접 내보내기도 지원합니다.**
 </Note>
 
-# Example Collector Configuration: Logs Sidecar
+# 수집기 구성 예시: Logs Sidecar
 
 ```yaml
 mode: sidecar
@@ -197,7 +197,7 @@ volumeMounts:
     readOnly: true
 ```
 
-# Example Collector Configuration: Metrics and Traces Gateway
+# 수집기 구성 예시: Metrics and Traces Gateway
 
 ```yaml
 mode: deployment

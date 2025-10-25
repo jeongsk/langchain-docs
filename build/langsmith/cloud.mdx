@@ -6,108 +6,108 @@ iconType: solid
 ---
 
 <Callout icon="rocket" color="#4F46E5" iconType="regular">
-앱을 Cloud에 배포할 준비가 되었다면 [Cloud 배포 빠른 시작](/langsmith/deployment-quickstart) 또는 [전체 설정 가이드](/langsmith/deploy-to-cloud)를 따르세요. 이 페이지는 참고용으로 Cloud 호스팅 모델을 설명합니다.
+앱을 Cloud에 배포할 준비가 되었다면 [Cloud 배포 빠른 시작 가이드](/langsmith/deployment-quickstart) 또는 [전체 설정 가이드](/langsmith/deploy-to-cloud)를 따라 진행하세요. 이 페이지에서는 참조를 위해 Cloud 호스팅 모델을 설명합니다.
 </Callout>
 
 **Cloud** 옵션은 LangChain이 모든 LangSmith 인프라와 서비스를 호스팅하고 운영하는 완전 관리형 호스팅 모델입니다:
 
-- **완전 관리형 인프라**: LangChain이 모든 인프라, 업데이트, 확장 및 유지 관리를 처리합니다.
-- **GitHub에서 배포**: 리포지토리를 연결하고 몇 번의 클릭으로 배포합니다.
-- **자동화된 CI/CD**: 빌드 프로세스가 플랫폼에 의해 자동으로 처리됩니다.
-- **LangSmith UI**: [관찰성](/langsmith/observability), [평가](/langsmith/evaluation), [배포 관리](/langsmith/deployments) 및 [Studio](/langsmith/studio)에 대한 전체 액세스.
+- **완전 관리형 인프라**: LangChain이 모든 인프라, 업데이트, 확장 및 유지보수를 처리합니다.
+- **GitHub에서 배포**: 리포지토리를 연결하고 몇 번의 클릭으로 배포할 수 있습니다.
+- **자동화된 CI/CD**: 플랫폼에서 빌드 프로세스를 자동으로 처리합니다.
+- **LangSmith UI**: [관찰 가능성](/langsmith/observability), [평가](/langsmith/evaluation), [배포 관리](/langsmith/deployments) 및 [Studio](/langsmith/studio)에 대한 전체 액세스를 제공합니다.
 
-|                   | **누가 관리하는가** | **어디서 실행되는가** |
+|                   | **관리 주체** | **실행 위치** |
 |-------------------|-------------------|-------------------|
-| **LangSmith 플랫폼 (UI, API, 데이터 저장소)** | LangChain | LangChain의 클라우드 |
+| **LangSmith 플랫폼 (UI, API, 데이터스토어)** | LangChain | LangChain의 클라우드 |
 | **사용자의 LangGraph 서버** | LangChain | LangChain의 클라우드 |
-| **앱을 위한 CI/CD** | LangChain | LangChain의 클라우드 |
+| **앱의 CI/CD** | LangChain | LangChain의 클라우드 |
 
-![Cloud deployment: LangChain hosts and manages all components including the UI, APIs, and your LangGraph Servers.](/langsmith/images/langgraph-cloud-architecture.png)
+![Cloud 배포: LangChain이 UI, API 및 LangGraph 서버를 포함한 모든 구성 요소를 호스팅하고 관리합니다.](/langsmith/images/langgraph-cloud-architecture.png)
 
 ## 시작하기
 
-Cloud에 첫 번째 애플리케이션을 배포하려면 [Cloud 배포 빠른 시작](/langsmith/deployment-quickstart)을 따르거나 [종합 설정 가이드](/langsmith/deploy-to-cloud)를 참조하세요.
+Cloud에 첫 번째 애플리케이션을 배포하려면 [Cloud 배포 빠른 시작 가이드](/langsmith/deployment-quickstart)를 따라 진행하거나 [전체 설정 가이드](/langsmith/deploy-to-cloud)를 참조하세요.
 
 ## Cloud 아키텍처 및 확장성
 
 <Note>
-이 섹션은 [https://smith.langchain.com](https://smith.langchain.com) 및 [https://eu.smith.langchain.com](https://eu.smith.langchain.com)에서 사용 가능한 클라우드 관리형 LangSmith 서비스에만 관련이 있습니다.
+이 섹션은 [https://smith.langchain.com](https://smith.langchain.com) 및 [https://eu.smith.langchain.com](https://eu.smith.langchain.com)에서 제공되는 클라우드 관리형 LangSmith 서비스에만 해당합니다.
 
-셀프 호스팅 LangSmith 솔루션에 대한 정보는 [셀프 호스팅 문서](/langsmith/self-hosted)를 참조하세요.
+자체 호스팅 LangSmith 솔루션에 대한 정보는 [자체 호스팅 문서](/langsmith/self-hosted)를 참조하세요.
 </Note>
 
-LangSmith는 Google Cloud Platform(GCP)에 배포되며 높은 확장성을 갖도록 설계되었습니다. 많은 고객이 LLM 애플리케이션 관찰성, 평가 및 에이전트 배포를 위해 LangSmith에서 프로덕션 워크로드를 실행하고 있습니다.
+LangSmith는 Google Cloud Platform(GCP)에 배포되어 있으며 높은 확장성을 갖도록 설계되었습니다. 많은 고객이 LLM 애플리케이션 관찰 가능성, 평가 및 에이전트 배포를 위해 LangSmith에서 프로덕션 워크로드를 실행하고 있습니다.
 
 ### 아키텍처
 
-미국 기반 LangSmith 서비스는 GCP의 `us-central1`(아이오와) 리전에 배포됩니다.
+미국 기반 LangSmith 서비스는 GCP의 `us-central1`(아이오와) 리전에 배포되어 있습니다.
 
 <Note>
-[EU 기반 LangSmith 서비스](https://eu.smith.langchain.com)는 현재 사용 가능하며(2024년 7월 중순부터) GCP의 `europe-west4`(네덜란드) 리전에 배포됩니다. 이 지역의 엔터프라이즈 플랜에 관심이 있으시면 [영업팀에 문의](https://www.langchain.com/contact-sales)하세요.
+[EU 기반 LangSmith 서비스](https://eu.smith.langchain.com)는 현재 사용 가능하며(2024년 7월 중순 기준) GCP의 `europe-west4`(네덜란드) 리전에 배포되어 있습니다. 이 리전에서 엔터프라이즈 플랜에 관심이 있으시면 [영업팀에 문의](https://www.langchain.com/contact-sales)하세요.
 </Note>
 
-#### 지역별 스토리지
+#### 리전별 스토리지
 
-이 표의 리소스와 서비스는 가입이 발생한 URL에 해당하는 위치(미국 또는 EU)에 저장됩니다. 클라우드 관리형 LangSmith는 인증/권한 부여를 위해 [Supabase](https://supabase.com)를, 데이터 웨어하우스를 위해 [ClickHouse Cloud](https://clickhouse.com/cloud)를 사용합니다.
+이 표의 리소스와 서비스는 가입이 발생한 URL(미국 또는 EU)에 해당하는 위치에 저장됩니다. 클라우드 관리형 LangSmith는 인증/권한 부여를 위해 [Supabase](https://supabase.com)를 사용하고 데이터 웨어하우스를 위해 [ClickHouse Cloud](https://clickhouse.com/cloud)를 사용합니다.
 
 |                                     | US                                                                 | EU                                                                       |
 | ----------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------ |
 | URL                                 | [https://smith.langchain.com](https://smith.langchain.com)         | [https://eu.smith.langchain.com](https://eu.smith.langchain.com)         |
 | API URL                             | [https://api.smith.langchain.com](https://api.smith.langchain.com) | [https://eu.api.smith.langchain.com](https://eu.api.smith.langchain.com) |
-| GCP                                 | us-central1 (Iowa)                                                 | europe-west4 (Netherlands)                                               |
-| Supabase                            | AWS us-east-1 (N. Virginia)                                        | AWS eu-central-1 (Germany)                                               |
-| ClickHouse Cloud                    | us-central1 (Iowa)                                                 | europe-west4 (Netherlands)                                               |
-| [LangSmith deployment](/langsmith/deployments) | us-central1 (Iowa)                                                 | europe-west4 (Netherlands)                                               |
+| GCP                                 | us-central1 (아이오와)                                                 | europe-west4 (네덜란드)                                               |
+| Supabase                            | AWS us-east-1 (버지니아 북부)                                        | AWS eu-central-1 (독일)                                               |
+| ClickHouse Cloud                    | us-central1 (아이오와)                                                 | europe-west4 (네덜란드)                                               |
+| [LangSmith 배포](/langsmith/deployments) | us-central1 (아이오와)                                                 | europe-west4 (네덜란드)                                               |
 
-자세한 내용은 [Regions FAQ](/langsmith/regions-faq)를 참조하세요.
+자세한 내용은 [리전 FAQ](/langsmith/regions-faq)를 참조하세요.
 
-#### 지역 독립적 스토리지
+#### 리전 독립적 스토리지
 
 여기에 나열된 데이터는 미국에만 저장됩니다:
 
-* Stripe 및 Metronome을 사용한 결제 및 청구 정보
+* Stripe 및 Metronome을 통한 결제 및 청구 정보
 
 #### GCP 서비스
 
-LangSmith는 다음 서비스로 구성되며 모두 Google Kubernetes Engine(GKE)에 배포됩니다:
+LangSmith는 다음 서비스로 구성되어 있으며, 모두 Google Kubernetes Engine(GKE)에 배포되어 있습니다:
 
 * LangSmith Frontend: LangSmith UI를 제공합니다.
 * LangSmith Backend: LangSmith API를 제공합니다.
-* LangSmith Platform Backend: 인증 및 기타 고용량 작업을 처리합니다. (내부 서비스)
-* LangSmith Playground: Playground 기능을 위해 다양한 LLM 공급자로 요청을 전달하는 것을 처리합니다.
-* LangSmith Queue: 비동기 작업 처리를 처리합니다. (내부 서비스)
+* LangSmith Platform Backend: 인증 및 기타 대용량 작업을 처리합니다. (내부 서비스)
+* LangSmith Playground: Playground 기능을 위해 다양한 LLM 제공자에게 요청을 전달하는 작업을 처리합니다.
+* LangSmith Queue: 비동기 작업 처리를 담당합니다. (내부 서비스)
 
 LangSmith는 다음 GCP 스토리지 서비스를 사용합니다:
 
-* 실행 입력 및 출력을 위한 Google Cloud Storage(GCS).
-* 트랜잭션 워크로드를 위한 Google Cloud SQL PostgreSQL.
-* 큐잉 및 캐싱을 위한 Google Cloud Memorystore for Redis.
-* 추적 수집 및 분석을 위한 GCP의 Clickhouse Cloud. 우리 서비스는 프라이빗 엔드포인트를 통해 동일한 GCP 리전에 호스팅된 Clickhouse Cloud에 연결합니다.
+* 실행 입력 및 출력을 위한 Google Cloud Storage(GCS)
+* 트랜잭션 워크로드를 위한 Google Cloud SQL PostgreSQL
+* 큐잉 및 캐싱을 위한 Google Cloud Memorystore for Redis
+* 추적 수집 및 분석을 위한 GCP 기반 Clickhouse Cloud. 우리 서비스는 프라이빗 엔드포인트를 통해 동일한 GCP 리전에 호스팅된 Clickhouse Cloud에 연결됩니다.
 
 사용하는 추가 GCP 서비스는 다음과 같습니다:
 
-* LangSmith 서비스로 트래픽을 라우팅하기 위한 Google Cloud Load Balancer.
-* 정적 자산을 캐싱하기 위한 Google Cloud CDN.
+* LangSmith 서비스로 트래픽을 라우팅하기 위한 Google Cloud Load Balancer
+* 정적 자산 캐싱을 위한 Google Cloud CDN
 * 보안 및 속도 제한을 위한 Google Cloud Armor. 적용하는 속도 제한에 대한 자세한 내용은 [이 가이드](/langsmith/administration-overview#rate-limits)를 참조하세요.
 
 <div style={{ textAlign: 'center' }}>
 <img
     className="block dark:hidden"
     src="/langsmith/images/cloud-arch-light.png"
-    alt="Light mode overview"
+    alt="라이트 모드 개요"
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/cloud-arch-dark.png"
-    alt="Dark mode overview"
+    alt="다크 모드 개요"
 />
 </div>
 
-### IP 주소 허용 목록 추가
+### IP 주소 허용 목록 등록
 
-#### LangChain SaaS에서 나가는 트래픽
-LangSmith 서비스에서 나가는 모든 트래픽은 NAT 게이트웨이를 통해 라우팅됩니다. 모든 트래픽은 다음 IP 주소에서 발생한 것처럼 보입니다:
+#### LangChain SaaS에서의 이그레스
+LangSmith 서비스를 떠나는 모든 트래픽은 NAT 게이트웨이를 통해 라우팅됩니다. 모든 트래픽은 다음 IP 주소에서 발생하는 것으로 표시됩니다:
 
 | US             | EU             |
 | -------------- | -------------- |
@@ -120,17 +120,17 @@ LangSmith 서비스에서 나가는 모든 트래픽은 NAT 게이트웨이를 �
 | 34.59.97.173   | 35.204.101.241 |
 | 104.198.162.55 | 35.204.48.32   |
 
-자체 AzureOpenAI 서비스 또는 Playground나 온라인 평가에서 필요할 수 있는 기타 엔드포인트에 연결하는 경우 이러한 IP 주소를 허용 목록에 추가하는 것이 도움이 될 수 있습니다.
+자체 AzureOpenAI 서비스 또는 Playground나 온라인 평가에서 필요할 수 있는 기타 엔드포인트에 연결하는 경우 이러한 IP 주소를 허용 목록에 등록하는 것이 도움이 될 수 있습니다.
 
-#### LangChain SaaS로 들어오는 트래픽
-langchain 엔드포인트는 다음 고정 IP 주소에 매핑됩니다:
+#### LangChain SaaS로의 인그레스
+langchain 엔드포인트는 다음 정적 IP 주소에 매핑됩니다:
 
 | US             | EU             |
 | -------------- | -------------- |
 | 34.8.121.39    | 34.95.92.214   |
 | 34.107.251.234 | 34.13.73.122   |
 
-프라이빗 네트워크에서 LangSmith SaaS 엔드포인트(`api.smith.langchain.com`, `smith.langchain.com`, `beacon.langchain.com`, `eu.api.smith.langchain.com`, `eu.smith.langchain.com`, `eu.beacon.langchain.com`)로의 트래픽을 활성화하려면 이러한 주소를 허용 목록에 추가해야 할 수 있습니다.
+프라이빗 네트워크에서 LangSmith SaaS 엔드포인트(`api.smith.langchain.com`, `smith.langchain.com`, `beacon.langchain.com`, `eu.api.smith.langchain.com`, `eu.smith.langchain.com`, `eu.beacon.langchain.com`)로의 트래픽을 활성화하려면 이러한 IP 주소를 허용 목록에 등록해야 할 수 있습니다.
 
 ---
 

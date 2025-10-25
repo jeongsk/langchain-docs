@@ -1,11 +1,11 @@
 ---
-title: Log multimodal traces
-sidebarTitle: Log multimodal traces
+title: 멀티모달 추적 로그 기록
+sidebarTitle: 멀티모달 추적 로그 기록
 ---
 
-LangSmith supports logging and rendering images as part of traces. This is currently supported for multimodal LLM runs.
+LangSmith는 추적의 일부로 이미지를 로깅하고 렌더링하는 기능을 지원합니다. 이 기능은 현재 멀티모달 LLM 실행에서 사용할 수 있습니다.
 
-In order to log images, use `wrap_openai`/ `wrapOpenAI` in Python or TypeScript respectively and pass an image URL or base64 encoded image as part of the input.
+이미지를 로깅하려면 Python에서는 `wrap_openai`를, TypeScript에서는 `wrapOpenAI`를 사용하고, 입력의 일부로 이미지 URL 또는 base64 인코딩된 이미지를 전달하세요.
 
 <CodeGroup>
 
@@ -36,7 +36,7 @@ print(response.choices[0])
 ```typescript TypeScript
 import OpenAI from "openai";
 import { wrapOpenAI } from "langsmith/wrappers";
-// Wrap the OpenAI client to automatically log traces
+// 추적을 자동으로 로깅하기 위해 OpenAI 클라이언트를 래핑합니다
 const wrappedClient = wrapOpenAI(new OpenAI());
 const response = await wrappedClient.chat.completions.create({
   model: "gpt-4-turbo",
@@ -60,7 +60,7 @@ console.log(response.choices[0]);
 
 </CodeGroup>
 
-The image will be rendered as part of the trace in the LangSmith UI.
+이미지는 LangSmith UI의 추적 일부로 렌더링됩니다.
 
 ![](/langsmith/images/multimodal.png)
 

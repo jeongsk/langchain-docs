@@ -1,35 +1,35 @@
 ---
-title: Query traces (SDK)
-sidebarTitle: Query traces (SDK)
+title: 트레이스 쿼리하기 (SDK)
+sidebarTitle: 트레이스 쿼리하기 (SDK)
 ---
 
 <Tip>
-**Recommended Reading**
+**권장 읽기 자료**
 
-Before diving into this content, it might be helpful to read the following:
+이 내용을 살펴보기 전에 다음 문서를 읽어보시면 도움이 됩니다:
 
-- [Run (span) data format](/langsmith/run-data-format)
-- <RegionalUrl type="api" suffix="/redoc" text="LangSmith API Reference" />
-- [LangSmith trace query syntax](/langsmith/trace-query-syntax)
+- [Run (span) 데이터 형식](/langsmith/run-data-format)
+- <RegionalUrl type="api" suffix="/redoc" text="LangSmith API 참조" />
+- [LangSmith 트레이스 쿼리 문법](/langsmith/trace-query-syntax)
 
 </Tip>
 
 <Note>
-**If you are looking to export a large volume of traces, we recommend that you use the [Bulk Data Export](./data-export) functionality, as it will better handle large data volumes and will support automatic retries and parallelization across partitions.**
+**대용량 트레이스를 내보내려는 경우, [대량 데이터 내보내기](./data-export) 기능을 사용하는 것을 권장합니다. 이 방법은 대용량 데이터를 더 효과적으로 처리하며, 자동 재시도 및 파티션 간 병렬 처리를 지원합니다.**
 </Note>
 
-The recommended way to query runs (the span data in LangSmith traces) is to use the `list_runs` method in the SDK or `/runs/query` endpoint in the API.
+run(LangSmith 트레이스의 span 데이터)을 쿼리하는 권장 방법은 SDK의 `list_runs` 메서드나 API의 `/runs/query` 엔드포인트를 사용하는 것입니다.
 
-LangSmith stores traces in a simple format that is specified in the [Run (span) data format](/langsmith/run-data-format).
+LangSmith는 트레이스를 [Run (span) 데이터 형식](/langsmith/run-data-format)에 명시된 간단한 형식으로 저장합니다.
 
-## Use filter arguments
+## 필터 인수 사용하기
 
-For simple queries, you don't have to rely on our query syntax. You can use the filter arguments specified in the [filter arguments reference](/langsmith/trace-query-syntax#filter-arguments).
+간단한 쿼리의 경우, 쿼리 문법에 의존할 필요가 없습니다. [필터 인수 참조](/langsmith/trace-query-syntax#filter-arguments)에 명시된 필터 인수를 사용할 수 있습니다.
 
 <Warning>
-**Prerequisites**
+**필수 조건**
 
-Initialize the client before running the below code snippets.
+아래 코드 스니펫을 실행하기 전에 클라이언트를 초기화해야 합니다.
 </Warning>
 
 <CodeGroup>
@@ -48,9 +48,9 @@ const client = new Client();
 
 </CodeGroup>
 
-Below are some examples of ways to list runs using keyword arguments:
+다음은 키워드 인수를 사용하여 run을 나열하는 몇 가지 예시입니다:
 
-### List all runs in a project
+### 프로젝트의 모든 run 나열하기
 
 <CodeGroup>
 
@@ -70,7 +70,7 @@ for await (const run of client.listRuns({
 
 </CodeGroup>
 
-### List LLM and Chat runs in the last 24 hours
+### 최근 24시간 내 LLM 및 Chat run 나열하기
 
 <CodeGroup>
 
@@ -95,9 +95,9 @@ for await (const run of client.listRuns({
 
 </CodeGroup>
 
-### List root runs in a project
+### 프로젝트의 루트 run 나열하기
 
-Root runs are runs that have no parents. These are assigned a value of `True` for `is_root`. You can use this to filter for root runs.
+루트 run은 부모가 없는 run입니다. 이러한 run은 `is_root`에 `True` 값이 할당됩니다. 이를 사용하여 루트 run을 필터링할 수 있습니다.
 
 <CodeGroup>
 
@@ -120,7 +120,7 @@ for await (const run of client.listRuns({
 
 </CodeGroup>
 
-### List runs without errors
+### 오류가 없는 run 나열하기
 
 <CodeGroup>
 
@@ -140,15 +140,15 @@ for await (const run of client.listRuns({
 
 </CodeGroup>
 
-### List runs by run ID
+### run ID로 run 나열하기
 
 <Warning>
-**Ignores Other Arguments**
+**다른 인수 무시됨**
 
-If you provide a list of run IDs in the way described above, it will ignore all other filtering arguments like `project_name`, `run_type`, etc. and directly return the runs matching the given IDs.
+위에 설명된 방식으로 run ID 목록을 제공하면 `project_name`, `run_type` 등과 같은 다른 모든 필터링 인수가 무시되고 지정된 ID와 일치하는 run만 직접 반환됩니다.
 </Warning>
 
-If you have a list of run IDs, you can list them directly:
+run ID 목록이 있는 경우 직접 나열할 수 있습니다:
 
 <CodeGroup>
 
@@ -172,14 +172,14 @@ for await (const run of client.listRuns({
 
 </CodeGroup>
 
-## Use filter query language
+## 필터 쿼리 언어 사용하기
 
-For more complex queries, you can use the query language described in the [filter query language reference](/langsmith/trace-query-syntax#filter-query-language).
+더 복잡한 쿼리의 경우 [필터 쿼리 언어 참조](/langsmith/trace-query-syntax#filter-query-language)에 설명된 쿼리 언어를 사용할 수 있습니다.
 
-### List all root runs in a conversational thread
+### 대화 스레드의 모든 루트 run 나열하기
 
-This is the way to fetch runs in a conversational thread. For more information on setting up threads, refer to our [how-to guide on setting up threads](./threads).
-Threads are grouped by setting a shared thread ID. The LangSmith UI lets you use any one of the following three metadata keys: `session_id`, `conversation_id`, or `thread_id`. The session ID is also known as the tracing project ID. The following query matches on any of them.
+이는 대화 스레드에서 run을 가져오는 방법입니다. 스레드 설정에 대한 자세한 내용은 [스레드 설정 방법 가이드](./threads)를 참조하세요.
+스레드는 공유 스레드 ID를 설정하여 그룹화됩니다. LangSmith UI에서는 다음 세 가지 메타데이터 키 중 하나를 사용할 수 있습니다: `session_id`, `conversation_id`, 또는 `thread_id`. 세션 ID는 추적 프로젝트 ID라고도 합니다. 다음 쿼리는 이들 중 하나와 일치합니다.
 
 <CodeGroup>
 
@@ -208,7 +208,7 @@ for await (const run of client.listRuns({
 
 </CodeGroup>
 
-### List all runs called "extractor" whose root of the trace was assigned feedback "user_score" score of 1
+### 트레이스의 루트에 "user_score" 피드백 점수 1이 할당된 "extractor"라는 모든 run 나열하기
 
 <CodeGroup>
 
@@ -230,7 +230,7 @@ client.listRuns({
 
 </CodeGroup>
 
-### List runs with "star_rating" key whose score is greater than 4
+### 점수가 4보다 큰 "star_rating" 키를 가진 run 나열하기
 
 <CodeGroup>
 
@@ -250,7 +250,7 @@ client.listRuns({
 
 </CodeGroup>
 
-### List runs that took longer than 5 seconds to complete
+### 완료하는 데 5초 이상 걸린 run 나열하기
 
 <CodeGroup>
 
@@ -262,7 +262,7 @@ client.list_runs(project_name="<your_project>", filter='gt(latency, "5s")')
 client.listRuns({projectName: "<your_project>", filter: 'gt(latency, "5s")'})
 ```
 </CodeGroup>
-### List all runs that have "error" not equal to null
+### "error"가 null이 아닌 모든 run 나열하기
 
 <CodeGroup>
 
@@ -276,7 +276,7 @@ client.listRuns({projectName: "<your_project>", filter: 'neq(error, null)'})
 
 </CodeGroup>
 
-### List all runs where start_time is greater than a specific timestamp
+### start_time이 특정 타임스탬프보다 큰 모든 run 나열하기
 
 <CodeGroup>
 
@@ -290,7 +290,7 @@ client.listRuns({projectName: "<your_project>", filter: 'gt(start_time, "2023-07
 
 </CodeGroup>
 
-### List all runs that contain the string "substring"
+### "substring" 문자열을 포함하는 모든 run 나열하기
 
 <CodeGroup>
 
@@ -304,7 +304,7 @@ client.listRuns({projectName: "<your_project>", filter: 'search("substring")'})
 
 </CodeGroup>
 
-### List all runs that are tagged with the git hash "2aa1cf4"
+### git 해시 "2aa1cf4"로 태그된 모든 run 나열하기
 
 <CodeGroup>
 
@@ -318,7 +318,7 @@ client.listRuns({projectName: "<your_project>", filter: 'has(tags, "2aa1cf4")'})
 
 </CodeGroup>
 
-### List all runs that started after a specific timestamp and either have "error" not equal to null or a "Correctness" feedback score equal to 0
+### 특정 타임스탬프 이후에 시작되고 "error"가 null이 아니거나 "Correctness" 피드백 점수가 0인 모든 run 나열하기
 
 <CodeGroup>
 
@@ -338,7 +338,7 @@ client.listRuns({
 
 </CodeGroup>
 
-### Complex query: List all runs where tags include "experimental" or "beta" and latency is greater than 2 seconds
+### 복잡한 쿼리: 태그에 "experimental" 또는 "beta"가 포함되고 지연 시간이 2초보다 큰 모든 run 나열하기
 
 <CodeGroup>
 
@@ -358,9 +358,9 @@ client.listRuns({
 
 </CodeGroup>
 
-### Search trace trees by full text
+### 전체 텍스트로 트레이스 트리 검색하기
 
-You can use the `search()` function without any specific field to do a full text search across all string fields in a run. This allows you to quickly find traces that match a search term.
+특정 필드 없이 `search()` 함수를 사용하여 run의 모든 문자열 필드에 대해 전체 텍스트 검색을 수행할 수 있습니다. 이를 통해 검색어와 일치하는 트레이스를 빠르게 찾을 수 있습니다.
 
 <CodeGroup>
 
@@ -380,9 +380,9 @@ client.listRuns({
 
 </CodeGroup>
 
-### Check for presence of metadata
+### 메타데이터 존재 여부 확인하기
 
-If you want to check for the presence of metadata, you can use the `eq` operator, optionally with an `and` statement to match by value. This is useful if you want to log more structured information about your runs.
+메타데이터의 존재 여부를 확인하려면 `eq` 연산자를 사용하고, 선택적으로 `and` 문을 사용하여 값으로 일치시킬 수 있습니다. 이는 run에 대한 보다 구조화된 정보를 기록하려는 경우 유용합니다.
 
 <CodeGroup>
 
@@ -418,9 +418,9 @@ client.listRuns({
 
 </CodeGroup>
 
-### Check for environment details in metadata
+### 메타데이터에서 환경 세부 정보 확인하기
 
-A common pattern is to add environment information to your traces via metadata. If you want to filter for runs containing environment metadata, you can use the same pattern as above:
+메타데이터를 통해 트레이스에 환경 정보를 추가하는 것이 일반적인 패턴입니다. 환경 메타데이터를 포함하는 run을 필터링하려면 위와 동일한 패턴을 사용할 수 있습니다:
 
 <CodeGroup>
 
@@ -440,9 +440,9 @@ client.listRuns({
 
 </CodeGroup>
 
-### Check for conversation ID in metadata
+### 메타데이터에서 대화 ID 확인하기
 
-Another common way to associate traces in the same conversation is by using a shared conversation ID. If you want to filter runs based on a conversation ID in this way, you can search for that ID in the metadata.
+동일한 대화의 트레이스를 연결하는 또 다른 일반적인 방법은 공유 대화 ID를 사용하는 것입니다. 이러한 방식으로 대화 ID를 기반으로 run을 필터링하려면 메타데이터에서 해당 ID를 검색할 수 있습니다.
 
 <CodeGroup>
 
@@ -462,9 +462,9 @@ client.listRuns({
 
 </CodeGroup>
 
-### Negative filtering on key-value pairs
+### 키-값 쌍의 부정 필터링
 
-You can use negative filtering on metadata, input, and output key-value pairs to exclude specific runs from your results. Here are some examples for metadata key-value pairs but the same logic applies to input and output key-value pairs.
+메타데이터, 입력 및 출력 키-값 쌍에 부정 필터링을 사용하여 결과에서 특정 run을 제외할 수 있습니다. 다음은 메타데이터 키-값 쌍에 대한 몇 가지 예시이지만, 동일한 로직이 입력 및 출력 키-값 쌍에도 적용됩니다.
 
 <CodeGroup>
 
@@ -522,9 +522,9 @@ client.listRuns({
 
 </CodeGroup>
 
-### Combine multiple filters
+### 여러 필터 결합하기
 
-If you want to combine multiple conditions to refine your search, you can use the `and` operator along with other filtering functions. Here's how you can search for runs named "ChatOpenAI" that also have a specific `conversation_id` in their metadata:
+검색을 세분화하기 위해 여러 조건을 결합하려면 다른 필터링 함수와 함께 `and` 연산자를 사용할 수 있습니다. 다음은 "ChatOpenAI"라는 이름의 run을 검색하면서 메타데이터에 특정 `conversation_id`를 가진 run을 찾는 방법입니다:
 
 <CodeGroup>
 
@@ -544,11 +544,11 @@ client.listRuns({
 
 </CodeGroup>
 
-### Tree Filter
+### 트리 필터
 
-List all runs named "RetrieveDocs" whose root run has a "user_score" feedback of 1 and any run in the full trace is named "ExpandQuery".
+루트 run에 "user_score" 피드백 1이 있고 전체 트레이스의 어느 run이 "ExpandQuery"라는 이름을 가진 경우, "RetrieveDocs"라는 이름의 모든 run을 나열합니다.
 
-This type of query is useful if you want to extract a specific run conditional on various states or steps being reached within the trace.
+이러한 유형의 쿼리는 트레이스 내에서 다양한 상태나 단계에 도달했는지를 조건으로 특정 run을 추출하려는 경우 유용합니다.
 
 <CodeGroup>
 
@@ -572,17 +572,17 @@ client.listRuns({
 
 </CodeGroup>
 
-### Advanced: export flattened trace view with child tool usage
+### 고급: 자식 도구 사용을 포함한 평면화된 트레이스 뷰 내보내기
 
-The following Python example demonstrates how to export a flattened view of traces, including information on the tools (from nested runs) used by the agent within each trace.
-This can be used to analyze the behavior of your agents across multiple traces.
+다음 Python 예시는 각 트레이스 내에서 에이전트가 사용한 도구(중첩된 run에서)에 대한 정보를 포함하여 트레이스의 평면화된 뷰를 내보내는 방법을 보여줍니다.
+이를 사용하여 여러 트레이스에 걸쳐 에이전트의 동작을 분석할 수 있습니다.
 
-This example queries all tool runs within a specified number of days and groups them by their parent (root) run ID. It then fetches the relevant information for each root run, such as the run name, inputs, outputs, and combines that information with the child run information.
+이 예시는 지정된 일수 내의 모든 도구 run을 쿼리하고 부모(루트) run ID별로 그룹화합니다. 그런 다음 각 루트 run에 대한 관련 정보(run 이름, 입력, 출력 등)를 가져와 자식 run 정보와 결합합니다.
 
-To optimize the query, the example:
+쿼리를 최적화하기 위해 이 예시는:
 
-1. Selects only the necessary fields when querying tool runs to reduce query time.
-2. Fetches root runs in batches while processing tool runs concurrently.
+1. 도구 run을 쿼리할 때 필요한 필드만 선택하여 쿼리 시간을 줄입니다.
+2. 도구 run을 동시에 처리하면서 루트 run을 배치로 가져옵니다.
 
 <CodeGroup>
 
@@ -669,10 +669,10 @@ df.head()
 
 </CodeGroup>
 
-### Advanced: export retriever IO for traces with feedback
+### 고급: 피드백이 있는 트레이스의 리트리버 입출력 내보내기
 
-This query is useful if you want to fine-tune embeddings or diagnose end-to-end system performance issues based on retriever behavior.
-The following Python example demonstrates how to export retriever inputs and outputs within traces that have a specific feedback score.
+이 쿼리는 임베딩을 미세 조정하거나 리트리버 동작을 기반으로 엔드투엔드 시스템 성능 문제를 진단하려는 경우 유용합니다.
+다음 Python 예시는 특정 피드백 점수를 가진 트레이스 내에서 리트리버 입력 및 출력을 내보내는 방법을 보여줍니다.
 
 <CodeGroup>
 

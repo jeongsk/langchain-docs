@@ -1,23 +1,23 @@
 ---
-title: Log retriever traces
-sidebarTitle: Log retriever traces
+title: 리트리버 트레이스 기록하기
+sidebarTitle: 리트리버 트레이스 기록하기
 ---
 
 <Note>
-Nothing will break if you don't log retriever traces in the correct format and data will still be logged. However, the data will not be rendered in a way that is specific to retriever steps.
+올바른 형식으로 리트리버 트레이스를 기록하지 않아도 문제가 발생하지 않으며, 데이터는 여전히 기록됩니다. 다만 데이터가 리트리버 단계에 특화된 방식으로 렌더링되지 않습니다.
 </Note>
 
-Many LLM applications require looking up documents from vector databases, knowledge graphs, or other types of indexes. Retriever traces are a way to log the documents that are retrieved by the retriever. LangSmith provides special rendering for retrieval steps in traces to make it easier to understand and diagnose retrieval issues. In order for retrieval steps to be rendered correctly, a few small steps need to be taken.
+많은 LLM 애플리케이션은 벡터 데이터베이스, 지식 그래프 또는 다른 유형의 인덱스에서 문서를 검색해야 합니다. 리트리버 트레이스는 리트리버가 검색한 문서를 기록하는 방법입니다. LangSmith는 트레이스에서 검색 단계에 대한 특수한 렌더링을 제공하여 검색 문제를 더 쉽게 이해하고 진단할 수 있도록 합니다. 검색 단계가 올바르게 렌더링되려면 몇 가지 간단한 단계를 수행해야 합니다.
 
-1. Annotate the retriever step with `run_type="retriever"`.
+1. 리트리버 단계에 `run_type="retriever"` 어노테이션을 추가합니다.
 
-2. Return a list of Python dictionaries or TypeScript objects from the retriever step. Each dictionary should contain the following keys:
+2. 리트리버 단계에서 Python 딕셔너리 또는 TypeScript 객체의 리스트를 반환합니다. 각 딕셔너리는 다음 키를 포함해야 합니다:
 
-   * `page_content`: The text of the document.
-   * `type`: This should always be "Document".
-   * `metadata`: A python dictionary or TypeScript object containing metadata about the document. This metadata will be displayed in the trace.
+   * `page_content`: 문서의 텍스트입니다.
+   * `type`: 이 값은 항상 "Document"이어야 합니다.
+   * `metadata`: 문서에 대한 메타데이터를 포함하는 Python 딕셔너리 또는 TypeScript 객체입니다. 이 메타데이터는 트레이스에 표시됩니다.
 
-The following code snippets show how to log a retrieval steps in Python and TypeScript.
+다음 코드 스니펫은 Python과 TypeScript에서 검색 단계를 기록하는 방법을 보여줍니다.
 
 <CodeGroup>
 
@@ -77,7 +77,7 @@ await retrieveDocs("User query");
 
 </CodeGroup>
 
-The following image shows how a retriever step is rendered in a trace. The contents along with the metadata are displayed with each document.
+다음 이미지는 트레이스에서 리트리버 단계가 어떻게 렌더링되는지 보여줍니다. 각 문서의 내용과 메타데이터가 함께 표시됩니다.
 
 ![](/langsmith/images/retriever-trace.png)
 

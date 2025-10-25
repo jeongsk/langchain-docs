@@ -1,17 +1,17 @@
 ---
-title: How to use prebuilt evaluators
-sidebarTitle: Use prebuilt evaluators
+title: 사전 구축된 평가자를 사용하는 방법
+sidebarTitle: 사전 구축된 평가자 사용
 ---
 
-LangSmith integrates with the open-source openevals package to provide a suite of prebuilt evaluators that you can use as starting points for evaluation.
+LangSmith는 오픈소스 openevals 패키지와 통합되어, 평가를 위한 시작점으로 사용할 수 있는 사전 구축된 평가자 모음을 제공합니다.
 
 <Note>
-This how-to guide will demonstrate how to set up and run one type of evaluator (LLM-as-a-judge). For a complete list of prebuilt evaluators with usage examples, refer to the [openevals](https://github.com/langchain-ai/openevals) and [agentevals](https://github.com/langchain-ai/agentevals) repos.
+이 사용 가이드에서는 한 가지 유형의 평가자(LLM-as-a-judge)를 설정하고 실행하는 방법을 보여드립니다. 사용 예제가 포함된 사전 구축된 평가자의 전체 목록은 [openevals](https://github.com/langchain-ai/openevals) 및 [agentevals](https://github.com/langchain-ai/agentevals) 리포지토리를 참조하세요.
 </Note>
 
-## Setup
+## 설정
 
-You'll need to install the `openevals` package to use the pre-built LLM-as-a-judge evaluator.
+사전 구축된 LLM-as-a-judge 평가자를 사용하려면 `openevals` 패키지를 설치해야 합니다.
 
 <CodeGroup>
 
@@ -25,21 +25,21 @@ yarn add openevals @langchain/core
 
 </CodeGroup>
 
-You'll also need to set your OpenAI API key as an environment variable, though you can choose different providers too:
+또한 OpenAI API 키를 환경 변수로 설정해야 하지만, 다른 공급자를 선택할 수도 있습니다:
 
 ```bash
 export OPENAI_API_KEY="your_openai_api_key"
 ```
 
-We'll also use LangSmith's [pytest](/langsmith/pytest) integration for Python and [Vitest/Jest](/langsmith/vitest-jest) for TypeScript to run our evals. `openevals` also integrates seamlessly with the [`evaluate`](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate) method as well. See the [appropriate guides](/langsmith/pytest) for setup instructions.
+평가를 실행하기 위해 Python에서는 LangSmith의 [pytest](/langsmith/pytest) 통합을, TypeScript에서는 [Vitest/Jest](/langsmith/vitest-jest)를 사용할 것입니다. `openevals`는 [`evaluate`](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate) 메서드와도 원활하게 통합됩니다. 설정 지침은 [해당 가이드](/langsmith/pytest)를 참조하세요.
 
-## Running an evaluator
+## 평가자 실행하기
 
-The general flow is simple: import the evaluator or factory function from `openevals`, then run it within your test file with inputs, outputs, and reference outputs. LangSmith will automatically log the evaluator's results as feedback.
+일반적인 흐름은 간단합니다: `openevals`에서 평가자 또는 팩토리 함수를 가져온 다음, 테스트 파일 내에서 입력, 출력 및 참조 출력과 함께 실행합니다. LangSmith는 평가자의 결과를 자동으로 피드백으로 기록합니다.
 
-Note that not all evaluators will require each parameter (the exact match evaluator only requires outputs and reference outputs, for example). Additionally, if your LLM-as-a-judge prompt requires additional variables, passing them in as kwargs will format them into the prompt.
+모든 평가자가 각 매개변수를 요구하는 것은 아닙니다(예를 들어, 정확한 일치 평가자는 출력과 참조 출력만 필요합니다). 또한 LLM-as-a-judge 프롬프트에 추가 변수가 필요한 경우, kwargs로 전달하면 프롬프트에 형식화됩니다.
 
-Set up your test file like this:
+다음과 같이 테스트 파일을 설정하세요:
 
 <CodeGroup>
 
@@ -114,13 +114,13 @@ ls.describe("Correctness", () => {
 
 </CodeGroup>
 
-The `feedback_key`/`feedbackKey` parameter will be used as the name of the feedback in your experiment.
+`feedback_key`/`feedbackKey` 매개변수는 실험에서 피드백의 이름으로 사용됩니다.
 
-Running the eval in your terminal will result in something like the following:
+터미널에서 평가를 실행하면 다음과 같은 결과가 표시됩니다:
 
 ![Prebuilt evaluator terminal result](/langsmith/images/prebuilt-eval-result.png)
 
-You can also pass prebuilt evaluators directly into the `evaluate` method if you have already created a dataset in LangSmith. If using Python, this requires `langsmith>=0.3.11`:
+LangSmith에서 이미 데이터셋을 생성한 경우, 사전 구축된 평가자를 `evaluate` 메서드에 직접 전달할 수도 있습니다. Python을 사용하는 경우 `langsmith>=0.3.11`이 필요합니다:
 
 <CodeGroup>
 
@@ -164,7 +164,7 @@ await evaluate((inputs) => "What color is the sky?", {
 
 </CodeGroup>
 
-For a complete list of available evaluators, see the [openevals](https://github.com/langchain-ai/openevals) and [agentevals](https://github.com/langchain-ai/agentevals) repos.
+사용 가능한 평가자의 전체 목록은 [openevals](https://github.com/langchain-ai/openevals) 및 [agentevals](https://github.com/langchain-ai/agentevals) 리포지토리를 참조하세요.
 
 ---
 
