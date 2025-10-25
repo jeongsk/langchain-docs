@@ -1,65 +1,62 @@
 ---
-title: Bulk Exporting Trace Data
-sidebarTitle: Bulk export trace data
+title: 트레이스 데이터 대량 내보내기
+sidebarTitle: 트레이스 데이터 대량 내보내기
 ---
 
 <Info>
-**Plan restrictions apply**
+**플랜 제한 사항**
 
-Please note that the Data Export functionality is only supported for [LangSmith Plus or Enterprise tiers](https://www.langchain.com/pricing-langsmith).
+데이터 내보내기 기능은 [LangSmith Plus 또는 Enterprise 티어](https://www.langchain.com/pricing-langsmith)에서만 지원됩니다.
 </Info>
 
-LangSmith's bulk data export functionality allows you to export your traces into an external destination. This can be useful if you want to analyze the
-data offline in a tool such as BigQuery, Snowflake, RedShift, Jupyter Notebooks, etc.
+LangSmith의 대량 데이터 내보내기 기능을 사용하면 트레이스를 외부 목적지로 내보낼 수 있습니다. BigQuery, Snowflake, RedShift, Jupyter Notebooks 등의 도구에서 데이터를 오프라인으로 분석하고자 할 때 유용합니다.
 
-An export can be launched to target a specific LangSmith project and date range. Once a batch export is launched, our system will handle the orchestration and resilience of the export process.
-Please note that exporting your data may take some time depending on the size of your data. We also have a limit on how many of your exports can run at the same time.
-Bulk exports also have a runtime timeout of 24 hours.
+내보내기는 특정 LangSmith 프로젝트와 날짜 범위를 대상으로 시작할 수 있습니다. 배치 내보내기가 시작되면 시스템이 내보내기 프로세스의 오케스트레이션과 복원력을 처리합니다.
+데이터 내보내기는 데이터 크기에 따라 시간이 걸릴 수 있습니다. 또한 동시에 실행할 수 있는 내보내기 수에도 제한이 있습니다.
+대량 내보내기는 24시간의 런타임 타임아웃이 있습니다.
 
-## Destinations
+## 목적지
 
-Currently we support exporting to an S3 bucket or S3 API compatible bucket that you provide. The data will be exported in
-[Parquet](https://parquet.apache.org/docs/overview/) columnar format. This format will allow you to easily import the data into
-other systems. The data export will contain equivalent data fields as the [Run data format](/langsmith/run-data-format).
+현재 사용자가 제공하는 S3 버킷 또는 S3 API 호환 버킷으로의 내보내기를 지원합니다. 데이터는 [Parquet](https://parquet.apache.org/docs/overview/) 컬럼 형식으로 내보내집니다. 이 형식을 사용하면 다른 시스템으로 데이터를 쉽게 가져올 수 있습니다. 데이터 내보내기에는 [Run 데이터 형식](/langsmith/run-data-format)과 동일한 데이터 필드가 포함됩니다.
 
-## Exporting Data
+## 데이터 내보내기
 
-### Destinations - Providing a S3 bucket
+### 목적지 - S3 버킷 제공
 
-To export LangSmith data, you will need to provide an S3 bucket where the data will be exported to.
+LangSmith 데이터를 내보내려면 데이터를 내보낼 S3 버킷을 제공해야 합니다.
 
-The following information is needed for the export:
+내보내기에는 다음 정보가 필요합니다:
 
-- **Bucket Name**: The name of the S3 bucket where the data will be exported to.
-- **Prefix**: The root prefix within the bucket where the data will be exported to.
-- **S3 Region**: The region of the bucket - this is needed for AWS S3 buckets.
-- **Endpoint URL**: The endpoint URL for the S3 bucket - this is needed for S3 API compatible buckets.
-- **Access Key**: The access key for the S3 bucket.
-- **Secret Key**: The secret key for the S3 bucket.
+- **Bucket Name**: 데이터를 내보낼 S3 버킷의 이름입니다.
+- **Prefix**: 버킷 내에서 데이터를 내보낼 루트 접두사입니다.
+- **S3 Region**: 버킷의 리전입니다 - AWS S3 버킷에 필요합니다.
+- **Endpoint URL**: S3 버킷의 엔드포인트 URL입니다 - S3 API 호환 버킷에 필요합니다.
+- **Access Key**: S3 버킷의 액세스 키입니다.
+- **Secret Key**: S3 버킷의 시크릿 키입니다.
 
-We support any S3 compatible bucket, for non AWS buckets such as GCS or MinIO, you will need to provide the endpoint URL.
+GCS 또는 MinIO와 같은 AWS가 아닌 버킷을 포함한 모든 S3 호환 버킷을 지원하며, 이 경우 엔드포인트 URL을 제공해야 합니다.
 
-### Preparing the Destination
+### 목적지 준비
 
 <Note>
-**For self-hosted and EU region deployments**
+**자체 호스팅 및 EU 리전 배포의 경우**
 
-Update the LangSmith URL appropriately for self-hosted installations or organizations in the EU region in the requests below.
-For the EU region, use `eu.api.smith.langchain.com`.
+아래 요청에서 자체 호스팅 설치 또는 EU 리전 조직에 맞게 LangSmith URL을 적절히 업데이트하세요.
+EU 리전의 경우 `eu.api.smith.langchain.com`을 사용하세요.
 </Note>
 
 <Note>
-**Permissions required**
+**필요한 권한**
 
-Both the `backend` and `queue` services require write access to the destination bucket:
+`backend` 및 `queue` 서비스 모두 목적지 버킷에 대한 쓰기 액세스 권한이 필요합니다:
 
-- The `backend` service attempts to write a test file to the destination bucket when the export destination is created.
-It will delete the test file if it has permission to do so (delete access is optional).
-- The `queue` service is responsible for bulk export execution and uploading the files to the bucket.
+- `backend` 서비스는 내보내기 목적지가 생성될 때 목적지 버킷에 테스트 파일을 쓰려고 시도합니다.
+권한이 있는 경우 테스트 파일을 삭제합니다(삭제 액세스는 선택 사항입니다).
+- `queue` 서비스는 대량 내보내기 실행을 담당하며 파일을 버킷에 업로드합니다.
 </Note>
 
-The following example demonstrates how to create a destination using cURL. Replace the placeholder values with your actual configuration details.
-Note that credentials will be stored securely in an encrypted form in our system.
+다음 예제는 cURL을 사용하여 목적지를 생성하는 방법을 보여줍니다. 플레이스홀더 값을 실제 구성 세부 정보로 바꾸세요.
+자격 증명은 시스템에 암호화된 형태로 안전하게 저장됩니다.
 
 ```bash
 curl --request POST \
@@ -83,25 +80,25 @@ curl --request POST \
   }'
 ```
 
-Use the returned `id` to reference this destination in subsequent bulk export operations.
+반환된 `id`를 사용하여 후속 대량 내보내기 작업에서 이 목적지를 참조하세요.
 
-**If you receive an error while creating a destination, see [debug destination errors](#debugging-destination-errors) for details on how to debug this.**
+**목적지 생성 중 오류가 발생하면 [목적지 오류 디버깅](#debugging-destination-errors)에서 디버깅 방법을 확인하세요.**
 
-#### Credentials configuration
+#### 자격 증명 구성
 
-<Note>**Requires LangSmith Helm version >= `0.10.34` (application version >= `0.10.91`)**</Note>
+<Note>**LangSmith Helm 버전 >= `0.10.34` (애플리케이션 버전 >= `0.10.91`) 필요**</Note>
 
-We support the following additional credentials formats besides static `access_key_id` and `secret_access_key`:
+정적 `access_key_id` 및 `secret_access_key` 외에도 다음과 같은 추가 자격 증명 형식을 지원합니다:
 
-- To use [temporary credentials](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html) that include an AWS session token,
-  additionally provide the `credentials.session_token` key when creating the bulk export destination.
-- (Self-hosted only): To use environment-based credentials such as with [AWS IAM Roles for Service Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) (IRSA),
-  omit the `credentials` key from the request when creating the bulk export destination.
-  In this case, the [standard Boto3 credentials locations](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#credentials) will be checked in the order defined by the library.
+- AWS 세션 토큰을 포함하는 [임시 자격 증명](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_use-resources.html)을 사용하려면
+  대량 내보내기 목적지를 생성할 때 `credentials.session_token` 키를 추가로 제공하세요.
+- (자체 호스팅 전용): [AWS IAM Roles for Service Accounts](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) (IRSA)와 같은 환경 기반 자격 증명을 사용하려면
+  대량 내보내기 목적지를 생성할 때 요청에서 `credentials` 키를 생략하세요.
+  이 경우 라이브러리에서 정의한 순서대로 [표준 Boto3 자격 증명 위치](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#credentials)를 확인합니다.
 
-#### AWS S3 bucket
+#### AWS S3 버킷
 
-For AWS S3, you can leave off the `endpoint_url` and supply the region that matches the region of your bucket.
+AWS S3의 경우 `endpoint_url`을 생략하고 버킷의 리전과 일치하는 리전을 제공할 수 있습니다.
 
 ```bash
 curl --request POST \
@@ -124,11 +121,10 @@ curl --request POST \
   }'
 ```
 
-#### Google GCS XML S3 compatible bucket
+#### Google GCS XML S3 호환 버킷
 
-When using Google's GCS bucket, you need to use the XML S3 compatible API, and supply the `endpoint_url`
-which is typically `https://storage.googleapis.com`.
-Here is an example of the API request when using the GCS XML API which is compatible with S3:
+Google의 GCS 버킷을 사용할 때는 XML S3 호환 API를 사용해야 하며, 일반적으로 `https://storage.googleapis.com`인 `endpoint_url`을 제공해야 합니다.
+다음은 S3와 호환되는 GCS XML API를 사용할 때의 API 요청 예시입니다:
 
 ```bash
 curl --request POST \
@@ -151,13 +147,13 @@ curl --request POST \
   }'
 ```
 
-See [Google documentation](https://cloud.google.com/storage/docs/interoperability#xml_api) for more info
+자세한 내용은 [Google 문서](https://cloud.google.com/storage/docs/interoperability#xml_api)를 참조하세요.
 
-### Create an export job
+### 내보내기 작업 생성
 
-To export data, you will need to create an export job. This job will specify the destination, the project, the date range, and filter expression of the data to export. The filter expression is used to narrow down the set of runs exported and is optional. Not setting the filter field will export all runs. Refer to our [filter query language](/langsmith/trace-query-syntax#filter-query-language) and [examples](/langsmith/export-traces#use-filter-query-language) to determine the correct filter expression for your export.
+데이터를 내보내려면 내보내기 작업을 생성해야 합니다. 이 작업은 목적지, 프로젝트, 날짜 범위 및 내보낼 데이터의 필터 표현식을 지정합니다. 필터 표현식은 내보낼 실행 세트를 좁히는 데 사용되며 선택 사항입니다. 필터 필드를 설정하지 않으면 모든 실행을 내보냅니다. 내보내기에 적합한 필터 표현식을 결정하려면 [필터 쿼리 언어](/langsmith/trace-query-syntax#filter-query-language) 및 [예제](/langsmith/export-traces#use-filter-query-language)를 참조하세요.
 
-You can use the following cURL command to create the job:
+다음 cURL 명령을 사용하여 작업을 생성할 수 있습니다:
 
 ```bash
 curl --request POST \
@@ -175,19 +171,19 @@ curl --request POST \
 ```
 
 <Note>
-The `session_id` is also known as the Tracing Project ID, which can be copied from the individual project view by clicking into the project in the Tracing Projects list.
+`session_id`는 트레이싱 프로젝트 ID라고도 하며, 트레이싱 프로젝트 목록에서 프로젝트를 클릭하여 개별 프로젝트 보기에서 복사할 수 있습니다.
 </Note>
 
-Use the returned `id` to reference this export in subsequent bulk export operations.
+반환된 `id`를 사용하여 후속 대량 내보내기 작업에서 이 내보내기를 참조하세요.
 
-### Scheduled exports
+### 예약된 내보내기
 
 <Note>
-Requires LangSmith Helm version >= `0.10.42` (application version >= `0.10.109`)
+LangSmith Helm 버전 >= `0.10.42` (애플리케이션 버전 >= `0.10.109`) 필요
 </Note>
 
-Scheduled exports collect runs periodically and export to the configured destination.
-To create a scheduled export, include `interval_hours` and remove `end_time`:
+예약된 내보내기는 주기적으로 실행을 수집하여 구성된 목적지로 내보냅니다.
+예약된 내보내기를 생성하려면 `interval_hours`를 포함하고 `end_time`을 제거하세요:
 
 ```bash
 curl --request POST \
@@ -204,33 +200,33 @@ curl --request POST \
   }'
 ```
 
-**Details**
+**세부 정보**
 
-- `interval_hours` must be between 1 hour and 168 hours (1 week) inclusive.
-- For spawned exports, the first time range exported is `start_time=(scheduled_export_start_time), end_time=(start_time + interval_hours)`.
-    Then `start_time=(previous_export_end_time), end_time=(this_export_start_time + interval_hours)`, and so on.
-- `end_time` must be omitted for scheduled exports. `end_time` is still required for non-scheduled exports.
-- Scheduled exports can be stopped by [cancelling the export](#stop-an-export).
-  - Exports that have been spawned by a scheduled export have the `source_bulk_export_id` attribute filled.
-  - If desired, these spawned bulk exports must be canceled separately from the source scheduled bulk export -
-    canceling the source bulk export **does not** cancel the spawned bulk exports.
-- Spawned exports run at `end_time + 10 minutes` to account for any runs that are submitted with `end_time` in the recent past.
+- `interval_hours`는 1시간에서 168시간(1주) 사이여야 합니다.
+- 생성된 내보내기의 경우 처음 내보내는 시간 범위는 `start_time=(scheduled_export_start_time), end_time=(start_time + interval_hours)`입니다.
+    그 다음은 `start_time=(previous_export_end_time), end_time=(this_export_start_time + interval_hours)` 등으로 진행됩니다.
+- 예약된 내보내기에는 `end_time`을 생략해야 합니다. 예약되지 않은 내보내기에는 여전히 `end_time`이 필요합니다.
+- 예약된 내보내기는 [내보내기 중지](#stop-an-export)를 통해 중지할 수 있습니다.
+  - 예약된 내보내기에 의해 생성된 내보내기는 `source_bulk_export_id` 속성이 채워져 있습니다.
+  - 필요한 경우 이러한 생성된 대량 내보내기는 소스 예약 대량 내보내기와 별도로 취소해야 합니다 -
+    소스 대량 내보내기를 취소해도 생성된 대량 내보내기는 취소되지 **않습니다**.
+- 생성된 내보내기는 최근 과거의 `end_time`으로 제출된 실행을 고려하기 위해 `end_time + 10분`에 실행됩니다.
 
-**Example**
+**예시**
 
-If a scheduled bulk export is created with `start_time=2025-07-16T00:00:00Z` and `interval_hours=6`:
+`start_time=2025-07-16T00:00:00Z` 및 `interval_hours=6`으로 예약 대량 내보내기를 생성하는 경우:
 
-| Export | Start Time           | End Time             | Runs At              |
+| 내보내기 | 시작 시간             | 종료 시간             | 실행 시간             |
 | ------ | -------------------- | -------------------- | -------------------- |
 | 1      | 2025-07-16T00:00:00Z | 2025-07-16T06:00:00Z | 2025-07-16T06:10:00Z |
 | 2      | 2025-07-16T06:00:00Z | 2025-07-16T12:00:00Z | 2025-07-16T12:10:00Z |
 | 3      | 2025-07-16T12:00:00Z | 2025-07-16T18:00:00Z | 2025-07-16T18:10:00Z |
 
-## Monitoring the Export Job
+## 내보내기 작업 모니터링
 
-### Monitor Export Status
+### 내보내기 상태 모니터링
 
-To monitor the status of an export job, use the following cURL command:
+내보내기 작업의 상태를 모니터링하려면 다음 cURL 명령을 사용하세요:
 
 ```bash
 curl --request GET \
@@ -240,12 +236,12 @@ curl --request GET \
   --header 'X-Tenant-Id: YOUR_WORKSPACE_ID'
 ```
 
-Replace `{export_id}` with the ID of the export you want to monitor. This command retrieves the current status of the specified export job.
+`{export_id}`를 모니터링하려는 내보내기의 ID로 바꾸세요. 이 명령은 지정된 내보내기 작업의 현재 상태를 검색합니다.
 
-### List Runs for an Export
+### 내보내기에 대한 실행 목록 조회
 
-An export is typically broken up into multiple runs which correspond to a specific date partition to export.
-To list all runs associated with a specific export, use the following cURL command:
+내보내기는 일반적으로 내보낼 특정 날짜 파티션에 해당하는 여러 실행으로 나뉩니다.
+특정 내보내기와 관련된 모든 실행을 나열하려면 다음 cURL 명령을 사용하세요:
 
 ```bash
 curl --request GET \
@@ -255,11 +251,11 @@ curl --request GET \
   --header 'X-Tenant-Id: YOUR_WORKSPACE_ID'
 ```
 
-This command fetches all runs related to the specified export, providing details such as run ID, status, creation time, rows exported, etc.
+이 명령은 지정된 내보내기와 관련된 모든 실행을 가져와서 실행 ID, 상태, 생성 시간, 내보낸 행 수 등의 세부 정보를 제공합니다.
 
-### List All Exports
+### 모든 내보내기 목록 조회
 
-To retrieve a list of all export jobs, use the following cURL command:
+모든 내보내기 작업 목록을 검색하려면 다음 cURL 명령을 사용하세요:
 
 ```bash
 curl --request GET \
@@ -269,11 +265,11 @@ curl --request GET \
   --header 'X-Tenant-Id: YOUR_WORKSPACE_ID'
 ```
 
-This command returns a list of all export jobs along with their current statuses and creation timestamps.
+이 명령은 현재 상태 및 생성 타임스탬프와 함께 모든 내보내기 작업 목록을 반환합니다.
 
-### Stop an Export
+### 내보내기 중지
 
-To stop an existing export, use the following cURL command:
+기존 내보내기를 중지하려면 다음 cURL 명령을 사용하세요:
 
 ```bash
 curl --request PATCH \
@@ -286,113 +282,109 @@ curl --request PATCH \
 }'
 ```
 
-Replace `{export_id}` with the ID of the export you wish to cancel. Note that a job cannot be restarted once it has been cancelled,
-you will need to create a new export job instead.
+`{export_id}`를 취소하려는 내보내기의 ID로 바꾸세요. 작업이 취소되면 다시 시작할 수 없으므로 대신 새 내보내기 작업을 생성해야 합니다.
 
-## Partitioning Scheme
+## 파티셔닝 체계
 
-Data will be exported into your bucket into the follow Hive partitioned format:
+데이터는 다음 Hive 파티션 형식으로 버킷에 내보내집니다:
 
 ```
 <bucket>/<prefix>/export_id=<export_id>/tenant_id=<tenant_id>/session_id=<session_id>/runs/year=<year>/month=<month>/day=<day>
 ```
 
-## Importing Data into other systems
+## 다른 시스템으로 데이터 가져오기
 
-Importing data from S3 and Parquet format is commonly supported by the majority of analytical systems. See below for documentation links:
+S3 및 Parquet 형식에서 데이터를 가져오는 것은 대부분의 분석 시스템에서 일반적으로 지원됩니다. 문서 링크는 아래를 참조하세요:
 
 ### BigQuery
 
-To import your data into BigQuery, see [Loading Data from Parquet](https://cloud.google.com/bigquery/docs/loading-data-cloud-storage-parquet) and also
-[Hive Partitioned loads](https://cloud.google.com/bigquery/docs/hive-partitioned-loads-gcs).
+데이터를 BigQuery로 가져오려면 [Parquet에서 데이터 로드](https://cloud.google.com/bigquery/docs/loading-data-cloud-storage-parquet) 및
+[Hive 파티션 로드](https://cloud.google.com/bigquery/docs/hive-partitioned-loads-gcs)를 참조하세요.
 
 ### Snowflake
 
-You can load data into Snowflake from S3 by following the [Load from Cloud Document](https://docs.snowflake.com/en/user-guide/tutorials/load-from-cloud-tutorial).
+[클라우드에서 로드 문서](https://docs.snowflake.com/en/user-guide/tutorials/load-from-cloud-tutorial)를 따라 S3에서 Snowflake로 데이터를 로드할 수 있습니다.
 
 ### RedShift
 
-You can COPY data from S3 or Parquet into Amazon Redshift by following the [AWS COPY command documentation](https://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html).
+[AWS COPY 명령 문서](https://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html)를 따라 S3 또는 Parquet에서 Amazon Redshift로 데이터를 COPY할 수 있습니다.
 
 ### Clickhouse
 
-You can directly query data in S3 / Parquet format in Clickhouse. As an example, if using GCS, you can query the data as follows:
+Clickhouse에서 S3 / Parquet 형식의 데이터를 직접 쿼리할 수 있습니다. 예를 들어 GCS를 사용하는 경우 다음과 같이 데이터를 쿼리할 수 있습니다:
 
 ```sql
 SELECT count(distinct id) FROM s3('https://storage.googleapis.com/<bucket>/<prefix>/export_id=<export_id>/**',
  'access_key_id', 'access_secret', 'Parquet')
 ```
 
-See [Clickhouse S3 Integration Documentation](https://clickhouse.com/docs/en/engines/table-engines/integrations/s3) for more information.
+자세한 내용은 [Clickhouse S3 통합 문서](https://clickhouse.com/docs/en/engines/table-engines/integrations/s3)를 참조하세요.
 
 ### DuckDB
 
-You can query the data from S3 in-memory with SQL using DuckDB. See [S3 import Documentation](https://duckdb.org/docs/guides/network_cloud_storage/s3_import.html).
+DuckDB를 사용하여 S3의 데이터를 SQL로 메모리 내에서 쿼리할 수 있습니다. [S3 가져오기 문서](https://duckdb.org/docs/guides/network_cloud_storage/s3_import.html)를 참조하세요.
 
-## Error Handling
+## 오류 처리
 
-### Debugging Destination Errors
+### 목적지 오류 디버깅
 
-The destinations API endpoint will validate that the destination and credentials are valid and that write access is
-is present for the bucket.
+목적지 API 엔드포인트는 목적지와 자격 증명이 유효하고 버킷에 대한 쓰기 액세스 권한이 있는지 확인합니다.
 
-If you receive an error, and would like to debug this error, you can use the [AWS CLI](https://aws.amazon.com/cli/)
-to test the connectivity to the bucket. You should be able to write a file with the CLI using the same
-data that you supplied to the destinations API above.
+오류가 발생하여 이 오류를 디버깅하려면 [AWS CLI](https://aws.amazon.com/cli/)를 사용하여 버킷에 대한 연결을 테스트할 수 있습니다. 위의 목적지 API에 제공한 것과 동일한 데이터를 사용하여 CLI로 파일을 작성할 수 있어야 합니다.
 
 **AWS S3:**
 
 ```bash
 aws configure
 
-# set the same access key credentials and region as you used for the destination
+# 목적지에 사용한 것과 동일한 액세스 키 자격 증명 및 리전 설정
 > AWS Access Key ID: <access_key_id>
 > AWS Secret Access Key: <secret_access_key>
 > Default region name [us-east-1]: <region>
 
-# List buckets
+# 버킷 나열
 aws s3 ls /
 
-# test write permissions
+# 쓰기 권한 테스트
 touch ./test.txt
 aws s3 cp ./test.txt s3://<bucket-name>/tmp/test.txt
 ```
 
-**GCS Compatible Buckets:**
+**GCS 호환 버킷:**
 
-You will need to supply the endpoint_url with `--endpoint-url` option.
-For GCS, the `endpoint_url` is typically `https://storage.googleapis.com`:
+`--endpoint-url` 옵션으로 endpoint_url을 제공해야 합니다.
+GCS의 경우 `endpoint_url`은 일반적으로 `https://storage.googleapis.com`입니다:
 
 ```bash
 aws configure
 
-# set the same access key credentials and region as you used for the destination
+# 목적지에 사용한 것과 동일한 액세스 키 자격 증명 및 리전 설정
 > AWS Access Key ID: <access_key_id>
 > AWS Secret Access Key: <secret_access_key>
 > Default region name [us-east-1]: <region>
 
-# List buckets
+# 버킷 나열
 aws s3 --endpoint-url=<endpoint_url> ls /
 
-# test write permissions
+# 쓰기 권한 테스트
 touch ./test.txt
 aws s3 --endpoint-url=<endpoint_url> cp ./test.txt s3://<bucket-name>/tmp/test.txt
 ```
 
-### Monitoring Runs
+### 실행 모니터링
 
-You can monitor your runs using the [List Runs API](#list-runs-for-an-export). If this is a known error, this will be added to the `errors` field of the run.
+[실행 목록 API](#list-runs-for-an-export)를 사용하여 실행을 모니터링할 수 있습니다. 알려진 오류인 경우 실행의 `errors` 필드에 추가됩니다.
 
-### Common Errors
+### 일반적인 오류
 
-Here are some common errors:
+다음은 일반적인 오류입니다:
 
-| Error                              | Description                                                                                                                                                                                                                                                                                            |
+| 오류                                | 설명                                                                                                                                                                                                                                                                                            |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Access denied                      | The blob store credentials or bucket are not valid. This error occurs when the provided access key and secret key combination doesn't have the necessary permissions to access the specified bucket or perform the required operations.                                                                |
-| Bucket is not valid                | The specified blob store bucket is not valid. This error is thrown when the bucket doesn't exist or there is not enough access to perform writes on the bucket.                                                                                                                                        |
-| Key ID you provided does not exist | The blob store credentials provided are not valid. This error occurs when the access key ID used for authentication is not a valid key.                                                                                                                                                                |
-| Invalid endpoint                   | The endpoint_url provided is invalid. This error is raised when the specified endpoint is an invalid endpoint. Only S3 compatible endpoints are supported, for example `https://storage.googleapis.com` for GCS, `https://play.min.io` for minio, etc. If using AWS, you should omit the endpoint_url. |
+| Access denied                      | Blob 저장소 자격 증명 또는 버킷이 유효하지 않습니다. 이 오류는 제공된 액세스 키와 시크릿 키 조합이 지정된 버킷에 액세스하거나 필요한 작업을 수행하는 데 필요한 권한이 없을 때 발생합니다.                                                                |
+| Bucket is not valid                | 지정된 Blob 저장소 버킷이 유효하지 않습니다. 이 오류는 버킷이 존재하지 않거나 버킷에 대한 쓰기를 수행할 수 있는 충분한 액세스 권한이 없을 때 발생합니다.                                                                                                                                        |
+| Key ID you provided does not exist | 제공된 Blob 저장소 자격 증명이 유효하지 않습니다. 이 오류는 인증에 사용된 액세스 키 ID가 유효한 키가 아닐 때 발생합니다.                                                                                                                                                                                |
+| Invalid endpoint                   | 제공된 endpoint_url이 유효하지 않습니다. 이 오류는 지정된 엔드포인트가 유효하지 않은 엔드포인트일 때 발생합니다. S3 호환 엔드포인트만 지원됩니다. 예를 들어 GCS의 경우 `https://storage.googleapis.com`, MinIO의 경우 `https://play.min.io` 등입니다. AWS를 사용하는 경우 endpoint_url을 생략해야 합니다. |
 
 ---
 
