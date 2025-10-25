@@ -1,67 +1,67 @@
 ---
-title: 추적에 대한 토큰 기반 비용 계산
-sidebarTitle: 추적에 대한 토큰 기반 비용 계산
+title: 추적의 토큰 기반 비용 계산
+sidebarTitle: 추적의 토큰 기반 비용 계산
 ---
 
 <Info>
-* [LLM 실행(스팬)에 대한 토큰 수 제공](/langsmith/log-llm-trace#provide-token-and-cost-information)
+* [LLM 실행(span)에 대한 토큰 수 제공](/langsmith/log-llm-trace#provide-token-and-cost-information)
 </Info>
 
-LangSmith를 사용하면 LLM 실행에 대한 토큰 기반 비용을 추적할 수 있습니다. 비용은 추적 및 프로젝트 수준으로 롤업됩니다.
+LangSmith를 사용하면 LLM 실행에 대한 토큰 기반 비용을 추적할 수 있습니다. 비용은 추적 및 프로젝트 수준으로 집계됩니다.
 
-비용을 추적할 수 있는 두 가지 방법이 있습니다:
+비용 추적에는 두 가지 방법이 있습니다:
 
-1. 토큰 수와 모델 가격에서 파생
+1. 토큰 수와 모델 가격으로부터 도출
 2. 실행 데이터의 일부로 직접 지정
 
-대부분의 경우 실행 데이터에 토큰 수를 포함하고 LangSmith에서 모델 가격을 지정하는 것이 더 쉽습니다. LangSmith는 비용이 토큰 유형별로 세분화된 토큰 수에 선형적이라고 가정합니다. 비선형 가격 책정이 있는 소수의 모델(예: X 입력 토큰 이상에서 토큰당 가격이 변경됨)의 경우 클라이언트 측에서 비용을 계산하고 실행 데이터의 일부로 전송하는 것이 좋습니다.
+대부분의 경우 실행 데이터에 토큰 수를 포함하고 LangSmith에서 모델 가격을 지정하는 것이 더 쉽습니다. LangSmith는 비용이 토큰 유형별로 분류된 토큰 수에 선형적으로 비례한다고 가정합니다. 비선형 가격 책정 모델(예: X개 이상의 입력 토큰일 때 토큰당 가격이 변경되는 경우)의 경우, 클라이언트 측에서 비용을 계산하여 실행 데이터의 일부로 전송하는 것을 권장합니다.
 
 ## 토큰 수 전송
 
-LangSmith가 LLM 실행에 대한 비용을 정확하게 파생하려면 토큰 수를 제공해야 합니다:
+LangSmith가 LLM 실행에 대한 비용을 정확하게 도출하려면 토큰 수를 제공해야 합니다:
 
-* OpenAI 또는 Anthropic 모델과 함께 LangSmith Python 또는 TS/JS SDK를 사용하는 경우 [내장 래퍼](/langsmith/annotate-code#wrap-the-openai-client)가 토큰 수, 모델 공급자 및 모델 이름 데이터를 LangSmith에 자동으로 전송합니다.
-* 다른 모델 공급자와 함께 LangSmith SDK를 사용하는 경우 [이 가이드](/langsmith/log-llm-trace#provide-token-and-cost-information)를 주의 깊게 읽어야 합니다.
-* LangChain Python 또는 TS/JS를 사용하는 경우 대부분의 채팅 모델 통합에 대해 토큰 수, 모델 공급자 및 모델 이름이 LangSmith에 자동으로 전송됩니다. 토큰 수가 누락되고 기본 API가 모델 응답에 토큰 수를 포함하는 채팅 모델 통합이 있는 경우 [LangChain 리포지토리](https://github.com/langchain-ai/langchain)에서 GitHub 이슈를 열어주세요.
+* LangSmith Python 또는 TS/JS SDK를 OpenAI 또는 Anthropic 모델과 함께 사용하는 경우, [내장 래퍼](/langsmith/annotate-code#wrap-the-openai-client)가 토큰 수, 모델 제공자 및 모델 이름 데이터를 LangSmith로 자동으로 전송합니다.
+* 다른 모델 제공자와 함께 LangSmith SDK를 사용하는 경우, [이 가이드](/langsmith/log-llm-trace#provide-token-and-cost-information)를 주의 깊게 읽어보시기 바랍니다.
+* LangChain Python 또는 TS/JS를 사용하는 경우, 대부분의 채팅 모델 통합에 대해 토큰 수, 모델 제공자 및 모델 이름이 자동으로 LangSmith로 전송됩니다. 토큰 수가 누락된 채팅 모델 통합이 있고 기본 API가 모델 응답에 토큰 수를 포함하는 경우, [LangChain 저장소](https://github.com/langchain-ai/langchain)에 GitHub 이슈를 열어주시기 바랍니다.
 
-정확한 비용 추적을 위해 토큰 수를 명시적으로 제공해야 합니다. 토큰 수를 포함하는 방법에 대한 자세한 내용은 [토큰 및 비용 정보 제공](/langsmith/log-llm-trace#provide-token-and-cost-information) 가이드를 참조하세요.
+정확한 비용 추적을 위해서는 토큰 수를 명시적으로 제공해야 합니다. 토큰 수를 포함하는 방법에 대한 자세한 내용은 [토큰 및 비용 정보 제공](/langsmith/log-llm-trace#provide-token-and-cost-information) 가이드를 참조하세요.
 
 ## 모델 이름 지정
 
-LangSmith는 [실행 메타데이터](/langsmith/add-metadata-tags)의 `ls_model_name` 필드에서 LLM 모델 이름을 읽습니다. [SDK 내장 래퍼](/langsmith/annotate-code#wrap-the-openai-client) 및 모든 LangChain 통합은 이 메타데이터 지정을 자동으로 처리합니다.
+LangSmith는 [실행 메타데이터](/langsmith/add-metadata-tags)의 `ls_model_name` 필드에서 LLM 모델 이름을 읽습니다. [SDK 내장 래퍼](/langsmith/annotate-code#wrap-the-openai-client) 및 모든 LangChain 통합은 이 메타데이터를 자동으로 지정합니다.
 
 ## 모델 가격 설정
 
-토큰 수와 모델 이름에서 비용을 계산하려면 사용 중인 모델의 토큰당 가격을 알아야 합니다. LangSmith에는 이를 위한 [모델 가격 테이블](https://smith.langchain.com/settings/workspaces/models)이 있습니다. 이 테이블에는 대부분의 OpenAI, Anthropic 및 Gemini 모델에 대한 가격 정보가 포함되어 있습니다. 다른 모델에 대한 가격을 추가하거나 기본 모델에 대한 가격을 덮어쓸 수 있습니다.
+토큰 수와 모델 이름으로부터 비용을 계산하려면 사용 중인 모델의 토큰당 가격을 알아야 합니다. LangSmith에는 이를 위한 [모델 가격 표](https://smith.langchain.com/settings/workspaces/models)가 있습니다. 이 표에는 대부분의 OpenAI, Anthropic 및 Gemini 모델에 대한 가격 정보가 포함되어 있습니다. 다른 모델의 가격을 추가하거나 기본 모델의 가격을 덮어쓸 수 있습니다.
 
-프롬프트(입력) 및 완료(출력) 토큰에 대한 가격을 지정할 수 있습니다. 필요한 경우 더 자세한 가격 내역을 제공할 수 있습니다. 예를 들어 일부 모델 공급자는 멀티모달 또는 캐시된 토큰에 대해 다른 가격을 책정합니다.
+프롬프트(입력) 및 완성(출력) 토큰에 대한 가격을 지정할 수 있습니다. 필요한 경우 가격에 대한 더 자세한 분류를 제공할 수 있습니다. 예를 들어, 일부 모델 제공자는 멀티모달 또는 캐시된 토큰에 대해 다른 가격을 책정합니다.
 
 ![](/langsmith/images/model-price-map.png)
 
-프롬프트/완료 가격 옆의 `...` 위로 마우스를 가져가면 토큰 유형별 가격 내역이 표시됩니다. 예를 들어 `audio` 및 `image` 프롬프트 토큰이 기본 텍스트 프롬프트 토큰과 다른 가격을 가지고 있는지 확인할 수 있습니다.
+프롬프트/완성 가격 옆의 `...` 위로 마우스를 가져가면 토큰 유형별 가격 분류를 볼 수 있습니다. 예를 들어 `audio` 및 `image` 프롬프트 토큰이 기본 텍스트 프롬프트 토큰과 다른 가격을 가지는지 확인할 수 있습니다.
 
-모델 가격 맵에 *새 항목*을 생성하려면 오른쪽 상단의 `Add new model` 버튼을 클릭합니다.
+모델 가격 맵에 *새 항목*을 생성하려면 오른쪽 상단의 `Add new model` 버튼을 클릭하세요.
 
-![New price map entry interface](/langsmith/images/new-price-map-entry.png)
+![새 가격 맵 항목 인터페이스](/langsmith/images/new-price-map-entry.png)
 
 여기에서 다음 필드를 지정할 수 있습니다:
 
-* **Model Name**: 모델의 사람이 읽을 수 있는 이름.
-* **Match Pattern**: 모델 이름과 일치시키는 정규식 패턴. 실행 메타데이터의 `ls_model_name` 값과 일치시키는 데 사용됩니다.
-* **Prompt (Input) Price**: 모델의 100만 입력 토큰당 비용. 이 숫자에 프롬프트의 토큰 수를 곱하여 프롬프트 비용을 계산합니다.
-* **Completion (Output) Price**: 모델의 100만 출력 토큰당 비용. 이 숫자에 완료의 토큰 수를 곱하여 완료 비용을 계산합니다.
-* **Prompt (Input) Price Breakdown**(선택 사항): 각 다른 유형의 프롬프트 토큰에 대한 가격 내역(예: `cache_read`, `video`, `audio` 등).
-* **Completion (Output) Price Breakdown**(선택 사항): 각 다른 유형의 완료 토큰에 대한 가격 내역(예: `reasoning`, `image` 등).
-* **Model Activation Date**(선택 사항): 가격이 적용되는 날짜. 이 날짜 이후의 실행만 이 모델 가격을 적용합니다.
-* **Provider**(선택 사항): 모델의 공급자. 지정된 경우 실행 메타데이터의 `ls_provider`와 일치합니다.
+* **Model Name**: 모델의 사람이 읽을 수 있는 이름입니다.
+* **Match Pattern**: 모델 이름과 일치시킬 정규식 패턴입니다. 이는 실행 메타데이터의 `ls_model_name` 값과 일치시키는 데 사용됩니다.
+* **Prompt (Input) Price**: 모델의 입력 토큰 100만 개당 비용입니다. 이 숫자에 프롬프트의 토큰 수를 곱하여 프롬프트 비용을 계산합니다.
+* **Completion (Output) Price**: 모델의 출력 토큰 100만 개당 비용입니다. 이 숫자에 완성의 토큰 수를 곱하여 완성 비용을 계산합니다.
+* **Prompt (Input) Price Breakdown** (선택 사항): 각각 다른 유형의 프롬프트 토큰(예: `cache_read`, `video`, `audio` 등)에 대한 가격 분류입니다.
+* **Completion (Output) Price Breakdown** (선택 사항): 각각 다른 유형의 완성 토큰(예: `reasoning`, `image` 등)에 대한 가격 분류입니다.
+* **Model Activation Date** (선택 사항): 가격이 적용되는 날짜입니다. 이 날짜 이후의 실행에만 이 모델 가격이 적용됩니다.
+* **Provider** (선택 사항): 모델의 제공자입니다. 지정된 경우, 실행 메타데이터의 `ls_provider`와 일치합니다.
 
-모델 가격 맵을 설정하면 LangSmith가 LLM 호출에 제공된 토큰 수를 기반으로 추적에 대한 토큰 기반 비용을 자동으로 계산하고 집계합니다.
+모델 가격 맵을 설정하면, LangSmith는 LLM 호출에 제공된 토큰 수를 기반으로 추적에 대한 토큰 기반 비용을 자동으로 계산하고 집계합니다.
 
 <Note>
-모델 가격 맵에 대한 업데이트는 이미 기록된 추적의 비용에 반영되지 않습니다. 현재 모델 가격 변경 사항 소급 적용을 지원하지 않습니다.
+모델 가격 맵의 업데이트는 이미 기록된 추적의 비용에 반영되지 않습니다. 현재 모델 가격 변경 사항의 소급 적용은 지원하지 않습니다.
 </Note>
 
-가격 내역 지정을 위해 LangChain 채팅 모델 통합 및 LangSmith SDK 래퍼에서 사용하는 자세한 토큰 수 유형은 다음과 같습니다:
+가격 분류를 지정하기 위해 LangChain 채팅 모델 통합 및 LangSmith SDK 래퍼에서 사용되는 자세한 토큰 수 유형은 다음과 같습니다:
 
 ```python
 # 표준화됨
@@ -76,9 +76,9 @@ ephemeral_1h_input_tokens
 ephemeral_5m_input_tokens
 ```
 
-## 비용 공식
+## 비용 계산 공식
 
-실행 비용은 가장 구체적인 토큰 유형에서 최소 구체적인 토큰 유형으로 탐욕스럽게 계산됩니다. 100만 프롬프트 토큰당 $2의 가격과 100만 `cache_read` 프롬프트 토큰당 $1의 자세한 가격, 100만 완료 토큰당 $3을 설정했다고 가정합니다. 다음 사용량 메타데이터를 업로드한 경우:
+실행에 대한 비용은 가장 구체적인 토큰 유형에서 덜 구체적인 토큰 유형 순으로 탐욕적으로 계산됩니다. 프롬프트 토큰 100만 개당 $2의 가격과 `cache_read` 프롬프트 토큰 100만 개당 $1의 상세 가격, 그리고 완성 토큰 100만 개당 $3의 가격을 설정했다고 가정하겠습니다. 다음과 같은 사용량 메타데이터를 업로드한 경우:
 
 ```python
 {
@@ -90,19 +90,20 @@ ephemeral_5m_input_tokens
 }
 ```
 
-그러면 토큰 비용을 다음과 같이 계산합니다:
+다음과 같이 토큰 비용을 계산합니다:
 
 ```python
-# 일명 prompt_cost
-# cache_read 비용을 계산한 다음 나머지 input_tokens에 대해 기본 입력 가격을 적용합니다.
+# A.K.A. prompt_cost
+# cache_read 비용을 계산한 다음 나머지 input_tokens에
+# 기본 입력 가격을 적용합니다.
 input_cost = 5 * 1e-6 + (20 - 5) * 2e-6  # 3.5e-5
-# 일명 completion_cost
+# A.K.A. completion_cost
 output_cost = 10 * 3e-6  # 3e-5
 total_cost = input_cost + output_cost  # 6.5e-5
 ```
 
-## 비용을 직접 전송
+## 비용 직접 전송
 
-토큰 비용 정보를 반환하는 LLM 호출을 추적하거나, 토큰 기반이 아닌 가격 책정 체계를 사용하는 API를 추적하거나, 그 외 런타임에 비용에 대한 정확한 정보가 있는 경우, LangSmith의 내장 비용 계산에 의존하는 대신 추적하는 동안 `usage_metadata` dict를 채울 수 있습니다.
+토큰 비용 정보를 반환하는 LLM 호출을 추적하거나, 비토큰 기반 가격 체계를 사용하는 API를 추적하거나, 런타임에 비용에 대한 정확한 정보가 있는 경우, LangSmith의 내장 비용 계산에 의존하는 대신 추적하는 동안 `usage_metadata` 딕셔너리를 채울 수 있습니다.
 
 실행에 대한 비용 정보를 수동으로 제공하는 방법을 알아보려면 [이 가이드](/langsmith/log-llm-trace#provide-token-and-cost-information)를 참조하세요.
