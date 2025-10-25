@@ -1,25 +1,25 @@
 ---
-title: How to audit evaluator scores
-sidebarTitle: Audit evaluator scores
+title: 평가자 점수를 감사하는 방법
+sidebarTitle: 평가자 점수 감사
 ---
 
-LLM-as-a-judge evaluators don't always get it right. Because of this, it is often useful for a human to manually audit the scores left by an evaluator and correct them where necessary. LangSmith allows you to make corrections on evaluator scores in the UI or SDK.
+LLM-as-a-judge 평가자가 항상 정확한 것은 아닙니다. 이 때문에 평가자가 남긴 점수를 사람이 수동으로 감사하고 필요한 경우 수정하는 것이 유용한 경우가 많습니다. LangSmith를 사용하면 UI 또는 SDK에서 평가자 점수를 수정할 수 있습니다.
 
-## In the comparison view
+## 비교 보기에서
 
-In the comparison view, you may click on any feedback tag to bring up the feedback details. From there, click the "edit" icon on the right to bring up the corrections view. You may then type in your desired score in the text box under "Make correction". If you would like, you may also attach an explanation to your correction. This is useful if you are using a [few-shot evaluator](/langsmith/create-few-shot-evaluators) and will be automatically inserted into your few-shot examples in place of the `few_shot_explanation` prompt variable.
+비교 보기에서 피드백 태그를 클릭하여 피드백 세부 정보를 표시할 수 있습니다. 그런 다음 오른쪽의 "편집" 아이콘을 클릭하여 수정 보기를 표시합니다. "Make correction" 아래의 텍스트 상자에 원하는 점수를 입력할 수 있습니다. 원하는 경우 수정에 설명을 첨부할 수도 있습니다. [few-shot 평가자](/langsmith/create-few-shot-evaluators)를 사용하는 경우 유용하며 `few_shot_explanation` 프롬프트 변수 대신 few-shot 예제에 자동으로 삽입됩니다.
 
 ![Audit Evaluator Comparison View](/langsmith/images/corrections-comparison-view.png)
 
-## In the runs table
+## 실행 테이블에서
 
-In the runs table, find the "Feedback" column and click on the feedback tag to bring up the feedback details. Again, click the "edit" icon on the right to bring up the corrections view.
+실행 테이블에서 "Feedback" 열을 찾아 피드백 태그를 클릭하여 피드백 세부 정보를 표시합니다. 다시 오른쪽의 "편집" 아이콘을 클릭하여 수정 보기를 표시합니다.
 
 ![Audit Evaluator Runs Table](/langsmith/images/corrections-runs-table.png)
 
-## In the SDK
+## SDK에서
 
-Corrections can be made via the SDK's `update_feedback` function, with the `correction` dict. You must specify a `score` key which corresponds to a number for it to be rendered in the UI.
+`correction` dict와 함께 SDK의 `update_feedback` 함수를 통해 수정할 수 있습니다. UI에서 렌더링되려면 숫자에 해당하는 `score` 키를 지정해야 합니다.
 
 <CodeGroup>
 
@@ -52,5 +52,3 @@ await client.updateFeedback(
 ```
 
 </CodeGroup>
-
-
