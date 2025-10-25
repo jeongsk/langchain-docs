@@ -1,138 +1,138 @@
 ---
-title: LangSmith control plane
-sidebarTitle: Control plane
+title: LangSmith 컨트롤 플레인
+sidebarTitle: 컨트롤 플레인
 ---
 
-_control plane_은 배포를 관리하는 LangSmith의 일부입니다. 여기에는 사용자가 [LangGraph Server](/langsmith/langgraph-server)를 생성하고 업데이트하는 control plane UI와 UI를 지원하고 프로그래매틱 액세스를 제공하는 control plane API가 포함됩니다.
+_컨트롤 플레인_은 배포를 관리하는 LangSmith의 구성 요소입니다. 사용자가 [LangGraph Server](/langsmith/langgraph-server)를 생성하고 업데이트하는 컨트롤 플레인 UI와, UI를 지원하고 프로그래밍 방식의 액세스를 제공하는 컨트롤 플레인 API를 포함합니다.
 
-control plane을 통해 업데이트를 수행하면 업데이트가 control plane 상태에 저장됩니다. [data plane](/langsmith/data-plane) "listener"는 control plane API를 호출하여 이러한 업데이트를 폴링합니다.
+컨트롤 플레인을 통해 업데이트를 수행하면 업데이트 내용이 컨트롤 플레인 상태에 저장됩니다. [데이터 플레인](/langsmith/data-plane) "리스너"는 컨트롤 플레인 API를 호출하여 이러한 업데이트를 폴링합니다.
 
-## Control plane UI
+## 컨트롤 플레인 UI
 
-control plane UI에서 다음을 수행할 수 있습니다:
+컨트롤 플레인 UI에서 다음을 수행할 수 있습니다:
 
-* 미처리 배포 목록을 봅니다.
-* 개별 배포의 세부 정보를 봅니다.
+* 대기 중인 배포 목록을 조회합니다.
+* 개별 배포의 세부 정보를 조회합니다.
 * 새 배포를 생성합니다.
 * 배포를 업데이트합니다.
-* 배포에 대한 환경 변수를 업데이트합니다.
-* 배포의 빌드 및 서버 로그를 봅니다.
-* CPU 및 메모리 사용량과 같은 배포 메트릭을 봅니다.
+* 배포의 환경 변수를 업데이트합니다.
+* 배포의 빌드 및 서버 로그를 조회합니다.
+* CPU 및 메모리 사용량과 같은 배포 메트릭을 조회합니다.
 * 배포를 삭제합니다.
 
-Control plane UI는 [LangSmith](https://docs.smith.langchain.com)에 내장되어 있습니다.
+컨트롤 플레인 UI는 [LangSmith](https://docs.smith.langchain.com)에 내장되어 있습니다.
 
-## Control plane API
+## 컨트롤 플레인 API
 
-이 섹션에서는 control plane API의 데이터 모델을 설명합니다. API는 배포를 생성, 업데이트 및 삭제하는 데 사용됩니다. 자세한 내용은 [control plane API 참조](/langsmith/api-ref-control-plane)를 참조하세요.
+이 섹션에서는 컨트롤 플레인 API의 데이터 모델을 설명합니다. 이 API는 배포를 생성, 업데이트 및 삭제하는 데 사용됩니다. 자세한 내용은 [컨트롤 플레인 API 레퍼런스](/langsmith/api-ref-control-plane)를 참조하세요.
 
-### Integrations
+### 통합
 
-통합은 `git` 리포지토리 공급자(예: GitHub)에 대한 추상화입니다. 여기에는 `git` 리포지토리에 연결하고 배포하는 데 필요한 모든 메타데이터가 포함됩니다.
+통합은 `git` 저장소 프로바이더(예: GitHub)에 대한 추상화입니다. `git` 저장소에 연결하고 배포하는 데 필요한 모든 메타데이터를 포함합니다.
 
-### Deployments
+### 배포
 
-배포는 LangGraph Server의 인스턴스입니다. 단일 배포에는 여러 개의 리비전이 있을 수 있습니다.
+배포는 LangGraph Server의 인스턴스입니다. 하나의 배포는 여러 개의 리비전을 가질 수 있습니다.
 
-### Revisions
+### 리비전
 
-리비전은 배포의 반복입니다. 새 배포가 생성되면 초기 리비전이 자동으로 생성됩니다. 배포에 대한 코드 변경 사항을 배포하거나 시크릿을 업데이트하려면 새 리비전을 생성해야 합니다.
+리비전은 배포의 반복입니다. 새 배포가 생성되면 초기 리비전이 자동으로 생성됩니다. 배포의 코드 변경 사항을 배포하거나 시크릿을 업데이트하려면 새 리비전을 생성해야 합니다.
 
-### Listeners
+### 리스너
 
-리스너는 ["listener" 애플리케이션](/langsmith/data-plane#"listener"-application)의 인스턴스입니다. 리스너에는 애플리케이션에 대한 메타데이터(예: 버전)와 배포할 수 있는 컴퓨팅 인프라에 대한 메타데이터(예: Kubernetes 네임스페이스)가 포함됩니다.
+리스너는 ["리스너" 애플리케이션](/langsmith/data-plane#"listener"-application)의 인스턴스입니다. 리스너는 애플리케이션에 대한 메타데이터(예: 버전)와 배포할 수 있는 컴퓨팅 인프라에 대한 메타데이터(예: Kubernetes 네임스페이스)를 포함합니다.
 
 리스너 데이터 모델은 [Hybrid](/langsmith/hybrid) 및 [Self-Hosted](/langsmith/self-hosted) 배포에만 적용됩니다.
 
-## Control Plane 기능
+## 컨트롤 플레인 기능
 
-이 섹션에서는 control plane의 다양한 기능을 설명합니다.
+이 섹션에서는 컨트롤 플레인의 다양한 기능을 설명합니다.
 
-### 배포 유형
+### 배포 타입
 
-간결성을 위해 control plane은 리소스 할당이 다른 두 가지 배포 유형을 제공합니다: `Development` 및 `Production`.
+컨트롤 플레인은 간편성을 위해 서로 다른 리소스 할당을 가진 두 가지 배포 타입 `Development`와 `Production`을 제공합니다.
 
-| **배포 유형** | **CPU/Memory**  | **Scaling**         | **Database**                                                                     |
+| **배포 타입** | **CPU/메모리**  | **스케일링**         | **데이터베이스**                                                                     |
 |---------------------|-----------------|---------------------|----------------------------------------------------------------------------------|
-| Development         | 1 CPU, 1 GB RAM | 최대 1개 복제본   | 10 GB 디스크, 백업 없음                                                           |
-| Production          | 2 CPU, 2 GB RAM | 최대 10개 복제본 | 자동 확장 디스크, 자동 백업, 고가용성(다중 영역 구성) |
+| Development         | 1 CPU, 1 GB RAM | 최대 1개의 복제본   | 10 GB 디스크, 백업 없음                                                           |
+| Production          | 2 CPU, 2 GB RAM | 최대 10개의 복제본 | 자동 스케일링 디스크, 자동 백업, 고가용성(다중 영역 구성) |
 
 CPU 및 메모리 리소스는 복제본당 할당됩니다.
 
 <Warning>
-**변경 불가능한 배포 유형**
-배포가 생성되면 배포 유형을 변경할 수 없습니다.
+**변경 불가능한 배포 타입**
+배포가 생성되면 배포 타입을 변경할 수 없습니다.
 </Warning>
 
 <Info>
 **Self-Hosted 배포**
-[Hybrid](/langsmith/hybrid) 및 [Self-Hosted](/langsmith/self-hosted) 배포에 대한 리소스는 완전히 사용자 정의할 수 있습니다. 배포 유형은 [Cloud](/langsmith/cloud) 배포에만 적용됩니다.
+[Hybrid](/langsmith/hybrid) 및 [Self-Hosted](/langsmith/self-hosted) 배포의 리소스는 완전히 사용자 정의할 수 있습니다. 배포 타입은 [Cloud](/langsmith/cloud) 배포에만 적용됩니다.
 </Info>
 
 #### Production
 
-`Production` 유형 배포는 "프로덕션" 워크로드에 적합합니다. 예를 들어, 중요한 경로의 고객 대면 애플리케이션에는 `Production`을 선택합니다.
+`Production` 타입 배포는 "프로덕션" 워크로드에 적합합니다. 예를 들어, 중요한 경로에 있는 고객 대면 애플리케이션에는 `Production`을 선택하세요.
 
-`Production` 유형 배포에 대한 리소스는 사용 사례 및 용량 제약에 따라 개별적으로 수동으로 증가할 수 있습니다. 리소스 증가를 요청하려면 support@langchain.dev에 문의하세요.
+`Production` 타입 배포의 리소스는 사용 사례와 용량 제약에 따라 개별적으로 수동 증가할 수 있습니다. 리소스 증가를 요청하려면 support@langchain.dev에 문의하세요.
 
 #### Development
 
-`Development` 유형 배포는 개발 및 테스트에 적합합니다. 예를 들어, 내부 테스트 환경에는 `Development`를 선택합니다. `Development` 유형 배포는 "프로덕션" 워크로드에는 적합하지 않습니다.
+`Development` 타입 배포는 개발 및 테스트에 적합합니다. 예를 들어, 내부 테스트 환경에는 `Development`를 선택하세요. `Development` 타입 배포는 "프로덕션" 워크로드에 적합하지 않습니다.
 
 <Danger>
 **선점형 컴퓨팅 인프라**
-`Development` 유형 배포(API 서버, 큐 서버 및 데이터베이스)는 선점형 컴퓨팅 인프라에 프로비저닝됩니다. 이는 컴퓨팅 인프라가 **예고 없이 언제든지 종료될 수 있음**을 의미합니다. 이로 인해 간헐적으로 다음과 같은 문제가 발생할 수 있습니다:
+`Development` 타입 배포(API 서버, 큐 서버, 데이터베이스)는 선점형 컴퓨팅 인프라에 프로비저닝됩니다. 즉, 컴퓨팅 인프라가 **사전 통지 없이 언제든지 종료될 수 있습니다**. 이로 인해 다음과 같은 간헐적 문제가 발생할 수 있습니다:
 
-* Redis 연결 시간 초과/오류
-* Postgres 연결 시간 초과/오류
-* 실패하거나 재시도하는 백그라운드 실행
+* Redis 연결 타임아웃/오류
+* Postgres 연결 타임아웃/오류
+* 실패하거나 재시도 중인 백그라운드 실행
 
-이러한 동작은 예상된 것입니다. 선점형 컴퓨팅 인프라는 **`Development` 유형 배포를 프로비저닝하는 비용을 크게 줄입니다**. 설계상 LangGraph Server는 내결함성이 있습니다. 구현은 Redis/Postgres 연결 오류에서 자동으로 복구를 시도하고 실패한 백그라운드 실행을 재시도합니다.
+이러한 동작은 예상된 것입니다. 선점형 컴퓨팅 인프라는 **`Development` 타입 배포를 프로비저닝하는 비용을 크게 절감합니다**. LangGraph Server는 설계상 장애 허용 방식입니다. 구현은 Redis/Postgres 연결 오류로부터 자동으로 복구를 시도하고 실패한 백그라운드 실행을 재시도합니다.
 
-`Production` 유형 배포는 선점형 컴퓨팅 인프라가 아닌 내구성 있는 컴퓨팅 인프라에 프로비저닝됩니다.
+`Production` 타입 배포는 선점형 컴퓨팅 인프라가 아닌 영구 컴퓨팅 인프라에 프로비저닝됩니다.
 </Danger>
 
-`Development` 유형 배포에 대한 데이터베이스 디스크 크기는 사용 사례 및 용량 제약에 따라 개별적으로 수동으로 증가할 수 있습니다. 대부분의 사용 사례에서는 디스크 사용량을 관리하기 위해 [TTL](/langsmith/configure-ttl)을 구성해야 합니다. 리소스 증가를 요청하려면 support@langchain.dev에 문의하세요.
+`Development` 타입 배포의 데이터베이스 디스크 크기는 사용 사례와 용량 제약에 따라 개별적으로 수동 증가할 수 있습니다. 대부분의 사용 사례에서는 디스크 사용량을 관리하기 위해 [TTL](/langsmith/configure-ttl)을 구성해야 합니다. 리소스 증가를 요청하려면 support@langchain.dev에 문의하세요.
 
 ### 데이터베이스 프로비저닝
 
-control plane과 [data plane](/langsmith/data-plane) "listener" 애플리케이션이 조정하여 각 배포에 대해 Postgres 데이터베이스를 자동으로 생성합니다. 데이터베이스는 배포에 대한 [지속성 레이어](/oss/langgraph/persistence#memory-store)로 사용됩니다.
+컨트롤 플레인과 [데이터 플레인](/langsmith/data-plane) "리스너" 애플리케이션이 협력하여 각 배포에 대한 Postgres 데이터베이스를 자동으로 생성합니다. 데이터베이스는 배포의 [영속성 계층](/oss/langgraph/persistence#memory-store)으로 작동합니다.
 
-LangGraph 애플리케이션을 구현할 때 개발자가 [checkpointer](/oss/langgraph/persistence#checkpointer-libraries)를 구성할 필요가 없습니다. 대신 그래프에 대해 checkpointer가 자동으로 구성됩니다. 그래프에 구성된 모든 checkpointer는 자동으로 구성된 checkpointer로 대체됩니다.
+LangGraph 애플리케이션을 구현할 때 개발자가 [체크포인터](/oss/langgraph/persistence#checkpointer-libraries)를 구성할 필요가 없습니다. 대신, 그래프에 대해 체크포인터가 자동으로 구성됩니다. 그래프에 구성된 모든 체크포인터는 자동으로 구성되는 체크포인터로 대체됩니다.
 
-데이터베이스에 직접 액세스할 수 없습니다. 데이터베이스에 대한 모든 액세스는 [LangGraph Server](/langsmith/langgraph-server)를 통해 발생합니다.
+데이터베이스에 대한 직접 액세스는 없습니다. 데이터베이스에 대한 모든 액세스는 [LangGraph Server](/langsmith/langgraph-server)를 통해 이루어집니다.
 
-데이터베이스는 배포 자체가 삭제될 때까지 삭제되지 않습니다.
+데이터베이스는 배포 자체가 삭제될 때까지 절대 삭제되지 않습니다.
 
 <Info>
-[Hybrid](/langsmith/hybrid) 및 [Self-Hosted](/langsmith/self-hosted) 배포에 대해 사용자 정의 Postgres 인스턴스를 구성할 수 있습니다.
+[Hybrid](/langsmith/hybrid) 및 [Self-Hosted](/langsmith/self-hosted) 배포에서는 사용자 정의 Postgres 인스턴스를 구성할 수 있습니다.
 </Info>
 
 ### 비동기 배포
 
-배포 및 리비전을 위한 인프라는 비동기적으로 프로비저닝되고 배포됩니다. 제출 후 즉시 배포되지 않습니다. 현재 배포는 최대 몇 분이 걸릴 수 있습니다.
+배포와 리비전을 위한 인프라는 비동기적으로 프로비저닝되고 배포됩니다. 제출 직후에는 즉시 배포되지 않습니다. 현재 배포는 최대 몇 분 정도 걸릴 수 있습니다.
 
-* 새 배포가 생성되면 배포에 대한 새 데이터베이스가 생성됩니다. 데이터베이스 생성은 일회성 단계입니다. 이 단계는 배포의 초기 리비전에 대한 배포 시간을 늘립니다.
+* 새 배포가 생성되면 배포를 위한 새 데이터베이스가 생성됩니다. 데이터베이스 생성은 일회성 단계입니다. 이 단계로 인해 배포의 초기 리비전은 더 긴 배포 시간이 소요됩니다.
 * 배포에 대한 후속 리비전이 생성되면 데이터베이스 생성 단계가 없습니다. 후속 리비전의 배포 시간은 초기 리비전의 배포 시간에 비해 훨씬 빠릅니다.
-* 각 리비전의 배포 프로세스에는 빌드 단계가 포함되며, 최대 몇 분이 걸릴 수 있습니다.
+* 각 리비전의 배포 프로세스에는 빌드 단계가 포함되며, 이는 최대 몇 분 정도 걸릴 수 있습니다.
 
-control plane과 [data plane](/langsmith/data-plane) "listener" 애플리케이션이 조정하여 비동기 배포를 수행합니다.
+컨트롤 플레인과 [데이터 플레인](/langsmith/data-plane) "리스너" 애플리케이션이 협력하여 비동기 배포를 수행합니다.
 
 ### 모니터링
 
-배포가 준비되면 control plane은 배포를 모니터링하고 다음과 같은 다양한 메트릭을 기록합니다:
+배포가 준비되면 컨트롤 플레인은 배포를 모니터링하고 다음과 같은 다양한 메트릭을 기록합니다:
 
 * 배포의 CPU 및 메모리 사용량.
 * 컨테이너 재시작 횟수.
-* 복제본 수([자동 확장](/langsmith/data-plane#autoscaling)과 함께 증가).
+* 복제본 수([자동 스케일링](/langsmith/data-plane#autoscaling)으로 증가함).
 * [PostgreSQL](/langsmith/data-plane#postgres) CPU, 메모리 사용량 및 디스크 사용량.
 * [LangGraph Server 큐](/langsmith/langgraph-server#persistence-and-task-queue) 대기 중/활성 실행 수.
-* [LangGraph Server API](/langsmith/langgraph-server) 성공 응답 수, 오류 응답 수 및 대기 시간.
+* [LangGraph Server API](/langsmith/langgraph-server) 성공 응답 수, 오류 응답 수 및 지연 시간.
 
-이러한 메트릭은 Control Plane UI에 차트로 표시됩니다.
+이러한 메트릭은 컨트롤 플레인 UI에 차트로 표시됩니다.
 
 ### LangSmith 통합
 
-각 배포에 대해 [LangSmith](/langsmith/home) 추적 프로젝트가 자동으로 생성됩니다. 추적 프로젝트는 배포와 동일한 이름을 갖습니다. 배포를 생성할 때 `LANGCHAIN_TRACING` 및 `LANGSMITH_API_KEY`/`LANGCHAIN_API_KEY` 환경 변수를 지정할 필요가 없습니다. control plane에서 자동으로 설정됩니다.
+각 배포에 대해 [LangSmith](/langsmith/home) 추적 프로젝트가 자동으로 생성됩니다. 추적 프로젝트는 배포와 동일한 이름을 갖습니다. 배포를 생성할 때 `LANGCHAIN_TRACING` 및 `LANGSMITH_API_KEY`/`LANGCHAIN_API_KEY` 환경 변수를 지정할 필요가 없으며, 컨트롤 플레인에 의해 자동으로 설정됩니다.
 
-배포가 삭제되어도 추적 및 추적 프로젝트는 삭제되지 않습니다.
+배포가 삭제되어도 추적과 추적 프로젝트는 삭제되지 않습니다.

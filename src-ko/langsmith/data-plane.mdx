@@ -1,88 +1,88 @@
 ---
-title: LangSmith data plane
-sidebarTitle: Data plane
+title: LangSmith 데이터 플레인
+sidebarTitle: 데이터 플레인
 ---
 
-The _data plane_ consists of your [LangGraph Servers](/langsmith/langgraph-server) (deployments), their supporting infrastructure, and the "listener" application that continuously polls for updates from the [LangSmith control plane](/langsmith/control-plane).
+_데이터 플레인_은 [LangGraph Server](/langsmith/langgraph-server)(배포), 이를 지원하는 인프라, 그리고 [LangSmith 컨트롤 플레인](/langsmith/control-plane)으로부터 지속적으로 업데이트를 폴링하는 "리스너" 애플리케이션으로 구성됩니다.
 
-## Server infrastructure
+## 서버 인프라
 
-In addition to the [LangGraph Server](/langsmith/langgraph-server) itself, the following infrastructure components for each server are also included in the broad definition of "data plane":
+[LangGraph Server](/langsmith/langgraph-server) 자체 외에도, 각 서버를 위한 다음 인프라 구성 요소가 "데이터 플레인"의 광범위한 정의에 포함됩니다:
 
-- **PostgreSQL**: persistence layer for user, run, and memory data.
-- **Redis**: communication and ephemeral metadata for workers.
-- **Secrets store**: secure management of environment secrets.
-- **Autoscalers**: scale server containers based on load.
+- **PostgreSQL**: 사용자, 실행 및 메모리 데이터를 위한 영속성 레이어입니다.
+- **Redis**: 워커 간 통신 및 임시 메타데이터를 처리합니다.
+- **시크릿 스토어**: 환경 시크릿의 안전한 관리를 제공합니다.
+- **오토스케일러**: 부하에 따라 서버 컨테이너를 확장합니다.
 
-## "Listener" application
+## "리스너" 애플리케이션
 
-The data plane "listener" application periodically calls [control plane APIs](/langsmith/control-plane#control-plane-api) to:
+데이터 플레인 "리스너" 애플리케이션은 주기적으로 [컨트롤 플레인 API](/langsmith/control-plane#control-plane-api)를 호출하여 다음을 수행합니다:
 
-* Determine if new deployments should be created.
-* Determine if existing deployments should be updated (i.e. new revisions).
-* Determine if existing deployments should be deleted.
+* 새 배포를 생성해야 하는지 결정합니다.
+* 기존 배포를 업데이트해야 하는지(즉, 새 리비전) 결정합니다.
+* 기존 배포를 삭제해야 하는지 결정합니다.
 
-In other words, the data plane "listener" reads the latest state of the control plane (desired state) and takes action to reconcile outstanding deployments (current state) to match the latest state.
+즉, 데이터 플레인 "리스너"는 컨트롤 플레인의 최신 상태(원하는 상태)를 읽고, 미완료 배포(현재 상태)를 최신 상태와 일치하도록 조정하는 작업을 수행합니다.
 
 ## PostgreSQL
 
-PostgreSQL is the persistence layer for all user, run, and long-term memory data in a LangGraph Server. This stores both checkpoints (see more info [here](/oss/langgraph/persistence)), server resources (threads, runs, assistants and crons), as well as items saved in the long-term memory store (see more info [here](/oss/langgraph/persistence#memory-store)).
+PostgreSQL은 LangGraph Server의 모든 사용자, 실행 및 장기 메모리 데이터를 위한 영속성 레이어입니다. 여기에는 체크포인트([여기](/oss/langgraph/persistence)에서 자세히 확인), 서버 리소스(스레드, 실행, 어시스턴트 및 cron), 그리고 장기 메모리 스토어에 저장된 항목([여기](/oss/langgraph/persistence#memory-store)에서 자세히 확인)이 모두 저장됩니다.
 
 ## Redis
 
-Redis is used in each LangGraph Server as a way for server and queue workers to communicate, and to store ephemeral metadata. No user or run data is stored in Redis.
+Redis는 각 LangGraph Server에서 서버 및 큐 워커 간 통신 수단과 임시 메타데이터 저장소로 사용됩니다. 사용자나 실행 데이터는 Redis에 저장되지 않습니다.
 
-### Communication
+### 통신
 
-All runs in a LangGraph Server are executed by a pool of background workers that are part of each deployment. In order to enable some features for those runs (such as cancellation and output streaming) we need a channel for two-way communication between the server and the worker handling a particular run. We use Redis to organize that communication.
+LangGraph Server의 모든 실행은 각 배포의 일부인 백그라운드 워커 풀에 의해 처리됩니다. 이러한 실행에 대해 일부 기능(취소 및 출력 스트리밍 등)을 활성화하려면, 서버와 특정 실행을 처리하는 워커 간에 양방향 통신 채널이 필요합니다. 우리는 Redis를 사용하여 이러한 통신을 조직합니다.
 
-1. A Redis list is used as a mechanism to wake up a worker as soon as a new run is created. Only a sentinel value is stored in this list, no actual run information. The run information is then retrieved from PostgreSQL by the worker.
-2. A combination of a Redis string and Redis PubSub channel is used for the server to communicate a run cancellation request to the appropriate worker.
-3. A Redis PubSub channel is used by the worker to broadcast streaming output from an agent while the run is being handled. Any open `/stream` request in the server will subscribe to that channel and forward any events to the response as they arrive. No events are stored in Redis at any time.
+1. Redis 리스트는 새 실행이 생성되는 즉시 워커를 깨우는 메커니즘으로 사용됩니다. 이 리스트에는 센티널 값만 저장되며, 실제 실행 정보는 저장되지 않습니다. 실행 정보는 이후 워커에 의해 PostgreSQL에서 검색됩니다.
+2. Redis 문자열과 Redis PubSub 채널의 조합은 서버가 적절한 워커에게 실행 취소 요청을 전달하는 데 사용됩니다.
+3. Redis PubSub 채널은 워커가 실행을 처리하는 동안 에이전트로부터의 스트리밍 출력을 브로드캐스트하는 데 사용됩니다. 서버의 모든 열린 `/stream` 요청은 해당 채널을 구독하고 도착하는 이벤트를 응답으로 전달합니다. 어떠한 이벤트도 Redis에 저장되지 않습니다.
 
-### Ephemeral metadata
+### 임시 메타데이터
 
-Runs in a LangGraph Server may be retried for specific failures (currently only for transient PostgreSQL errors encountered during the run). In order to limit the number of retries (currently limited to 3 attempts per run) we record the attempt number in a Redis string when it is picked up. This contains no run-specific info other than its ID, and expires after a short delay.
+LangGraph Server의 실행은 특정 실패(현재는 실행 중 발생한 일시적인 PostgreSQL 오류만 해당)에 대해 재시도될 수 있습니다. 재시도 횟수를 제한하기 위해(현재 실행당 최대 3회로 제한), 워커가 실행을 선택할 때 Redis 문자열에 시도 번호를 기록합니다. 여기에는 ID 외에 실행별 정보가 포함되지 않으며, 짧은 지연 후 만료됩니다.
 
-## Data plane features
+## 데이터 플레인 기능
 
-This section describes various features of the data plane.
+이 섹션에서는 데이터 플레인의 다양한 기능에 대해 설명합니다.
 
-### Data region
-
-<Info>
-**Only for Cloud**
-Data regions are only applicable for [Cloud](/langsmith/cloud) deployments.
-</Info>
-
-Deployments can be created in 2 data regions: US and EU
-
-The data region for a deployment is implied by the data region of the LangSmith organization where the deployment is created. Deployments and the underlying database for the deployments cannot be migrated between data regions.
-
-### Autoscaling
-
-[`Production` type](/langsmith/control-plane#deployment-types) deployments automatically scale up to 10 containers. Scaling is based on 3 metrics:
-
-1. CPU utilization
-2. Memory utilization
-3. Number of pending (in progress) [runs](/langsmith/assistants#execution)
-
-For CPU utilization, the autoscaler targets 75% utilization. This means the autoscaler will scale the number of containers up or down to ensure that CPU utilization is at or near 75%. For memory utilization, the autoscaler targets 75% utilization as well.
-
-For number of pending runs, the autoscaler targets 10 pending runs. For example, if the current number of containers is 1, but the number of pending runs is 20, the autoscaler will scale up the deployment to 2 containers (20 pending runs / 2 containers = 10 pending runs per container).
-
-Each metric is computed independently and the autoscaler will determine the scaling action based on the metric that results in the largest number of containers.
-
-Scale down actions are delayed for 30 minutes before any action is taken. In other words, if the autoscaler decides to scale down a deployment, it will first wait for 30 minutes before scaling down. After 30 minutes, the metrics are recomputed and the deployment will scale down if the recomputed metrics result in a lower number of containers than the current number. Otherwise, the deployment remains scaled up. This "cool down" period ensures that deployments do not scale up and down too frequently.
-
-### Static IP addresses
+### 데이터 리전
 
 <Info>
-**Only for Cloud**
-Static IP addresses are only available for [Cloud](/langsmith/cloud) deployments.
+**클라우드 전용**
+데이터 리전은 [클라우드](/langsmith/cloud) 배포에만 적용됩니다.
 </Info>
 
-All traffic from deployments created after January 6th 2025 will come through a NAT gateway. This NAT gateway will have several static IP addresses depending on the data region. Refer to the table below for the list of static IP addresses:
+배포는 미국(US)과 유럽(EU) 2개의 데이터 리전에서 생성될 수 있습니다.
+
+배포의 데이터 리전은 배포가 생성된 LangSmith 조직의 데이터 리전에 의해 결정됩니다. 배포 및 배포를 위한 기본 데이터베이스는 데이터 리전 간에 마이그레이션할 수 없습니다.
+
+### 오토스케일링
+
+[`Production` 타입](/langsmith/control-plane#deployment-types) 배포는 자동으로 최대 10개의 컨테이너까지 확장됩니다. 스케일링은 다음 3가지 메트릭을 기반으로 합니다:
+
+1. CPU 사용률
+2. 메모리 사용률
+3. 대기 중인(진행 중인) [실행](/langsmith/assistants#execution) 수
+
+CPU 사용률의 경우, 오토스케일러는 75% 사용률을 목표로 합니다. 이는 오토스케일러가 CPU 사용률이 75% 수준이 되도록 컨테이너 수를 늘리거나 줄인다는 의미입니다. 메모리 사용률의 경우에도 오토스케일러는 75% 사용률을 목표로 합니다.
+
+대기 중인 실행 수의 경우, 오토스케일러는 10개의 대기 실행을 목표로 합니다. 예를 들어, 현재 컨테이너 수가 1개이지만 대기 중인 실행이 20개인 경우, 오토스케일러는 배포를 2개의 컨테이너로 확장합니다(20개의 대기 실행 / 2개의 컨테이너 = 컨테이너당 10개의 대기 실행).
+
+각 메트릭은 독립적으로 계산되며, 오토스케일러는 가장 많은 컨테이너 수를 결과로 하는 메트릭을 기반으로 스케일링 작업을 결정합니다.
+
+스케일 다운 작업은 실제 조치가 취해지기 전에 30분 동안 지연됩니다. 즉, 오토스케일러가 배포를 스케일 다운하기로 결정하면, 먼저 30분 동안 대기한 후 스케일 다운을 진행합니다. 30분 후 메트릭이 재계산되며, 재계산된 메트릭이 현재 컨테이너 수보다 적은 수를 결과로 하면 배포가 스케일 다운됩니다. 그렇지 않으면 배포는 확장된 상태로 유지됩니다. 이러한 "쿨다운" 기간은 배포가 너무 자주 확장 및 축소되지 않도록 보장합니다.
+
+### 고정 IP 주소
+
+<Info>
+**클라우드 전용**
+고정 IP 주소는 [클라우드](/langsmith/cloud) 배포에만 사용할 수 있습니다.
+</Info>
+
+2025년 1월 6일 이후 생성된 배포의 모든 트래픽은 NAT 게이트웨이를 통해 전달됩니다. 이 NAT 게이트웨이는 데이터 리전에 따라 여러 개의 고정 IP 주소를 가집니다. 고정 IP 주소 목록은 아래 표를 참조하세요:
 
 | US             | EU             |
 |----------------|----------------|
@@ -103,46 +103,46 @@ All traffic from deployments created after January 6th 2025 will come through a 
 | 34.121.166.52  |                |
 | 34.31.121.70   |                |
 
-### Custom PostgreSQL
+### 커스텀 PostgreSQL
 
 <Info>
-Custom PostgreSQL instances are only available for [hybrid](/langsmith/hybrid) and [self-hosted](/langsmith/self-hosted) deployments.
+커스텀 PostgreSQL 인스턴스는 [하이브리드](/langsmith/hybrid) 및 [셀프 호스팅](/langsmith/self-hosted) 배포에만 사용할 수 있습니다.
 </Info>
 
-A custom PostgreSQL instance can be used instead of the [one automatically created by the control plane](/langsmith/control-plane#database-provisioning). Specify the [`POSTGRES_URI_CUSTOM`](/langsmith/env-var#postgres_uri_custom) environment variable to use a custom PostgreSQL instance.
+[컨트롤 플레인에 의해 자동으로 생성되는 것](/langsmith/control-plane#database-provisioning) 대신 커스텀 PostgreSQL 인스턴스를 사용할 수 있습니다. 커스텀 PostgreSQL 인스턴스를 사용하려면 [`POSTGRES_URI_CUSTOM`](/langsmith/env-var#postgres_uri_custom) 환경 변수를 지정하세요.
 
-Multiple deployments can share the same PostgreSQL instance. For example, for `Deployment A`, `POSTGRES_URI_CUSTOM` can be set to `postgres://<user>:<password>@/<database_name_1>?host=<hostname_1>` and for `Deployment B`, `POSTGRES_URI_CUSTOM` can be set to `postgres://<user>:<password>@/<database_name_2>?host=<hostname_1>`. `<database_name_1>` and `database_name_2` are different databases within the same instance, but `<hostname_1>` is shared. **The same database cannot be used for separate deployments**.
+여러 배포가 동일한 PostgreSQL 인스턴스를 공유할 수 있습니다. 예를 들어, `Deployment A`의 경우 `POSTGRES_URI_CUSTOM`을 `postgres://<user>:<password>@/<database_name_1>?host=<hostname_1>`로 설정하고, `Deployment B`의 경우 `POSTGRES_URI_CUSTOM`을 `postgres://<user>:<password>@/<database_name_2>?host=<hostname_1>`로 설정할 수 있습니다. `<database_name_1>`과 `database_name_2`는 동일한 인스턴스 내의 서로 다른 데이터베이스이지만, `<hostname_1>`은 공유됩니다. **동일한 데이터베이스를 별도의 배포에 사용할 수 없습니다**.
 
-### Custom Redis
+### 커스텀 Redis
 
 <Info>
-Custom Redis instances are only available for [Hybrid](/langsmith/hybrid) and [Self-Hosted](/langsmith/self-hosted) deployments.
+커스텀 Redis 인스턴스는 [하이브리드](/langsmith/hybrid) 및 [셀프 호스팅](/langsmith/self-hosted) 배포에만 사용할 수 있습니다.
 </Info>
 
-A custom Redis instance can be used instead of the one automatically created by the control plane. Specify the [REDIS_URI_CUSTOM](/langsmith/env-var#redis_uri_custom) environment variable to use a custom Redis instance.
+컨트롤 플레인에 의해 자동으로 생성되는 것 대신 커스텀 Redis 인스턴스를 사용할 수 있습니다. 커스텀 Redis 인스턴스를 사용하려면 [REDIS_URI_CUSTOM](/langsmith/env-var#redis_uri_custom) 환경 변수를 지정하세요.
 
-Multiple deployments can share the same Redis instance. For example, for `Deployment A`, `REDIS_URI_CUSTOM` can be set to `redis://<hostname_1>:<port>/1` and for `Deployment B`, `REDIS_URI_CUSTOM` can be set to `redis://<hostname_1>:<port>/2`. `1` and `2` are different database numbers within the same instance, but `<hostname_1>` is shared. **The same database number cannot be used for separate deployments**.
+여러 배포가 동일한 Redis 인스턴스를 공유할 수 있습니다. 예를 들어, `Deployment A`의 경우 `REDIS_URI_CUSTOM`을 `redis://<hostname_1>:<port>/1`로 설정하고, `Deployment B`의 경우 `REDIS_URI_CUSTOM`을 `redis://<hostname_1>:<port>/2`로 설정할 수 있습니다. `1`과 `2`는 동일한 인스턴스 내의 서로 다른 데이터베이스 번호이지만, `<hostname_1>`은 공유됩니다. **동일한 데이터베이스 번호를 별도의 배포에 사용할 수 없습니다**.
 
-### LangSmith tracing
+### LangSmith 트레이싱
 
-LangGraph Server is automatically configured to send traces to LangSmith. See the table below for details with respect to each deployment option.
+LangGraph Server는 자동으로 LangSmith에 트레이스를 전송하도록 구성됩니다. 각 배포 옵션에 대한 세부 사항은 아래 표를 참조하세요.
 
-| Cloud | Hybrid | Self-Hosted |
+| 클라우드 | 하이브리드 | 셀프 호스팅 |
 |------------|------------------------|----------------------|
-| Required<br />Trace to LangSmith SaaS. | Optional<br />Disable tracing or trace to LangSmith SaaS. | Optional<br />Disable tracing, trace to LangSmith SaaS, or trace to Self-Hosted LangSmith. |
+| 필수<br />LangSmith SaaS로 트레이스 전송. | 선택 사항<br />트레이싱 비활성화 또는 LangSmith SaaS로 트레이스 전송. | 선택 사항<br />트레이싱 비활성화, LangSmith SaaS로 트레이스 전송, 또는 셀프 호스팅 LangSmith로 트레이스 전송. |
 
-### Telemetry
+### 텔레메트리
 
-LangGraph Server is automatically configured to report telemetry metadata for billing purposes. See the table below for details with respect to each deployment option.
+LangGraph Server는 과금 목적으로 텔레메트리 메타데이터를 자동으로 보고하도록 구성됩니다. 각 배포 옵션에 대한 세부 사항은 아래 표를 참조하세요.
 
-| Cloud | Hybrid | Self-Hosted |
+| 클라우드 | 하이브리드 | 셀프 호스팅 |
 |------------|------------------------|----------------------|
-| Telemetry sent to LangSmith SaaS. | Telemetry sent to LangSmith SaaS. | Self-reported usage (audit) for air-gapped license key.<br />Telemetry sent to LangSmith SaaS for LangSmith License Key. |
+| LangSmith SaaS로 텔레메트리 전송. | LangSmith SaaS로 텔레메트리 전송. | 에어갭 라이선스 키의 경우 자체 보고 사용량(감사).<br />LangSmith 라이선스 키의 경우 LangSmith SaaS로 텔레메트리 전송. |
 
-### Licensing
+### 라이선싱
 
-LangGraph Server is automatically configured to perform license key validation. See the table below for details with respect to each deployment option.
+LangGraph Server는 라이선스 키 검증을 수행하도록 자동으로 구성됩니다. 각 배포 옵션에 대한 세부 사항은 아래 표를 참조하세요.
 
-| Cloud | Hybrid | Self-Hosted |
+| 클라우드 | 하이브리드 | 셀프 호스팅 |
 |------------|------------------------|----------------------|
-| LangSmith API Key validated against LangSmith SaaS. | LangSmith API Key validated against LangSmith SaaS. | Air-gapped license key or Platform License Key validated against LangSmith SaaS. |
+| LangSmith SaaS에 대해 LangSmith API 키 검증. | LangSmith SaaS에 대해 LangSmith API 키 검증. | LangSmith SaaS에 대해 에어갭 라이선스 키 또는 플랫폼 라이선스 키 검증. |

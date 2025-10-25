@@ -1,29 +1,29 @@
 ---
-title: How to define a target function to evaluate
-sidebarTitle: Define a target function to evaluate
+title: 평가할 타겟 함수를 정의하는 방법
+sidebarTitle: 평가할 타겟 함수 정의하기
 ---
 
-There are three main pieces need to run an evaluation:
+평가를 실행하기 위해 필요한 세 가지 주요 요소는 다음과 같습니다:
 
-1. A [dataset](/langsmith/evaluation-concepts#datasets) of test inputs and expected outputs.
-2. A target function which is what you're evaluating.
-3. [Evaluators](/langsmith/evaluation-concepts#evaluators) that score your target function's outputs.
+1. 테스트 입력과 예상 출력의 [데이터셋](/langsmith/evaluation-concepts#datasets)
+2. 평가 대상이 되는 타겟 함수
+3. 타겟 함수의 출력을 평가하는 [평가자](/langsmith/evaluation-concepts#evaluators)
 
-This guide shows you how to define the target function depending on the part of your application you are evaluating. See here for [how to create a dataset](/langsmith/manage-datasets-programmatically) and [how to define evaluators](/langsmith/code-evaluator), and here for an [end-to-end example of running an evaluation](/langsmith/evaluate-llm-application).
+이 가이드는 애플리케이션의 어느 부분을 평가하는지에 따라 타겟 함수를 정의하는 방법을 보여줍니다. [데이터셋 생성 방법](/langsmith/manage-datasets-programmatically), [평가자 정의 방법](/langsmith/code-evaluator), 그리고 [평가 실행의 엔드투엔드 예제](/langsmith/evaluate-llm-application)는 각 링크를 참조하세요.
 
-## Target function signature
+## 타겟 함수 시그니처
 
-In order to evaluate an application in code, we need a way to run the application. When using `evaluate()` ([Python](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.evaluate)/[TypeScript](https://docs.smith.langchain.com/reference/js/functions/evaluation.evaluate))we'll do this by passing in a *target function* argument. This is a function that takes in a dataset [Example's](/langsmith/evaluation-concepts#examples) inputs and returns the application output as a dict. Within this function we can call our application however we'd like. We can also format the output however we'd like. The key is that any evaluator functions we define should work with the output format we return in our target function.
+코드에서 애플리케이션을 평가하려면 애플리케이션을 실행할 수 있는 방법이 필요합니다. `evaluate()` 함수를 사용할 때([Python](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.evaluate)/[TypeScript](https://docs.smith.langchain.com/reference/js/functions/evaluation.evaluate)) *타겟 함수* 인자를 전달하여 이를 수행합니다. 이 함수는 데이터셋 [Example](/langsmith/evaluation-concepts#examples)의 입력을 받아 애플리케이션 출력을 dict로 반환하는 함수입니다. 이 함수 내에서 원하는 방식으로 애플리케이션을 호출할 수 있습니다. 또한 원하는 방식으로 출력을 포맷할 수 있습니다. 중요한 점은 정의한 모든 평가자 함수가 타겟 함수에서 반환하는 출력 형식과 호환되어야 한다는 것입니다.
 
 ```python
 from langsmith import Client
 
-# 'inputs' will come from your dataset.
+# 'inputs'는 데이터셋에서 제공됩니다.
 def dummy_target(inputs: dict) -> dict:
     return {"foo": 1, "bar": "two"}
 
-# 'inputs' will come from your dataset.
-# 'outputs' will come from your target function.
+# 'inputs'는 데이터셋에서 제공됩니다.
+# 'outputs'는 타겟 함수에서 제공됩니다.
 def evaluator_one(inputs: dict, outputs: dict) -> bool:
     return outputs["foo"] == 2
 
@@ -32,7 +32,7 @@ def evaluator_two(inputs: dict, outputs: dict) -> bool:
 
 client = Client()
 results = client.evaluate(
-    dummy_target,  # <-- target function
+    dummy_target,  # <-- 타겟 함수
     data="your-dataset-name",
     evaluators=[evaluator_one, evaluator_two],
     ...
@@ -40,10 +40,10 @@ results = client.evaluate(
 ```
 
 <Check>
-`evaluate()` will automatically trace your target function. This means that if you run any traceable code within your target function, this will also be traced as child runs of the target trace.
+`evaluate()` 함수는 타겟 함수를 자동으로 추적합니다. 즉, 타겟 함수 내에서 추적 가능한 코드를 실행하면 해당 코드도 타겟 트레이스의 하위 실행으로 추적됩니다.
 </Check>
 
-## Example: Single LLM call
+## 예제: 단일 LLM 호출
 
 <CodeGroup>
 
@@ -51,13 +51,13 @@ results = client.evaluate(
 from langsmith import wrappers
 from openai import OpenAI
 
-# Optionally wrap the OpenAI client to automatically
-# trace all model calls.
+# 선택적으로 OpenAI 클라이언트를 래핑하여
+# 모든 모델 호출을 자동으로 추적할 수 있습니다.
 oai_client = wrappers.wrap_openai(OpenAI())
 
 def target(inputs: dict) -> dict:
-  # This assumes your dataset has inputs with a 'messages' key.
-  # You can update to match your dataset schema.
+  # 이 코드는 데이터셋에 'messages' 키가 있다고 가정합니다.
+  # 데이터셋 스키마에 맞게 업데이트할 수 있습니다.
   messages = inputs["messages"]
   response = oai_client.chat.completions.create(
       messages=messages,
@@ -72,9 +72,9 @@ import { wrapOpenAI } from "langsmith/wrappers";
 
 const client = wrapOpenAI(new OpenAI());
 
-// This is the function you will evaluate.
+// 이 함수를 평가하게 됩니다.
 const target = async(inputs) => {
-  // This assumes your dataset has inputs with a `messages` key
+  // 이 코드는 데이터셋에 `messages` 키가 있다고 가정합니다
   const messages = inputs.messages;
   const response = await client.chat.completions.create({
       messages: messages,
@@ -90,7 +90,7 @@ from langchain.chat_models import init_chat_model
 model = init_chat_model("openai:gpt-4o-mini")
 
 def target(inputs: dict) -> dict:
-  # This assumes your dataset has inputs with a `messages` key
+  # 이 코드는 데이터셋에 `messages` 키가 있다고 가정합니다
   messages = inputs["messages"]
   response = model.invoke(messages)
   return {"answer": response.content}
@@ -99,9 +99,9 @@ def target(inputs: dict) -> dict:
 ```typescript TypeScript (LangChain)
 import { ChatOpenAI } from '@langchain/openai';
 
-// This is the function you will evaluate.
+// 이 함수를 평가하게 됩니다.
 const target = async(inputs) => {
-  // This assumes your dataset has inputs with a `messages` key
+  // 이 코드는 데이터셋에 `messages` 키가 있다고 가정합니다
   const messages = inputs.messages;
   const model = new ChatOpenAI({ model: "gpt-4o-mini" });
   const response = await model.invoke(messages);
@@ -111,14 +111,14 @@ const target = async(inputs) => {
 
 </CodeGroup>
 
-## Example: Non-LLM component
+## 예제: Non-LLM 컴포넌트
 
 <CodeGroup>
 
 ```python Python
 from langsmith import traceable
 
-# Optionally decorate with '@traceable' to trace all invocations of this function.
+# 선택적으로 '@traceable'로 데코레이트하여 이 함수의 모든 호출을 추적할 수 있습니다.
 @traceable
 def calculator_tool(operation: str, number1: float, number2: float) -> str:
   if operation == "add":
@@ -132,9 +132,9 @@ def calculator_tool(operation: str, number1: float, number2: float) -> str:
   else:
       raise ValueError(f"Unrecognized operation: {operation}.")
 
-# This is the function you will evaluate.
+# 이 함수를 평가하게 됩니다.
 def target(inputs: dict) -> dict:
-  # This assumes your dataset has inputs with `operation`, `num1`, and `num2` keys.
+  # 이 코드는 데이터셋에 `operation`, `num1`, `num2` 키가 있다고 가정합니다.
   operation = inputs["operation"]
   number1 = inputs["num1"]
   number2 = inputs["num2"]
@@ -145,9 +145,9 @@ def target(inputs: dict) -> dict:
 ```typescript TypeScript
 import { traceable } from "langsmith/traceable";
 
-// Optionally wrap in 'traceable' to trace all invocations of this function.
+// 선택적으로 'traceable'로 래핑하여 이 함수의 모든 호출을 추적할 수 있습니다.
 const calculatorTool = traceable(async ({ operation, number1, number2 }) => {
-// Functions must return strings
+// 함수는 반드시 문자열을 반환해야 합니다
 if (operation === "add") {
   return (number1 + number2).toString();
 } else if (operation === "subtract") {
@@ -161,9 +161,9 @@ if (operation === "add") {
 }
 });
 
-// This is the function you will evaluate.
+// 이 함수를 평가하게 됩니다.
 const target = async (inputs) => {
-// This assumes your dataset has inputs with `operation`, `num1`, and `num2` keys
+// 이 코드는 데이터셋에 `operation`, `num1`, `num2` 키가 있다고 가정합니다
 const result = await calculatorTool.invoke({
   operation: inputs.operation,
   number1: inputs.num1,
@@ -175,33 +175,33 @@ return { result };
 
 </CodeGroup>
 
-## Example: Application or agent
+## 예제: 애플리케이션 또는 에이전트
 
 <CodeGroup>
 
 ```python Python
 from my_agent import agent
 
-      # This is the function you will evaluate.
+      # 이 함수를 평가하게 됩니다.
 def target(inputs: dict) -> dict:
-  # This assumes your dataset has inputs with a `messages` key
+  # 이 코드는 데이터셋에 `messages` 키가 있다고 가정합니다
   messages = inputs["messages"]
-  # Replace `invoke` with whatever you use to call your agent
+  # `invoke`를 에이전트를 호출하는데 사용하는 메서드로 교체하세요
   response = agent.invoke({"messages": messages})
-  # This assumes your agent output is in the right format
+  # 이 코드는 에이전트 출력이 올바른 형식이라고 가정합니다
   return response
 ```
 
 ```typescript TypeScript
 import { agent } from 'my_agent';
 
-// This is the function you will evaluate.
+// 이 함수를 평가하게 됩니다.
 const target = async(inputs) => {
-// This assumes your dataset has inputs with a `messages` key
+// 이 코드는 데이터셋에 `messages` 키가 있다고 가정합니다
 const messages = inputs.messages;
-// Replace `invoke` with whatever you use to call your agent
+// `invoke`를 에이전트를 호출하는데 사용하는 메서드로 교체하세요
 const response = await agent.invoke({ messages });
-// This assumes your agent output is in the right format
+// 이 코드는 에이전트 출력이 올바른 형식이라고 가정합니다
 return response;
 }
 ```
@@ -209,7 +209,7 @@ return response;
 </CodeGroup>
 
 <Check>
-If you have a LangGraph/LangChain agent that accepts the inputs defined in your dataset and that returns the output format you want to use in your evaluators, you can pass that object in as the target directly:
+데이터셋에 정의된 입력을 받아들이고 평가자에서 사용하려는 출력 형식을 반환하는 LangGraph/LangChain 에이전트가 있다면, 해당 객체를 타겟으로 직접 전달할 수 있습니다:
 
 ```python
 from my_agent import agent
