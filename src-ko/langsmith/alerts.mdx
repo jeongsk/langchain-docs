@@ -1,93 +1,93 @@
 ---
-title: Alerts in LangSmith
-sidebarTitle: Alerts
+title: LangSmith의 알림
+sidebarTitle: 알림
 ---
 
 <Note>
-**Self-hosted Version Requirement**
+**자체 호스팅 버전 요구사항**
 
-Access to alerts requires Helm chart version **0.10.3** or later.
+알림 기능을 사용하려면 Helm 차트 버전 **0.10.3** 이상이 필요합니다.
 </Note>
 
-## Overview
+## 개요
 
-Effective observability in LLM applications requires proactive detection of failures, performance degradations, and regressions. LangSmith's alerts feature helps identify critical issues such as:
+LLM 애플리케이션에서 효과적인 관찰성을 확보하려면 장애, 성능 저하, 회귀를 사전에 감지해야 합니다. LangSmith의 알림 기능은 다음과 같은 중요한 문제를 식별하는 데 도움을 줍니다:
 
-- API rate limit violations from model providers
-- Latency increases for your application
-- Application changes that affect feedback scores reflecting end-user experience
+- 모델 제공업체의 API 속도 제한 위반
+- 애플리케이션의 지연 시간 증가
+- 최종 사용자 경험을 반영하는 피드백 점수에 영향을 미치는 애플리케이션 변경사항
 
-Alerts in LangSmith are project-scoped, requiring separate configuration for each monitored project.
+LangSmith의 알림은 프로젝트 범위로 지정되므로, 모니터링하려는 각 프로젝트마다 별도로 구성해야 합니다.
 
-## Configuring an alert
+## 알림 구성하기
 
-### Step 1: Navigate To Create Alert
+### 1단계: 알림 생성 화면으로 이동
 
-First navigate to the Tracing project that you would like to configure alerts for. Click the Alerts icon on the top right hand corner of the page to view existing alerts for that project and set up a new alert.
+먼저 알림을 구성하려는 Tracing 프로젝트로 이동합니다. 페이지 오른쪽 상단의 알림 아이콘을 클릭하여 해당 프로젝트의 기존 알림을 확인하고 새 알림을 설정합니다.
 
-### Step 2: Select Metric Type
-
-<br />
-<div style={{ textAlign: 'center' }}>
-
-![Alert Metrics](/langsmith/images/alert-metric.png)
-
-</div>
-
-LangSmith offers threshold-based alerting on three core metrics:
-
-| Metric Type        | Description                         | Use Case                                                                                                                                                                                 |
-| ------------------ | ----------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Errored Runs**   | Track runs with an error status     | Monitors for failures in an application.                                                                                                                                                 |
-| **Feedback Score** | Measures the average feedback score | Track [feedback from end users](/langsmith/attach-user-feedback) or [online evaluation results](/langsmith/online-evaluations) to alert on regressions. |
-| **Latency**        | Measures average run execution time | Tracks the latency of your application to alert on spikes and performance bottlenecks.                                                                                                   |
-
-Additionally, for **Errored Runs** and **Run Latency**, you can define filters to narrow down the runs that trigger alerts. For example, you might create an error alert filter for all `llm` runs tagged with `support_agent` that encounter a `RateLimitExceeded` error.
-
-<div style={{ textAlign: 'center' }}>
-
-![Alert Metrics](/langsmith/images/alerts-filter.png)
-
-</div>
-
-### Step 2: Define Alert Conditions
-
-Alert conditions consist of several components:
-
-- **Aggregation Method**: Average, Percentage, or Count
-- **Comparison Operator**: `>=`, `<=`, or exceeds threshold
-- **Threshold Value**: Numerical value triggering the alert
-- **Aggregation Window**: Time period for metric calculation (currently choose between 5 or 15 minutes)
-- **Feedback Key** (Feedback Score alerts only): Specific feedback metric to monitor
+### 2단계: 메트릭 유형 선택
 
 <br />
 <div style={{ textAlign: 'center' }}>
 
-![Alert Condition Configuration](/langsmith/images/define-conditions.png)
+![알림 메트릭](/langsmith/images/alert-metric.png)
 
 </div>
 
-**Example:** The configuration shown above would generate an alert when more than 5% of runs within the past 5 minutes result in errors.
+LangSmith는 세 가지 핵심 메트릭에 대한 임계값 기반 알림을 제공합니다:
 
-You can preview alert behavior over a historical time window to understand how many datapoints—and which ones—would have triggered an alert at a chosen threshold (indicated in red). For example, setting an average latency threshold of 60 seconds for a project lets you visualize potential alerts, as shown in the image below.
+| 메트릭 유형        | 설명                         | 사용 사례                                                                                                                                                                 |
+| ------------------ | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **오류 발생 실행** | 오류 상태의 실행을 추적      | 애플리케이션의 장애를 모니터링합니다.                                                                                                                                     |
+| **피드백 점수**    | 평균 피드백 점수를 측정      | [최종 사용자의 피드백](/langsmith/attach-user-feedback) 또는 [온라인 평가 결과](/langsmith/online-evaluations)를 추적하여 회귀에 대한 알림을 받습니다. |
+| **지연 시간**      | 평균 실행 시간을 측정        | 애플리케이션의 지연 시간을 추적하여 급증 및 성능 병목 현상에 대한 알림을 받습니다.                                                                                        |
+
+또한, **오류 발생 실행** 및 **실행 지연 시간**의 경우 필터를 정의하여 알림을 트리거하는 실행 범위를 좁힐 수 있습니다. 예를 들어, `support_agent`로 태그된 모든 `llm` 실행 중 `RateLimitExceeded` 오류가 발생한 경우에 대한 오류 알림 필터를 생성할 수 있습니다.
 
 <div style={{ textAlign: 'center' }}>
 
-![Alert Metrics](/langsmith/images/alert-preview.png)
+![알림 메트릭](/langsmith/images/alerts-filter.png)
 
 </div>
 
-### Step 3: Configure Notification Channel
+### 2단계: 알림 조건 정의
 
-LangSmith supports the following notification channels:
+알림 조건은 여러 구성 요소로 이루어져 있습니다:
 
-1. [PagerDuty Integration](/langsmith/alerts-pagerduty)
-2. [Webhook Notifications](/langsmith/alerts-webhook)
+- **집계 방법**: 평균, 백분율 또는 개수
+- **비교 연산자**: `>=`, `<=` 또는 임계값 초과
+- **임계값**: 알림을 트리거하는 숫자 값
+- **집계 기간**: 메트릭 계산을 위한 시간 범위(현재 5분 또는 15분 중 선택 가능)
+- **피드백 키** (피드백 점수 알림만 해당): 모니터링할 특정 피드백 메트릭
 
-Select the appropriate channel to ensure notifications reach the responsible team members.
+<br />
+<div style={{ textAlign: 'center' }}>
 
-## Best Practices
+![알림 조건 구성](/langsmith/images/define-conditions.png)
 
-- Adjust sensitivity based on application criticality
-- Start with broader thresholds and refine based on observed patterns
-- Ensure alert routing reaches appropriate on-call personnel
+</div>
+
+**예시:** 위에 표시된 구성은 지난 5분 동안 실행의 5% 이상이 오류로 끝날 때 알림을 생성합니다.
+
+과거 시간 범위에 대한 알림 동작을 미리 확인하여 선택한 임계값에서 얼마나 많은 데이터 포인트가 알림을 트리거했을지(빨간색으로 표시됨) 파악할 수 있습니다. 예를 들어, 프로젝트의 평균 지연 시간 임계값을 60초로 설정하면 아래 이미지와 같이 잠재적 알림을 시각화할 수 있습니다.
+
+<div style={{ textAlign: 'center' }}>
+
+![알림 메트릭](/langsmith/images/alert-preview.png)
+
+</div>
+
+### 3단계: 알림 채널 구성
+
+LangSmith는 다음 알림 채널을 지원합니다:
+
+1. [PagerDuty 통합](/langsmith/alerts-pagerduty)
+2. [Webhook 알림](/langsmith/alerts-webhook)
+
+적절한 채널을 선택하여 알림이 담당 팀원에게 전달되도록 합니다.
+
+## 모범 사례
+
+- 애플리케이션의 중요도에 따라 민감도를 조정하세요
+- 더 넓은 임계값으로 시작하여 관찰된 패턴을 바탕으로 개선하세요
+- 알림 라우팅이 적절한 대기 인력에게 도달하도록 보장하세요

@@ -1,22 +1,22 @@
 ---
-title: How to evaluate an application's intermediate steps
-sidebarTitle: Evaluate intermediate steps
+title: 애플리케이션의 중간 단계를 평가하는 방법
+sidebarTitle: 중간 단계 평가
 ---
 
-While, in many scenarios, it is sufficient to evaluate the final output of your task, in some cases you might want to evaluate the intermediate steps of your pipeline.
+많은 시나리오에서는 작업의 최종 출력을 평가하는 것으로 충분하지만, 경우에 따라서는 파이프라인의 중간 단계를 평가하고 싶을 수 있습니다.
 
-For example, for retrieval-augmented generation (RAG), you might want to
+예를 들어, 검색 증강 생성(RAG)의 경우 다음을 평가할 수 있습니다:
 
-1. Evaluate the retrieval step to ensure that the correct documents are retrieved w\.r.t the input query.
-2. Evaluate the generation step to ensure that the correct answer is generated w\.r.t the retrieved documents.
+1. 입력 쿼리에 대해 올바른 문서가 검색되는지 확인하기 위한 검색 단계 평가.
+2. 검색된 문서에 대해 올바른 답변이 생성되는지 확인하기 위한 생성 단계 평가.
 
-In this guide, we will use a simple, fully-custom evaluator for evaluating criteria 1 and an LLM-based evaluator for evaluating criteria 2 to highlight both scenarios.
+이 가이드에서는 두 시나리오를 모두 강조하기 위해 기준 1을 평가하는 간단한 완전 사용자 정의 평가자와 기준 2를 평가하는 LLM 기반 평가자를 사용합니다.
 
-In order to evaluate the intermediate steps of your pipeline, your evaluator function should traverse and process the `run`/`rootRun` argument, which is a `Run` object that contains the intermediate steps of your pipeline.
+파이프라인의 중간 단계를 평가하려면 평가자 함수가 `run`/`rootRun` 인수를 탐색하고 처리해야 합니다. 이는 파이프라인의 중간 단계를 포함하는 `Run` 객체입니다.
 
-## 1. Define your LLM pipeline
+## 1. LLM 파이프라인 정의
 
-The below RAG pipeline consists of 1) generating a Wikipedia query given the input question, 2) retrieving relevant documents from Wikipedia, and 3) generating an answer given the retrieved documents.
+아래의 RAG 파이프라인은 1) 입력 질문으로부터 Wikipedia 쿼리 생성, 2) Wikipedia에서 관련 문서 검색, 3) 검색된 문서를 기반으로 답변 생성으로 구성됩니다.
 
 <CodeGroup>
 
@@ -30,7 +30,7 @@ yarn add langsmith langchain @langchain/openai wikipedia
 
 </CodeGroup>
 
-Requires `langsmith>=0.3.13`
+`langsmith>=0.3.13`이 필요합니다.
 
 <CodeGroup>
 
@@ -190,13 +190,13 @@ const ragPipeline = traceable(
 
 </CodeGroup>
 
-This pipeline will produce a trace that looks something like: ![evaluation_intermediate_trace.png](/langsmith/images/evaluation-intermediate-trace.png)
+이 파이프라인은 다음과 같은 트레이스를 생성합니다: ![evaluation_intermediate_trace.png](/langsmith/images/evaluation-intermediate-trace.png)
 
-## 2. Create a dataset and examples to evaluate the pipeline
+## 2. 파이프라인을 평가할 데이터셋 및 예제 생성
 
-We are building a very simple dataset with a couple of examples to evaluate the pipeline.
+파이프라인을 평가하기 위해 몇 가지 예제가 포함된 매우 간단한 데이터셋을 구축합니다.
 
-Requires `langsmith>=0.3.13`
+`langsmith>=0.3.13`이 필요합니다.
 
 <CodeGroup>
 
@@ -241,13 +241,13 @@ await client.createExamples({ datasetId: dataset.id, inputs, outputs });
 
 </CodeGroup>
 
-## 3. Define your custom evaluators
+## 3. 사용자 정의 평가자 정의
 
-As mentioned above, we will define two evaluators: one that evaluates the relevance of the retrieved documents w\.r.t the input query and another that evaluates the hallucination of the generated answer w\.r.t the retrieved documents. We will be using LangChain LLM wrappers, along with [`with_structured_output`](https://python.langchain.com/v0.1/docs/modules/model_io/chat/structured_output/) to define the evaluator for hallucination.
+위에서 언급한 것처럼 두 가지 평가자를 정의합니다: 입력 쿼리에 대한 검색된 문서의 관련성을 평가하는 평가자와 검색된 문서에 대한 생성된 답변의 환각을 평가하는 평가자입니다. 환각 평가자를 정의하기 위해 [`with_structured_output`](https://python.langchain.com/v0.1/docs/modules/model_io/chat/structured_output/)과 함께 LangChain LLM 래퍼를 사용합니다.
 
-The key here is that the evaluator function should traverse the `run` / `rootRun` argument to access the intermediate steps of the pipeline. The evaluator can then process the inputs and outputs of the intermediate steps to evaluate according to the desired criteria.
+여기서 핵심은 평가자 함수가 파이프라인의 중간 단계에 접근하기 위해 `run` / `rootRun` 인수를 탐색해야 한다는 것입니다. 그런 다음 평가자는 원하는 기준에 따라 평가하기 위해 중간 단계의 입력과 출력을 처리할 수 있습니다.
 
-Example uses `langchain` for convenience, this is not required.
+예제에서는 편의를 위해 `langchain`을 사용하지만, 이는 필수가 아닙니다.
 
 <CodeGroup>
 
@@ -390,9 +390,9 @@ async function hallucination(
 
 </CodeGroup>
 
-## 4. Evaluate the pipeline
+## 4. 파이프라인 평가
 
-Finally, we'll run `evaluate` with the custom evaluators defined above.
+마지막으로 위에서 정의한 사용자 정의 평가자와 함께 `evaluate`를 실행합니다.
 
 <CodeGroup>
 
@@ -421,8 +421,8 @@ await evaluate((inputs) => ragPipeline({ question: inputs.input }), {
 
 </CodeGroup>
 
-The experiment will contain the results of the evaluation, including the scores and comments from the evaluators: ![evaluation_intermediate_experiment.png](/langsmith/images/evaluation-intermediate-experiment.png)
+실험에는 평가자의 점수와 코멘트를 포함한 평가 결과가 포함됩니다: ![evaluation_intermediate_experiment.png](/langsmith/images/evaluation-intermediate-experiment.png)
 
-## Related
+## 관련 문서
 
-* [Evaluate a `langgraph` graph](/langsmith/evaluate-on-intermediate-steps)
+* [`langgraph` 그래프 평가하기](/langsmith/evaluate-on-intermediate-steps)

@@ -1,132 +1,132 @@
 ---
-title: Configure webhook notifications for LangSmith alerts
-sidebarTitle: Configure webhook notifications for alerts
+title: LangSmith 알림을 위한 웹훅 알림 구성
+sidebarTitle: 알림을 위한 웹훅 알림 구성
 ---
 
-## Overview
+## 개요
 
-This guide details the process for setting up webhook notifications for [LangSmith alerts](/langsmith/alerts). Before proceeding, make sure you have followed the steps leading up to the notification step of creating the alert by following [this guide](./alerts). Webhooks enable integration with custom services and third-party platforms by sending HTTP POST requests when alert conditions are triggered. Use webhooks to forward alert data to ticketing systems, chat applications, or custom monitoring solutions.
+이 가이드는 [LangSmith 알림](/langsmith/alerts)을 위한 웹훅 알림을 설정하는 과정을 자세히 설명합니다. 진행하기 전에 [이 가이드](./alerts)를 따라 알림 생성의 알림 단계까지 이르는 단계를 완료했는지 확인하세요. 웹훅은 알림 조건이 트리거될 때 HTTP POST 요청을 전송하여 사용자 정의 서비스 및 타사 플랫폼과의 통합을 가능하게 합니다. 웹훅을 사용하여 알림 데이터를 티켓팅 시스템, 채팅 애플리케이션 또는 사용자 정의 모니터링 솔루션으로 전달할 수 있습니다.
 
-## Prerequisites
+## 사전 요구 사항
 
-* An endpoint that can receive HTTP POST requests
-* Appropriate authentication credentials for your receiving service (if required)
+* HTTP POST 요청을 수신할 수 있는 엔드포인트
+* 수신 서비스에 대한 적절한 인증 자격 증명(필요한 경우)
 
-## Integration Configuration
+## 통합 구성
 
-### Step 1: Prepare Your Receiving Endpoint
+### 1단계: 수신 엔드포인트 준비
 
-Before configuring the webhook in LangSmith, ensure your receiving endpoint:
+LangSmith에서 웹훅을 구성하기 전에 수신 엔드포인트가 다음을 충족하는지 확인하세요:
 
-* Accepts HTTP POST requests
-* Can process JSON payloads
-* Is accessible from external services
-* Has appropriate authentication mechanisms (if required)
+* HTTP POST 요청을 수락함
+* JSON 페이로드를 처리할 수 있음
+* 외부 서비스에서 액세스 가능함
+* 적절한 인증 메커니즘을 갖추고 있음(필요한 경우)
 
-Additionally, if on a custom deployment of LangSmith, make sure there are no firewall settings blocking egress traffic from LangSmith services.
+또한 LangSmith의 사용자 정의 배포를 사용하는 경우 LangSmith 서비스에서 나가는 트래픽을 차단하는 방화벽 설정이 없는지 확인하세요.
 
-### Step 2: Configure Webhook Parameters
+### 2단계: 웹훅 매개변수 구성
 
 ![Webhook Setup](/langsmith/images/webhook-setup.png)
 
-In the notification section of your alert complete the webhook configuration with the following parameters:
+알림의 알림 섹션에서 다음 매개변수를 사용하여 웹훅 구성을 완료하세요:
 
-**Required Fields**
+**필수 필드**
 
-* **URL**: The complete URL of your receiving endpoint
-  * Example: `https://api.example.com/incident-webhook`
+* **URL**: 수신 엔드포인트의 전체 URL
+  * 예시: `https://api.example.com/incident-webhook`
 
-**Optional Fields**
+**선택적 필드**
 
-* **Headers**: JSON Key-value pairs sent with the webhook request
+* **Headers**: 웹훅 요청과 함께 전송되는 JSON 키-값 쌍
 
-  * Common headers include:
+  * 일반적인 헤더는 다음과 같습니다:
 
-    * `Authorization`: For authentication tokens
-    * `Content-Type`: Usually set to `application/json` (default)
-    * `X-Source`: To identify the source as LangSmith
+    * `Authorization`: 인증 토큰용
+    * `Content-Type`: 일반적으로 `application/json`로 설정됨(기본값)
+    * `X-Source`: 소스를 LangSmith로 식별하기 위해 사용
 
-  * If no headers, then simply use `{}`
+  * 헤더가 없는 경우 단순히 `{}`를 사용하세요
 
-* **Request Body Template**: Customize the JSON payload sent to your endpoint
+* **Request Body Template**: 엔드포인트로 전송되는 JSON 페이로드를 사용자 정의
 
-  * Default: LangSmith sends the payload defined and the following additonal key-value pairs appended to the payload:
+  * 기본값: LangSmith는 정의된 페이로드와 페이로드에 추가되는 다음 추가 키-값 쌍을 전송합니다:
 
-    * `project_name`: Name of the triggered alert
-    * `alert_rule_id`: A UUID to identify the LangSmith alert. This can be used as a de-duplication key in the webhook service.
-    * `alert_rule_name`: The name of the alert rule.
-    * `alert_rule_type`: The type of alert (as of 04/01/2025 all alerts are of type `threshold`).
-    * `alert_rule_attribute`: The attribute associated with the alert rule - `error_count`, `feedback_score` or `latency`.
-    * `triggered_metric_value`: The value of the metric at the time the threshold was triggered.
-    * `triggered_threshold`: The threshold that triggered the alert.
-    * `timestamp`: The timestamp that triggered the alert.
+    * `project_name`: 트리거된 알림의 이름
+    * `alert_rule_id`: LangSmith 알림을 식별하는 UUID. 웹훅 서비스에서 중복 제거 키로 사용할 수 있습니다.
+    * `alert_rule_name`: 알림 규칙의 이름.
+    * `alert_rule_type`: 알림 유형(2025년 4월 1일 기준 모든 알림은 `threshold` 유형입니다).
+    * `alert_rule_attribute`: 알림 규칙과 연관된 속성 - `error_count`, `feedback_score` 또는 `latency`.
+    * `triggered_metric_value`: 임계값이 트리거된 시점의 메트릭 값.
+    * `triggered_threshold`: 알림을 트리거한 임계값.
+    * `timestamp`: 알림을 트리거한 타임스탬프.
 
-### Step 3: Test the Webhook
+### 3단계: 웹훅 테스트
 
-Click **Send Test Alert** to send the webhook notification to ensure the notification works as intended.
+**테스트 알림 보내기**를 클릭하여 웹훅 알림을 전송하고 알림이 의도한 대로 작동하는지 확인하세요.
 
-## Troubleshooting
+## 문제 해결
 
-If webhook notifications aren't being delivered:
+웹훅 알림이 전달되지 않는 경우:
 
-* Verify the webhook URL is correct and accessible
-* Ensure any authentication headers are properly formatted
-* Check that your receiving endpoint accepts POST requests
-* Examine your endpoint's logs for received but rejected requests
-* Verify your custom payload template is valid JSON format
+* 웹훅 URL이 정확하고 액세스 가능한지 확인하세요
+* 모든 인증 헤더가 올바르게 형식화되었는지 확인하세요
+* 수신 엔드포인트가 POST 요청을 수락하는지 확인하세요
+* 수신되었지만 거부된 요청에 대해 엔드포인트의 로그를 검토하세요
+* 사용자 정의 페이로드 템플릿이 유효한 JSON 형식인지 확인하세요
 
-## Security Considerations
+## 보안 고려 사항
 
-* Use HTTPS for your webhook endpoints
-* Implement authentication for your webhook endpoint
-* Consider adding a shared secret in your headers to verify webhook sources
-* Validate incoming webhook requests before processing them
+* 웹훅 엔드포인트에 HTTPS를 사용하세요
+* 웹훅 엔드포인트에 대한 인증을 구현하세요
+* 웹훅 소스를 확인하기 위해 헤더에 공유 비밀을 추가하는 것을 고려하세요
+* 들어오는 웹훅 요청을 처리하기 전에 유효성을 검사하세요
 
-## Sending alerts to Slack using a webhook
+## 웹훅을 사용하여 Slack으로 알림 보내기
 
-Here is an example for configuring LangSmith alerts to send notifications to Slack channels using the [`chat.postMessage`](https://api.slack.com/methods/chat.postMessage) API.
+다음은 [`chat.postMessage`](https://api.slack.com/methods/chat.postMessage) API를 사용하여 Slack 채널로 알림을 보내도록 LangSmith 알림을 구성하는 예시입니다.
 
-### Prerequisites
+### 사전 요구 사항
 
-* Access to a Slack workspace
-* A LangSmith project to set up alerts
-* Permissions to create Slack applications
+* Slack 워크스페이스에 대한 액세스
+* 알림을 설정할 LangSmith 프로젝트
+* Slack 애플리케이션을 생성할 수 있는 권한
 
-### Step 1: Create a Slack App
+### 1단계: Slack 앱 생성
 
-1. Visit the [Slack API Applications page](https://api.slack.com/apps)
-2. Click **Create New App**
-3. Select **From scratch**
-4. Provide an **App Name** (e.g., "LangSmith Alerts")
-5. Select the workspace where you want to install the app
-6. Click **Create App**
+1. [Slack API Applications 페이지](https://api.slack.com/apps)를 방문하세요
+2. **Create New App**을 클릭하세요
+3. **From scratch**를 선택하세요
+4. **App Name**을 입력하세요(예: "LangSmith Alerts")
+5. 앱을 설치할 워크스페이스를 선택하세요
+6. **Create App**을 클릭하세요
 
-### Step 2: Configure Bot Permissions
+### 2단계: 봇 권한 구성
 
-1. In the left sidebar of your Slack app configuration, click **OAuth & Permissions**
+1. Slack 앱 구성의 왼쪽 사이드바에서 **OAuth & Permissions**를 클릭하세요
 
-2. Scroll down to **Bot Token Scopes** under **Scopes** and click **Add an OAuth Scope**
+2. **Scopes** 아래의 **Bot Token Scopes**로 스크롤하고 **Add an OAuth Scope**를 클릭하세요
 
-3. Add the following scopes:
+3. 다음 스코프를 추가하세요:
 
-   * `chat:write` (Send messages as the app)
-   * `chat:write.public` (Send messages to channels the app isn't in)
-   * `channels:read` (View basic channel information)
+   * `chat:write` (앱으로 메시지 전송)
+   * `chat:write.public` (앱이 참여하지 않은 채널로 메시지 전송)
+   * `channels:read` (기본 채널 정보 보기)
 
-### Step 3: Install the App to Your Workspace
+### 3단계: 워크스페이스에 앱 설치
 
-1. Scroll up to the top of the **OAuth & Permissions** page
-2. Click **Install to Workspace**
-3. Review the permissions and click **Allow**
-4. Copy the **Bot User OAuth Token** that appears (begins with `xoxb-`)
+1. **OAuth & Permissions** 페이지 상단으로 스크롤하세요
+2. **Install to Workspace**를 클릭하세요
+3. 권한을 검토하고 **Allow**를 클릭하세요
+4. 표시되는 **Bot User OAuth Token**을 복사하세요(`xoxb-`로 시작)
 
-### Step 4: Configure the Webhook Alert in LangSmith
+### 4단계: LangSmith에서 웹훅 알림 구성
 
-1. In LangSmith, navigate to your project
-2. Select **Alerts → Create Alert**
-3. Define your alert metrics and conditions
-4. In the notification section, select **Webhook**
-5. Configure the webhook with the following settings:
+1. LangSmith에서 프로젝트로 이동하세요
+2. **Alerts → Create Alert**을 선택하세요
+3. 알림 메트릭과 조건을 정의하세요
+4. 알림 섹션에서 **Webhook**을 선택하세요
+5. 다음 설정으로 웹훅을 구성하세요:
 
 **Webhook URL**
 
@@ -143,7 +143,7 @@ https://slack.com/api/chat.postMessage
 }
 ```
 
-> **Note:** Replace `xoxb-your-token-here` with your actual Bot User OAuth Token
+> **참고:** `xoxb-your-token-here`를 실제 Bot User OAuth Token으로 교체하세요
 
 **Request Body Template**
 
@@ -177,32 +177,32 @@ https://slack.com/api/chat.postMessage
 }
 ```
 
-**NOTE:** Fill in the `channel_id`, `alert_name`, `project_name` and `project_url` when creating the alert. You can find your `project_url` in the browser's URL bar. Copy the portion up to but not including any query parameters.
+**참고:** 알림을 생성할 때 `channel_id`, `alert_name`, `project_name` 및 `project_url`을 입력하세요. `project_url`은 브라우저의 URL 표시줄에서 찾을 수 있습니다. 쿼리 매개변수를 제외한 부분까지 복사하세요.
 
-6. Click **Save** to activate the webhook configuration
+6. **Save**를 클릭하여 웹훅 구성을 활성화하세요
 
-### Step 5: Test the Integration
+### 5단계: 통합 테스트
 
-1. In the LangSmith alert configuration, click **Test Alert**
-2. Check your specified Slack channel for the test notification
-3. Verify that the message contains the expected alert information
+1. LangSmith 알림 구성에서 **Test Alert**를 클릭하세요
+2. 지정된 Slack 채널에서 테스트 알림을 확인하세요
+3. 메시지에 예상된 알림 정보가 포함되어 있는지 확인하세요
 
-### (Optional) Step 6: Link to the Alert Preview in the Request Body
+### (선택 사항) 6단계: 요청 본문에 알림 미리보기 링크 추가
 
-After creating an alert, you can optionally link to its preview in the webhook's request body.
+알림을 생성한 후 웹훅의 요청 본문에 알림 미리보기에 대한 링크를 선택적으로 추가할 수 있습니다.
 
 ![Alert Preview Pane](/langsmith/images/alert-preview-pane.png)
 
-To configure this:
+이를 구성하려면:
 
-1. Save your alert
-2. Find your saved alert in the alerts table and click it
-3. Copy the dsiplayed URL
-4. Click "Edit Alert"
-5. Replace the existing project URL with the copied alert preview URL
+1. 알림을 저장하세요
+2. 알림 테이블에서 저장된 알림을 찾아 클릭하세요
+3. 표시된 URL을 복사하세요
+4. "Edit Alert"을 클릭하세요
+5. 기존 프로젝트 URL을 복사한 알림 미리보기 URL로 교체하세요
 
-## Additional Resources
+## 추가 리소스
 
-* [LangSmith Alerts Documentation](/langsmith/alerts)
-* [Slack chat.postMessage API Documentation](https://api.slack.com/methods/chat.postMessage)
+* [LangSmith Alerts 문서](/langsmith/alerts)
+* [Slack chat.postMessage API 문서](https://api.slack.com/methods/chat.postMessage)
 * [Slack Block Kit Builder](https://app.slack.com/block-kit-builder/)

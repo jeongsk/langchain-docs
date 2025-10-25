@@ -1,243 +1,243 @@
 ---
-title: Manage billing in your account
-sidebarTitle: Manage billing
+title: 계정에서 청구 관리하기
+sidebarTitle: 청구 관리
 ---
 
-This page describes how to manage billing for your LangSmith organization:
+이 페이지는 LangSmith 조직의 청구를 관리하는 방법을 설명합니다:
 
-- [Set up billing for your account](#set-up-billing-for-your-account): Complete the billing setup process for Developer and Plus plans, including special instructions for legacy accounts.
-- [Update your information](#update-your-information): Modify invoice email addresses, business information, and tax IDs for your organization.
-- [Optimize your tracing spend](#optimize-your-tracing-spend): Learn how to reduce costs through data retention management and usage limits.
+- [계정에 청구 설정하기](#set-up-billing-for-your-account): 레거시 계정에 대한 특별 지침을 포함하여 Developer 및 Plus 플랜의 청구 설정 프로세스를 완료합니다.
+- [정보 업데이트하기](#update-your-information): 조직의 청구서 이메일 주소, 비즈니스 정보 및 세금 ID를 수정합니다.
+- [추적 비용 최적화하기](#optimize-your-tracing-spend): 데이터 보존 관리 및 사용량 제한을 통해 비용을 절감하는 방법을 알아봅니다.
 
-## Set up billing for your account
-
-<Note>
-Before using this guide, note the following:
-
-- If you are interested in the [Enterprise](https://www.langchain.com/pricing) plan, please [contact sales](https://www.langchain.com/contact-sales). This guide is only for our self-serve billing plans.
-- If you created your LangSmith organization before pricing was introduced on April 2nd, 2024, please [skip to the final section](#set-up-billing-for-accounts-created-before-pricing-was-introduced-on-april-2-2024).
-</Note>
-
-To set up billing for your LangSmith organization, navigate to the [Usage and Billing](https://smith.langchain.com/settings/payments) page under **Settings**. Depending on your organization's settings, there are different setup guides:
-
-- [Developer plan](#developer-plan%3A-set-up-billing-on-your-personal-organization)
-- [Plus plan](#plus-plan%3A-set-up-billing-on-a-shared-organization)
-- [Setup for accounts created before April 2, 2024 pricing introduction](#set-up-billing-for-accounts-created-before-pricing-introduction)
-
-### Developer Plan: set up billing on your personal organization
-
-Personal organizations are limited to 5000 traces per month until a credit card is added. You can add a credit card on the **Plans and Billing** page as follows:
-
-1. Click **Set up Billing**.
-1. Add your credit card information. After this step, you will no longer be rate limited to 5000 traces, and you will be charged for any excess traces at rates specified on the [pricing](https://www.langchain.com/pricing-langsmith) page.
-
-### Plus Plan: set up billing on a shared organization
-
-If you have not yet created an organization, you need to follow [this guide](/langsmith/set-up-a-workspace#set-up-an-organization) before setting up billing. The following steps assume you are already in a new organization.
+## 계정에 청구 설정하기 {#set-up-billing-for-your-account}
 
 <Note>
-You can't use a new organization until you enter credit card information. After you complete the following steps, you will gain complete access to LangSmith.
+이 가이드를 사용하기 전에 다음 사항을 참고하세요:
+
+- [Enterprise](https://www.langchain.com/pricing) 플랜에 관심이 있으시면 [영업팀에 문의](https://www.langchain.com/contact-sales)해 주세요. 이 가이드는 셀프서비스 청구 플랜에만 해당됩니다.
+- 2024년 4월 2일에 가격제가 도입되기 전에 LangSmith 조직을 생성한 경우, [마지막 섹션으로 이동](#set-up-billing-for-accounts-created-before-pricing-was-introduced-on-april-2-2024)해 주세요.
 </Note>
 
-1. Click **Subscribe** on the **Plus** page.
+LangSmith 조직의 청구를 설정하려면 **Settings** 하위의 [Usage and Billing](https://smith.langchain.com/settings/payments) 페이지로 이동하세요. 조직의 설정에 따라 다른 설정 가이드가 제공됩니다:
+
+- [Developer 플랜](#developer-plan%3A-set-up-billing-on-your-personal-organization)
+- [Plus 플랜](#plus-plan%3A-set-up-billing-on-a-shared-organization)
+- [2024년 4월 2일 가격제 도입 이전에 생성된 계정 설정](#set-up-billing-for-accounts-created-before-pricing-introduction)
+
+### Developer 플랜: 개인 조직에서 청구 설정하기 {#developer-plan-set-up-billing-on-your-personal-organization}
+
+개인 조직은 신용카드가 추가될 때까지 월 5,000개의 추적으로 제한됩니다. **Plans and Billing** 페이지에서 다음과 같이 신용카드를 추가할 수 있습니다:
+
+1. **Set up Billing**을 클릭합니다.
+1. 신용카드 정보를 추가합니다. 이 단계 이후에는 더 이상 5,000개의 추적으로 제한되지 않으며, [가격](https://www.langchain.com/pricing-langsmith) 페이지에 명시된 요금으로 초과 추적에 대해 청구됩니다.
+
+### Plus 플랜: 공유 조직에서 청구 설정하기 {#plus-plan-set-up-billing-on-a-shared-organization}
+
+아직 조직을 생성하지 않았다면 청구를 설정하기 전에 [이 가이드](/langsmith/set-up-a-workspace#set-up-an-organization)를 따라야 합니다. 다음 단계는 이미 새 조직에 있다고 가정합니다.
+
+<Note>
+신용카드 정보를 입력할 때까지는 새 조직을 사용할 수 없습니다. 다음 단계를 완료하면 LangSmith에 대한 전체 액세스 권한을 얻게 됩니다.
+</Note>
+
+1. **Plus** 페이지에서 **Subscribe**를 클릭합니다.
     <Note>
-    If you are a startup building with AI, instead click **Apply Now** on the Startup Plan. You may be eligible for discounted prices and a free, monthly trace allotment.
+    AI를 활용하여 구축하는 스타트업이라면 Startup 플랜에서 **Apply Now**를 클릭하세요. 할인된 가격과 무료 월간 추적 할당량을 받을 수 있습니다.
     </Note>
-1. Review your existing members. Before subscribing, LangSmith lets you remove any added users that you do **not** want to be included in the bill.
-1. Enter your credit card information. Then, enter business information, invoice email, and tax ID. If this organization belongs to a business, check the **This is a business** checkbox and enter the information accordingly.
+1. 기존 멤버를 검토합니다. 구독하기 전에 LangSmith는 청구서에 포함하고 싶지 **않은** 추가된 사용자를 제거할 수 있게 합니다.
+1. 신용카드 정보를 입력합니다. 그런 다음 비즈니스 정보, 청구서 이메일 및 세금 ID를 입력합니다. 이 조직이 비즈니스에 속한 경우 **This is a business** 체크박스를 선택하고 정보를 그에 맞게 입력합니다.
 
-For more information, refer to the [Update your information section](#update-your-information).
+자세한 내용은 [정보 업데이트 섹션](#update-your-information)을 참조하세요.
 
-Once this step is complete, your organization will have access to the rest of LangSmith.
+이 단계가 완료되면 조직은 LangSmith의 나머지 기능에 액세스할 수 있습니다.
 
-### Set up billing for accounts created before pricing introduction
+### 가격제 도입 이전에 생성된 계정에 대한 청구 설정 {#set-up-billing-for-accounts-created-before-pricing-introduction}
 
-If you joined LangSmith before pricing was introduced on April 2, 2024, you have the option to upgrade your existing account to set up billing. If you did not set up billing by July 8, 2024, then your account is now rate limited to a maximum of 5,000 traces per month.
+2024년 4월 2일에 가격제가 도입되기 전에 LangSmith에 가입한 경우, 기존 계정을 업그레이드하여 청구를 설정할 수 있는 옵션이 있습니다. 2024년 7월 8일까지 청구를 설정하지 않았다면 현재 계정은 월 최대 5,000개의 추적으로 제한됩니다.
 
-1. Navigate to the [Settings](https://smith.langchain.com/settings) page.
-2. Click **Set up Billing**.
+1. [Settings](https://smith.langchain.com/settings) 페이지로 이동합니다.
+2. **Set up Billing**을 클릭합니다.
 
   ![](/langsmith/images/setup-billing-legacy.png)
 
-3. Enter your credit card information. If you are on a Personal organization, this will add you to the Developer plan. If you are on a shared organization, this will add you to the Plus plan. For more information, refer to the guides for the [Developer](#developer-plan%3A-set-up-billing-on-your-personal-organization) or [Plus](#plus-plan%3A-set-up-billing-on-a-shared-organization) plans respectively, starting at step 2.
-4. Claim free credits as a thank you for being an early LangSmith user.
+3. 신용카드 정보를 입력합니다. 개인 조직에 있는 경우 Developer 플랜에 추가됩니다. 공유 조직에 있는 경우 Plus 플랜에 추가됩니다. 자세한 내용은 각각 2단계부터 시작하는 [Developer](#developer-plan%3A-set-up-billing-on-your-personal-organization) 또는 [Plus](#plus-plan%3A-set-up-billing-on-a-shared-organization) 플랜 가이드를 참조하세요.
+4. 초기 LangSmith 사용자에 대한 감사의 표시로 무료 크레딧을 청구합니다.
 
-## Update your information
+## 정보 업데이트하기 {#update-your-information}
 
-To update business information for your LangSmith organization, head to the [Usage and Billing](https://smith.langchain.com/settings/payments) page under **Settings** and click on the [Plans and Billing](https://smith.langchain.com/settings/payments?tab=2) tab.
+LangSmith 조직의 비즈니스 정보를 업데이트하려면 **Settings** 하위의 [Usage and Billing](https://smith.langchain.com/settings/payments) 페이지로 이동하여 [Plans and Billing](https://smith.langchain.com/settings/payments?tab=2) 탭을 클릭하세요.
 
 <Note>
-Business information, tax ID, and invoice email can only be updated for the Plus and Startup plans. Free and Developer plans cannot update this information.
+비즈니스 정보, 세금 ID 및 청구서 이메일은 Plus 및 Startup 플랜에서만 업데이트할 수 있습니다. Free 및 Developer 플랜은 이 정보를 업데이트할 수 없습니다.
 </Note>
 
-### Invoice email
+### 청구서 이메일
 
 ![](/langsmith/images/update-invoice-email.png)
 
-To update the email address for invoices, follow these steps:
+청구서에 대한 이메일 주소를 업데이트하려면 다음 단계를 따르세요:
 
-1. Navigate to the **Plans and Billing** tab.
-2. Locate the section beneath the payment method, where the current invoice email is displayed.
-3. Enter the new email address for invoices in the provided field.
-4. The new email address will be automatically saved.
+1. **Plans and Billing** 탭으로 이동합니다.
+2. 결제 수단 아래의 섹션에서 현재 청구서 이메일이 표시되는 위치를 찾습니다.
+3. 제공된 필드에 청구서를 받을 새 이메일 주소를 입력합니다.
+4. 새 이메일 주소가 자동으로 저장됩니다.
 
-You will receive all future invoices to the updated email address.
+이후 모든 청구서는 업데이트된 이메일 주소로 받게 됩니다.
 
-### Business information and tax ID
+### 비즈니스 정보 및 세금 ID
 
 <Note>
-In certain jurisdictions, LangSmith is required to collect sales tax. If you are a business, providing your tax ID may qualify you for a sales tax exemption.
+특정 관할 지역에서는 LangSmith가 판매세를 징수해야 합니다. 비즈니스인 경우 세금 ID를 제공하면 판매세 면제 자격을 얻을 수 있습니다.
 </Note>
 
 ![](/langsmith/images/update-business-info.png)
 
-To update your organization's business information, follow these steps:
+조직의 비즈니스 정보를 업데이트하려면 다음 단계를 따르세요:
 
-1. Navigate to the **Plans and Billing** tab.
-2. Below the invoice email section, you will find a checkbox labeled **Business**.
-3. Check the **Business** checkbox if your organization belongs to a business.
-4. A business information section will appear, allowing you to enter or update the following details:
-   - Business Name
-   - Address
-   - Tax ID for applicable jurisdictions
-5. A Tax ID field will appear for applicable jurisdictions after you select a country.
-6. After entering the necessary information, click the **Save** button to save your changes.
+1. **Plans and Billing** 탭으로 이동합니다.
+2. 청구서 이메일 섹션 아래에 **Business**라는 레이블이 있는 체크박스가 있습니다.
+3. 조직이 비즈니스에 속한 경우 **Business** 체크박스를 선택합니다.
+4. 비즈니스 정보 섹션이 나타나며 다음 세부 정보를 입력하거나 업데이트할 수 있습니다:
+   - 비즈니스 이름
+   - 주소
+   - 해당 관할 지역의 세금 ID
+5. 국가를 선택하면 해당 관할 지역에 대한 세금 ID 필드가 나타납니다.
+6. 필요한 정보를 입력한 후 **Save** 버튼을 클릭하여 변경 사항을 저장합니다.
 
-This ensures that your business information is up-to-date and accurate for billing and tax purposes.
+이를 통해 청구 및 세금 목적으로 비즈니스 정보를 최신 상태로 정확하게 유지할 수 있습니다.
 
-## Optimize your tracing spend
+## 추적 비용 최적화하기 {#optimize-your-tracing-spend}
 
 <Check>
-You may find it helpful to read the following pages, before continuing with this section on optimizing your tracing spend:
+추적 비용 최적화에 대한 이 섹션을 계속하기 전에 다음 페이지를 읽어보는 것이 도움이 될 수 있습니다:
 
-- [Data Retention Conceptual Docs](/langsmith/administration-overview#data-retention)
-- [Usage Limiting Conceptual Docs](/langsmith/administration-overview#usage-limits)
+- [데이터 보존 개념 문서](/langsmith/administration-overview#data-retention)
+- [사용량 제한 개념 문서](/langsmith/administration-overview#usage-limits)
 </Check>
 
 <Note>
-Some of the features mentioned in this guide are not currently available on Enterprise plan due to its custom nature of billing. If you are on the Enterprise plan and have questions about cost optimization, reach out to your sales rep or [support@langchain.dev](mailto:support@langchain.dev).
+이 가이드에서 언급된 일부 기능은 Enterprise 플랜의 맞춤형 청구 특성으로 인해 현재 사용할 수 없습니다. Enterprise 플랜을 사용 중이고 비용 최적화에 대한 질문이 있으시면 영업 담당자 또는 [support@langchain.dev](mailto:support@langchain.dev)에 문의하세요.
 </Note>
 
-You will learn how to optimize existing spend and prevent future overspend in LangSmith, which includes:
+LangSmith에서 기존 비용을 최적화하고 향후 초과 지출을 방지하는 방법을 배우게 됩니다. 여기에는 다음이 포함됩니다:
 
-1. Reducing existing costs with data retention policies.
-2. Preventing future overspend with usage limits.
+1. 데이터 보존 정책으로 기존 비용 절감하기.
+2. 사용량 제한으로 향후 초과 지출 방지하기.
 
-This tutorial will use an existing LangSmith organization with high usage. You can transfer the concepts from this example to your own organization. The example organization has three [workspaces](/langsmith/administration-overview#workspaces), one for each deployment stage (`Dev`, `Staging`, and `Prod`):
+이 튜토리얼은 사용량이 많은 기존 LangSmith 조직을 사용합니다. 이 예제의 개념을 자신의 조직에 적용할 수 있습니다. 예제 조직에는 각 배포 단계(`Dev`, `Staging`, `Prod`)에 대한 세 개의 [워크스페이스](/langsmith/administration-overview#workspaces)가 있습니다:
 
 ![](/langsmith/images/workspaces.png)
 
-### Understand your current usage
+### 현재 사용량 이해하기
 
-The first step of any optimization process is to understand current usage. LangSmith provides two ways to do this: [Usage graph](#usage-graph) and [Invoices](#invoices).
+모든 최적화 프로세스의 첫 번째 단계는 현재 사용량을 이해하는 것입니다. LangSmith는 이를 위해 두 가지 방법을 제공합니다: [사용량 그래프](#usage-graph) 및 [청구서](#invoices).
 
-#### Usage graph
+#### 사용량 그래프
 
-The usage graph lets you examine how much of each usage-based pricing metric you have consumed. It does not directly show spend (which you will review later in the draft invoice).
+사용량 그래프를 통해 각 사용량 기반 가격 측정항목을 얼마나 소비했는지 확인할 수 있습니다. 지출액을 직접 표시하지는 않습니다(나중에 초안 청구서에서 검토합니다).
 
-You can navigate to the usage graph under **Settings** -> **Usage and Billing** -> **Usage Graph**.
+**Settings** -> **Usage and Billing** -> **Usage Graph** 하위에서 사용량 그래프로 이동할 수 있습니다.
 
 ![](/langsmith/images/usage-graph.png)
 
-This graph shows that there are two usage metrics that LangSmith charges for:
+이 그래프는 LangSmith가 요금을 청구하는 두 가지 사용량 측정항목이 있음을 보여줍니다:
 
-- LangSmith Traces (Base Charge): tracks all traces that you send to LangSmith.
-- LangSmith Traces (Extended Data Retention Upgrades): tracks all traces that also have our Extended 400 Day Data Retention.
+- LangSmith Traces (Base Charge): LangSmith로 전송하는 모든 추적을 추적합니다.
+- LangSmith Traces (Extended Data Retention Upgrades): Extended 400 Day Data Retention이 적용된 모든 추적을 추적합니다.
 
-For more details, refer to the [data retention conceptual docs](/langsmith/administration-overview#data-retention). Notice that these graphs look identical, which you will review later in the tutorial.
+자세한 내용은 [데이터 보존 개념 문서](/langsmith/administration-overview#data-retention)를 참조하세요. 이 그래프들이 동일하게 보인다는 점에 유의하세요. 이는 튜토리얼의 뒷부분에서 검토하게 됩니다.
 
-LangSmith Traces usage is measured per workspace, because workspaces often represent development environments (as in the example), or teams within an organization. As a LangSmith administrator, you may want to understand spend granularly per each of these units. In this case where you just want to cut spend, you can focus on the environment responsible for the majority of costs first for the greatest savings.
+LangSmith Traces 사용량은 워크스페이스별로 측정됩니다. 워크스페이스는 (예제에서와 같이) 개발 환경 또는 조직 내의 팀을 나타내는 경우가 많기 때문입니다. LangSmith 관리자는 이러한 각 단위별로 세밀하게 지출을 이해하고 싶을 수 있습니다. 단순히 지출을 줄이려는 경우, 가장 큰 비용 절감을 위해 비용의 대부분을 차지하는 환경에 먼저 집중할 수 있습니다.
 
-#### Invoices
+#### 청구서
 
-You understand what usage looks like in terms of traces, but you now need to translate that into spend. To do so, navigate to the **Invoices** tab. The first invoice that will appear on screen is a draft of your current month's invoice, which shows your running spend thus far this month.
+추적 측면에서 사용량이 어떻게 보이는지 이해했지만, 이제 이를 지출로 변환해야 합니다. 이를 위해 **Invoices** 탭으로 이동하세요. 화면에 나타나는 첫 번째 청구서는 현재 월의 초안 청구서로, 이번 달 지금까지의 누적 지출을 보여줍니다.
 
 ![](/langsmith/images/invoice-investigation-v2.gif)
 
 <Note>
-LangSmith's Usage Graph and Invoice use the term `tenant_id` to refer to a workspace ID. They are interchangeable.
+LangSmith의 사용량 그래프 및 청구서는 워크스페이스 ID를 참조하기 위해 `tenant_id`라는 용어를 사용합니다. 이들은 서로 바꿔 사용할 수 있습니다.
 </Note>
 
-In the GIF, you'll see that the charges for LangSmith Traces are broken up by "tenant\_id" (i.e., workspace ID), which means you can track tracing spend on each of the workspaces. In the first few days of June, the vast majority of the total spend of roughly $2,000 is in the production workspace. Further, the majority of spend in that workspace was on extended data retention trace upgrades.
+GIF에서 LangSmith Traces에 대한 요금이 "tenant\_id"(즉, 워크스페이스 ID)별로 구분되어 있음을 확인할 수 있습니다. 이는 각 워크스페이스에서 추적 지출을 추적할 수 있음을 의미합니다. 6월 첫 며칠 동안 약 $2,000의 총 지출 중 대부분은 프로덕션 워크스페이스에서 발생했습니다. 또한 해당 워크스페이스의 지출 대부분은 확장 데이터 보존 추적 업그레이드에서 발생했습니다.
 
-These upgrades occur for two reasons:
+이러한 업그레이드는 두 가지 이유로 발생합니다:
 
-1. You use extended data retention tracing, which means by default your traces are retained for 400 days.
-2. You use base data retention tracing and use a feature that automatically extends the data retention of a trace. ([Refer to the Auto-Upgrade conceptual docs](/langsmith/administration-overview#data-retention).)
+1. 확장 데이터 보존 추적을 사용하는 경우, 기본적으로 추적이 400일 동안 보존됩니다.
+2. 기본 데이터 보존 추적을 사용하고 추적의 데이터 보존을 자동으로 확장하는 기능을 사용합니다. ([Auto-Upgrade 개념 문서 참조](/langsmith/administration-overview#data-retention).)
 
-Given that the number of total traces per day is equal to the number of extended retention traces per day, it's most likely the case that this organization is using extended data retention tracing everywhere. As a result, start by optimizing the retention settings.
+하루당 총 추적 수가 하루당 확장 보존 추적 수와 같다는 점을 고려하면, 이 조직은 모든 곳에서 확장 데이터 보존 추적을 사용하고 있을 가능성이 높습니다. 따라서 보존 설정을 최적화하는 것부터 시작하세요.
 
-### Optimization 1: manage data retention
+### 최적화 1: 데이터 보존 관리하기
 
-LangSmith charges differently based on a trace's [data retention](/langsmith/administration-overview#data-retention), where short-lived traces are an order of magnitude less expensive than ones that last for a long time. In this optimization, you'll learn how to get optimal settings for data retention without sacrificing historical observability, and see the effect it has on the bill.
+LangSmith는 추적의 [데이터 보존](/langsmith/administration-overview#data-retention)에 따라 다르게 요금을 부과합니다. 단기 추적은 장기간 지속되는 추적보다 훨씬 저렴합니다. 이 최적화에서는 기록 관찰성을 희생하지 않으면서 데이터 보존에 대한 최적 설정을 얻는 방법과 이것이 청구서에 미치는 영향을 알아봅니다.
 
-#### Change org level retention defaults for new projects
+#### 새 프로젝트에 대한 조직 수준 보존 기본값 변경하기
 
-Navigate to the **Usage configuration** tab, and look at the organization level retention settings. Modifying this setting affects all **new projects** that are created going forward in all workspaces in the organizaton.
+**Usage configuration** 탭으로 이동하여 조직 수준 보존 설정을 확인하세요. 이 설정을 수정하면 조직의 모든 워크스페이스에서 앞으로 생성되는 모든 **새 프로젝트**에 영향을 줍니다.
 
 <Note>
-For backwards compatibility, older organizations may have this defaulted to **Extended**. Organizations created after June 3rd, 2024 have this defaulted to **Base**.
+하위 호환성을 위해 오래된 조직은 기본값이 **Extended**로 설정되어 있을 수 있습니다. 2024년 6월 3일 이후에 생성된 조직은 기본값이 **Base**로 설정됩니다.
 </Note>
 
 ![](/langsmith/images/p1orgretention-v2.png)
 
-#### Change project level retention defaults
+#### 프로젝트 수준 보존 기본값 변경하기
 
-Data retention settings are adjustable per project on the tracing project page.
+데이터 보존 설정은 추적 프로젝트 페이지에서 프로젝트별로 조정할 수 있습니다.
 
-Navigate to **Projects** > ***Your project name*** > Select **Retention** and modify the default retention of the project to **Base**. This will only affect retention (and pricing) for **traces going forward**.
+**Projects** > ***프로젝트 이름*** > **Retention** 선택으로 이동하여 프로젝트의 기본 보존을 **Base**로 수정하세요. 이는 **향후 추적**에 대한 보존(및 가격 책정)에만 영향을 미칩니다.
 
 ![](/langsmith/images/p1projectretention.png)
 
-#### Apply extended data retention to a percentage of traces
+#### 추적의 일정 비율에 확장 데이터 보존 적용하기
 
-You may not want all traces to expire after 14 days. You can automatically extend the retention of traces that match some criteria by creating an [automation rule](/langsmith/rules). You might want to apply extended data retention to specific types of traces, such as:
+모든 추적이 14일 후에 만료되기를 원하지 않을 수 있습니다. [자동화 규칙](/langsmith/rules)을 생성하여 특정 기준과 일치하는 추적의 보존을 자동으로 확장할 수 있습니다. 다음과 같은 특정 유형의 추적에 확장 데이터 보존을 적용할 수 있습니다:
 
-* 10% of all traces: For general analysis or analyzing trends long term.
-* Errored traces: To investigate and debug issues thoroughly.
-* Traces with specific metadata: For long-term examination of particular features or user flows.
+* 전체 추적의 10%: 일반 분석 또는 장기 추세 분석을 위해.
+* 오류가 발생한 추적: 문제를 철저히 조사하고 디버그하기 위해.
+* 특정 메타데이터가 있는 추적: 특정 기능 또는 사용자 플로우를 장기적으로 검토하기 위해.
 
-To configure this:
+이를 구성하려면:
 
-1. Navigate to **Projects** > ***Your project name*** > Select **+ New** > Select **New Automation**.
-2. Name your rule and optionally apply filters or a sample rate. For more information on configuring filters, refer to [filtering techniques](/langsmith/filter-traces-in-application#filter-operators).
+1. **Projects** > ***프로젝트 이름*** > **+ New** 선택 > **New Automation** 선택으로 이동합니다.
+2. 규칙의 이름을 지정하고 선택적으로 필터 또는 샘플 비율을 적용합니다. 필터 구성에 대한 자세한 내용은 [필터링 기술](/langsmith/filter-traces-in-application#filter-operators)을 참조하세요.
 
 <Note>
-When an automation rule matches any [run](/langsmith/observability-concepts#runs) within a [trace](/langsmith/observability-concepts#traces), then all runs within the trace are upgraded to be retained for 400 days.
+자동화 규칙이 [추적](/langsmith/observability-concepts#traces) 내의 [실행](/langsmith/observability-concepts#runs)과 일치하면 추적 내의 모든 실행이 400일 동안 보존되도록 업그레이드됩니다.
 </Note>
 
-For example, this is the expected configuration to keep 10% of all traces for extended data retention:
+예를 들어, 다음은 전체 추적의 10%를 확장 데이터 보존을 위해 유지하는 예상 구성입니다:
 
 ![](/langsmith/images/P2SampleTraces.png)
 
-If you want to keep a subset of traces for **longer than 400 days** for data collection purposes, you can create another run rule that sends some runs to a dataset of your choosing. A dataset allows you to store the trace inputs and outputs (e.g., as a key-value dataset), and will persist indefinitely, even after the trace gets deleted.
+데이터 수집 목적으로 추적의 하위 집합을 **400일 이상** 유지하려면, 일부 실행을 선택한 데이터셋으로 보내는 다른 실행 규칙을 생성할 수 있습니다. 데이터셋을 사용하면 추적 입력 및 출력을 저장할 수 있으며(예: 키-값 데이터셋으로), 추적이 삭제된 후에도 무기한 유지됩니다.
 
-#### See results after 7 days
+#### 7일 후 결과 확인하기
 
-While the total amount of traces per day stayed the same, the extended data retention traces was cut heavily. In the invoice, the spend reduced to roughly \$900 in the last 7 days, as opposed to $2,000 in the previous 4. That's a cost reduction of nearly 75% per day.
+하루당 총 추적량은 동일하게 유지되었지만, 확장 데이터 보존 추적은 크게 감소했습니다. 청구서에서 지출은 이전 4일의 $2,000에서 지난 7일 동안 약 \$900으로 감소했습니다. 이는 하루당 약 75%의 비용 절감입니다.
 
 ![](/langsmith/images/p1endresultinvoice-v2.png)
 
-### Optimization 2: limit usage
+### 최적화 2: 사용량 제한하기
 
-In the previous section, you managed data retention settings to **optimize existing spend**. In this section, you will use usage limits to **prevent future overspend**.
+이전 섹션에서는 **기존 지출을 최적화**하기 위해 데이터 보존 설정을 관리했습니다. 이 섹션에서는 사용량 제한을 사용하여 **향후 초과 지출을 방지**합니다.
 
-LangSmith has two usage limits: total traces and extended retention traces. These correspond to the two metrics tracked on the [usage graph](#usage-graph). You can use these in tandem to have granular control over spend.
+LangSmith에는 두 가지 사용량 제한이 있습니다: 총 추적 및 확장 보존 추적. 이는 [사용량 그래프](#usage-graph)에서 추적되는 두 가지 측정항목에 해당합니다. 이들을 함께 사용하여 지출을 세밀하게 제어할 수 있습니다.
 
-To set limits, navigate back to **Settings** -> **Usage and Billing** -> **Usage configuration**. There is a table at the bottom of the page that lets you set usage limits per workspace. For each workspace, the two limits appear, along with a cost estimate:
+제한을 설정하려면 **Settings** -> **Usage and Billing** -> **Usage configuration**으로 다시 이동하세요. 페이지 하단에는 워크스페이스별로 사용량 제한을 설정할 수 있는 표가 있습니다. 각 워크스페이스에 대해 두 가지 제한이 비용 추정과 함께 나타납니다:
 
 ![](/langsmith/images/p2usagelimitsempty-v2.png)
 
-Start by setting limits on production usage, since that is where the majority of spend comes from.
+지출의 대부분이 발생하는 프로덕션 사용량에 대한 제한을 설정하는 것부터 시작하세요.
 
-#### Set a good total traces limit
+#### 적절한 총 추적 제한 설정하기
 
-Picking the right total traces limit depends on the expected load of traces that you will send to LangSmith. It is important to consider potential growth before setting a limit. For example:
+올바른 총 추적 제한을 선택하는 것은 LangSmith로 전송할 예상 추적 부하에 따라 달라집니다. 제한을 설정하기 전에 잠재적인 성장을 고려하는 것이 중요합니다. 예를 들어:
 
-- **Current Load**: The gen AI application is called between 1.2-1.5 times per second, and each API request has a trace associated with it, meaning it logs around 100,000-130,000 traces per day.
-- **Expected Growth in Load**: The expectation is that this will double in size in the near future.
+- **현재 부하**: 생성형 AI 애플리케이션은 초당 1.2-1.5회 호출되며, 각 API 요청에는 관련된 추적이 있으므로 하루에 약 100,000-130,000개의 추적을 기록합니다.
+- **예상 부하 증가**: 가까운 미래에 이것이 두 배로 증가할 것으로 예상됩니다.
 
-From these assumptions, you can calculate an approximate limit:
+이러한 가정에서 대략적인 제한을 계산할 수 있습니다:
 
 ```python
 limit = current_load_per_day * expected_growth * days/month
@@ -245,39 +245,39 @@ limit = current_load_per_day * expected_growth * days/month
       = 7,800,000 traces / month
 ```
 
-Click on the edit icon on the right side of the table for the **Prod** row to enter the limit.
+제한을 입력하려면 **Prod** 행의 표 오른쪽에 있는 편집 아이콘을 클릭하세요.
 
 ![](/langsmith/images/p2alllimitonly-v2.png)
 
 <Note>
-When set without the extended data retention traces limit, the maximum cost estimator assumes that all traces are using extended data retention.
+확장 데이터 보존 추적 제한 없이 설정하면 최대 비용 추정기는 모든 추적이 확장 데이터 보존을 사용한다고 가정합니다.
 </Note>
 
-#### Cut maximum spend with an extended data retention limit
+#### 확장 데이터 보존 제한으로 최대 지출 줄이기
 
-From [Optimization 1](#optimization-1-manage-data-retention), you learned that the easiest way to cut cost was through managing data retention. The same is true for limits. If you only want to keep roughly 10% of traces to be around more than 14 days, you can set a limit on the maximum high retention traces you can keep. This would result in `.10 * 7,800,000 = 780,000`.
+[최적화 1](#optimization-1-manage-data-retention)에서 비용을 절감하는 가장 쉬운 방법은 데이터 보존 관리를 통한 것임을 배웠습니다. 제한에서도 마찬가지입니다. 추적의 약 10%만 14일 이상 유지하려면 유지할 수 있는 최대 높은 보존 추적에 대한 제한을 설정할 수 있습니다. 이는 `.10 * 7,800,000 = 780,000`이 됩니다.
 
 ![](/langsmith/images/p2bothlimits-v2.png)
 
-The maximum cost is cut from \~40k per month to \~7.5k per month, because you no longer allow as many expensive data retention upgrades. This ensures that new users on the platform will not accidentally cause cost to balloon.
+최대 비용은 월 ~40k에서 월 ~7.5k로 감소합니다. 더 이상 많은 비용이 드는 데이터 보존 업그레이드를 허용하지 않기 때문입니다. 이를 통해 플랫폼의 신규 사용자가 실수로 비용이 급증하는 것을 방지할 수 있습니다.
 
 <Note>
-The extended data retention limit can cause features other than traces to stop working once reached. If you plan to use this feature, read more about its [functionality and side effects](/langsmith/administration-overview#side-effects-of-extended-data-retention-traces-limit).
+확장 데이터 보존 제한에 도달하면 추적 이외의 기능도 작동을 멈출 수 있습니다. 이 기능을 사용하려는 경우 [기능 및 부작용](/langsmith/administration-overview#side-effects-of-extended-data-retention-traces-limit)에 대해 자세히 읽어보세요.
 </Note>
 
-#### Set dev/staging limits and view total spent limit across workspaces
+#### dev/staging 제한 설정 및 워크스페이스 전체의 총 지출 제한 보기
 
-Following a similar logic for the `dev` and `staging` environments, you can set limits at 10% of the production limit on usage for each workspace.
+`dev` 및 `staging` 환경에 대해 유사한 논리를 따라 각 워크스페이스의 사용량에 대해 프로덕션 제한의 10%로 제한을 설정할 수 있습니다.
 
-While this works with this usage pattern, setting good dev and staging limits may vary depending on your use case with LangSmith. For example, if you run evals as part of CI/CD in dev or staging, you may want to be more flexible with your usage limits to avoid test failures.
+이것은 이 사용 패턴에서 작동하지만, 좋은 dev 및 staging 제한을 설정하는 것은 LangSmith 사용 사례에 따라 다를 수 있습니다. 예를 들어, dev 또는 staging에서 CI/CD의 일부로 평가를 실행하는 경우 테스트 실패를 피하기 위해 사용량 제한을 더 유연하게 설정하고 싶을 수 있습니다.
 
-With the limits set, LangSmith shows a maximum spend estimate across all workspaces:
+제한이 설정되면 LangSmith는 모든 워크스페이스에 대한 최대 지출 추정치를 표시합니다:
 
 ![](/langsmith/images/p2totalspendlimits-v2.png)
 
-You can use the cost estimate to plan for your invoice total.
+비용 추정치를 사용하여 총 청구서를 계획할 수 있습니다.
 
-### Summary
+### 요약
 
-If you have questions about further optimizing your spend, please reach out to [support@langchain.dev](mailto:support@langchain.dev).
+지출을 추가로 최적화하는 것에 대한 질문이 있으시면 [support@langchain.dev](mailto:support@langchain.dev)로 문의해 주세요.
 

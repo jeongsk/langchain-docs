@@ -1,91 +1,91 @@
 ---
-title: Filter traces
-sidebarTitle: Filter traces
+title: 트레이스 필터링
+sidebarTitle: 트레이스 필터링
 ---
 
-<Tip>**Recommended reading**: It might be helpful to read the [Conceptual guide on tracing](/langsmith/observability-concepts) to gain familiarity with the concepts mentioned on this page.</Tip>
+<Tip>**추천 자료**: 이 페이지에서 언급되는 개념에 익숙해지기 위해 [트레이싱 개념 가이드](/langsmith/observability-concepts)를 먼저 읽어보시는 것이 도움이 될 수 있습니다.</Tip>
 
-Tracing projects can contain a significant amount of data. Filters are used for effectively navigating and analyzing this data, allowing you to:
+트레이싱 프로젝트에는 상당한 양의 데이터가 포함될 수 있습니다. 필터는 이러한 데이터를 효과적으로 탐색하고 분석하는 데 사용되며, 다음과 같은 작업을 가능하게 합니다:
 
-- **Have focused investigations**: Quickly narrow down to specific runs for ad-hoc analysis
-- **Debug and analyze**: Identify and examine errors, failed runs, and performance bottlenecks
+- **집중적인 조사**: 임시 분석을 위해 특정 실행으로 신속하게 범위를 좁힘
+- **디버그 및 분석**: 오류, 실패한 실행 및 성능 병목 지점을 식별하고 검토함
 
-This page contains a series of guides for how to filter runs in a tracing project. If you are programmatically exporting runs for analysis via the [API](https://api.smith.langchain.com/redoc#tag/run/operation/query_runs_api_v1_runs_query_post) or [SDK](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.list_runs), please refer to the [exporting traces guide](./export-traces) for more information.
+이 페이지에는 트레이싱 프로젝트에서 실행을 필터링하는 방법에 대한 일련의 가이드가 포함되어 있습니다. [API](https://api.smith.langchain.com/redoc#tag/run/operation/query_runs_api_v1_runs_query_post) 또는 [SDK](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.list_runs)를 통해 프로그래밍 방식으로 실행을 내보내 분석하는 경우, 자세한 정보는 [트레이스 내보내기 가이드](./export-traces)를 참조하세요.
 
-## Creating and Applying Filters
+## 필터 생성 및 적용
 
-### Filtering by run attributes
+### 실행 속성으로 필터링
 
-There are two ways to filter runs in a tracing project:
+트레이싱 프로젝트에서 실행을 필터링하는 방법은 두 가지가 있습니다:
 
-1. **Filters**: Located towards the top-left of the tracing projects page. This is where you construct and manage detailed filter criteria.
+1. **필터**: 트레이싱 프로젝트 페이지의 왼쪽 상단에 위치합니다. 여기에서 상세한 필터 기준을 구성하고 관리할 수 있습니다.
 
 ![Filtering](/langsmith/images/filter.png)
 
-2. **Filter Shortcuts**: Positioned on the right sidebar of the tracing projects page. The filter shortcuts bar provides quick access to filters based on the most frequently occurring attributes in your project's runs.
+2. **필터 바로가기**: 트레이싱 프로젝트 페이지의 오른쪽 사이드바에 위치합니다. 필터 바로가기 막대는 프로젝트 실행에서 가장 빈번하게 나타나는 속성을 기반으로 필터에 빠르게 접근할 수 있도록 합니다.
 
 ![Filter Shortcuts](/langsmith/images/filter-shortcuts.png)
 
 <Info>
-**Default filter**
+**기본 필터**
 
-By default, the `IsTrace` is `true` filter is applied. This displays only top-level traces. Removing this filter will show all runs, including intermediate spans, in the project.
+기본적으로 `IsTrace` is `true` 필터가 적용됩니다. 이는 최상위 레벨 트레이스만 표시합니다. 이 필터를 제거하면 프로젝트의 중간 스팬을 포함한 모든 실행이 표시됩니다.
 </Info>
 
-### Filtering by time range
+### 시간 범위로 필터링
 
-In addition to filtering by run attributes, you can also filter runs within a specific time range. This option is available towards the top-left of the tracing projects page.
+실행 속성으로 필터링하는 것 외에도, 특정 시간 범위 내의 실행을 필터링할 수 있습니다. 이 옵션은 트레이싱 프로젝트 페이지의 왼쪽 상단에서 사용할 수 있습니다.
 
 ![Filtering on time](/langsmith/images/filter-time.png)
 
-### Filter operators
+### 필터 연산자
 
-The available filter operators depend on the data type of the attribute you are filtering on. Here's an overview of common operators:
+사용 가능한 필터 연산자는 필터링하려는 속성의 데이터 타입에 따라 다릅니다. 일반적인 연산자의 개요는 다음과 같습니다:
 
-- **is**: Exact match on the filter value
-- **is not**: Negative match on the filter value
-- **contains**: Partial match on the filter value
-- **does not contain**: Negative partial match on the filter value
-- **is one of**: Match on any of the values in the list
-- `>` / `<`: Available for numeric fields
+- **is**: 필터 값과 정확히 일치
+- **is not**: 필터 값과 일치하지 않음
+- **contains**: 필터 값과 부분적으로 일치
+- **does not contain**: 필터 값과 부분적으로 일치하지 않음
+- **is one of**: 목록의 값 중 하나와 일치
+- `>` / `<`: 숫자 필드에 사용 가능
 
-## Specific Filtering Techniques
+## 특정 필터링 기법
 
-### Filter for intermediate runs (spans)
+### 중간 실행(스팬) 필터링
 
-In order to filter for intermediate runs (spans), you first need to remove the default `IsTrace` is `true` filter. For example, you would do this if you wanted to filter by `run name` for sub runs or filter by `run type`.
+중간 실행(스팬)을 필터링하려면 먼저 기본 `IsTrace` is `true` 필터를 제거해야 합니다. 예를 들어, 하위 실행의 `run name`으로 필터링하거나 `run type`으로 필터링하려는 경우 이 작업을 수행합니다.
 
-Run metadata and tags are also powerful to filter on. These rely on good tagging across all parts of your pipeline. To learn more, you can check out [this guide](./add-metadata-tags).
+실행 메타데이터와 태그도 필터링에 강력한 도구입니다. 이는 파이프라인의 모든 부분에 걸쳐 적절한 태깅에 의존합니다. 자세한 내용은 [이 가이드](./add-metadata-tags)를 참조하세요.
 
-### Filter based on inputs and outputs
+### 입력 및 출력 기반 필터링
 
-You can filter runs based on the content in the inputs and outputs of the run.
+실행의 입력 및 출력 내용을 기반으로 실행을 필터링할 수 있습니다.
 
-To filter either inputs or outputs, you can use the `Full-Text Search` filter which will match keywords in either field. For more targeted search, you can use the `Input` or `Output` filters which will only match content based on the respective field.
+입력 또는 출력을 필터링하려면 두 필드 중 하나에서 키워드를 일치시키는 `Full-Text Search` 필터를 사용할 수 있습니다. 더 타겟팅된 검색을 위해서는 각 필드를 기반으로만 내용을 일치시키는 `Input` 또는 `Output` 필터를 사용할 수 있습니다.
 
 <Note>
-For performance, we index up to 250 characters of data for full-text search. If your search query exceeds this limit, we recommend using [Input/Output key-value search](/langsmith/filter-traces-in-application#filter-based-on-input-%2F-output-key-value-pairs) instead.
+성능을 위해 전체 텍스트 검색을 위해 최대 250자의 데이터를 인덱싱합니다. 검색 쿼리가 이 제한을 초과하는 경우, 대신 [입력/출력 키-값 검색](/langsmith/filter-traces-in-application#filter-based-on-input-%2F-output-key-value-pairs)을 사용하는 것을 권장합니다.
 </Note>
 
-You can also specify multiple matches, either by including multiple terms separated by whitespace, or adding multiple filters - which will try to match all terms provided.
+공백으로 구분된 여러 용어를 포함하거나 여러 필터를 추가하여 여러 일치 항목을 지정할 수도 있습니다. 이렇게 하면 제공된 모든 용어를 일치시키려고 시도합니다.
 
-Note that keyword search is done by splitting the text and finding any partial matches on the search keywords, so it is not done in specific order. We exclude common stop words from the search (from the nltk stop word list along with a few other common JSON keywords).
+키워드 검색은 텍스트를 분할하고 검색 키워드와 부분적으로 일치하는 항목을 찾는 방식으로 수행되므로 특정 순서로 수행되지 않습니다. 검색에서 일반적인 불용어를 제외합니다(nltk 불용어 목록과 몇 가지 다른 일반적인 JSON 키워드 포함).
 
 ![Filtering](/langsmith/images/filter-full-text.png)
 
-Based on the filters above, the system will search for `python` and `tensorflow` in either inputs or outputs, and `embedding` in the inputs along with `fine` and `tune` in the outputs.
+위의 필터를 기반으로 시스템은 입력 또는 출력에서 `python`과 `tensorflow`를 검색하고, 입력에서 `embedding`을, 출력에서 `fine`과 `tune`을 검색합니다.
 
-### Filter based on input / output key-value pairs
+### 입력/출력 키-값 쌍 기반 필터링
 
-In addition to full-text search, you can filter runs based on specific key-value pairs in the inputs and outputs. This allows for more precise filtering, especially when dealing with structured data.
+전체 텍스트 검색 외에도, 입력 및 출력의 특정 키-값 쌍을 기반으로 실행을 필터링할 수 있습니다. 이는 특히 구조화된 데이터를 다룰 때 더 정확한 필터링을 가능하게 합니다.
 
 <Note>
-We index up to 100 unique keys to keep your data organized and searchable. Each key also has a character limit of 250 characters per value. If your data exceeds either of these limits, the text won't be indexed. This helps us ensure fast, reliable performance.
+데이터를 체계적이고 검색 가능하게 유지하기 위해 최대 100개의 고유 키를 인덱싱합니다. 각 키는 값당 250자의 문자 제한도 있습니다. 데이터가 이 제한 중 하나를 초과하면 텍스트가 인덱싱되지 않습니다. 이는 빠르고 안정적인 성능을 보장하는 데 도움이 됩니다.
 </Note>
 
-To filter based on key-value pairs, select the `Input Key` or `Output Key` filter from the filters dropdown.
+키-값 쌍을 기반으로 필터링하려면 필터 드롭다운에서 `Input Key` 또는 `Output Key` 필터를 선택합니다.
 
-For example, to match the following input:
+예를 들어, 다음 입력을 일치시키려면:
 
 ```json
 {
@@ -93,11 +93,11 @@ For example, to match the following input:
 }
 ```
 
-Select `Filters`, `Add Filter` to bring up the filtering options. Then select `Input Key`, enter `input` as the key and enter `What is the capital of France?` as the value.
+`Filters`, `Add Filter`를 선택하여 필터링 옵션을 표시합니다. 그런 다음 `Input Key`를 선택하고 키로 `input`을 입력하고 값으로 `What is the capital of France?`를 입력합니다.
 
 ![Filtering](/langsmith/images/search-kv-input.png)
 
-You can also match nested keys by using dot notation to select the nested key name. For example, to match nested keys in the output:
+점 표기법을 사용하여 중첩된 키 이름을 선택함으로써 중첩된 키를 일치시킬 수도 있습니다. 예를 들어, 출력에서 중첩된 키를 일치시키려면:
 
 ```json
 {
@@ -111,21 +111,21 @@ You can also match nested keys by using dot notation to select the nested key na
 }
 ```
 
-Select `Output Key`, enter `documents.page_content` as the key and enter `The capital of France is Paris` as the value. This will match the nested key `documents.page_content` with the specified value.
+`Output Key`를 선택하고 키로 `documents.page_content`를 입력하고 값으로 `The capital of France is Paris`를 입력합니다. 이렇게 하면 중첩된 키 `documents.page_content`가 지정된 값과 일치합니다.
 
 ![Filtering](/langsmith/images/search-kv-output.png)
 
-You can add multiple key-value filters to create more complex queries. You can also use the `Filter Shortcuts` on the right side to quickly filter based on common key-value pairs as shown below:
+여러 키-값 필터를 추가하여 더 복잡한 쿼리를 만들 수 있습니다. 또한 아래와 같이 일반적인 키-값 쌍을 기반으로 빠르게 필터링하기 위해 오른쪽의 `Filter Shortcuts`를 사용할 수도 있습니다:
 
 ![Filtering](/langsmith/images/search-kv-filter-shortcut.png)
 
-### Example: Filtering for tool calls
+### 예시: 도구 호출 필터링
 
-It's common to want to search for traces that contain specific tool calls. Tool calls are typically indicated in the output of an LLM run. To filter for tool calls, you would use the `Output Key` filter.
+특정 도구 호출을 포함하는 트레이스를 검색하고자 하는 것은 일반적입니다. 도구 호출은 일반적으로 LLM 실행의 출력에 표시됩니다. 도구 호출을 필터링하려면 `Output Key` 필터를 사용합니다.
 
-While this example will show you how to filter for tool calls, the same logic can be applied to filter for any key-value pair in the output.
+이 예시는 도구 호출을 필터링하는 방법을 보여주지만, 출력의 모든 키-값 쌍을 필터링하는 데 동일한 논리를 적용할 수 있습니다.
 
-In this case, let's assume this is the output you want to filter for:
+이 경우, 필터링하려는 출력이 다음과 같다고 가정하겠습니다:
 
 ```json
 {
@@ -166,9 +166,9 @@ In this case, let's assume this is the output you want to filter for:
 }
 ```
 
-With the example above, the KV search will map each nested JSON path as a key-value pair that you can use to search and filter.
+위의 예시에서 KV 검색은 각 중첩된 JSON 경로를 검색 및 필터링에 사용할 수 있는 키-값 쌍으로 매핑합니다.
 
-LangSmith will break it into the following set of searchable key-value pairs:
+LangSmith는 다음과 같은 검색 가능한 키-값 쌍 세트로 분해합니다:
 
 | Key                                                | Value                                                                        |
 | -------------------------------------------------- | ---------------------------------------------------------------------------- |
@@ -184,118 +184,118 @@ LangSmith will break it into the following set of searchable key-value pairs:
 | `generations.message.kwargs.tool_calls.type`       | `tool_call`                                                                  |
 | `type`                                             | `LLMResult`                                                                  |
 
-To search for a specific tool call, you can use the following Output Key search while removing the root runs filter:
+특정 도구 호출을 검색하려면 루트 실행 필터를 제거하면서 다음 Output Key 검색을 사용할 수 있습니다:
 
 `generations.message.kwargs.tool_calls.name` = `Plan`
 
-This will match root and non-root runs where the `tool_calls` name is `Plan`.
+이렇게 하면 `tool_calls` 이름이 `Plan`인 루트 및 비루트 실행이 일치합니다.
 
 ![Filtering](/langsmith/images/search-kv-tool.png)
 
-### Negative filtering on key-value pairs
+### 키-값 쌍의 부정 필터링
 
-Different types of negative filtering can be applied to `Metadata`, `Input Key`, and `Output Key` fields to exclude specific runs from your results.
+결과에서 특정 실행을 제외하기 위해 `Metadata`, `Input Key`, `Output Key` 필드에 다양한 유형의 부정 필터링을 적용할 수 있습니다.
 
-For example, to find all runs where the metadata key `phone` is not equal to `1234567890`, set the `Metadata` `Key` operator to `is` and `Key` field to `phone`, then set the `Value` operator to `is not` and the `Value` field to `1234567890`. This will match all runs that have a metadata key `phone` with any value except `1234567890`.
+예를 들어, 메타데이터 키 `phone`이 `1234567890`과 같지 않은 모든 실행을 찾으려면 `Metadata` `Key` 연산자를 `is`로 설정하고 `Key` 필드를 `phone`으로 설정한 다음, `Value` 연산자를 `is not`으로 설정하고 `Value` 필드를 `1234567890`으로 설정합니다. 이렇게 하면 `1234567890`을 제외한 모든 값을 가진 메타데이터 키 `phone`을 포함하는 모든 실행이 일치합니다.
 
 ![Filtering](/langsmith/images/negative-filtering-1.png)
 
-To find runs that don't have a specific metadata key, set the `Key` operator to `is not`. For example, setting the `Key` operator to `is not` with `phone` as the key will match all runs that don't have a `phone` field in their metadata.
+특정 메타데이터 키가 없는 실행을 찾으려면 `Key` 연산자를 `is not`으로 설정합니다. 예를 들어, `Key` 연산자를 `is not`으로 설정하고 키를 `phone`으로 설정하면 메타데이터에 `phone` 필드가 없는 모든 실행이 일치합니다.
 
 ![Filtering](/langsmith/images/negative-filtering-2.png)
 
-You can also filter for runs that neither have a specific key nor a specific value. To find runs where the metadata has neither the key `phone` nor any field with the value `1234567890`, set the `Key` operator to `is not` with key `phone`, and the `Value` operator to `is not` with value `1234567890`.
+특정 키와 특정 값이 모두 없는 실행을 필터링할 수도 있습니다. 메타데이터에 키 `phone`도 없고 값이 `1234567890`인 필드도 없는 실행을 찾으려면 `Key` 연산자를 `is not`으로 설정하고 키를 `phone`으로, `Value` 연산자를 `is not`으로 설정하고 값을 `1234567890`으로 설정합니다.
 
 ![Filtering](/langsmith/images/negative-filtering-3.png)
 
-Finally, you can also filter for runs that do not have a specific key but have a specific value. To find runs where there is no `phone` key but there is a value of `1234567890` for some other key, set the `Key` operator to `is not` with key `phone`, and the `Value` operator to `is` with value `1234567890`.
+마지막으로, 특정 키는 없지만 특정 값은 가진 실행을 필터링할 수도 있습니다. `phone` 키는 없지만 다른 키에 대해 `1234567890` 값이 있는 실행을 찾으려면 `Key` 연산자를 `is not`으로 설정하고 키를 `phone`으로, `Value` 연산자를 `is`로 설정하고 값을 `1234567890`으로 설정합니다.
 
 ![Filtering](/langsmith/images/negative-filtering-4.png)
 
-Note that you can use the `does not contain` operator instead of `is not` to perform a substring match.
+부분 문자열 일치를 수행하려면 `is not` 대신 `does not contain` 연산자를 사용할 수 있습니다.
 
-## Save a filter
+## 필터 저장
 
-Saving filters allows you to store and reuse frequently used filter configurations. Saved filters are specific to a tracing project.
+필터를 저장하면 자주 사용하는 필터 구성을 저장하고 재사용할 수 있습니다. 저장된 필터는 트레이싱 프로젝트에 특정합니다.
 
-#### Save a filter
+#### 필터 저장
 
-In the filter box, click the **Save filter** button after you have constructed your filter. This will bring up a dialog to specify the name and a description of the filter.
+필터를 구성한 후 필터 박스에서 **Save filter** 버튼을 클릭합니다. 필터의 이름과 설명을 지정하는 대화 상자가 표시됩니다.
 
 ![Filtering](/langsmith/images/save-a-filter.png)
 
-#### Use a saved filter
+#### 저장된 필터 사용
 
-After saving a filter, it is available in the filter bar as a quick filter for you to use. If you have more than three saved filters, only two will be displayed directly, with the rest accessible via a "more" menu. You can use the settings icon in the saved filter bar to optionally hide default saved filters.
+필터를 저장한 후에는 필터 바에서 빠른 필터로 사용할 수 있습니다. 저장된 필터가 3개 이상인 경우, 2개만 직접 표시되고 나머지는 "more" 메뉴를 통해 접근할 수 있습니다. 저장된 필터 바의 설정 아이콘을 사용하여 기본 저장된 필터를 선택적으로 숨길 수 있습니다.
 
 ![Filtering](/langsmith/images/selecting-a-filter.png)
 
-#### Update a saved filter
+#### 저장된 필터 업데이트
 
-With the filter selected, make any changes to filter parameters. Then click **Update filter** > **Update** to update the filter.
+필터를 선택한 상태에서 필터 파라미터를 변경합니다. 그런 다음 **Update filter** > **Update**를 클릭하여 필터를 업데이트합니다.
 
-In the same menu, you can also create a new saved filter by clicking **Update filter** > **Create new**.
+동일한 메뉴에서 **Update filter** > **Create new**를 클릭하여 새 저장된 필터를 생성할 수도 있습니다.
 
-#### Delete a saved filter
+#### 저장된 필터 삭제
 
-Click the settings icon in the saved filter bar, and delete a filter using the trash icon.
+저장된 필터 바의 설정 아이콘을 클릭하고 휴지통 아이콘을 사용하여 필터를 삭제합니다.
 
-## Copy a filter
+## 필터 복사
 
-You can copy a constructed filter to share it with colleagues, reuse it later, or query runs programmatically in the [API](https://api.smith.langchain.com/redoc#tag/run/operation/query_runs_api_v1_runs_query_post) or [SDK](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.list_runs).
+구성된 필터를 복사하여 동료와 공유하거나, 나중에 재사용하거나, [API](https://api.smith.langchain.com/redoc#tag/run/operation/query_runs_api_v1_runs_query_post) 또는 [SDK](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.list_runs)에서 프로그래밍 방식으로 실행을 쿼리할 수 있습니다.
 
-In order to copy the filter, you can first create it in the UI. From there, you can click the copy button in the upper right hand corner. If you have constructed tree or trace filters, you can also copy those.
+필터를 복사하려면 먼저 UI에서 필터를 생성합니다. 그런 다음 오른쪽 상단 모서리에 있는 복사 버튼을 클릭할 수 있습니다. 트리 또는 트레이스 필터를 구성한 경우에도 복사할 수 있습니다.
 
-This will give you a string representing the filter in the LangSmith query language. For example: `and(eq(is_root, true), and(eq(feedback_key, "user_score"), eq(feedback_score, 1)))`. For more information on the query language syntax, please refer to [this reference](/langsmith/trace-query-syntax#filter-query-language).
+이렇게 하면 LangSmith 쿼리 언어로 필터를 나타내는 문자열이 제공됩니다. 예: `and(eq(is_root, true), and(eq(feedback_key, "user_score"), eq(feedback_score, 1)))`. 쿼리 언어 구문에 대한 자세한 내용은 [이 참조](/langsmith/trace-query-syntax#filter-query-language)를 확인하세요.
 
 ![Copy Filter](/langsmith/images/copy-filter.png)
 
-## Filtering runs within the trace view
+## 트레이스 뷰 내에서 실행 필터링
 
-You can also apply filters directly within the trace view, which is useful for sifting through traces with a large number of runs. The same filters available in the main runs table view can be applied here.
+트레이스 뷰 내에서 직접 필터를 적용할 수도 있으며, 이는 많은 수의 실행이 있는 트레이스를 검토할 때 유용합니다. 메인 실행 테이블 뷰에서 사용할 수 있는 동일한 필터를 여기에서 적용할 수 있습니다.
 
-By default, only the runs that match the filters will be shown. To see the matched runs within the broader context of the trace tree, switch the view option from "Filtered Only" to "Show All" or "Most relevant".
+기본적으로 필터와 일치하는 실행만 표시됩니다. 트레이스 트리의 더 넓은 컨텍스트 내에서 일치하는 실행을 보려면 뷰 옵션을 "Filtered Only"에서 "Show All" 또는 "Most relevant"로 전환하세요.
 
 ![Filtering within trace view](/langsmith/images/filter-runs-in-trace-view.png)
 
-## Manually specify a raw query in LangSmith query language
+## LangSmith 쿼리 언어로 원시 쿼리 수동 지정
 
-If you have [copied a previously constructed filter](/langsmith/filter-traces-in-application#copy-the-filter), you may want to manually apply this raw query in a future session.
+[이전에 구성된 필터를 복사](/langsmith/filter-traces-in-application#copy-the-filter)한 경우, 향후 세션에서 이 원시 쿼리를 수동으로 적용하고 싶을 수 있습니다.
 
-In order to do this, you can click on **Advanced filters** on the bottom of the filters popover. From there you can paste a raw query into the text box.
+이를 수행하려면 필터 팝오버 하단의 **Advanced filters**를 클릭합니다. 그런 다음 텍스트 상자에 원시 쿼리를 붙여넣을 수 있습니다.
 
-Note that this will add that query to the existing queries, not overwrite it.
+이는 기존 쿼리를 덮어쓰지 않고 해당 쿼리를 기존 쿼리에 추가합니다.
 
 ![Raw Query](/langsmith/images/raw-query.png)
 
-## Use an AI Query to auto-generate a query (Experimental)
+## AI 쿼리를 사용하여 쿼리 자동 생성 (실험적)
 
-Sometimes figuring out the exact query to specify can be difficult! In order to make it easier, we've added an `AI Query` functionality. With this, you can type in the filter you want to construct in natural language and it will convert it into a valid query.
+때로는 지정할 정확한 쿼리를 파악하는 것이 어려울 수 있습니다! 이를 쉽게 하기 위해 `AI Query` 기능을 추가했습니다. 이를 통해 구성하려는 필터를 자연어로 입력하면 유효한 쿼리로 변환됩니다.
 
-For example: "All runs longer than 10 seconds"
+예: "All runs longer than 10 seconds"
 
 ![AI Query](/langsmith/images/ai-query.png)
 
-## Advanced filters
+## 고급 필터
 
-### Filter for intermediate runs (spans) on properties of the root
+### 루트의 속성을 기반으로 중간 실행(스팬) 필터링
 
-A common concept is to filter for intermediate runs which are part of a trace whose root run has some attribute. An example is filtering for intermediate runs of a particular type whose root run has positive (or negative) feedback associated with it.
+일반적인 개념은 루트 실행이 특정 속성을 가진 트레이스의 일부인 중간 실행을 필터링하는 것입니다. 예를 들어, 루트 실행에 긍정적(또는 부정적) 피드백이 연결된 특정 유형의 중간 실행을 필터링하는 것입니다.
 
-In order to do this, first set up a filter for intermediate runs (per the above section). After that, you can then add another filter rule. You can then click the `Advanced Filters` link all the way at the bottom of the filter. This will open up a new modal where you can add `Trace filters`. These filters will apply to the traces of all the parent runs of the individual runs you've already filtered for.
+이를 수행하려면 먼저 중간 실행에 대한 필터를 설정합니다(위의 섹션 참조). 그런 다음 다른 필터 규칙을 추가할 수 있습니다. 필터 맨 아래에 있는 `Advanced Filters` 링크를 클릭할 수 있습니다. 이렇게 하면 `Trace filters`를 추가할 수 있는 새 모달이 열립니다. 이러한 필터는 이미 필터링한 개별 실행의 모든 상위 실행의 트레이스에 적용됩니다.
 
 ![Filtering](/langsmith/images/trace-filter.png)
 
-### Filter for runs (spans) whose child runs have some attribute
+### 자식 실행이 특정 속성을 가진 실행(스팬) 필터링
 
-This is the opposite of the above. You may want to search for runs who have specific types of sub runs. An example of this could be searching for all traces that had a sub run with name `Foo`. This is useful when `Foo` is not always called, but you want to analyze the cases where it is.
+이는 위의 반대입니다. 특정 유형의 하위 실행을 가진 실행을 검색하고 싶을 수 있습니다. 예를 들어, 이름이 `Foo`인 하위 실행을 가진 모든 트레이스를 검색하는 것입니다. 이는 `Foo`가 항상 호출되는 것은 아니지만 호출되는 경우를 분석하고 싶을 때 유용합니다.
 
-In order to do this, you can click on the `Advanced Filters` link all the way at the bottom of the filter. This will open up a new modal where you can add `Tree filters`. This will make the rule you specify apply to all child runs of the individual runs you've already filtered for.
+이를 수행하려면 필터 맨 아래에 있는 `Advanced Filters` 링크를 클릭할 수 있습니다. 이렇게 하면 `Tree filters`를 추가할 수 있는 새 모달이 열립니다. 이렇게 하면 지정한 규칙이 이미 필터링한 개별 실행의 모든 자식 실행에 적용됩니다.
 
 ![Filtering](/langsmith/images/child-runs.png)
 
-### Example: Filtering on all runs whose tree contains the tool call filter
+### 예시: 트리에 도구 호출 필터가 포함된 모든 실행 필터링
 
-Extending the [tool call filtering example](/langsmith/filter-traces-in-application#example-filtering-for-tool-calls) from above, if you would like to filter for all runs _whose tree contains_ the tool filter call, you can use the tree filter in the [advanced filters](/langsmith/filter-traces-in-application#advanced-filters) setting:
+위의 [도구 호출 필터링 예시](/langsmith/filter-traces-in-application#example-filtering-for-tool-calls)를 확장하여, _트리에 도구 호출 필터가 포함된_ 모든 실행을 필터링하려면 [고급 필터](/langsmith/filter-traces-in-application#advanced-filters) 설정에서 트리 필터를 사용할 수 있습니다:
 
 ![Filtering](/langsmith/images/search-kv-tool-tree.png)

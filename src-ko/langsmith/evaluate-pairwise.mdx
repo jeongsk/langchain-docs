@@ -1,90 +1,90 @@
 ---
-title: How to run a pairwise evaluation
-sidebarTitle: Pairwise evaluation
+title: 쌍별 평가를 실행하는 방법
+sidebarTitle: 쌍별 평가
 ---
 
 <Info>
-Concept: [Pairwise evaluations](/langsmith/evaluation-concepts#pairwise)
+개념: [쌍별 평가](/langsmith/evaluation-concepts#pairwise)
 </Info>
 
-LangSmith supports evaluating **existing** experiments in a comparative manner. Instead of evaluating one output at a time, you can score the output from multiple experiments against each other. In this guide, you'll use [`evaluate()`](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate) with two existing experiments to [define an evaluator](#define-a-pairwise-evaluator) and [run a pairwise evaluation](#run-a-pairwise-evaluation). Finally, you'll use the LangSmith UI to [view the pairwise experiments](#view-pairwise-experiments).
+LangSmith는 **기존** 실험을 비교 방식으로 평가하는 것을 지원합니다. 한 번에 하나의 출력을 평가하는 대신, 여러 실험의 출력을 서로 비교하여 점수를 매길 수 있습니다. 이 가이드에서는 두 개의 기존 실험과 함께 [`evaluate()`](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate)를 사용하여 [평가자를 정의](#define-a-pairwise-evaluator)하고 [쌍별 평가를 실행](#run-a-pairwise-evaluation)합니다. 마지막으로 LangSmith UI를 사용하여 [쌍별 실험을 확인](#view-pairwise-experiments)합니다.
 
-## Prerequisites
+## 사전 요구사항
 
-* If you haven't already created experiments to compare, check out the [quick start](/langsmith/evaluation-quickstart) or the [how-to guide](/langsmith/evaluate-llm-application) to get started with evaluations.
-* This guide requires `langsmith` Python version `>=0.2.0` or JS version `>=0.2.9`.
+* 아직 비교할 실험을 생성하지 않은 경우, [빠른 시작](/langsmith/evaluation-quickstart) 또는 [사용 방법 가이드](/langsmith/evaluate-llm-application)를 확인하여 평가를 시작하세요.
+* 이 가이드는 `langsmith` Python 버전 `>=0.2.0` 또는 JS 버전 `>=0.2.9`가 필요합니다.
 
 <Info>
-You can also use [`evaluate_comparative()`](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate_comparative) with more than two existing experiments.
+두 개 이상의 기존 실험에서 [`evaluate_comparative()`](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate_comparative)를 사용할 수도 있습니다.
 </Info>
 
-## `evaluate()` comparative args
+## `evaluate()` 비교 인수
 
-At its simplest, `evaluate` / `aevaluate` function takes the following arguments:
+가장 간단하게, `evaluate` / `aevaluate` 함수는 다음 인수를 받습니다:
 
-| Argument     | Description                                                                                                                        |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `target`     | A list of the two **existing experiments** you would like to evaluate against each other. These can be uuids or experiment names.  |
-| `evaluators` | A list of the pairwise evaluators that you would like to attach to this evaluation. See the section below for how to define these. |
+| 인수          | 설명                                                                                            |
+| ------------ | ---------------------------------------------------------------------------------------------- |
+| `target`     | 서로 평가하고자 하는 두 개의 **기존 실험** 목록입니다. uuid 또는 실험 이름이 될 수 있습니다.            |
+| `evaluators` | 이 평가에 연결하려는 쌍별 평가자 목록입니다. 이를 정의하는 방법은 아래 섹션을 참조하세요.                |
 
-Along with these, you can also pass in the following optional args:
+이와 함께 다음의 선택적 인수를 전달할 수도 있습니다:
 
-| Argument                                 | Description                                                                                                                                                                                                                                                                                                                                                                    |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `randomize_order` / `randomizeOrder`     | An optional boolean indicating whether the order of the outputs should be randomized for each evaluation. This is a strategy for minimizing positional bias in your prompt: often, the LLM will be biased towards one of the responses based on the order. This should mainly be addressed via prompt engineering, but this is another optional mitigation. Defaults to False. |
-| `experiment_prefix` / `experimentPrefix` | A prefix to be attached to the beginning of the pairwise experiment name. Defaults to None.                                                                                                                                                                                                                                                                                    |
-| `description`                            | A description of the pairwise experiment. Defaults to None.                                                                                                                                                                                                                                                                                                                    |
-| `max_concurrency` / `maxConcurrency`     | The maximum number of concurrent evaluations to run. Defaults to 5.                                                                                                                                                                                                                                                                                                            |
-| `client`                                 | The LangSmith client to use. Defaults to None.                                                                                                                                                                                                                                                                                                                                 |
-| `metadata`                               | Metadata to attach to your pairwise experiment. Defaults to None.                                                                                                                                                                                                                                                                                                              |
-| `load_nested` / `loadNested`             | Whether to load all child runs for the experiment. When False, only the root trace will be passed to your evaluator. Defaults to False.                                                                                                                                                                                                                                        |
+| 인수                                      | 설명                                                                                                                                                                                                                                                                                                                                              |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `randomize_order` / `randomizeOrder`     | 각 평가에 대해 출력 순서를 무작위로 지정할지 여부를 나타내는 선택적 불리언 값입니다. 이는 프롬프트에서 위치 편향을 최소화하기 위한 전략입니다. 종종 LLM은 순서에 따라 응답 중 하나에 편향되는 경향이 있습니다. 이는 주로 프롬프트 엔지니어링을 통해 해결해야 하지만, 이것은 또 다른 선택적 완화 방법입니다. 기본값은 False입니다.                  |
+| `experiment_prefix` / `experimentPrefix` | 쌍별 실험 이름의 시작 부분에 붙일 접두사입니다. 기본값은 None입니다.                                                                                                                                                                                                                                                                                    |
+| `description`                            | 쌍별 실험에 대한 설명입니다. 기본값은 None입니다.                                                                                                                                                                                                                                                                                                     |
+| `max_concurrency` / `maxConcurrency`     | 실행할 최대 동시 평가 수입니다. 기본값은 5입니다.                                                                                                                                                                                                                                                                                                      |
+| `client`                                 | 사용할 LangSmith 클라이언트입니다. 기본값은 None입니다.                                                                                                                                                                                                                                                                                               |
+| `metadata`                               | 쌍별 실험에 첨부할 메타데이터입니다. 기본값은 None입니다.                                                                                                                                                                                                                                                                                              |
+| `load_nested` / `loadNested`             | 실험에 대한 모든 하위 실행을 로드할지 여부입니다. False인 경우, 루트 추적만 평가자에 전달됩니다. 기본값은 False입니다.                                                                                                                                                                                                                                       |
 
-## Define a pairwise evaluator
+## 쌍별 평가자 정의
 
-Pairwise evaluators are just functions with an expected signature.
+쌍별 평가자는 예상되는 시그니처를 가진 함수일 뿐입니다.
 
-### Evaluator args
+### 평가자 인수
 
-Custom evaluator functions must have specific argument names. They can take any subset of the following arguments:
+사용자 정의 평가자 함수는 특정한 인수 이름을 가져야 합니다. 다음 인수의 하위 집합을 받을 수 있습니다:
 
-* `inputs: dict`: A dictionary of the inputs corresponding to a single example in a dataset.
-* `outputs: list[dict]`: A two-item list of the dict outputs produced by each experiment on the given inputs.
-* `reference_outputs` / `referenceOutputs: dict`: A dictionary of the reference outputs associated with the example, if available.
-* `runs: list[Run]`: A two-item list of the full [Run](/langsmith/run-data-format) objects generated by the two experiments on the given example. Use this if you need access to intermediate steps or metadata about each run.
-* `example: Example`: The full dataset [Example](/langsmith/example-data-format), including the example inputs, outputs (if available), and metadata (if available).
+* `inputs: dict`: 데이터셋의 단일 예제에 해당하는 입력의 딕셔너리입니다.
+* `outputs: list[dict]`: 주어진 입력에 대해 각 실험이 생성한 딕셔너리 출력의 두 항목 목록입니다.
+* `reference_outputs` / `referenceOutputs: dict`: 사용 가능한 경우 예제와 연결된 참조 출력의 딕셔너리입니다.
+* `runs: list[Run]`: 주어진 예제에 대해 두 실험이 생성한 전체 [Run](/langsmith/run-data-format) 객체의 두 항목 목록입니다. 각 실행에 대한 중간 단계나 메타데이터에 액세스해야 하는 경우 사용하세요.
+* `example: Example`: 예제 입력, 출력(사용 가능한 경우), 메타데이터(사용 가능한 경우)를 포함한 전체 데이터셋 [Example](/langsmith/example-data-format)입니다.
 
-For most use cases you'll only need `inputs`, `outputs`, and `reference_outputs` / `referenceOutputs`. `runs` and `example` are useful only if you need some extra trace or example metadata outside of the actual inputs and outputs of the application.
+대부분의 사용 사례에서는 `inputs`, `outputs`, `reference_outputs` / `referenceOutputs`만 필요합니다. `runs`와 `example`은 애플리케이션의 실제 입력 및 출력 외부의 추가 추적 또는 예제 메타데이터가 필요한 경우에만 유용합니다.
 
-### Evaluator output
+### 평가자 출력
 
-Custom evaluators are expected to return one of the following types:
+사용자 정의 평가자는 다음 유형 중 하나를 반환해야 합니다:
 
-Python and JS/TS
+Python 및 JS/TS
 
-* `dict`: dictionary with keys:
+* `dict`: 다음 키를 가진 딕셔너리:
 
-  * `key`, which represents the feedback key that will be logged
-  * `scores`, which is a mapping from run ID to score for that run.
-  * `comment`, which is a string. Most commonly used for model reasoning.
+  * `key`, 로그될 피드백 키를 나타냅니다
+  * `scores`, 실행 ID에서 해당 실행의 점수로의 매핑입니다.
+  * `comment`, 문자열입니다. 모델 추론에 가장 일반적으로 사용됩니다.
 
-Currently Python only
+현재 Python만
 
-* `list[int | float | bool]`: a two-item list of scores. The list is assumed to have the same order as the `runs` / `outputs` evaluator args. The evaluator function name is used for the feedback key.
+* `list[int | float | bool]`: 두 항목의 점수 목록입니다. 목록은 `runs` / `outputs` 평가자 인수와 동일한 순서를 가진다고 가정합니다. 평가자 함수 이름이 피드백 키로 사용됩니다.
 
-Note that you should choose a feedback key that is distinct from standard feedbacks on your run. We recommend prefixing pairwise feedback keys with `pairwise_` or `ranked_`.
+실행의 표준 피드백과 구별되는 피드백 키를 선택해야 합니다. 쌍별 피드백 키에 `pairwise_` 또는 `ranked_` 접두사를 붙이는 것을 권장합니다.
 
-## Run a pairwise evaluation
+## 쌍별 평가 실행
 
-The following example uses [a prompt](https://smith.langchain.com/hub/langchain-ai/pairwise-evaluation-2) which asks the LLM to decide which is better between two AI assistant responses. It uses structured output to parse the AI's response: 0, 1, or 2.
+다음 예제는 두 AI 어시스턴트 응답 중 어느 것이 더 나은지 LLM에게 결정하도록 요청하는 [프롬프트](https://smith.langchain.com/hub/langchain-ai/pairwise-evaluation-2)를 사용합니다. 구조화된 출력을 사용하여 AI의 응답(0, 1 또는 2)을 파싱합니다.
 
 <Info>
-In the Python example below, we are pulling [this structured prompt](https://smith.langchain.com/hub/langchain-ai/pairwise-evaluation-2) from the [LangChain Hub](/langsmith/manage-prompts#public-prompt-hub) and using it with a LangChain chat model wrapper.
+아래 Python 예제에서는 [LangChain Hub](/langsmith/manage-prompts#public-prompt-hub)에서 [이 구조화된 프롬프트](https://smith.langchain.com/hub/langchain-ai/pairwise-evaluation-2)를 가져와 LangChain 채팅 모델 래퍼와 함께 사용하고 있습니다.
 
-**Usage of LangChain is totally optional.** To illustrate this point, the TypeScript example uses the OpenAI SDK directly.
+**LangChain 사용은 완전히 선택 사항입니다.** 이 점을 설명하기 위해, TypeScript 예제에서는 OpenAI SDK를 직접 사용합니다.
 </Info>
 
-- Python: Requires `langsmith>=0.2.0`
-- TypeScript: Requires `langsmith>=0.2.9`
+- Python: `langsmith>=0.2.0` 필요
+- TypeScript: `langsmith>=0.2.9` 필요
 
 <CodeGroup>
 
@@ -93,14 +93,14 @@ from langchain_classic import hub
 from langchain.chat_models import init_chat_model
 from langsmith import evaluate
 
-# See the prompt: https://smith.langchain.com/hub/langchain-ai/pairwise-evaluation-2
+# 프롬프트 참조: https://smith.langchain.com/hub/langchain-ai/pairwise-evaluation-2
 prompt = hub.pull("langchain-ai/pairwise-evaluation-2")
 model = init_chat_model("gpt-4o")
 chain = prompt | model
 
 def ranked_preference(inputs: dict, outputs: list[dict]) -> list:
-    # Assumes example inputs have a 'question' key and experiment
-    # outputs have an 'answer' key.
+    # 예제 입력에 'question' 키가 있고 실험
+    # 출력에 'answer' 키가 있다고 가정합니다.
     response = chain.invoke({
         "question": inputs["question"],
         "answer_a": outputs[0].get("answer", "N/A"),
@@ -115,7 +115,7 @@ def ranked_preference(inputs: dict, outputs: list[dict]) -> list:
     return scores
 
 evaluate(
-    ("experiment-1", "experiment-2"),  # Replace with the names/IDs of your experiments
+    ("experiment-1", "experiment-2"),  # 실험의 이름/ID로 교체하세요
     evaluators=[ranked_preference],
     randomize_order=True,
     max_concurrency=4,
@@ -227,16 +227,16 @@ await evaluate(["earnest-name-40", "reflecting-pump-91"], {
 
 </CodeGroup>
 
-## View pairwise experiments
+## 쌍별 실험 확인
 
-Navigate to the "Pairwise Experiments" tab from the dataset page:
+데이터셋 페이지에서 "Pairwise Experiments" 탭으로 이동하세요:
 
 ![Pairwise Experiments Tab](/langsmith/images/pairwise-from-dataset.png)
 
-Click on a pairwise experiment that you would like to inspect, and you will be brought to the Comparison View:
+검사하려는 쌍별 실험을 클릭하면 비교 뷰로 이동합니다:
 
 ![Pairwise Comparison View](/langsmith/images/pairwise-comparison-view.png)
 
-You may filter to runs where the first experiment was better or vice versa by clicking the thumbs up/thumbs down buttons in the table header:
+테이블 헤더에서 엄지손가락 위/아래 버튼을 클릭하여 첫 번째 실험이 더 나은 경우 또는 그 반대의 경우로 실행을 필터링할 수 있습니다:
 
 ![Pairwise Filtering](/langsmith/images/filter-pairwise.png)

@@ -1,32 +1,32 @@
 ---
-title: How to run an evaluation asynchronously
-sidebarTitle: Run an evaluation asynchronously
+title: 비동기적으로 평가를 실행하는 방법
+sidebarTitle: 비동기적으로 평가 실행하기
 ---
 
 <Info>
-[Evaluations](/langsmith/evaluation-concepts#applying-evaluations) | [Evaluators](/langsmith/evaluation-concepts#evaluators) | [Datasets](/langsmith/evaluation-concepts#datasets) | [Experiments](/langsmith/evaluation-concepts#experiments)
+[평가](/langsmith/evaluation-concepts#applying-evaluations) | [평가자](/langsmith/evaluation-concepts#evaluators) | [데이터셋](/langsmith/evaluation-concepts#datasets) | [실험](/langsmith/evaluation-concepts#experiments)
 </Info>
 
-We can run evaluations asynchronously via the SDK using [aevaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._arunner.aevaluate), which accepts all of the same arguments as [evaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate) but expects the application function to be asynchronous. You can learn more about how to use the `evaluate()` function [here](/langsmith/evaluate-llm-application).
+SDK를 사용하여 [aevaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._arunner.aevaluate) 함수로 평가를 비동기적으로 실행할 수 있습니다. 이 함수는 [evaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate) 함수와 동일한 인자를 받지만, 애플리케이션 함수가 비동기여야 합니다. `evaluate()` 함수 사용법에 대한 자세한 내용은 [여기](/langsmith/evaluate-llm-application)에서 확인할 수 있습니다.
 
 <Info>
-This guide is only relevant when using the Python SDK. In JS/TS the `evaluate()` function is already async. You can see how to use it [here](/langsmith/evaluate-llm-application).
+이 가이드는 Python SDK를 사용할 때만 관련이 있습니다. JS/TS에서는 `evaluate()` 함수가 이미 비동기입니다. 사용법은 [여기](/langsmith/evaluate-llm-application)에서 확인할 수 있습니다.
 </Info>
 
-## Use `aevaluate()`
+## `aevaluate()` 사용하기
 
 * Python
 
-Requires `langsmith>=0.3.13`
+`langsmith>=0.3.13` 버전이 필요합니다.
 
 ```python
 from langsmith import wrappers, Client
 from openai import AsyncOpenAI
 
-# Optionally wrap the OpenAI client to trace all model calls.
+# 선택사항: 모든 모델 호출을 추적하기 위해 OpenAI 클라이언트를 래핑합니다.
 oai_client = wrappers.wrap_openai(AsyncOpenAI())
 
-# Optionally add the 'traceable' decorator to trace the inputs/outputs of this function.
+# 선택사항: 이 함수의 입력/출력을 추적하기 위해 'traceable' 데코레이터를 추가합니다.
 @traceable
 async def researcher_app(inputs: dict) -> str:
     instructions = """You are an excellent researcher. Given a high-level research idea, \
@@ -41,7 +41,7 @@ list 5 concrete questions that should be investigated to determine if the idea i
     )
     return response.choices[0].message.content
 
-# Evaluator functions can be sync or async
+# 평가자 함수는 동기 또는 비동기일 수 있습니다
 def concise(inputs: dict, outputs: dict) -> bool:
     return len(outputs["output"]) < 3 * len(inputs["idea"])
 
@@ -58,20 +58,20 @@ ls_client.create_examples(
     examples=[{"inputs": {"idea": i}} for i in ideas],
 )
 
-# Can equivalently use the 'aevaluate' function directly:
+# 'aevaluate' 함수를 직접 사용할 수도 있습니다:
 # from langsmith import aevaluate
 # await aevaluate(...)
 results = await ls_client.aevaluate(
     researcher_app,
     data=dataset,
     evaluators=[concise],
-    # Optional, add concurrency.
-    max_concurrency=2,  # Optional, add concurrency.
-    experiment_prefix="gpt-4o-mini-baseline"  # Optional, random by default.
+    # 선택사항: 동시성을 추가합니다.
+    max_concurrency=2,  # 선택사항: 동시성을 추가합니다.
+    experiment_prefix="gpt-4o-mini-baseline"  # 선택사항: 기본적으로 무작위입니다.
 )
 ```
 
-## Related
+## 관련 항목
 
-* [Run an evaluation (synchronously)](/langsmith/evaluate-llm-application)
-* [Handle model rate limits](/langsmith/rate-limiting)
+* [평가 실행하기 (동기)](/langsmith/evaluate-llm-application)
+* [모델 속도 제한 처리하기](/langsmith/rate-limiting)

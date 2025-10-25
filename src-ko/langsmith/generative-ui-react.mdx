@@ -1,25 +1,25 @@
 ---
-title: How to implement generative user interfaces with LangGraph
-sidebarTitle: Implement generative user interfaces with LangGraph
+title: LangGraph로 생성형 사용자 인터페이스를 구현하는 방법
+sidebarTitle: LangGraph로 생성형 사용자 인터페이스 구현하기
 ---
 <Info>
-**Prerequisites**
+**사전 요구 사항**
 * [LangSmith](/langsmith/home)
 * [LangGraph Server](/langsmith/langgraph-server)
 * [`useStream()` React Hook](/langsmith/use-stream-react)
 </Info>
 
-Generative user interfaces (Generative UI) allows agents to go beyond text and generate rich user interfaces. This enables creating more interactive and context-aware applications where the UI adapts based on the conversation flow and AI responses.
+생성형 사용자 인터페이스(Generative UI)는 에이전트가 텍스트를 넘어 풍부한 사용자 인터페이스를 생성할 수 있게 해줍니다. 이를 통해 대화 흐름과 AI 응답에 따라 UI가 적응하는, 더 인터랙티브하고 컨텍스트를 인식하는 애플리케이션을 만들 수 있습니다.
 
-![Agent Chat showing a prompt about booking/lodging and a generated set of hotel listing cards (images, titles, prices, locations) rendered inline as UI components.](/langsmith/images/generative-ui-sample.jpg)
+![예약/숙박에 대한 프롬프트와 UI 컴포넌트로 인라인 렌더링된 호텔 목록 카드(이미지, 제목, 가격, 위치) 세트를 보여주는 에이전트 채팅](/langsmith/images/generative-ui-sample.jpg)
 
-LangSmith supports colocating your React components with your graph code. This allows you to focus on building specific UI components for your graph while easily plugging into existing chat interfaces such as [Agent Chat](https://agentchat.vercel.app) and loading the code only when actually needed.
+LangSmith는 React 컴포넌트를 그래프 코드와 함께 배치할 수 있도록 지원합니다. 이를 통해 그래프에 특화된 UI 컴포넌트를 구축하는 데 집중하면서, [Agent Chat](https://agentchat.vercel.app)과 같은 기존 채팅 인터페이스에 쉽게 연결하고 실제로 필요할 때만 코드를 로드할 수 있습니다.
 
-## Tutorial
+## 튜토리얼
 
-### 1. Define and configure UI components
+### 1. UI 컴포넌트 정의 및 구성
 
-First, create your first UI component. For each component you need to provide an unique identifier that will be used to reference the component in your graph code.
+먼저 첫 번째 UI 컴포넌트를 생성합니다. 각 컴포넌트에는 그래프 코드에서 컴포넌트를 참조하는 데 사용될 고유 식별자를 제공해야 합니다.
 
 ```tsx title="src/agent/ui.tsx"
 const WeatherComponent = (props: { city: string }) => {
@@ -31,7 +31,7 @@ export default {
 };
 ```
 
-Next, define your UI components in your `langgraph.json` configuration:
+다음으로, `langgraph.json` 구성에서 UI 컴포넌트를 정의합니다:
 
 ```json
 {
@@ -45,11 +45,11 @@ Next, define your UI components in your `langgraph.json` configuration:
 }
 ```
 
-The `ui` section points to the UI components that will be used by graphs. By default, we recommend using the same key as the graph name, but you can split out the components however you like, see [Customise the namespace of UI components](#customise-the-namespace-of-ui-components) for more details.
+`ui` 섹션은 그래프에서 사용할 UI 컴포넌트를 가리킵니다. 기본적으로 그래프 이름과 동일한 키를 사용하는 것을 권장하지만, 원하는 방식으로 컴포넌트를 분할할 수 있습니다. 자세한 내용은 [UI 컴포넌트의 네임스페이스 사용자 정의](#customise-the-namespace-of-ui-components)를 참조하세요.
 
-LangSmith will automatically bundle your UI components code and styles and serve them as external assets that can be loaded by the `LoadExternalComponent` component. Some dependencies such as `react` and `react-dom` will be automatically excluded from the bundle.
+LangSmith는 UI 컴포넌트 코드와 스타일을 자동으로 번들링하고 `LoadExternalComponent` 컴포넌트로 로드할 수 있는 외부 자산으로 제공합니다. `react` 및 `react-dom`과 같은 일부 종속성은 번들에서 자동으로 제외됩니다.
 
-CSS and Tailwind 4.x is also supported out of the box, so you can freely use Tailwind classes as well as `shadcn/ui` in your UI components.
+CSS와 Tailwind 4.x도 기본적으로 지원되므로, UI 컴포넌트에서 Tailwind 클래스와 `shadcn/ui`를 자유롭게 사용할 수 있습니다.
 
 <Tabs>
     <Tab title="src/agent/ui.tsx">
@@ -72,7 +72,7 @@ CSS and Tailwind 4.x is also supported out of the box, so you can freely use Tai
     </Tab>
 </Tabs>
 
-### 2. Send the UI components in your graph
+### 2. 그래프에서 UI 컴포넌트 전송
 
 <Tabs>
     <Tab title="Python">
@@ -108,7 +108,7 @@ CSS and Tailwind 4.x is also supported out of the box, so you can freely use Tai
             content=f"Here's the weather for {weather['city']}",
         )
 
-        # Emit UI elements associated with the message
+        # 메시지와 연결된 UI 요소 발송
         push_ui_message("weather", weather, message=message)
         return {"messages": [message]}
 
@@ -120,7 +120,7 @@ CSS and Tailwind 4.x is also supported out of the box, so you can freely use Tai
     ```
     </Tab>
     <Tab title="JS">
-    Use the `typedUi` utility to emit UI elements from your agent nodes:
+    `typedUi` 유틸리티를 사용하여 에이전트 노드에서 UI 요소를 발송합니다:
 
     ```typescript title="src/agent/index.ts"
     import {
@@ -148,9 +148,9 @@ CSS and Tailwind 4.x is also supported out of the box, so you can freely use Tai
 
     export const graph = new StateGraph(AgentState)
       .addNode("weather", async (state, config) => {
-        // Provide the type of the component map to ensure
-        // type safety of `ui.push()` calls as well as
-        // pushing the messages to the `ui` and sending a custom event as well.
+        // 컴포넌트 맵의 타입을 제공하여
+        // `ui.push()` 호출의 타입 안전성을 보장하고
+        // 메시지를 `ui`에 푸시하고 커스텀 이벤트도 전송합니다.
         const ui = typedUi<typeof ComponentMap>(config);
 
         const weather = await new ChatOpenAI({ model: "gpt-4o-mini" })
@@ -164,7 +164,7 @@ CSS and Tailwind 4.x is also supported out of the box, so you can freely use Tai
           content: `Here's the weather for ${weather.city}`,
         };
 
-        // Emit UI elements associated with the AI message
+        // AI 메시지와 연결된 UI 요소 발송
         ui.push({ name: "weather", props: weather }, { message: response });
 
         return { messages: [response] };
@@ -175,9 +175,9 @@ CSS and Tailwind 4.x is also supported out of the box, so you can freely use Tai
     </Tab>
 </Tabs>
 
-### 3. Handle UI elements in your React application
+### 3. React 애플리케이션에서 UI 요소 처리
 
-On the client side, you can use `useStream()` and `LoadExternalComponent` to display the UI elements.
+클라이언트 측에서 `useStream()` 및 `LoadExternalComponent`를 사용하여 UI 요소를 표시할 수 있습니다.
 
 ```tsx title="src/app/page.tsx"
 "use client";
@@ -208,13 +208,13 @@ export default function Page() {
 }
 ```
 
-Behind the scenes, `LoadExternalComponent` will fetch the JS and CSS for the UI components from LangSmith and render them in a shadow DOM, thus ensuring style isolation from the rest of your application.
+내부적으로 `LoadExternalComponent`는 LangSmith에서 UI 컴포넌트의 JS와 CSS를 가져와 shadow DOM에서 렌더링하여, 애플리케이션의 나머지 부분과 스타일 격리를 보장합니다.
 
-## How-to guides
+## 사용 가이드
 
-### Provide custom components on the client side
+### 클라이언트 측에서 커스텀 컴포넌트 제공
 
-If you already have the components loaded in your client application, you can provide a map of such components to be rendered directly without fetching the UI code from LangSmith.
+이미 클라이언트 애플리케이션에 컴포넌트가 로드되어 있는 경우, LangSmith에서 UI 코드를 가져오지 않고 직접 렌더링할 컴포넌트 맵을 제공할 수 있습니다.
 
 ```tsx
 const clientComponents = {
@@ -228,9 +228,9 @@ const clientComponents = {
 />;
 ```
 
-### Show loading UI when components are loading
+### 컴포넌트 로딩 중 로딩 UI 표시
 
-You can provide a fallback UI to be rendered when the components are loading.
+컴포넌트가 로드되는 동안 렌더링할 대체 UI를 제공할 수 있습니다.
 
 ```tsx
 <LoadExternalComponent
@@ -240,9 +240,9 @@ You can provide a fallback UI to be rendered when the components are loading.
 />
 ```
 
-### Customise the namespace of UI components.
+### UI 컴포넌트의 네임스페이스 사용자 정의
 
-By default `LoadExternalComponent` will use the `assistantId` from `useStream()` hook to fetch the code for UI components. You can customise this by providing a `namespace` prop to the `LoadExternalComponent` component.
+기본적으로 `LoadExternalComponent`는 `useStream()` 훅의 `assistantId`를 사용하여 UI 컴포넌트 코드를 가져옵니다. `LoadExternalComponent` 컴포넌트에 `namespace` prop을 제공하여 이를 사용자 정의할 수 있습니다.
 
 <Tabs>
     <Tab title="src/app/page.tsx">
@@ -265,9 +265,9 @@ By default `LoadExternalComponent` will use the `assistantId` from `useStream()`
     </Tab>
 </Tabs>
 
-### Access and interact with the thread state from the UI component
+### UI 컴포넌트에서 스레드 상태 액세스 및 상호 작용
 
-You can access the thread state inside the UI component by using the `useStreamContext` hook.
+`useStreamContext` 훅을 사용하여 UI 컴포넌트 내부에서 스레드 상태에 액세스할 수 있습니다.
 
 ```tsx
 import { useStreamContext } from "@langchain/langgraph-sdk/react-ui";
@@ -295,15 +295,15 @@ const WeatherComponent = (props: { city: string }) => {
 };
 ```
 
-### Pass additional context to the client components
+### 클라이언트 컴포넌트에 추가 컨텍스트 전달
 
-You can pass additional context to the client components by providing a `meta` prop to the `LoadExternalComponent` component.
+`LoadExternalComponent` 컴포넌트에 `meta` prop을 제공하여 클라이언트 컴포넌트에 추가 컨텍스트를 전달할 수 있습니다.
 
 ```tsx
 <LoadExternalComponent stream={thread} message={ui} meta={{ userId: "123" }} />
 ```
 
-Then, you can access the `meta` prop in the UI component by using the `useStreamContext` hook.
+그런 다음 `useStreamContext` 훅을 사용하여 UI 컴포넌트에서 `meta` prop에 액세스할 수 있습니다.
 
 ```tsx
 import { useStreamContext } from "@langchain/langgraph-sdk/react-ui";
@@ -322,9 +322,9 @@ const WeatherComponent = (props: { city: string }) => {
 };
 ```
 
-### Streaming UI messages from the server
+### 서버에서 UI 메시지 스트리밍
 
-You can stream UI messages before the node execution is finished by using the `onCustomEvent` callback of the `useStream()` hook. This is especially useful when updating the UI component as the LLM is generating the response.
+`useStream()` 훅의 `onCustomEvent` 콜백을 사용하여 노드 실행이 완료되기 전에 UI 메시지를 스트리밍할 수 있습니다. 이는 LLM이 응답을 생성하는 동안 UI 컴포넌트를 업데이트할 때 특히 유용합니다.
 
 ```tsx
 import { uiMessageReducer } from "@langchain/langgraph-sdk/react-ui";
@@ -341,7 +341,7 @@ const { thread, submit } = useStream({
 });
 ```
 
-Then you can push updates to the UI component by calling `ui.push()` / `push_ui_message()` with the same ID as the UI message you wish to update.
+그런 다음 업데이트하려는 UI 메시지와 동일한 ID로 `ui.push()` / `push_ui_message()`를 호출하여 UI 컴포넌트에 업데이트를 푸시할 수 있습니다.
 
 <Tabs>
     <Tab title="Python">
@@ -361,7 +361,7 @@ Then you can push updates to the UI component by calling `ui.push()` / `push_ui_
 
 
     class CreateTextDocument(TypedDict):
-        """Prepare a document heading for the user."""
+        """사용자를 위한 문서 제목을 준비합니다."""
 
         title: str
 
@@ -382,8 +382,8 @@ Then you can push updates to the UI component by calling `ui.push()` / `push_ui_
             ui_message = push_ui_message("writer", tool_call, message=message)
             ui_message_id = ui_message["id"]
 
-            # We're already streaming the LLM response to the client through UI messages
-            # so we don't need to stream it again to the `messages` stream mode.
+            # UI 메시지를 통해 이미 LLM 응답을 클라이언트로 스트리밍하고 있으므로
+            # `messages` 스트림 모드로 다시 스트리밍할 필요가 없습니다.
             content_stream = model.with_config({"tags": ["nostream"]}).astream(
                 f"Create a document with the title: {tool_call['title']}"
             )
@@ -397,7 +397,7 @@ Then you can push updates to the UI component by calling `ui.push()` / `push_ui_
                     {"content": content.text()},
                     id=ui_message_id,
                     message=message,
-                    # Use `merge=rue` to merge props with the existing UI message
+                    # `merge=True`를 사용하여 기존 UI 메시지와 props를 병합합니다
                     merge=True,
                 )
 
@@ -458,8 +458,8 @@ Then you can push updates to the UI component by calling `ui.push()` / `push_ui_
         );
 
         const contentStream = await model
-          // We're already streaming the LLM response to the client through UI messages
-          // so we don't need to stream it again to the `messages` stream mode.
+          // UI 메시지를 통해 이미 LLM 응답을 클라이언트로 스트리밍하고 있으므로
+          // `messages` 스트림 모드로 다시 스트리밍할 필요가 없습니다.
           .withConfig({ tags: ["nostream"] })
           .stream(`Create a short poem with the topic: ${message.text}`);
 
@@ -469,7 +469,7 @@ Then you can push updates to the UI component by calling `ui.push()` / `push_ui_
 
           ui.push(
             { id, name, props: { content: content?.text } },
-            // Use `merge: true` to merge props with the existing UI message
+            // `merge: true`를 사용하여 기존 UI 메시지와 props를 병합합니다
             { message, merge: true }
           );
         }
@@ -497,33 +497,33 @@ Then you can push updates to the UI component by calling `ui.push()` / `push_ui_
     </Tab>
 </Tabs>
 
-### Remove UI messages from state
+### 상태에서 UI 메시지 제거
 
-Similar to how messages can be removed from the state by appending a RemoveMessage you can remove an UI message from the state by calling `remove_ui_message` / `ui.delete` with the ID of the UI message.
+RemoveMessage를 추가하여 상태에서 메시지를 제거할 수 있는 것처럼, UI 메시지의 ID로 `remove_ui_message` / `ui.delete`를 호출하여 상태에서 UI 메시지를 제거할 수 있습니다.
 
 <Tabs>
     <Tab title="Python">
     ```python
     from langgraph.graph.ui import push_ui_message, delete_ui_message
 
-    # push message
+    # 메시지 푸시
     message = push_ui_message("weather", {"city": "London"})
 
-    # remove said message
+    # 해당 메시지 제거
     delete_ui_message(message["id"])
     ```
     </Tab>
     <Tab title="JS">
     ```tsx
-    // push message
+    // 메시지 푸시
     const message = ui.push({ name: "weather", props: { city: "London" } });
 
-    // remove said message
+    // 해당 메시지 제거
     ui.delete(message.id);
     ```
     </Tab>
 </Tabs>
 
-## Learn more
+## 더 알아보기
 
 * [JS/TS SDK Reference](https://langchain-ai.github.io/langgraphjs/reference/modules/sdk.html)
