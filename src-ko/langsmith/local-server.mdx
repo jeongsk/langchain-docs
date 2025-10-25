@@ -1,15 +1,15 @@
 ---
-title: Run a LangGraph app locally
-sidebarTitle: Quickstart
+title: LangGraph 앱을 로컬에서 실행하기
+sidebarTitle: 빠른 시작
 ---
 
-This quickstart shows you how to set up a LangGraph application locally for testing and development.
+이 빠른 시작 가이드는 테스트 및 개발을 위해 LangGraph 애플리케이션을 로컬에서 설정하는 방법을 보여줍니다.
 
-## Prerequisites
+## 사전 요구사항
 
-Before you begin, ensure you have an API key for [LangSmith](https://smith.langchain.com/settings) (free to sign up).
+시작하기 전에 [LangSmith](https://smith.langchain.com/settings)용 API 키를 준비해야 합니다(무료 가입 가능).
 
-## 1. Install the LangGraph CLI
+## 1. LangGraph CLI 설치하기
 
 <Tabs>
     <Tab title="Python server">
@@ -26,9 +26,9 @@ Before you begin, ensure you have an API key for [LangSmith](https://smith.langc
     </Tab>
 </Tabs>
 
-## 2. Create a LangGraph app 🌱
+## 2. LangGraph 앱 생성하기 🌱
 
-Create a new app from the [`new-langgraph-project-python` template](https://github.com/langchain-ai/new-langgraph-project) or [`new-langgraph-project-js` template](https://github.com/langchain-ai/new-langgraphjs-project). This template demonstrates a single-node application you can extend with your own logic.
+[`new-langgraph-project-python` 템플릿](https://github.com/langchain-ai/new-langgraph-project) 또는 [`new-langgraph-project-js` 템플릿](https://github.com/langchain-ai/new-langgraphjs-project)에서 새 앱을 생성합니다. 이 템플릿은 사용자의 로직으로 확장할 수 있는 단일 노드 애플리케이션을 제공합니다.
 
 <Tabs>
     <Tab title="Python server">
@@ -44,13 +44,13 @@ Create a new app from the [`new-langgraph-project-python` template](https://gith
 </Tabs>
 
 <Tip>
-**Additional templates**<br></br>
-If you use [`langgraph new`](/langsmith/cli) without specifying a template, you will be presented with an interactive menu that will allow you to choose from a list of available templates.
+**추가 템플릿**<br></br>
+템플릿을 지정하지 않고 [`langgraph new`](/langsmith/cli)를 사용하면 사용 가능한 템플릿 목록에서 선택할 수 있는 대화형 메뉴가 표시됩니다.
 </Tip>
 
-## 3. Install dependencies
+## 3. 의존성 설치하기
 
-In the root of your new LangGraph app, install the dependencies in `edit` mode so your local changes are used by the server:
+새로 생성한 LangGraph 앱의 루트 디렉토리에서 서버가 로컬 변경사항을 사용할 수 있도록 `edit` 모드로 의존성을 설치합니다:
 
 <Tabs>
     <Tab title="Python server">
@@ -67,17 +67,17 @@ In the root of your new LangGraph app, install the dependencies in `edit` mode s
     </Tab>
 </Tabs>
 
-## 4. Create a `.env` file
+## 4. `.env` 파일 생성하기
 
-You will find a [`.env.example`](/langsmith/application-structure#configuration-file) in the root of your new LangGraph app. Create a `.env` file in the root of your new LangGraph app and copy the contents of the `.env.example` file into it, filling in the necessary API keys:
+새로 생성한 LangGraph 앱의 루트 디렉토리에서 [`.env.example`](/langsmith/application-structure#configuration-file) 파일을 찾을 수 있습니다. 루트 디렉토리에 `.env` 파일을 생성하고 `.env.example` 파일의 내용을 복사한 다음, 필요한 API 키를 입력합니다:
 
 ```bash
 LANGSMITH_API_KEY=lsv2...
 ```
 
-## 5. Launch LangGraph Server 🚀
+## 5. LangGraph Server 실행하기 🚀
 
-Start the LangGraph API server locally:
+LangGraph API 서버를 로컬에서 시작합니다:
 
 <Tabs>
     <Tab title="Python server">
@@ -92,7 +92,7 @@ Start the LangGraph API server locally:
     </Tab>
 </Tabs>
 
-Sample output:
+출력 예시:
 
 ```
 >    Ready!
@@ -104,21 +104,21 @@ Sample output:
 >    - Studio Web UI: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 ```
 
-The [`langgraph dev`](/langsmith/cli) command starts [LangGraph Server](/langsmith/langgraph-server) in an in-memory mode. This mode is suitable for development and testing purposes.
+[`langgraph dev`](/langsmith/cli) 명령은 [LangGraph Server](/langsmith/langgraph-server)를 인메모리 모드로 시작합니다. 이 모드는 개발 및 테스트 목적에 적합합니다.
 
 <Tip>
-For production use, deploy LangGraph Server with a persistent storage backend. For more information, refer to the LangSmith [hosting options](/langsmith/hosting).
+프로덕션 환경에서 사용하려면 영구 스토리지 백엔드와 함께 LangGraph Server를 배포하세요. 자세한 내용은 LangSmith [호스팅 옵션](/langsmith/hosting)을 참조하세요.
 </Tip>
 
-## 6. Test the API
+## 6. API 테스트하기
 
 <Tabs>
     <Tab title="Python SDK (async)">
-    1. Install the LangGraph Python SDK:
+    1. LangGraph Python SDK를 설치합니다:
       ```shell
       pip install langgraph-sdk
       ```
-    2. Send a message to the assistant (threadless run):
+    2. 어시스턴트에게 메시지를 전송합니다(스레드리스 실행):
       ```python
       from langgraph_sdk import get_client
       import asyncio
@@ -144,11 +144,11 @@ For production use, deploy LangGraph Server with a persistent storage backend. F
       ```
     </Tab>
     <Tab title="Python SDK (sync)">
-    1. Install the LangGraph Python SDK:
+    1. LangGraph Python SDK를 설치합니다:
       ```shell
       pip install langgraph-sdk
       ```
-    2. Send a message to the assistant (threadless run):
+    2. 어시스턴트에게 메시지를 전송합니다(스레드리스 실행):
       ```python
       from langgraph_sdk import get_sync_client
 
@@ -171,11 +171,11 @@ For production use, deploy LangGraph Server with a persistent storage backend. F
       ```
     </Tab>
     <Tab title="Javascript SDK">
-    1. Install the LangGraph JS SDK:
+    1. LangGraph JS SDK를 설치합니다:
       ```shell
       npm install @langchain/langgraph-sdk
       ```
-    2. Send a message to the assistant (threadless run):
+    2. 어시스턴트에게 메시지를 전송합니다(스레드리스 실행):
       ```js
       const { Client } = await import("@langchain/langgraph-sdk");
 
@@ -223,21 +223,21 @@ For production use, deploy LangGraph Server with a persistent storage backend. F
     </Tab>
 </Tabs>
 
-## Next steps
+## 다음 단계
 
-Now that you have a LangGraph app running locally, you're ready to deploy it:
+이제 로컬에서 LangGraph 앱을 실행하고 있으니, 배포할 준비가 되었습니다:
 
-**Choose a hosting option for LangSmith:**
-- [**Cloud**](/langsmith/cloud): Fastest setup, fully managed (recommended).
-- [**Hybrid**](/langsmith/hybrid): <Tooltip tip="The runtime environment where your LangGraph Servers and agents execute.">Data plane</Tooltip> in your cloud, <Tooltip tip="The LangSmith UI and APIs for managing deployments.">control plane</Tooltip> managed by LangChain.
-- [**Self-hosted**](/langsmith/self-hosted): Full control in your infrastructure.
+**LangSmith 호스팅 옵션 선택하기:**
+- [**클라우드**](/langsmith/cloud): 가장 빠른 설정, 완전 관리형(권장).
+- [**하이브리드**](/langsmith/hybrid): <Tooltip tip="LangGraph Server와 에이전트가 실행되는 런타임 환경입니다.">데이터 플레인</Tooltip>은 사용자 클라우드에, <Tooltip tip="배포를 관리하는 LangSmith UI와 API입니다.">컨트롤 플레인</Tooltip>은 LangChain이 관리합니다.
+- [**셀프 호스팅**](/langsmith/self-hosted): 사용자 인프라에서 완전한 제어권을 가집니다.
 
-For more details, refer to the [hosting comparison](/langsmith/hosting).
+자세한 내용은 [호스팅 비교](/langsmith/hosting)를 참조하세요.
 
-**Then deploy your app:**
-- [Deploy to Cloud quickstart](/langsmith/deployment-quickstart): Quick setup guide.
-- [Full Cloud setup guide](/langsmith/deploy-to-cloud): Comprehensive deployment documentation.
+**앱 배포하기:**
+- [클라우드 배포 빠른 시작](/langsmith/deployment-quickstart): 빠른 설정 가이드입니다.
+- [클라우드 전체 설정 가이드](/langsmith/deploy-to-cloud): 포괄적인 배포 문서입니다.
 
-**Explore features:**
-- **[Studio](/langsmith/studio)**: Visualize, interact with, and debug your application with the Studio UI. Try the [Studio quickstart](/langsmith/quick-start-studio).
-- **API References**: [LangGraph Server API](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref/), [Python SDK](/langsmith/langgraph-python-sdk), [JS/TS SDK](/langsmith/langgraph-js-ts-sdk)
+**기능 살펴보기:**
+- **[Studio](/langsmith/studio)**: Studio UI를 통해 애플리케이션을 시각화하고, 상호작용하며, 디버그할 수 있습니다. [Studio 빠른 시작](/langsmith/quick-start-studio)을 시도해보세요.
+- **API 레퍼런스**: [LangGraph Server API](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref/), [Python SDK](/langsmith/langgraph-python-sdk), [JS/TS SDK](/langsmith/langgraph-js-ts-sdk)
