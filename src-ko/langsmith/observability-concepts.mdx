@@ -1,47 +1,47 @@
 ---
-title: Observability concepts
-sidebarTitle: Concepts
+title: 관찰성 개념
+sidebarTitle: 개념
 ---
 
-This page covers key concepts that are important to understand when logging traces to LangSmith.
+이 페이지는 LangSmith에 추적을 로깅할 때 이해해야 할 핵심 개념들을 다룹니다.
 
-A [_trace_](#traces) records the sequence of steps your application takes—from receiving an input, through intermediate processing, to producing a final output. Each step within a trace is represented by a [_run_](#runs). Multiple traces are grouped together within a [_project_](#projects), and traces from multi-turn conversations can be linked together as a [_thread_](#threads).
+[_추적(trace)_](#traces)은 애플리케이션이 입력을 받아 중간 처리를 거쳐 최종 출력을 생성하기까지의 일련의 단계들을 기록합니다. 추적 내의 각 단계는 [_실행(run)_](#runs)으로 표현됩니다. 여러 추적들은 [_프로젝트(project)_](#projects) 내에 그룹화되며, 다중 턴 대화의 추적들은 [_스레드(thread)_](#threads)로 연결될 수 있습니다.
 
-The following diagram displays these concepts in the context of a simple RAG app, which retrieves documents from an index and generates an answer.
+다음 다이어그램은 인덱스에서 문서를 검색하고 답변을 생성하는 간단한 RAG 앱의 맥락에서 이러한 개념들을 보여줍니다.
 
 <div style={{ textAlign: 'center' }}>
 <img
     className="block dark:hidden"
     src="/langsmith/images/primitives.png"
-    alt="Primitives of LangSmith Project, Trace, Run in the context of a question and answer RAG app."
+    alt="질문 답변 RAG 앱의 맥락에서 LangSmith 프로젝트, 추적, 실행의 기본 요소."
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/primitives-dark.png"
-    alt="Primitives of LangSmith Project, Trace, Run in the context of a question and answer RAG app."
+    alt="질문 답변 RAG 앱의 맥락에서 LangSmith 프로젝트, 추적, 실행의 기본 요소."
 />
 </div>
 
-## Runs
+## 실행(Runs)
 
-A _run_ is a span representing a single unit of work or operation within your LLM application. This could be anything from a single call to an LLM or chain, to a prompt formatting call, to a runnable lambda invocation. If you are familiar with [OpenTelemetry](https://opentelemetry.io/), you can think of a run as a span.
+_실행(run)_ 은 LLM 애플리케이션 내에서 단일 작업 단위 또는 작업을 나타내는 스팬입니다. 이는 LLM이나 체인에 대한 단일 호출부터 프롬프트 포맷팅 호출, 실행 가능한 람다 호출까지 무엇이든 될 수 있습니다. [OpenTelemetry](https://opentelemetry.io/)에 익숙하시다면, 실행을 스팬으로 생각하실 수 있습니다.
 
 ![Run](/langsmith/images/run.png)
 
-## Traces
+## 추적(Traces)
 
-A _trace_ is a collection of runs for a single operation. For example, if you have a user request that triggers a chain, and that chain makes a call to an LLM, then to an output parser, and so on, all of these runs would be part of the same trace. If you are familiar with [OpenTelemetry](https://opentelemetry.io/), you can think of a LangSmith trace as a collection of spans. Runs are bound to a trace by a unique trace ID.
+_추적(trace)_ 은 단일 작업에 대한 실행들의 모음입니다. 예를 들어, 사용자 요청이 체인을 트리거하고, 그 체인이 LLM을 호출한 다음 출력 파서를 호출하는 등의 경우, 이 모든 실행들은 동일한 추적의 일부가 됩니다. [OpenTelemetry](https://opentelemetry.io/)에 익숙하시다면, LangSmith 추적을 스팬들의 모음으로 생각하실 수 있습니다. 실행들은 고유한 추적 ID를 통해 추적에 바인딩됩니다.
 
 ![Trace](/langsmith/images/trace.png)
 
-## Threads
+## 스레드(Threads)
 
-A _thread_ is a sequence of traces representing a single conversation. Many LLM applications have a chatbot-like interface in which the user and the LLM application engage in a multi-turn conversation. Each turn in the conversation is represented as its own trace, but these traces are linked together by being part of the same thread. The most recent trace in a thread is the latest message exchange.
+_스레드(thread)_ 는 단일 대화를 나타내는 추적들의 시퀀스입니다. 많은 LLM 애플리케이션은 사용자와 LLM 애플리케이션이 다중 턴 대화를 나누는 챗봇과 같은 인터페이스를 가지고 있습니다. 대화의 각 턴은 자체 추적으로 표현되지만, 이러한 추적들은 동일한 스레드의 일부로서 함께 연결됩니다. 스레드에서 가장 최근의 추적은 가장 최신 메시지 교환입니다.
 
-To group traces into threads, you pass a special metadata key (`session_id`, `thread_id`, or `conversation_id`) with a unique identifier value that links the traces together.
+추적들을 스레드로 그룹화하려면, 추적들을 함께 연결하는 고유 식별자 값과 함께 특수 메타데이터 키(`session_id`, `thread_id` 또는 `conversation_id`)를 전달합니다.
 
-[Learn how to configure threads](/langsmith/threads).
+[스레드 구성 방법 알아보기](/langsmith/threads).
 
 <img
     className="block dark:hidden"

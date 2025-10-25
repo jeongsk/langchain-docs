@@ -1,78 +1,78 @@
 ---
-title: Manage datasets
-sidebarTitle: Manage datasets
+title: 데이터셋 관리
+sidebarTitle: 데이터셋 관리
 ---
 
-LangSmith provides tools for managing and working with your [_datasets_](/langsmith/evaluation-concepts#datasets). This page describes dataset operations including:
+LangSmith는 [_데이터셋_](/langsmith/evaluation-concepts#datasets)을 관리하고 작업하기 위한 도구를 제공합니다. 이 페이지에서는 다음을 포함한 데이터셋 작업에 대해 설명합니다:
 
-- [Versioning datasets](#version-a-dataset) to track changes over time.
-- [Filtering](#evaluate-on-a-filtered-view-of-a-dataset) and [splitting](#evaluate-on-a-dataset-split) datasets for evaluation.
-- [Sharing datasets](#share-a-dataset) publicly.
-- [Exporting datasets](#export-a-dataset) in various formats.
+- 시간 경과에 따른 변경 사항을 추적하기 위한 [데이터셋 버전 관리](#version-a-dataset)
+- 평가를 위한 데이터셋 [필터링](#evaluate-on-a-filtered-view-of-a-dataset) 및 [분할](#evaluate-on-a-dataset-split)
+- 데이터셋 [공개 공유](#share-a-dataset)
+- 다양한 형식으로 [데이터셋 내보내기](#export-a-dataset)
 
-You'll also learn how to [export filtered traces](#export-filtered-traces-from-experiment-to-dataset) from [experiments](/langsmith/evaluation-concepts#experiment) back to datasets for further analysis and iteration.
+또한 추가 분석 및 반복 작업을 위해 [실험](/langsmith/evaluation-concepts#experiment)에서 [필터링된 트레이스를 데이터셋으로 내보내는](#export-filtered-traces-from-experiment-to-dataset) 방법도 학습합니다.
 
-## Version a dataset
+## 데이터셋 버전 관리 {#version-a-dataset}
 
-In LangSmith, datasets are versioned. This means that every time you add, update, or delete examples in your dataset, a new version of the dataset is created.
+LangSmith에서 데이터셋은 버전 관리됩니다. 즉, 데이터셋에서 예제를 추가, 업데이트 또는 삭제할 때마다 데이터셋의 새 버전이 생성됩니다.
 
-### Create a new version of a dataset
+### 데이터셋의 새 버전 만들기
 
-Any time you add, update, or delete examples in your dataset, a new [version](/langsmith/evaluation-concepts#versions) of your dataset is created. This allows you to track changes to your dataset over time and understand how your dataset has evolved.
+데이터셋에서 예제를 추가, 업데이트 또는 삭제할 때마다 데이터셋의 새 [버전](/langsmith/evaluation-concepts#versions)이 생성됩니다. 이를 통해 시간 경과에 따른 데이터셋의 변경 사항을 추적하고 데이터셋이 어떻게 발전했는지 이해할 수 있습니다.
 
-By default, the version is defined by the timestamp of the change. When you click on a particular version of a dataset (by timestamp) in the **Examples** tab, you will find the state of the dataset at that point in time.
+기본적으로 버전은 변경 시점의 타임스탬프로 정의됩니다. **Examples** 탭에서 특정 버전의 데이터셋을 (타임스탬프로) 클릭하면 해당 시점의 데이터셋 상태를 확인할 수 있습니다.
 
 ![Version Datasets](/langsmith/images/version-dataset.png)
 
-Note that examples are read-only when viewing a past version of the dataset. You will also see the operations that were between this version of the dataset and the latest version of the dataset.
+데이터셋의 과거 버전을 볼 때는 예제가 읽기 전용입니다. 또한 이 버전의 데이터셋과 최신 버전의 데이터셋 사이에 수행된 작업도 확인할 수 있습니다.
 
 <Note>
-By default, the latest version of the dataset is shown in the **Examples** tab and experiments from all versions are shown in the **Tests** tab.
+기본적으로 **Examples** 탭에는 최신 버전의 데이터셋이 표시되고 **Tests** 탭에는 모든 버전의 실험이 표시됩니다.
 </Note>
 
-In the **Tests** tab, you will find the results of tests run on the dataset at different versions.
+**Tests** 탭에서는 서로 다른 버전의 데이터셋에서 실행된 테스트 결과를 확인할 수 있습니다.
 
 ![Version Datasets](/langsmith/images/version-dataset-tests.png)
 
-### Tag a version
+### 버전 태그 지정
 
-You can also tag versions of your dataset to give them a more human-readable name, which can be useful for marking important milestones in your dataset's history.
+데이터셋의 버전에 태그를 지정하여 사람이 읽기 쉬운 이름을 부여할 수 있으며, 이는 데이터셋 히스토리에서 중요한 이정표를 표시하는 데 유용합니다.
 
-For example, you might tag a version of your dataset as "prod" and use it to run tests against your LLM pipeline.
+예를 들어, 데이터셋의 버전을 "prod"로 태그 지정하고 이를 사용하여 LLM 파이프라인에 대한 테스트를 실행할 수 있습니다.
 
-You can tag a version of your dataset in the UI by clicking on **+ Tag this version** in the **Examples** tab.
+UI에서 **Examples** 탭의 **+ Tag this version**을 클릭하여 데이터셋의 버전에 태그를 지정할 수 있습니다.
 
 ![Tagging Datasets](/langsmith/images/tag-this-version.png)
 
-You can also tag versions of your dataset using the SDK. Here's an example of how to tag a version of a dataset using the [Python SDK](https://docs.smith.langchain.com/reference/python/reference):
+SDK를 사용하여 데이터셋의 버전에 태그를 지정할 수도 있습니다. 다음은 [Python SDK](https://docs.smith.langchain.com/reference/python/reference)를 사용하여 데이터셋의 버전에 태그를 지정하는 예제입니다:
 
 ```python
 from langsmith import Client
 from datetime import datetime
 
 client = Client()
-initial_time = datetime(2024, 1, 1, 0, 0, 0) # The timestamp of the version you want to tag
+initial_time = datetime(2024, 1, 1, 0, 0, 0) # 태그를 지정할 버전의 타임스탬프
 
-# You can tag a specific dataset version with a semantic name, like "prod"
+# 특정 데이터셋 버전에 "prod"와 같은 의미 있는 이름으로 태그를 지정할 수 있습니다
 client.update_dataset_tag(
     dataset_name=toxic_dataset_name, as_of=initial_time, tag="prod"
 )
 ```
 
-To run an evaluation on a particular tagged version of a dataset, refer to the [Evaluate on a specific dataset version section](#evaluate-on-specific-dataset-version).
+데이터셋의 특정 태그 버전에서 평가를 실행하려면 [특정 데이터셋 버전에서 평가 섹션](#evaluate-on-specific-dataset-version)을 참조하세요.
 
-## Evaluate on a specific dataset version
+## 특정 데이터셋 버전에서 평가 {#evaluate-on-specific-dataset-version}
 
 <Check>
-You may find it helpful to refer to the following content before you read this section:
+이 섹션을 읽기 전에 다음 콘텐츠를 참조하는 것이 도움이 될 수 있습니다:
 
-- [Version a dataset](#version-a-dataset).
-- [Fetching examples](/langsmith/manage-datasets-programmatically#fetch-examples).
+- [데이터셋 버전 관리](#version-a-dataset)
+- [예제 가져오기](/langsmith/manage-datasets-programmatically#fetch-examples)
 </Check>
 
-### Use `list_examples`
+### `list_examples` 사용
 
-You can use `evaluate` / `aevaluate` to pass in an iterable of examples to evaluate on a particular version of a dataset. Use `list_examples` / `listExamples` to fetch examples from a particular version tag using `as_of` / `asOf` and pass that into the `data` argument.
+`evaluate` / `aevaluate`를 사용하여 데이터셋의 특정 버전에서 평가할 예제의 iterable을 전달할 수 있습니다. `list_examples` / `listExamples`를 사용하여 `as_of` / `asOf`를 통해 특정 버전 태그에서 예제를 가져온 다음 `data` 인수에 전달합니다.
 
 <CodeGroup>
 
@@ -81,17 +81,17 @@ from langsmith import Client
 
 ls_client = Client()
 
-# Assumes actual outputs have a 'class' key.
-# Assumes example outputs have a 'label' key.
+# 실제 출력에 'class' 키가 있다고 가정합니다.
+# 예제 출력에 'label' 키가 있다고 가정합니다.
 def correct(outputs: dict, reference_outputs: dict) -> bool:
   return outputs["class"] == reference_outputs["label"]
 
 results = ls_client.evaluate(
     lambda inputs: {"class": "Not toxic"},
-    # Pass in filtered data here:
+    # 여기에 필터링된 데이터를 전달합니다:
     data=ls_client.list_examples(
       dataset_name="Toxic Queries",
-      as_of="latest",  # specify version here
+      as_of="latest",  # 여기에서 버전을 지정합니다
     ),
     evaluators=[correct],
 )
@@ -111,22 +111,22 @@ await evaluate((inputs) => labelText(inputs["input"]), {
 
 </CodeGroup>
 
-Learn more about how to fetch views of a dataset on the [Create and manage datasets programmatically](/langsmith/manage-datasets-programmatically#fetch-datasets) page.
+데이터셋의 뷰를 가져오는 방법에 대한 자세한 내용은 [프로그래밍 방식으로 데이터셋 생성 및 관리](/langsmith/manage-datasets-programmatically#fetch-datasets) 페이지를 참조하세요.
 
-## Evaluate on a split / filtered view of a dataset
+## 데이터셋의 분할/필터링된 뷰에서 평가 {#evaluate-on-a-split--filtered-view-of-a-dataset}
 
 <Check>
-You may find it helpful to refer to the following content before you read this section:
+이 섹션을 읽기 전에 다음 콘텐츠를 참조하는 것이 도움이 될 수 있습니다:
 
-- [Fetching examples](/langsmith/manage-datasets-programmatically#fetch-examples).
-- [Creating and managing dataset splits](/langsmith/manage-datasets-in-application#create-and-manage-dataset-splits).
+- [예제 가져오기](/langsmith/manage-datasets-programmatically#fetch-examples)
+- [데이터셋 분할 생성 및 관리](/langsmith/manage-datasets-in-application#create-and-manage-dataset-splits)
 </Check>
 
-### Evaluate on a filtered view of a dataset
+### 데이터셋의 필터링된 뷰에서 평가 {#evaluate-on-a-filtered-view-of-a-dataset}
 
-You can use the `list_examples` / `listExamples` method to [fetch](/langsmith/manage-datasets-programmatically#fetch-examples) a subset of examples from a dataset to evaluate on.
+`list_examples` / `listExamples` 메서드를 사용하여 데이터셋에서 평가할 예제의 하위 집합을 [가져올](/langsmith/manage-datasets-programmatically#fetch-examples) 수 있습니다.
 
-One common workflow is to fetch examples that have a certain metadata key-value pair.
+일반적인 워크플로 중 하나는 특정 메타데이터 키-값 쌍을 가진 예제를 가져오는 것입니다.
 
 <CodeGroup>
 
@@ -156,11 +156,11 @@ await evaluate((inputs) => labelText(inputs["input"]), {
 
 </CodeGroup>
 
-For more filtering capabilities, refer to this [how-to guide](/langsmith/manage-datasets-programmatically#list-examples-by-structured-filter).
+더 많은 필터링 기능은 이 [가이드](/langsmith/manage-datasets-programmatically#list-examples-by-structured-filter)를 참조하세요.
 
-### Evaluate on a dataset split
+### 데이터셋 분할에서 평가 {#evaluate-on-a-dataset-split}
 
-You can use the `list_examples` / `listExamples` method to evaluate on one or multiple [splits](/langsmith/evaluation-concepts#splits) of your dataset. The `splits` parameter takes a list of the splits you would like to evaluate.
+`list_examples` / `listExamples` 메서드를 사용하여 데이터셋의 하나 또는 여러 [분할](/langsmith/evaluation-concepts#splits)에서 평가할 수 있습니다. `splits` 매개변수는 평가하려는 분할 목록을 받습니다.
 
 <CodeGroup>
 
@@ -190,55 +190,55 @@ await evaluate((inputs) => labelText(inputs["input"]), {
 
 </CodeGroup>
 
-For more details on fetching views of a dataset, refer to the guide on [fetching datasets](/langsmith/manage-datasets-programmatically#fetch-datasets).
+데이터셋의 뷰를 가져오는 방법에 대한 자세한 내용은 [데이터셋 가져오기](/langsmith/manage-datasets-programmatically#fetch-datasets) 가이드를 참조하세요.
 
-## Share a dataset
+## 데이터셋 공유 {#share-a-dataset}
 
-### Share a dataset publicly
+### 데이터셋 공개적으로 공유 {#share-a-dataset-publicly}
 
 <Warning>
-Sharing a dataset publicly will make the **dataset examples, experiments and associated runs, and feedback on this dataset accessible to anyone with the link**, even if they don't have a LangSmith account. Make sure you're not sharing sensitive information.
+데이터셋을 공개적으로 공유하면 **데이터셋 예제, 실험 및 관련 실행, 이 데이터셋에 대한 피드백이 LangSmith 계정이 없는 사용자를 포함하여 링크를 가진 모든 사람에게 액세스 가능**하게 됩니다. 민감한 정보를 공유하지 않도록 주의하세요.
 
-This feature is only available in the cloud-hosted version of LangSmith.
+이 기능은 LangSmith의 클라우드 호스팅 버전에서만 사용할 수 있습니다.
 </Warning>
 
-From the **Dataset & Experiments** tab, select a dataset, click **⋮** (top right of the page), click **Share Dataset**. This will open a dialog where you can copy the link to the dataset.
+**Dataset & Experiments** 탭에서 데이터셋을 선택하고 **⋮** (페이지 우측 상단)을 클릭한 다음 **Share Dataset**을 클릭합니다. 데이터셋 링크를 복사할 수 있는 대화 상자가 열립니다.
 
 ![Share Dataset](/langsmith/images/share-dataset.gif)
 
-### Unshare a dataset
+### 데이터셋 공유 해제 {#unshare-a-dataset}
 
-1. Click on **Unshare** by clicking on **Public** in the upper right hand corner of any publicly shared dataset, then **Unshare** in the dialog. ![Unshare Dataset](/langsmith/images/unshare-dataset.png)
+1. 공개적으로 공유된 데이터셋의 우측 상단에 있는 **Public**을 클릭한 다음 대화 상자에서 **Unshare**를 클릭하여 **Unshare**합니다. ![Unshare Dataset](/langsmith/images/unshare-dataset.png)
 
-2. Navigate to your organization's list of publicly shared datasets, by clicking on **Settings** -> **Shared URLs** or [this link](https://smith.langchain.com/settings/shared), then click on **Unshare** next to the dataset you want to unshare.
+2. **Settings** -> **Shared URLs** 또는 [이 링크](https://smith.langchain.com/settings/shared)를 클릭하여 조직의 공개적으로 공유된 데이터셋 목록으로 이동한 다음 공유 해제하려는 데이터셋 옆의 **Unshare**를 클릭합니다.
 
 ![Unshare Trace List](/langsmith/images/unshare-trace-list.png)
 
-## Export a dataset
+## 데이터셋 내보내기 {#export-a-dataset}
 
-You can export your LangSmith dataset to a CSV, JSONL, or [OpenAI's fine tuning format](https://platform.openai.com/docs/guides/fine-tuning#example-format) from the LangSmith UI.
+LangSmith UI에서 LangSmith 데이터셋을 CSV, JSONL 또는 [OpenAI의 파인 튜닝 형식](https://platform.openai.com/docs/guides/fine-tuning#example-format)으로 내보낼 수 있습니다.
 
-From the **Dataset & Experiments** tab, select a dataset, click **⋮** (top right of the page), click **Download Dataset**.
+**Dataset & Experiments** 탭에서 데이터셋을 선택하고 **⋮** (페이지 우측 상단)을 클릭한 다음 **Download Dataset**을 클릭합니다.
 
 ![Export Dataset Button](/langsmith/images/export-dataset-button.gif)
 
-## Export filtered traces from experiment to dataset
+## 실험에서 필터링된 트레이스를 데이터셋으로 내보내기 {#export-filtered-traces-from-experiment-to-dataset}
 
-After running an [offline evaluation](/langsmith/evaluation-concepts#offline-evaluation) in LangSmith, you may want to export [traces](/langsmith/observability-concepts#traces) that met some evaluation criteria to a dataset.
+LangSmith에서 [오프라인 평가](/langsmith/evaluation-concepts#offline-evaluation)를 실행한 후 일부 평가 기준을 충족한 [트레이스](/langsmith/observability-concepts#traces)를 데이터셋으로 내보낼 수 있습니다.
 
-### View experiment traces
+### 실험 트레이스 보기
 
 ![Export filtered traces](/langsmith/images/export-filtered-trace-to-dataset.png)
 
-To do so, first click on the arrow next to your experiment name. This will direct you to a project that contains the traces generated from your experiment.
+먼저 실험 이름 옆의 화살표를 클릭합니다. 그러면 실험에서 생성된 트레이스가 포함된 프로젝트로 이동합니다.
 
 ![Export filtered traces](/langsmith/images/experiment-tracing-project.png)
 
-From there, you can filter the traces based on your evaluation criteria. In this example, we're filtering for all traces that received an accuracy score greater than 0.5.
+여기에서 평가 기준에 따라 트레이스를 필터링할 수 있습니다. 이 예제에서는 정확도 점수가 0.5보다 큰 모든 트레이스를 필터링합니다.
 
 ![Export filtered traces](/langsmith/images/filtered-traces-from-experiment.png)
 
-After applying the filter on the project, we can multi-select runs to add to the dataset, and click **Add to Dataset**.
+프로젝트에 필터를 적용한 후 데이터셋에 추가할 실행을 다중 선택하고 **Add to Dataset**을 클릭합니다.
 
 ![Export filtered traces](/langsmith/images/add-filtered-traces-to-dataset.png)
 
