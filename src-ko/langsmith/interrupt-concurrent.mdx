@@ -1,15 +1,15 @@
 ---
-title: Interrupt concurrent
-sidebarTitle: Interrupt
+title: 동시 실행 중단
+sidebarTitle: 중단
 ---
 
-This guide assumes knowledge of what double-texting is, which you can learn about in the [double-texting conceptual guide](/langsmith/double-texting).
+이 가이드는 더블 텍스팅이 무엇인지에 대한 지식을 전제로 하며, [더블 텍스팅 개념 가이드](/langsmith/double-texting)에서 관련 내용을 학습할 수 있습니다.
 
-The guide covers the `interrupt` option for double texting, which interrupts the prior run of the graph and starts a new one with the double-text. This option does not delete the first run, but rather keeps it in the database but sets its status to `interrupted`. Below is a quick example of using the `interrupt` option.
+이 가이드는 더블 텍스팅을 위한 `interrupt` 옵션을 다룹니다. 이 옵션은 이전 그래프 실행을 중단하고 더블 텍스트로 새로운 실행을 시작합니다. 이 옵션은 첫 번째 실행을 삭제하지 않고 데이터베이스에 유지하되 상태를 `interrupted`로 설정합니다. 아래는 `interrupt` 옵션을 사용하는 간단한 예제입니다.
 
-## Setup
+## 설정
 
-First, we will define a quick helper function for printing out JS and CURL model outputs (you can skip this if using Python):
+먼저 JS 및 CURL 모델 출력을 출력하기 위한 간단한 헬퍼 함수를 정의합니다 (Python을 사용하는 경우 이 단계를 건너뛸 수 있습니다):
 
 <Tabs>
     <Tab title="Javascript">
@@ -49,7 +49,7 @@ First, we will define a quick helper function for printing out JS and CURL model
     </Tab>
 </Tabs>
 
-Now, let's import our required packages and instantiate our client, assistant, and thread.
+이제 필요한 패키지를 가져오고 클라이언트, 어시스턴트, 스레드를 인스턴스화하겠습니다.
 
 <Tabs>
     <Tab title="Python">
@@ -85,9 +85,9 @@ Now, let's import our required packages and instantiate our client, assistant, a
     </Tab>
 </Tabs>
 
-## Create runs
+## 실행 생성
 
-Now we can start our two runs and join the second one until it has completed:
+이제 두 개의 실행을 시작하고 두 번째 실행이 완료될 때까지 조인할 수 있습니다:
 
 <Tabs>
     <Tab title="Python">
@@ -155,9 +155,9 @@ Now we can start our two runs and join the second one until it has completed:
     </Tab>
 </Tabs>
 
-## View run results
+## 실행 결과 확인
 
-We can see that the thread has partial data from the first run + data from the second run
+스레드에 첫 번째 실행의 부분 데이터와 두 번째 실행의 데이터가 포함되어 있는 것을 확인할 수 있습니다.
 
 <Tabs>
     <Tab title="Python">
@@ -190,7 +190,7 @@ We can see that the thread has partial data from the first run + data from the s
     </Tab>
 </Tabs>
 
-Output:
+출력:
 
 ```
 ================================ Human Message =================================
@@ -235,7 +235,7 @@ The search results provide weather forecasts and information for New York City. 
 So in summary, the search provides a convenient overview of the expected weather conditions in New York City over the next month to give you an idea of what to prepare for if traveling or making plans there. Let me know if you need any other details!
 ```
 
-Verify that the original, interrupted run was interrupted
+원래 중단된 실행이 실제로 중단되었는지 확인합니다.
 
 <Tabs>
     <Tab title="Python">
@@ -250,7 +250,7 @@ Verify that the original, interrupted run was interrupted
     </Tab>
 </Tabs>
 
-Output:
+출력:
 
 ```
 'interrupted'

@@ -1,20 +1,20 @@
 ---
-title: How to create and manage datasets programmatically
-sidebarTitle: With the SDK
+title: 프로그래밍 방식으로 데이터셋을 생성하고 관리하는 방법
+sidebarTitle: SDK 사용
 ---
 
-You can use the Python and TypeScript SDK to manage datasets programmatically. This includes creating, updating, and deleting datasets, as well as adding examples to them.
+Python 및 TypeScript SDK를 사용하여 프로그래밍 방식으로 데이터셋을 관리할 수 있습니다. 여기에는 데이터셋 생성, 업데이트, 삭제 및 예제 추가가 포함됩니다.
 
-## Create a dataset
+## 데이터셋 생성
 
-### Create a dataset from list of values
+### 값 목록으로 데이터셋 생성
 
-The most flexible way to make a dataset using the client is by creating examples from a list of inputs and optional outputs. Below is an example.
+클라이언트를 사용하여 데이터셋을 만드는 가장 유연한 방법은 입력 목록과 선택적 출력으로부터 예제를 생성하는 것입니다. 다음은 예시입니다.
 
-Note that you can add arbitrary metadata to each example, such as a note or a source. The metadata is stored as a dictionary.
+각 예제에 노트나 출처와 같은 임의의 메타데이터를 추가할 수 있습니다. 메타데이터는 딕셔너리로 저장됩니다.
 
 <Check>
-If you have many examples to create, consider using the `create_examples`/`createExamples` method to create multiple examples in a single request. If creating a single example, you can use the `create_example`/`createExample` method.
+생성할 예제가 많은 경우, 단일 요청으로 여러 예제를 생성하기 위해 `create_examples`/`createExamples` 메서드를 사용하는 것을 고려하세요. 단일 예제를 생성하는 경우 `create_example`/`createExample` 메서드를 사용할 수 있습니다.
 </Check>
 
 <CodeGroup>
@@ -48,13 +48,13 @@ examples = [
 client = Client()
 dataset_name = "Elementary Animal Questions"
 
-# Storing inputs in a dataset lets us
-# run chains and LLMs over a shared set of examples.
+# 데이터셋에 입력을 저장하면
+# 공유된 예제 세트에 대해 체인과 LLM을 실행할 수 있습니다.
 dataset = client.create_dataset(
   dataset_name=dataset_name, description="Questions and answers about animal phylogenetics.",
 )
 
-# Prepare inputs, outputs, and metadata for bulk creation
+# 대량 생성을 위한 입력, 출력 및 메타데이터 준비
 client.create_examples(
   dataset_id=dataset.id,
   examples=examples
@@ -78,18 +78,18 @@ const exampleInputs: [string, string][] = [
 
 const datasetName = "Elementary Animal Questions";
 
-// Storing inputs in a dataset lets us
-// run chains and LLMs over a shared set of examples.
+// 데이터셋에 입력을 저장하면
+// 공유된 예제 세트에 대해 체인과 LLM을 실행할 수 있습니다.
 const dataset = await client.createDataset(datasetName, {
   description: "Questions and answers about animal phylogenetics",
 });
 
-// Prepare inputs, outputs, and metadata for bulk creation
+// 대량 생성을 위한 입력, 출력 및 메타데이터 준비
 const inputs = exampleInputs.map(([inputPrompt]) => ({ question: inputPrompt }));
 const outputs = exampleInputs.map(([, outputAnswer]) => ({ answer: outputAnswer }));
 const metadata = exampleInputs.map(() => ({ source: "Wikipedia" }));
 
-// Use the bulk createExamples method
+// 대량 createExamples 메서드 사용
 await client.createExamples({
   inputs,
   outputs,
@@ -100,9 +100,9 @@ await client.createExamples({
 
 </CodeGroup>
 
-### Create a dataset from traces
+### 트레이스로부터 데이터셋 생성
 
-To create datasets from the runs (spans) of your traces, you can use the same approach. For **many** more examples of how to fetch and filter runs, see the [export traces](/langsmith/export-traces) guide. Below is an example:
+트레이스의 실행(스팬)으로부터 데이터셋을 생성하려면 동일한 방법을 사용할 수 있습니다. 실행을 가져오고 필터링하는 방법에 대한 **훨씬 더 많은** 예제는 [트레이스 내보내기](/langsmith/export-traces) 가이드를 참조하세요. 다음은 예시입니다:
 
 <CodeGroup>
 
@@ -112,7 +112,7 @@ from langsmith import Client
 client = Client()
 dataset_name = "Example Dataset"
 
-# Filter runs to add to the dataset
+# 데이터셋에 추가할 실행 필터링
 runs = client.list_runs(
   project_name="my_project",
   is_root=True,
@@ -121,10 +121,10 @@ runs = client.list_runs(
 
 dataset = client.create_dataset(dataset_name, description="An example dataset")
 
-# Prepare inputs and outputs for bulk creation
+# 대량 생성을 위한 입력 및 출력 준비
 examples = [{"inputs": run.inputs, "outputs": run.outputs} for run in runs]
 
-# Use the bulk create_examples method
+# 대량 create_examples 메서드 사용
 client.create_examples(
   dataset_id=dataset.id,
   examples=examples
@@ -137,7 +137,7 @@ import { Client, Run } from "langsmith";
 const client = new Client();
 const datasetName = "Example Dataset";
 
-// Filter runs to add to the dataset
+// 데이터셋에 추가할 실행 필터링
 const runs: Run[] = [];
 for await (const run of client.listRuns({
   projectName: "my_project",
@@ -152,11 +152,11 @@ const dataset = await client.createDataset(datasetName, {
   dataType: "kv",
 });
 
-// Prepare inputs and outputs for bulk creation
+// 대량 생성을 위한 입력 및 출력 준비
 const inputs = runs.map(run => run.inputs);
 const outputs = runs.map(run => run.outputs ?? {});
 
-// Use the bulk createExamples method
+// 대량 createExamples 메서드 사용
 await client.createExamples({
   inputs,
   outputs,
@@ -166,11 +166,11 @@ await client.createExamples({
 
 </CodeGroup>
 
-### Create a dataset from a CSV file
+### CSV 파일로부터 데이터셋 생성
 
-In this section, we will demonstrate how you can create a dataset by uploading a CSV file.
+이 섹션에서는 CSV 파일을 업로드하여 데이터셋을 생성하는 방법을 보여드립니다.
 
-First, ensure your CSV file is properly formatted with columns that represent your input and output keys. These keys will be utilized to map your data properly during the upload. You can specify an optional name and description for your dataset. Otherwise, the file name will be used as the dataset name and no description will be provided.
+먼저, 입력 및 출력 키를 나타내는 열로 CSV 파일이 적절하게 형식화되어 있는지 확인하세요. 이러한 키는 업로드 중에 데이터를 올바르게 매핑하는 데 사용됩니다. 데이터셋에 대한 선택적 이름과 설명을 지정할 수 있습니다. 그렇지 않으면 파일 이름이 데이터셋 이름으로 사용되며 설명은 제공되지 않습니다.
 
 <CodeGroup>
 
@@ -180,8 +180,8 @@ import os
 
 client = Client()
 csv_file = 'path/to/your/csvfile.csv'
-input_keys = ['column1', 'column2'] # replace with your input column names
-output_keys = ['output1', 'output2'] # replace with your output column names
+input_keys = ['column1', 'column2'] # 입력 열 이름으로 교체
+output_keys = ['output1', 'output2'] # 출력 열 이름으로 교체
 
 dataset = client.upload_csv(
   csv_file=csv_file,
@@ -198,8 +198,8 @@ import { Client } from "langsmith";
 
 const client = new Client();
 const csvFile = 'path/to/your/csvfile.csv';
-const inputKeys = ['column1', 'column2']; // replace with your input column names
-const outputKeys = ['output1', 'output2']; // replace with your output column names
+const inputKeys = ['column1', 'column2']; // 입력 열 이름으로 교체
+const outputKeys = ['output1', 'output2']; // 출력 열 이름으로 교체
 
 const dataset = await client.uploadCsv({
   csvFile: csvFile,
@@ -213,9 +213,9 @@ const dataset = await client.uploadCsv({
 
 </CodeGroup>
 
-### Create a dataset from pandas DataFrame (Python only)
+### pandas DataFrame으로부터 데이터셋 생성 (Python 전용)
 
-The python client offers an additional convenience method to upload a dataset from a pandas dataframe.
+Python 클라이언트는 pandas 데이터프레임으로부터 데이터셋을 업로드하는 추가적인 편의 메서드를 제공합니다.
 
 ```python
 from langsmith import Client
@@ -224,8 +224,8 @@ import pandas as pd
 
 client = Client()
 df = pd.read_parquet('path/to/your/myfile.parquet')
-input_keys = ['column1', 'column2'] # replace with your input column names
-output_keys = ['output1', 'output2'] # replace with your output column names
+input_keys = ['column1', 'column2'] # 입력 열 이름으로 교체
+output_keys = ['output1', 'output2'] # 출력 열 이름으로 교체
 
 dataset = client.upload_dataframe(
     df=df,
@@ -233,16 +233,16 @@ dataset = client.upload_dataframe(
     output_keys=output_keys,
     name="My Parquet Dataset",
     description="Dataset created from a parquet file",
-    data_type="kv" # The default
+    data_type="kv" # 기본값
 )
 ```
 
-## Fetch datasets
+## 데이터셋 가져오기
 
-You can programmatically fetch datasets from LangSmith using the `list_datasets`/`listDatasets` method in the Python and TypeScript SDKs. Below are some common calls.
+Python 및 TypeScript SDK의 `list_datasets`/`listDatasets` 메서드를 사용하여 LangSmith에서 프로그래밍 방식으로 데이터셋을 가져올 수 있습니다. 다음은 일반적인 호출입니다.
 
 <Info>
-Initialize the client before running the below code snippets.
+아래 코드 스니펫을 실행하기 전에 클라이언트를 초기화하세요.
 </Info>
 
 <CodeGroup>
@@ -261,7 +261,7 @@ const client = new Client();
 
 </CodeGroup>
 
-### Query all datasets
+### 모든 데이터셋 조회
 
 <CodeGroup>
 
@@ -275,9 +275,9 @@ const datasets = await client.listDatasets();
 
 </CodeGroup>
 
-### List datasets by name
+### 이름으로 데이터셋 목록 조회
 
-If you want to search by the exact name, you can do the following:
+정확한 이름으로 검색하려면 다음과 같이 할 수 있습니다:
 
 <CodeGroup>
 
@@ -293,7 +293,7 @@ const datasets = await client.listDatasets({
 
 </CodeGroup>
 
-If you want to do a case-invariant substring search, try the following:
+대소문자를 구분하지 않는 부분 문자열 검색을 하려면 다음을 시도해 보세요:
 
 <CodeGroup>
 
@@ -309,9 +309,9 @@ const datasets = await client.listDatasets({
 
 </CodeGroup>
 
-### List datasets by type
+### 타입별로 데이터셋 목록 조회
 
-You can filter datasets by type. Below is an example querying for chat datasets.
+타입별로 데이터셋을 필터링할 수 있습니다. 다음은 채팅 데이터셋을 쿼리하는 예시입니다.
 
 <CodeGroup>
 
@@ -327,12 +327,12 @@ const datasets = await client.listDatasets({
 
 </CodeGroup>
 
-## Fetch examples
+## 예제 가져오기
 
-You can programmatically fetch examples from LangSmith using the `list_examples`/`listExamples` method in the Python and TypeScript SDKs. Below are some common calls.
+Python 및 TypeScript SDK의 `list_examples`/`listExamples` 메서드를 사용하여 LangSmith에서 프로그래밍 방식으로 예제를 가져올 수 있습니다. 다음은 일반적인 호출입니다.
 
 <Info>
-Initialize the client before running the below code snippets.
+아래 코드 스니펫을 실행하기 전에 클라이언트를 초기화하세요.
 </Info>
 
 <CodeGroup>
@@ -351,9 +351,9 @@ const client = new Client();
 
 </CodeGroup>
 
-### List all examples for a dataset
+### 데이터셋의 모든 예제 나열
 
-You can filter by dataset ID:
+데이터셋 ID로 필터링할 수 있습니다:
 
 <CodeGroup>
 
@@ -369,7 +369,7 @@ const examples = await client.listExamples({
 
 </CodeGroup>
 
-Or you can filter by dataset name (this must exactly match the dataset name you want to query)
+또는 데이터셋 이름으로 필터링할 수 있습니다(쿼리하려는 데이터셋 이름과 정확히 일치해야 합니다).
 
 <CodeGroup>
 
@@ -385,9 +385,9 @@ const examples = await client.listExamples({
 
 </CodeGroup>
 
-### List examples by id
+### ID로 예제 나열
 
-You can also list multiple examples all by ID.
+ID로 여러 예제를 모두 나열할 수도 있습니다.
 
 <CodeGroup>
 
@@ -415,11 +415,11 @@ const examples = await client.listExamples({
 
 </CodeGroup>
 
-### List examples by metadata
+### 메타데이터로 예제 나열
 
-You can also filter examples by metadata. Below is an example querying for examples with a specific metadata key-value pair. Under the hood, we check to see if the example's metadata contains the key-value pair(s) you specify.
+메타데이터로 예제를 필터링할 수도 있습니다. 다음은 특정 메타데이터 키-값 쌍을 가진 예제를 쿼리하는 예시입니다. 내부적으로 예제의 메타데이터에 지정한 키-값 쌍이 포함되어 있는지 확인합니다.
 
-For example, if you have an example with metadata `{"foo": "bar", "baz": "qux"}`, both `{foo: bar}` and `{baz: qux}` would match, as would `{foo: bar, baz: qux}`.
+예를 들어, 메타데이터가 `{"foo": "bar", "baz": "qux"}`인 예제가 있는 경우, `{foo: bar}` 및 `{baz: qux}` 모두 일치하며, `{foo: bar, baz: qux}`도 일치합니다.
 
 <CodeGroup>
 
@@ -436,17 +436,17 @@ const examples = await client.listExamples({
 
 </CodeGroup>
 
-### List examples by structured filter
+### 구조화된 필터로 예제 나열
 
-Similar to how you can use the structured filter query language to [fetch runs](/langsmith/export-traces#use-filter-query-language), you can use it to fetch examples.
+[실행 가져오기](/langsmith/export-traces#use-filter-query-language)에 구조화된 필터 쿼리 언어를 사용할 수 있는 것처럼 예제를 가져오는 데도 사용할 수 있습니다.
 
 <Note>
-This is currently only available in v0.1.83 and later of the Python SDK and v0.1.35 and later of the TypeScript SDK.
+이 기능은 현재 Python SDK v0.1.83 이상 및 TypeScript SDK v0.1.35 이상에서만 사용할 수 있습니다.
 
-Additionally, the structured filter query language is only supported for `metadata` fields.
+또한, 구조화된 필터 쿼리 언어는 `metadata` 필드에만 지원됩니다.
 </Note>
 
-You can use the `has` operator to fetch examples with metadata fields that contain specific key/value pairs and the `exists` operator to fetch examples with metadata fields that contain a specific key. Additionally, you can also chain multiple filters together using the `and` operator and negate a filter using the `not` operator.
+`has` 연산자를 사용하여 특정 키/값 쌍을 포함하는 메타데이터 필드가 있는 예제를 가져오고, `exists` 연산자를 사용하여 특정 키를 포함하는 메타데이터 필드가 있는 예제를 가져올 수 있습니다. 또한, `and` 연산자를 사용하여 여러 필터를 연결하고 `not` 연산자를 사용하여 필터를 부정할 수도 있습니다.
 
 <CodeGroup>
 
@@ -466,11 +466,11 @@ const examples = await client.listExamples({
 
 </CodeGroup>
 
-## Update examples
+## 예제 업데이트
 
-### Update single example
+### 단일 예제 업데이트
 
-You can programmatically update examples from LangSmith using the `update_example`/`updateExample` method in the Python and TypeScript SDKs. Below is an example.
+Python 및 TypeScript SDK의 `update_example`/`updateExample` 메서드를 사용하여 LangSmith에서 프로그래밍 방식으로 예제를 업데이트할 수 있습니다. 다음은 예시입니다.
 
 <CodeGroup>
 
@@ -495,9 +495,9 @@ await client.updateExample(example.id, {
 
 </CodeGroup>
 
-### Bulk update examples
+### 대량 예제 업데이트
 
-You can also programmatically update multiple examples in a single request with the `update_examples`/`updateExamples` method in the Python and TypeScript SDKs. Below is an example.
+Python 및 TypeScript SDK의 `update_examples`/`updateExamples` 메서드를 사용하여 단일 요청으로 여러 예제를 프로그래밍 방식으로 업데이트할 수도 있습니다. 다음은 예시입니다.
 
 <CodeGroup>
 
@@ -510,7 +510,7 @@ client.update_examples(
       {"output": "updated output 2"},
   ],
   metadata=[{"foo": "baz"}, {"foo": "qux"}],
-  splits=[["training", "foo"], "training"] # Splits can be arrays or standalone strings
+  splits=[["training", "foo"], "training"] # Splits는 배열 또는 독립 문자열이 될 수 있습니다
 )
 ```
 
@@ -521,7 +521,7 @@ await client.updateExamples([
     inputs: { input: "updated input 1" },
     outputs: { output: "updated output 1" },
     metadata: { foo: "baz" },
-    split: ["training", "foo"] // Splits can be arrays or standalone strings
+    split: ["training", "foo"] // Splits는 배열 또는 독립 문자열이 될 수 있습니다
   },
   {
     id: example2.id,

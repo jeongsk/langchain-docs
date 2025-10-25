@@ -2,58 +2,56 @@
 title: LangGraph Server
 ---
 
-**LangGraph Server** offers an API for creating and managing agent-based applications. It is built on the concept of [assistants](/langsmith/assistants), which are agents configured for specific tasks, and includes built-in [persistence](/oss/langgraph/persistence#memory-store) and a **task queue**. This versatile API supports a wide range of agentic application use cases, from background processing to real-time interactions.
+**LangGraph Server**는 에이전트 기반 애플리케이션을 생성하고 관리하기 위한 API를 제공합니다. 이는 특정 작업을 위해 구성된 에이전트인 [어시스턴트](/langsmith/assistants) 개념을 기반으로 구축되었으며, 내장된 [영속성](/oss/langgraph/persistence#memory-store)과 **태스크 큐**를 포함합니다. 이 다목적 API는 백그라운드 처리부터 실시간 상호작용까지 광범위한 에이전틱 애플리케이션 사용 사례를 지원합니다.
 
-Use LangGraph Server to create and manage [assistants](/langsmith/assistants), [threads](/oss/langgraph/persistence#threads), [runs](/langsmith/assistants#execution), [cron jobs](/langsmith/cron-jobs), [webhooks](/langsmith/use-webhooks), and more.
+LangGraph Server를 사용하여 [어시스턴트](/langsmith/assistants), [스레드](/oss/langgraph/persistence#threads), [실행](/langsmith/assistants#execution), [크론 작업](/langsmith/cron-jobs), [웹훅](/langsmith/use-webhooks) 등을 생성하고 관리할 수 있습니다.
 
 <Tip>
-**API reference**<br></br>
-For detailed information on the API endpoints and data models, refer to the [API reference docs](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html).
+**API 참조**<br></br>
+API 엔드포인트 및 데이터 모델에 대한 자세한 정보는 [API 참조 문서](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html)를 참조하세요.
 </Tip>
 
-To use the `Enterprise` version of the LangGraph Server, you must acquire a license key that you will need to specify when running the Docker image. To acquire a license key, [contact our sales team](https://www.langchain.com/contact-sales).
+LangGraph Server의 `Enterprise` 버전을 사용하려면 Docker 이미지를 실행할 때 지정해야 하는 라이선스 키를 획득해야 합니다. 라이선스 키를 획득하려면 [영업팀에 문의](https://www.langchain.com/contact-sales)하세요.
 
-You can run the `Enterprise` version of the LangGraph Server on the following LangSmith [hosting](/langsmith/hosting) options:
+다음 LangSmith [호스팅](/langsmith/hosting) 옵션에서 LangGraph Server의 `Enterprise` 버전을 실행할 수 있습니다:
 
-- [Cloud](/langsmith/cloud)
-- [Hybrid](/langsmith/hybrid)
-- [Self-hosted](/langsmith/self-hosted)
+- [클라우드](/langsmith/cloud)
+- [하이브리드](/langsmith/hybrid)
+- [자체 호스팅](/langsmith/self-hosted)
 
-## Application structure
+## 애플리케이션 구조
 
-To deploy a LangGraph Server application, you need to specify the graph(s) you want to deploy, as well as any relevant configuration settings, such as dependencies and environment variables.
+LangGraph Server 애플리케이션을 배포하려면 배포하려는 그래프와 의존성 및 환경 변수와 같은 관련 구성 설정을 지정해야 합니다.
 
-Read the [application structure](/langsmith/application-structure) guide to learn how to structure your LangGraph application for deployment.
+배포를 위해 LangGraph 애플리케이션을 구조화하는 방법을 알아보려면 [애플리케이션 구조](/langsmith/application-structure) 가이드를 읽어보세요.
 
-## Parts of a deployment
+## 배포의 구성 요소
 
-When you deploy LangGraph Server, you are deploying one or more [graphs](#graphs), a database for [persistence](/oss/langgraph/persistence), and a task queue.
+LangGraph Server를 배포할 때는 하나 이상의 [그래프](#graphs), [영속성](/oss/langgraph/persistence)을 위한 데이터베이스, 그리고 태스크 큐를 배포하게 됩니다.
 
-### Graphs
+### 그래프
 
-When you deploy a graph with LangGraph Server, you are deploying a "blueprint" for an [Assistant](/langsmith/assistants).
+LangGraph Server로 그래프를 배포할 때는 [어시스턴트](/langsmith/assistants)의 "청사진"을 배포하는 것입니다.
 
-An [Assistant](/langsmith/assistants) is a graph paired with specific configuration settings. You can create multiple assistants per graph, each with unique settings to accommodate different use cases
-that can be served by the same graph.
+[어시스턴트](/langsmith/assistants)는 특정 구성 설정과 쌍을 이루는 그래프입니다. 그래프당 여러 어시스턴트를 생성할 수 있으며, 각 어시스턴트는 동일한 그래프로 제공할 수 있는 다양한 사용 사례를 수용하기 위한 고유한 설정을 가질 수 있습니다.
 
-Upon deployment, LangGraph Server will automatically create a default assistant for each graph using the graph's default configuration settings.
+배포 시 LangGraph Server는 그래프의 기본 구성 설정을 사용하여 각 그래프에 대한 기본 어시스턴트를 자동으로 생성합니다.
 
 <Note>
-We often think of a graph as implementing an [agent](/oss/langgraph/workflows-agents), but a graph does not necessarily need to implement an agent. For example, a graph could implement a simple
-chatbot that only supports back-and-forth conversation, without the ability to influence any application control flow. In reality, as applications get more complex, a graph will often implement a more complex flow that may use [multiple agents](/oss/langchain/multi-agent) working in tandem.
+우리는 종종 그래프를 [에이전트](/oss/langgraph/workflows-agents)를 구현하는 것으로 생각하지만, 그래프가 반드시 에이전트를 구현해야 하는 것은 아닙니다. 예를 들어, 그래프는 애플리케이션 제어 흐름에 영향을 줄 수 있는 능력 없이 양방향 대화만 지원하는 간단한 챗봇을 구현할 수 있습니다. 실제로 애플리케이션이 더 복잡해지면서 그래프는 종종 [여러 에이전트](/oss/langchain/multi-agent)가 함께 작동하는 더 복잡한 흐름을 구현하게 됩니다.
 </Note>
 
-### Persistence and task queue
+### 영속성 및 태스크 큐
 
-LangGraph Server leverages a database for [persistence](/oss/langgraph/persistence) and a task queue.
+LangGraph Server는 [영속성](/oss/langgraph/persistence)을 위한 데이터베이스와 태스크 큐를 활용합니다.
 
-[PostgreSQL](https://www.postgresql.org/) is supported as a database for LangGraph Server and [Redis](https://redis.io/) as the task queue.
+LangGraph Server의 데이터베이스로는 [PostgreSQL](https://www.postgresql.org/)이 지원되며, 태스크 큐로는 [Redis](https://redis.io/)가 지원됩니다.
 
-If you're deploying using [LangSmith cloud](/langsmith/cloud), these components are managed for you. If you're deploying LangGraph Server on your [own infrastructure](/langsmith/self-hosted), you'll need to set up and manage these components yourself.
+[LangSmith 클라우드](/langsmith/cloud)를 사용하여 배포하는 경우 이러한 구성 요소는 자동으로 관리됩니다. [자체 인프라](/langsmith/self-hosted)에 LangGraph Server를 배포하는 경우에는 이러한 구성 요소를 직접 설정하고 관리해야 합니다.
 
-For more information on how these components are set up and managed, review the [hosting options](/langsmith/hosting) guide.
+이러한 구성 요소가 어떻게 설정되고 관리되는지에 대한 자세한 정보는 [호스팅 옵션](/langsmith/hosting) 가이드를 검토하세요.
 
-## Learn more
+## 더 알아보기
 
-- LangGraph [Application Structure](/langsmith/application-structure) guide explains how to structure your LangGraph application for deployment.
-- The [API Reference](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html) provides detailed information on the API endpoints and data models.
+- LangGraph [애플리케이션 구조](/langsmith/application-structure) 가이드는 배포를 위해 LangGraph 애플리케이션을 구조화하는 방법을 설명합니다.
+- [API 참조](https://langchain-ai.github.io/langgraph/cloud/reference/api/api_ref.html)는 API 엔드포인트 및 데이터 모델에 대한 자세한 정보를 제공합니다.

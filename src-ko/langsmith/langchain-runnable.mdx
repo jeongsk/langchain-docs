@@ -1,18 +1,18 @@
 ---
-title: How to evaluate a runnable
-sidebarTitle: Evaluate a runnable
+title: Runnable 평가하는 방법
+sidebarTitle: Runnable 평가하기
 ---
 
 <Info>
-* `langchain`: [Python](https://python.langchain.com) and [JS/TS](https://js.langchain.com)
-* Runnable: [Python](https://python.langchain.com/docs/concepts/runnables/) and [JS/TS](https://js.langchain.com/docs/concepts/runnables/)
+* `langchain`: [Python](https://python.langchain.com) 및 [JS/TS](https://js.langchain.com)
+* Runnable: [Python](https://python.langchain.com/docs/concepts/runnables/) 및 [JS/TS](https://js.langchain.com/docs/concepts/runnables/)
 </Info>
 
-`langchain` [Runnable](https://python.langchain.com/docs/concepts/runnables/) objects (such as chat models, retrievers, chains, etc.) can be passed directly into `evaluate()` / `aevaluate()`.
+`langchain` [Runnable](https://python.langchain.com/docs/concepts/runnables/) 객체(채팅 모델, 리트리버, 체인 등)는 `evaluate()` / `aevaluate()`에 직접 전달할 수 있습니다.
 
-## Setup
+## 설정
 
-Let's define a simple chain to evaluate. First, install all the required packages:
+평가할 간단한 체인을 정의해 보겠습니다. 먼저 필요한 모든 패키지를 설치합니다:
 
 <CodeGroup>
 
@@ -26,7 +26,7 @@ yarn add langsmith @langchain/openai
 
 </CodeGroup>
 
-Now define a chain:
+이제 체인을 정의합니다:
 
 <CodeGroup>
 
@@ -66,9 +66,9 @@ const chain = prompt.pipe(chatModel).pipe(outputParser);
 
 </CodeGroup>
 
-## Evaluate
+## 평가
 
-To evaluate our chain we can pass it directly to the `evaluate()` / `aevaluate()` method. Note that the input variables of the chain must match the keys of the example inputs. In this case, the example inputs should have the form `{"text": "..."}`.
+체인을 평가하려면 `evaluate()` / `aevaluate()` 메서드에 직접 전달하면 됩니다. 체인의 입력 변수는 예제 입력의 키와 일치해야 합니다. 이 경우 예제 입력은 `{"text": "..."}` 형식이어야 합니다.
 
 <CodeGroup>
 
@@ -117,10 +117,10 @@ await evaluate(chain, {
 
 </CodeGroup>
 
-The runnable is traced appropriately for each output.
+Runnable은 각 출력에 대해 적절하게 추적됩니다.
 
 ![Runnable Evaluation](/langsmith/images/runnable-eval.png)
 
-## Related
+## 관련 항목
 
-* [How to evaluate a `langgraph` graph](/langsmith/evaluate-on-intermediate-steps)
+* [`langgraph` 그래프 평가하는 방법](/langsmith/evaluate-on-intermediate-steps)
