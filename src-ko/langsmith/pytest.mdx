@@ -1,28 +1,28 @@
 ---
-title: How to run evaluations with pytest (beta)
-sidebarTitle: Run evaluations with pytest
+title: pytest로 평가를 실행하는 방법 (베타)
+sidebarTitle: pytest로 평가 실행하기
 ---
 
-The LangSmith pytest plugin lets Python developers define their datasets and evaluations as pytest test cases. Compared to the standard evaluation flow, this is useful when:
+LangSmith pytest 플러그인을 사용하면 Python 개발자가 데이터셋과 평가를 pytest 테스트 케이스로 정의할 수 있습니다. 표준 평가 플로우와 비교했을 때, 다음과 같은 경우에 유용합니다:
 
-* Each example requires different evaluation logic
-* You want to assert binary expectations, and both track these assertions in LangSmith and raise assertion errors locally (e.g. in CI pipelines)
-* You want pytest-like terminal outputs
-* You already use pytest to test your app and want to add LangSmith tracking
+* 각 예제마다 다른 평가 로직이 필요한 경우
+* 이진 기댓값을 assert하고, 이러한 assertion을 LangSmith에서 추적하면서 동시에 로컬(예: CI 파이프라인)에서 assertion 에러를 발생시키려는 경우
+* pytest와 유사한 터미널 출력을 원하는 경우
+* 이미 pytest를 사용하여 앱을 테스트하고 있으며 LangSmith 추적을 추가하려는 경우
 
 <Warning>
-The pytest integration is in beta and is subject to change in upcoming releases.
+pytest 통합은 베타 버전이며 향후 릴리스에서 변경될 수 있습니다.
 </Warning>
 
 <Info>
-The JS/TS SDK has an analogous [Vitest/Jest integration](/langsmith/vitest-jest).
+JS/TS SDK에는 이와 유사한 [Vitest/Jest 통합](/langsmith/vitest-jest)이 있습니다.
 </Info>
 
-## Installation
+## 설치
 
-This functionality requires Python SDK version `langsmith>=0.3.4`.
+이 기능을 사용하려면 Python SDK 버전 `langsmith>=0.3.4`가 필요합니다.
 
-For extra features like [rich terminal outputs](#rich-outputs) and [test caching](#caching) install:
+[풍부한 터미널 출력](#rich-outputs) 및 [테스트 캐싱](#caching)과 같은 추가 기능을 사용하려면 다음과 같이 설치하세요:
 
 <CodeGroup>
 ```bash pip
@@ -34,11 +34,11 @@ uv add langsmith[pytest]
 ```
 </CodeGroup>
 
-## Define and run tests
+## 테스트 정의 및 실행
 
-The pytest integration lets you define datasets and evaluators as test cases.
+pytest 통합을 사용하면 데이터셋과 평가자를 테스트 케이스로 정의할 수 있습니다.
 
-To track a test in LangSmith add the `@pytest.mark.langsmith` decorator. Every decorated test case will be synced to a dataset example. When you run the test suite, the dataset will be updated and a new experiment will be created with one result for each test case.
+LangSmith에서 테스트를 추적하려면 `@pytest.mark.langsmith` 데코레이터를 추가하세요. 데코레이트된 모든 테스트 케이스는 데이터셋 예제와 동기화됩니다. 테스트 스위트를 실행하면 데이터셋이 업데이트되고 각 테스트 케이스에 대한 하나의 결과를 포함하는 새로운 실험이 생성됩니다.
 
 <CodeGroup>
 
@@ -84,38 +84,38 @@ def test_sql_generation_select_all() -> None:
 
 </CodeGroup>
 
-When you run this test it will have a default `pass` boolean feedback key based on the test case passing / failing. It will also track any inputs, outputs, and reference (expected) outputs that you log.
+이 테스트를 실행하면 테스트 케이스의 통과/실패 여부에 따라 기본적으로 `pass` 불린 피드백 키가 생성됩니다. 또한 로깅한 입력, 출력 및 참조(예상) 출력도 추적합니다.
 
-Use `pytest` as you normally would to run the tests:
+평소처럼 `pytest`를 사용하여 테스트를 실행하세요:
 
 ```bash
 pytest tests/
 ```
 
-In most cases we recommend setting a test suite name:
+대부분의 경우 테스트 스위트 이름을 설정하는 것을 권장합니다:
 
 ```bash
 LANGSMITH_TEST_SUITE='SQL app tests' pytest tests/
 ```
 
-Each time you run this test suite, LangSmith:
+이 테스트 스위트를 실행할 때마다 LangSmith는:
 
-* creates a [dataset](/langsmith/evaluation-concepts#datasets) for each test file. If a dataset for this test file already exists it will be updated
-* creates an [experiment](/langsmith/evaluation-concepts#experiment) in each created/updated dataset
-* creates an experiment row for each test case, with the inputs, outputs, reference outputs and feedback you've logged
-* collects the pass/fail rate under the `pass` feedback key for each test case
+* 각 테스트 파일에 대한 [데이터셋](/langsmith/evaluation-concepts#datasets)을 생성합니다. 이 테스트 파일에 대한 데이터셋이 이미 존재하는 경우 업데이트됩니다
+* 생성/업데이트된 각 데이터셋에서 [실험](/langsmith/evaluation-concepts#experiment)을 생성합니다
+* 로깅한 입력, 출력, 참조 출력 및 피드백과 함께 각 테스트 케이스에 대한 실험 행을 생성합니다
+* 각 테스트 케이스에 대한 `pass` 피드백 키 아래 통과/실패율을 수집합니다
 
-Here's what a test suite dataset looks like:
+다음은 테스트 스위트 데이터셋의 모습입니다:
 
 ![Dataset](/langsmith/images/simple-pytest-dataset.png)
 
-And what an experiment against that test suite looks like:
+그리고 해당 테스트 스위트에 대한 실험의 모습은 다음과 같습니다:
 
 ![Experiment](/langsmith/images/simple-pytest.png)
 
-## Log inputs, outputs, and reference outputs
+## 입력, 출력 및 참조 출력 로깅
 
-Every time we run a test we're syncing it to a dataset example and tracing it as a run. There's a few different ways that we can trace the example inputs and reference outputs and the run outputs. The simplest is to use the `log_inputs`, `log_outputs`, and `log_reference_outputs` methods. You can run these any time in a test to update the example and run for that test:
+테스트를 실행할 때마다 데이터셋 예제와 동기화하고 실행으로 추적합니다. 예제 입력 및 참조 출력, 그리고 실행 출력을 추적할 수 있는 몇 가지 방법이 있습니다. 가장 간단한 방법은 `log_inputs`, `log_outputs`, `log_reference_outputs` 메서드를 사용하는 것입니다. 테스트 중 언제든지 이러한 메서드를 실행하여 해당 테스트의 예제 및 실행을 업데이트할 수 있습니다:
 
 ```python
 import pytest
@@ -129,11 +129,11 @@ def test_foo() -> None:
     assert True
 ```
 
-Running this test will create/update an example with name "test_foo", inputs `{"a": 1, "b": 2}`, reference outputs `{"foo": "bar"}` and trace a run with outputs `{"foo": "baz"}`.
+이 테스트를 실행하면 이름이 "test_foo"인 예제가 생성/업데이트되고, 입력은 `{"a": 1, "b": 2}`, 참조 출력은 `{"foo": "bar"}`이며, 출력이 `{"foo": "baz"}`인 실행이 추적됩니다.
 
-**NOTE**: If you run `log_inputs`, `log_outputs`, or `log_reference_outputs` twice, the previous values will be overwritten.
+**참고**: `log_inputs`, `log_outputs` 또는 `log_reference_outputs`를 두 번 실행하면 이전 값이 덮어씌워집니다.
 
-Another way to define example inputs and reference outputs is via pytest fixtures/parametrizations. By default any arguments to your test function will be logged as inputs on the corresponding example. If certain arguments are meant to represet reference outputs, you can specify that they should be logged as such using `@pytest.mark.langsmith(output_keys=["name_of_ref_output_arg"])`:
+예제 입력 및 참조 출력을 정의하는 또 다른 방법은 pytest fixture/parametrization을 사용하는 것입니다. 기본적으로 테스트 함수의 모든 인수는 해당 예제의 입력으로 로깅됩니다. 특정 인수가 참조 출력을 나타내는 경우, `@pytest.mark.langsmith(output_keys=["name_of_ref_output_arg"])`를 사용하여 해당 인수가 참조 출력으로 로깅되도록 지정할 수 있습니다:
 
 ```python
 import pytest
@@ -153,11 +153,11 @@ def test_cd(c: int, d: int) -> None:
     assert result == d
 ```
 
-This will create/sync an example with name "test_cd", inputs `{"c": 5}` and reference outputs `{"d": 6}`, and run output `{"d": 10}`.
+이렇게 하면 이름이 "test_cd"이고 입력이 `{"c": 5}`, 참조 출력이 `{"d": 6}`, 실행 출력이 `{"d": 10}`인 예제가 생성/동기화됩니다.
 
-## Log feedback
+## 피드백 로깅
 
-By default LangSmith collects the pass/fail rate under the `pass` feedback key for each test case. You can add additional feedback with `log_feedback`.
+기본적으로 LangSmith는 각 테스트 케이스에 대한 `pass` 피드백 키 아래 통과/실패율을 수집합니다. `log_feedback`을 사용하여 추가 피드백을 추가할 수 있습니다.
 
 ```python
 import openai
@@ -199,35 +199,35 @@ def test_offtopic_input() -> None:
     assert score
 ```
 
-Note the use of the `trace_feedback()` context manager. This makes it so that the LLM-as-judge call is traced separately from the rest of the test case. Instead of showing up in the main test case run it will instead show up in the trace for the `correct` feedback key.
+`trace_feedback()` 컨텍스트 매니저의 사용에 주목하세요. 이를 통해 LLM-as-judge 호출이 테스트 케이스의 나머지 부분과 별도로 추적됩니다. 메인 테스트 케이스 실행에 표시되는 대신 `correct` 피드백 키에 대한 추적에 표시됩니다.
 
-**NOTE**: Make sure that the `log_feedback` call associated with the feedback trace occurs inside the `trace_feedback` context. This way we'll be able to associate the feedback with the trace, and when seeing the feedback in the UI you'll be able to click on it to see the trace that generated it.
+**참고**: 피드백 추적과 연결된 `log_feedback` 호출이 `trace_feedback` 컨텍스트 내에서 발생하는지 확인하세요. 이렇게 하면 피드백을 추적과 연결할 수 있으며, UI에서 피드백을 볼 때 클릭하여 해당 피드백을 생성한 추적을 확인할 수 있습니다.
 
-## Trace intermediate calls
+## 중간 호출 추적
 
-LangSmith will automatically trace any traceable intermediate calls that happen in the course of test case execution.
+LangSmith는 테스트 케이스 실행 과정에서 발생하는 모든 추적 가능한 중간 호출을 자동으로 추적합니다.
 
-## Grouping tests into a test suite
+## 테스트를 테스트 스위트로 그룹화
 
-By default, all tests within a given file will be grouped as a single "test suite" with a corresponding dataset. You can configure which test suite a test belongs to by passing the `test_suite_name` parameter to `@pytest.mark.langsmith` for case-by-case grouping, or you can set the `LANGSMITH_TEST_SUITE` env var to group all tests from an execution into a single test suite:
+기본적으로 주어진 파일 내의 모든 테스트는 해당 데이터셋이 있는 단일 "테스트 스위트"로 그룹화됩니다. 케이스별 그룹화를 위해 `@pytest.mark.langsmith`에 `test_suite_name` 매개변수를 전달하여 테스트가 속한 테스트 스위트를 구성하거나, `LANGSMITH_TEST_SUITE` 환경 변수를 설정하여 실행의 모든 테스트를 단일 테스트 스위트로 그룹화할 수 있습니다:
 
 ```bash
 LANGSMITH_TEST_SUITE="SQL app tests" pytest tests/
 ```
 
-We generally recommend setting `LANGSMITH_TEST_SUITE` to get a consolidated view of all of your results.
+모든 결과를 통합하여 확인하려면 일반적으로 `LANGSMITH_TEST_SUITE`를 설정하는 것을 권장합니다.
 
-## Naming experiments
+## 실험 이름 지정
 
-You can name an experiment using the `LANGSMITH_EXPERIMENT` env var:
+`LANGSMITH_EXPERIMENT` 환경 변수를 사용하여 실험 이름을 지정할 수 있습니다:
 
 ```bash
 LANGSMITH_TEST_SUITE="SQL app tests" LANGSMITH_EXPERIMENT="baseline" pytest tests/
 ```
 
-## Caching
+## 캐싱
 
-LLMs on every commit in CI can get expensive. To save time and resources, LangSmith lets you cache HTTP requests to disk. To enable caching, install with `langsmith[pytest]` and set an env var: `LANGSMITH_TEST_CACHE=/my/cache/path`:
+CI에서 커밋할 때마다 LLM을 호출하는 것은 비용이 많이 들 수 있습니다. 시간과 리소스를 절약하기 위해 LangSmith를 사용하면 HTTP 요청을 디스크에 캐시할 수 있습니다. 캐싱을 활성화하려면 `langsmith[pytest]`로 설치하고 환경 변수 `LANGSMITH_TEST_CACHE=/my/cache/path`를 설정하세요:
 
 <CodeGroup>
 ```bash pip
@@ -241,9 +241,9 @@ LANGSMITH_TEST_CACHE=tests/cassettes pytest tests/my_llm_tests
 ```
 </CodeGroup>
 
-All requests will be cached to `tests/cassettes` and loaded from there on subsequent runs. If you check this in to your repository, your CI will be able to use the cache as well.
+모든 요청은 `tests/cassettes`에 캐시되고 이후 실행 시 거기에서 로드됩니다. 이를 저장소에 체크인하면 CI에서도 캐시를 사용할 수 있습니다.
 
-In `langsmith>=0.4.10`, you may selectively enable caching for requests to individual URLs or hostnames like this:
+`langsmith>=0.4.10`에서는 다음과 같이 개별 URL 또는 호스트명에 대한 요청에 대해 선택적으로 캐싱을 활성화할 수 있습니다:
 
 ```python
 @pytest.mark.langsmith(cached_hosts=["api.openai.com", "https://api.anthropic.com"])
@@ -251,13 +251,13 @@ def my_test():
     ...
 ```
 
-## pytest features
+## pytest 기능
 
-`@pytest.mark.langsmith` is designed to stay out of your way and works well with familiar `pytest` features.
+`@pytest.mark.langsmith`는 방해가 되지 않도록 설계되었으며 익숙한 `pytest` 기능과 잘 작동합니다.
 
-### Parametrize with `pytest.mark.parametrize`
+### `pytest.mark.parametrize`로 매개변수화
 
-You can use the `parametrize` decorator as before. This will create a new test case for each parametrized instance of the test.
+이전처럼 `parametrize` 데코레이터를 사용할 수 있습니다. 이렇게 하면 테스트의 매개변수화된 각 인스턴스에 대해 새로운 테스트 케이스가 생성됩니다.
 
 ```python
 @pytest.mark.langsmith(output_keys=["expected_sql"])
@@ -273,11 +273,11 @@ def test_sql_generation_parametrized(user_query, expected_sql):
     assert sql == expected_sql
 ```
 
-**Note:** as the parametrized list grows, you may consider using `evaluate()` instead. This parallelizes the evaluation and makes it easier to control individual experiments and the corresponding dataset.
+**참고:** 매개변수화된 목록이 커지면 대신 `evaluate()`를 사용하는 것을 고려하세요. 이렇게 하면 평가가 병렬화되고 개별 실험 및 해당 데이터셋을 더 쉽게 제어할 수 있습니다.
 
-### Parallelize with `pytest-xdist`
+### `pytest-xdist`로 병렬화
 
-You can use [pytest-xdist](https://pytest-xdist.readthedocs.io/en/stable/) as you normally would to parallelize test execution:
+평소처럼 [pytest-xdist](https://pytest-xdist.readthedocs.io/en/stable/)를 사용하여 테스트 실행을 병렬화할 수 있습니다:
 
 <CodeGroup>
 ```bash pip
@@ -291,13 +291,13 @@ pytest -n auto tests
 ```
 </CodeGroup>
 
-### Async tests with `pytest-asyncio`
+### `pytest-asyncio`를 사용한 비동기 테스트
 
-`@pytest.mark.langsmith` works with sync or async tests, so you can run async tests exactly as before.
+`@pytest.mark.langsmith`는 동기 또는 비동기 테스트와 함께 작동하므로 이전과 똑같이 비동기 테스트를 실행할 수 있습니다.
 
-### Watch mode with `pytest-watch`
+### `pytest-watch`를 사용한 감시 모드
 
-Use watch mode to quickly iterate on your tests. We *highly* recommend ony using this with test caching (see below) enabled to avoid unnecessary LLM calls:
+감시 모드를 사용하여 테스트를 빠르게 반복할 수 있습니다. 불필요한 LLM 호출을 피하기 위해 테스트 캐싱(아래 참조)을 활성화한 상태에서만 사용하는 것을 *강력히* 권장합니다:
 
 <CodeGroup>
 ```bash pip
@@ -311,40 +311,40 @@ LANGSMITH_TEST_CACHE=tests/cassettes ptw tests/my_llm_tests
 ```
 </CodeGroup>
 
-## Rich outputs
+## 풍부한 출력
 
-If you'd like to see a rich display of the LangSmith results of your test run you can specify `--langsmith-output`:
+테스트 실행의 LangSmith 결과를 풍부하게 표시하려면 `--langsmith-output`을 지정할 수 있습니다:
 
 ```bash
 pytest --langsmith-output tests
 ```
 
-**Note:** This flag used to be `--output=langsmith` in `langsmith<=0.3.3` but was updated to avoid collisions with other pytest plugins.
+**참고:** 이 플래그는 `langsmith<=0.3.3`에서는 `--output=langsmith`였지만 다른 pytest 플러그인과의 충돌을 피하기 위해 업데이트되었습니다.
 
-You'll get a nice table per test suite that updates live as the results are uploaded to LangSmith:
+결과가 LangSmith에 업로드될 때 실시간으로 업데이트되는 테스트 스위트당 멋진 테이블을 얻을 수 있습니다:
 
 ![Rich pytest outputs](/langsmith/images/rich-pytest-outputs.png)
 
-Some important notes for using this feature:
+이 기능을 사용할 때 몇 가지 중요한 참고 사항:
 
-* Make sure you've installed `pip install -U "langsmith[pytest]"`
-* Rich outputs do not currently work with `pytest-xdist`
+* `pip install -U "langsmith[pytest]"`를 설치했는지 확인하세요
+* 풍부한 출력은 현재 `pytest-xdist`와 함께 작동하지 않습니다
 
-**NOTE**: The custom output removes all the standard pytest outputs. If you're trying to debug some unexpected behavior it's often better to show the regular pytest outputs so to get full error traces.
+**참고**: 사용자 지정 출력은 모든 표준 pytest 출력을 제거합니다. 예상치 못한 동작을 디버깅하려는 경우 전체 오류 추적을 확인하기 위해 일반 pytest 출력을 표시하는 것이 더 나은 경우가 많습니다.
 
-## Dry-run mode
+## 드라이런 모드
 
-If you want to run the tests without syncing the results to LangSmith, you can set `LANGSMITH_TEST_TRACKING=false` in your environment.
+결과를 LangSmith에 동기화하지 않고 테스트를 실행하려면 환경에서 `LANGSMITH_TEST_TRACKING=false`를 설정할 수 있습니다.
 
 ```bash
 LANGSMITH_TEST_TRACKING=false pytest tests/
 ```
 
-The tests will run as normal, but the experiment logs will not be sent to LangSmith.
+테스트는 정상적으로 실행되지만 실험 로그는 LangSmith로 전송되지 않습니다.
 
 ## Expectations
 
-LangSmith provides an [expect](https://docs.smith.langchain.com/reference/python/_expect/langsmith._expect._Expect#langsmith._expect._Expect) utility to help define expectations about your LLM output. For example:
+LangSmith는 LLM 출력에 대한 기대값을 정의하는 데 도움이 되는 [expect](https://docs.smith.langchain.com/reference/python/_expect/langsmith._expect._Expect#langsmith._expect._Expect) 유틸리티를 제공합니다. 예를 들어:
 
 ```python
 from langsmith import expect
@@ -356,9 +356,9 @@ def test_sql_generation_select_all():
     expect(sql).to_contain("customers")
 ```
 
-This will log the binary "expectation" score to the experiment results, additionally `assert`ing that the expectation is met possibly triggering a test failure.
+이렇게 하면 이진 "expectation" 점수가 실험 결과에 로깅되며, 추가로 기대값이 충족되는지 `assert`하여 테스트 실패를 유발할 수 있습니다.
 
-`expect` also provides "fuzzy match" methods. For example:
+`expect`는 "퍼지 매치" 메서드도 제공합니다. 예를 들어:
 
 ```python
 @pytest.mark.langsmith(output_keys=["expectation"])
@@ -383,20 +383,20 @@ def test_embedding_similarity(query, expectation):
     )
 ```
 
-This test case will be assigned 4 scores:
+이 테스트 케이스에는 4개의 점수가 할당됩니다:
 
-1. The `embedding_distance` between the prediction and the expectation
-2. The binary `expectation` score (1 if cosine distance is less than 0.5, 0 if not)
-3. The `edit_distance` between the prediction and the expectation
-4. The overall test pass/fail score (binary)
+1. 예측과 기대값 사이의 `embedding_distance`
+2. 이진 `expectation` 점수(코사인 거리가 0.5 미만이면 1, 그렇지 않으면 0)
+3. 예측과 기대값 사이의 `edit_distance`
+4. 전체 테스트 통과/실패 점수(이진)
 
-The `expect` utility is modeled off of [Jest](https://jestjs.io/docs/expect)'s expect API, with some off-the-shelf functionality to make it easier to grade your LLMs.
+`expect` 유틸리티는 [Jest](https://jestjs.io/docs/expect)의 expect API를 모델로 하며, LLM을 더 쉽게 평가할 수 있도록 기본 제공 기능을 제공합니다.
 
-## Legacy
+## 레거시
 
-#### `@test` / `@unit` decorator
+#### `@test` / `@unit` 데코레이터
 
-The legacy method for marking test cases is using the `@test` or `@unit` decorators:
+테스트 케이스를 표시하는 레거시 방법은 `@test` 또는 `@unit` 데코레이터를 사용하는 것입니다:
 
 ```python
 from langsmith import test

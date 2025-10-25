@@ -1,103 +1,103 @@
 ---
-title: Set up a workspace
-sidebarTitle: Set up a workspace
+title: 워크스페이스 설정하기
+sidebarTitle: 워크스페이스 설정하기
 ---
 
-This page describes setting up and managing your LangSmith [_organization_](/langsmith/administration-overview#organizations) and [_workspaces_](/langsmith/administration-overview#workspaces):
+이 페이지에서는 LangSmith [_조직_](/langsmith/administration-overview#organizations)과 [_워크스페이스_](/langsmith/administration-overview#workspaces)를 설정하고 관리하는 방법을 설명합니다:
 
-- [Set up an organization](#set-up-an-organization): Create and manage organizations for team collaboration, including user management and role assignments.
-- [Set up a workspace](#set-up-a-workspace): Set up and configure workspaces to organize your LangSmith resources, manage workspace members, and configure settings for team collaboration.
+- [조직 설정하기](#set-up-an-organization): 팀 협업을 위한 조직을 생성하고 관리하며, 사용자 관리 및 역할 할당을 수행합니다.
+- [워크스페이스 설정하기](#set-up-a-workspace): LangSmith 리소스를 구성하기 위한 워크스페이스를 설정 및 구성하고, 워크스페이스 멤버를 관리하며, 팀 협업을 위한 설정을 구성합니다.
 
 <Check>
-You may find it helpful to refer to the [overview on LangSmith resource hierarchy](/langsmith/administration-overview) before you read this setup page.
+이 설정 페이지를 읽기 전에 [LangSmith 리소스 계층 구조 개요](/langsmith/administration-overview)를 참조하시면 도움이 될 것입니다.
 </Check>
 
-## Set up an organization
+## 조직 설정하기
 
 <Note>
-If you're interested in managing your organization and workspaces programmatically, see [this how-to guide](/langsmith/manage-organization-by-api).
+프로그래밍 방식으로 조직과 워크스페이스를 관리하는 데 관심이 있으시다면, [이 가이드](/langsmith/manage-organization-by-api)를 참조하세요.
 </Note>
 
-### Create an organization
+### 조직 생성하기
 
-When you log in for the first time, LangSmith will create a personal organization for you automatically. If you'd like to collaborate with others, you can create a separate organization and invite your team members to join.
+처음 로그인하면 LangSmith가 자동으로 개인 조직을 생성합니다. 다른 사람들과 협업하고 싶다면, 별도의 조직을 만들고 팀원들을 초대할 수 있습니다.
 
-To do this, open the Organizations drawer by clicking your profile icon in the bottom left and click **+ New**. Shared organizations require a credit card before they can be used. You will need to [set up billing](/langsmith/billing#set-up-billing-for-your-account) to proceed.
+이를 위해 왼쪽 하단의 프로필 아이콘을 클릭하여 조직 drawer를 열고 **+ New**를 클릭합니다. 공유 조직을 사용하려면 신용카드가 필요합니다. 계속 진행하려면 [결제를 설정](/langsmith/billing#set-up-billing-for-your-account)해야 합니다.
 
-### Manage and navigate workspaces
+### 워크스페이스 관리 및 탐색하기
 
-Once you've subscribed to a plan that allows for multiple users per organization, you can [set up workspaces](/langsmith/administration-overview#workspaces) to collaborate more effectively and isolate LangSmith resources between different groups of users. To navigate between workspaces and access the resources within each workspace (trace projects, annotation queues, etc.), select the desired workspace from the picker in the top left:
+조직당 여러 사용자를 허용하는 플랜에 가입하면, [워크스페이스를 설정](/langsmith/administration-overview#workspaces)하여 더욱 효과적으로 협업하고 서로 다른 사용자 그룹 간에 LangSmith 리소스를 격리할 수 있습니다. 워크스페이스 간에 이동하고 각 워크스페이스 내의 리소스(추적 프로젝트, 주석 큐 등)에 액세스하려면, 왼쪽 상단의 선택기에서 원하는 워크스페이스를 선택하세요:
 
 ![](/langsmith/images/select-workspace.png)
 
-### Manage users
+### 사용자 관리하기
 
-Manage membership in your shared organization in the **Members and roles** tabs on the [Settings page](https://smith.langchain.com/settings). Here you can:
+[설정 페이지](https://smith.langchain.com/settings)의 **Members and roles** 탭에서 공유 조직의 멤버십을 관리할 수 있습니다. 여기에서 다음을 수행할 수 있습니다:
 
-- Invite new users to your organization, selecting workspace membership and (if RBAC is enabled) workspace role.
-- Edit a user's organization role.
-- Remove users from your organization.
+- 조직에 새 사용자를 초대하고, 워크스페이스 멤버십과 (RBAC가 활성화된 경우) 워크스페이스 역할을 선택합니다.
+- 사용자의 조직 역할을 편집합니다.
+- 조직에서 사용자를 제거합니다.
 
 ![](/langsmith/images/organization-members-and-roles.png)
 
-Organizations on the Enterprise plan may set up custom workspace roles in the **Roles** tab. For more details, refer to the [access control setup guide](/langsmith/user-management).
+Enterprise 플랜의 조직은 **Roles** 탭에서 사용자 정의 워크스페이스 역할을 설정할 수 있습니다. 자세한 내용은 [액세스 제어 설정 가이드](/langsmith/user-management)를 참조하세요.
 
-#### Organization roles
+#### 조직 역할
 
-Organization-scoped roles are used to determine access to organization settings. The role selected also impacts workspace membership:
+조직 범위 역할은 조직 설정에 대한 액세스를 결정하는 데 사용됩니다. 선택한 역할은 워크스페이스 멤버십에도 영향을 미칩니다:
 
-- `Organization Admin` grants full access to manage all organization configuration, users, billing, and workspaces. Any `Organization Admin` has `Admin` access to all workspaces in an organization.
-* `Organization User` may read organization information, but cannot execute any write actions at the organization level. You can add an `Organization User` to a subset of workspaces and assigned workspace roles as usual (if RBAC is enabled), which specify permissions at the workspace level.
+- `Organization Admin`은 모든 조직 구성, 사용자, 결제 및 워크스페이스를 관리할 수 있는 전체 액세스 권한을 부여합니다. 모든 `Organization Admin`은 조직의 모든 워크스페이스에 대한 `Admin` 액세스 권한을 갖습니다.
+* `Organization User`는 조직 정보를 읽을 수 있지만, 조직 수준에서 쓰기 작업을 실행할 수 없습니다. `Organization User`를 워크스페이스의 일부에 추가하고 일반적인 방법으로 워크스페이스 역할을 할당할 수 있으며(RBAC가 활성화된 경우), 이는 워크스페이스 수준에서의 권한을 지정합니다.
 
 <Info>
-The `Organization User` role is only available in organizations on plans with multiple workspaces. In organizations limited to a single workspace, all users are `Organization Admins`. Custom organization-scoped roles are not available.
+`Organization User` 역할은 여러 워크스페이스를 지원하는 플랜의 조직에서만 사용할 수 있습니다. 단일 워크스페이스로 제한된 조직에서는 모든 사용자가 `Organization Admin`입니다. 사용자 정의 조직 범위 역할은 사용할 수 없습니다.
 </Info>
 
-For a full list of permissions associated with each role, refer to the [Administration overview](/langsmith/administration-overview#organization-roles) page.
+각 역할과 관련된 전체 권한 목록은 [관리 개요](/langsmith/administration-overview#organization-roles) 페이지를 참조하세요.
 
-## Set up a workspace
+## 워크스페이스 설정하기
 
-When you log in for the first time, a default [workspace](/langsmith/administration-overview#workspaces) will be created for you in your personal organization. Workspaces are often used to separate resources between different teams or business units to establish clear trust boundaries between them. Within each workspace, Role-Based Access Control (RBAC) manages permissions and access levels, which ensures that users only have access to the resources and settings necessary for their role. Most LangSmith activity happens in the context of a workspace, each of which has its own settings and access controls.
+처음 로그인하면 개인 조직에 기본 [워크스페이스](/langsmith/administration-overview#workspaces)가 생성됩니다. 워크스페이스는 서로 다른 팀이나 사업부 간에 리소스를 분리하여 명확한 신뢰 경계를 설정하는 데 자주 사용됩니다. 각 워크스페이스 내에서 역할 기반 액세스 제어(RBAC)가 권한과 액세스 수준을 관리하여, 사용자가 자신의 역할에 필요한 리소스와 설정에만 액세스할 수 있도록 보장합니다. 대부분의 LangSmith 활동은 워크스페이스의 컨텍스트에서 발생하며, 각 워크스페이스는 자체 설정과 액세스 제어를 갖습니다.
 
-To organize resources within a workspace, you can use [resource tags](/langsmith/set-up-resource-tags).
+워크스페이스 내에서 리소스를 구성하려면 [리소스 태그](/langsmith/set-up-resource-tags)를 사용할 수 있습니다.
 
-### Create a workspace
+### 워크스페이스 생성하기
 
-To create a new workspace, navigate to the [Settings page](https://smith.langchain.com/settings) **Workspaces** tab in your shared organization and click **Add Workspace**. Once you have created your workspace, you can manage its members and other configuration by selecting it on this page.
+새 워크스페이스를 생성하려면 공유 조직의 [설정 페이지](https://smith.langchain.com/settings) **Workspaces** 탭으로 이동하여 **Add Workspace**를 클릭합니다. 워크스페이스를 생성한 후에는 이 페이지에서 선택하여 멤버 및 기타 구성을 관리할 수 있습니다.
 
 ![](/langsmith/images/create-workspace.png)
 
 <Note>
-Different plans have different limits placed on the number of workspaces that can be used in an organization. For more information, refer to the [pricing page](https://www.langchain.com/pricing-langsmith).
+플랜마다 조직에서 사용할 수 있는 워크스페이스 수에 대한 제한이 다릅니다. 자세한 내용은 [가격 페이지](https://www.langchain.com/pricing-langsmith)를 참조하세요.
 </Note>
 
-### Manage users
+### 사용자 관리하기
 
 <Info>
-Only workspace `Admins` can manage workspace membership and, if RBAC is enabled, change a user's workspace role.
+워크스페이스 `Admin`만 워크스페이스 멤버십을 관리하고, RBAC가 활성화된 경우 사용자의 워크스페이스 역할을 변경할 수 있습니다.
 </Info>
 
-For users that are already members of an organization, a workspace `Admin` may add them to a workspace in the **Workspace members** tab under [Workspaces settings page](https://smith.langchain.com/settings/workspaces). Users may also be invited directly to one or more workspaces when they are [invited to an organization](#manage-users).
+이미 조직의 멤버인 사용자의 경우, 워크스페이스 `Admin`은 [워크스페이스 설정 페이지](https://smith.langchain.com/settings/workspaces)의 **Workspace members** 탭에서 워크스페이스에 추가할 수 있습니다. 사용자는 [조직에 초대](#manage-users)될 때 하나 이상의 워크스페이스에 직접 초대될 수도 있습니다.
 
-### Configure workspace settings
+### 워크스페이스 설정 구성하기
 
-Workspace configuration exists in the [Workspaces settings page](https://smith.langchain.com/settings/workspaces) tab. Select the workspace to configure and then the desired configuration sub-tab. The following example shows the **API keys**, and other configuration options including secrets, models, and shared URLs are available here as well.
+워크스페이스 구성은 [워크스페이스 설정 페이지](https://smith.langchain.com/settings/workspaces) 탭에 있습니다. 구성할 워크스페이스를 선택한 다음 원하는 구성 하위 탭을 선택합니다. 다음 예시는 **API keys**를 보여주며, secrets, models, shared URLs를 포함한 기타 구성 옵션도 여기에서 사용할 수 있습니다.
 
 ![](/langsmith/images/workspace-settings.png)
 
-### Delete a workspace
+### 워크스페이스 삭제하기
 
 <Warning>
-Deleting a workspace will permanently delete the workspace and all associated data. This action cannot be undone.
+워크스페이스를 삭제하면 워크스페이스와 모든 관련 데이터가 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다.
 </Warning>
 
-You can delete a workspace through the LangSmith UI or via [API](https://api.smith.langchain.com/redoc?#tag/workspaces/operation/delete_workspace_api_v1_workspaces__workspace_id__delete). You must be a workspace `Admin` in order to delete a workspace.
+LangSmith UI 또는 [API](https://api.smith.langchain.com/redoc?#tag/workspaces/operation/delete_workspace_api_v1_workspaces__workspace_id__delete)를 통해 워크스페이스를 삭제할 수 있습니다. 워크스페이스를 삭제하려면 워크스페이스 `Admin`이어야 합니다.
 
-### Delete a workspace via the UI
+### UI를 통해 워크스페이스 삭제하기
 
-1. Navigate to **Settings**.
-2. Select the workspace you want to delete.
-3. Click **Delete** in the top-right corner of the screen.
+1. **Settings**로 이동합니다.
+2. 삭제할 워크스페이스를 선택합니다.
+3. 화면 오른쪽 상단의 **Delete**를 클릭합니다.
 
 ![Delete a workspace](/langsmith/images/delete-workspace.png)
 

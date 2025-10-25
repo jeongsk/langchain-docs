@@ -1,58 +1,58 @@
 ---
-title: Set up resource tags
-sidebarTitle: Set up resource tags
+title: 리소스 태그 설정하기
+sidebarTitle: 리소스 태그 설정하기
 ---
 
 <Check>
-Before diving into this content, it might be helpful to read the following:
+이 내용을 읽기 전에 다음 문서를 먼저 읽어보시면 도움이 됩니다:
 
-* [Conceptual guide on organizations and workspaces](/langsmith/administration-overview)
+* [조직 및 워크스페이스 개념 가이드](/langsmith/administration-overview)
 </Check>
 
 <Info>
-Resource tags are available for Plus and Enterprise plans.
+리소스 태그는 Plus 및 Enterprise 플랜에서 사용할 수 있습니다.
 </Info>
 
-While workspaces help separate trust boundaries and access control, tags help you organize resources within a workspace. Tags are key-value pairs that you can attach to resources.
+워크스페이스는 신뢰 경계와 액세스 제어를 분리하는 데 도움이 되는 반면, 태그는 워크스페이스 내에서 리소스를 정리하는 데 도움이 됩니다. 태그는 리소스에 첨부할 수 있는 키-값 쌍입니다.
 
-## Create a tag
+## 태그 생성하기
 
-To create a tag, head to the workspace settings and click on the "Resource Tags" tab. Here, you'll be able to see the existing tag values, grouped by key. Two keys `Application` and `Environment` are created by default.
+태그를 생성하려면 워크스페이스 설정으로 이동하여 "Resource Tags" 탭을 클릭하세요. 여기에서 키별로 그룹화된 기존 태그 값을 확인할 수 있습니다. `Application`과 `Environment` 두 개의 키가 기본적으로 생성되어 있습니다.
 
-To create a new tag, click on the "New Tag" button. You'll be prompted to enter a key and a value for the tag. Note that you can use an existing key or create a new one.
+새 태그를 생성하려면 "New Tag" 버튼을 클릭하세요. 태그의 키와 값을 입력하라는 메시지가 표시됩니다. 기존 키를 사용하거나 새 키를 생성할 수 있습니다.
 
 ![](/langsmith/images/create-tag.png)
 
-## Assign a tag to a resource
+## 리소스에 태그 할당하기
 
-Within the same side panel for creating a new tag, you can also create assign resources to tags. Search for corresponding resources in the "Assign Resources" section and select the resources you want to tag.
+새 태그를 생성하는 동일한 사이드 패널 내에서 리소스에 태그를 할당할 수도 있습니다. "Assign Resources" 섹션에서 해당 리소스를 검색하고 태그를 지정할 리소스를 선택하세요.
 
 <Note>
-You can only tag workspace-scoped resources with resource tags. This includes Tracing Projects, Annotation Queues, Deployments, Experiments, Datasets, and Prompts.
+리소스 태그를 사용하여 워크스페이스 범위 리소스에만 태그를 지정할 수 있습니다. 여기에는 추적 프로젝트(Tracing Projects), 주석 큐(Annotation Queues), 배포(Deployments), 실험(Experiments), 데이터셋(Datasets) 및 프롬프트(Prompts)가 포함됩니다.
 </Note>
 
-You can also assign tags to resources from the resource's detail page. Click on the Resource tags button to open up the tag panel and assign tags.
+리소스의 상세 페이지에서도 리소스에 태그를 할당할 수 있습니다. Resource tags 버튼을 클릭하여 태그 패널을 열고 태그를 할당하세요.
 
 ![](/langsmith/images/assign-tag.png)
 
-To un-assign a tag from a resource, click on the Trash icon next to the tag, both in the tag panel and the resource tag panel.
+리소스에서 태그를 제거하려면 태그 패널과 리소스 태그 패널 모두에서 태그 옆에 있는 휴지통 아이콘을 클릭하세요.
 
-## Delete a tag
+## 태그 삭제하기
 
-You can delete either a key or a value of a tag from the [workspace settings page](https://smith.langchain.com/settings/workspaces/resource_tags). To delete a key, click on the Trash icon next to the key. To delete a value, click on the Trash icon next to the value.
+[워크스페이스 설정 페이지](https://smith.langchain.com/settings/workspaces/resource_tags)에서 태그의 키 또는 값을 삭제할 수 있습니다. 키를 삭제하려면 키 옆의 휴지통 아이콘을 클릭하세요. 값을 삭제하려면 값 옆의 휴지통 아이콘을 클릭하세요.
 
-Note that if you delete a key, all values associated with that key will also be deleted. When you delete a value, you will lose all associations between that value and resources.
+키를 삭제하면 해당 키와 연결된 모든 값도 함께 삭제됩니다. 값을 삭제하면 해당 값과 리소스 간의 모든 연결이 제거됩니다.
 
 ![](/langsmith/images/delete-tag.png)
 
-## Filter resources by tags
+## 태그로 리소스 필터링하기
 
-You can use resource tags to organize your experience navigating resources in the workspace.
+리소스 태그를 사용하여 워크스페이스에서 리소스를 탐색하는 경험을 정리할 수 있습니다.
 
-To filter resources by tags in your workspace, open up the left-hand side panel and click on the tags icon. Here, you can select the tags you want to filter by.
+워크스페이스에서 태그로 리소스를 필터링하려면 왼쪽 사이드 패널을 열고 태그 아이콘을 클릭하세요. 여기에서 필터링할 태그를 선택할 수 있습니다.
 
-In the homepage, you can see updated counts for resources based on the tags you've selected.
+홈페이지에서는 선택한 태그를 기반으로 업데이트된 리소스 수를 확인할 수 있습니다.
 
-As you navigate through the different product surfaces, you will *only* see resources that match the tags you've selected. At any time, you can clear the tags to see all resources in the workspace or select different tags to filter by.
+다양한 제품 화면을 탐색할 때 선택한 태그와 일치하는 리소스*만* 표시됩니다. 언제든지 태그를 지워서 워크스페이스의 모든 리소스를 보거나 다른 태그를 선택하여 필터링할 수 있습니다.
 
 ![](/langsmith/images/filter-by-tags.png)
