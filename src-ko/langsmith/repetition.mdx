@@ -1,13 +1,13 @@
 ---
-title: How to evaluate with repetitions
-sidebarTitle: Evaluate with repetitions
+title: 반복 실행으로 평가하는 방법
+sidebarTitle: 반복 실행으로 평가
 ---
 
-Running multiple repetitions can give a more accurate estimate of the performance of your system since LLM outputs are not deterministic. Outputs can differ from one repetition to the next. Repetitions are a way to reduce noise in systems prone to high variability, such as agents.
+LLM 출력은 결정적이지 않기 때문에 여러 번 반복 실행하면 시스템 성능에 대한 더 정확한 추정치를 얻을 수 있습니다. 출력은 반복 실행마다 달라질 수 있습니다. 반복 실행은 에이전트와 같이 높은 변동성을 보이는 시스템에서 노이즈를 줄이는 방법입니다.
 
-## Configuring repetitions on an experiment
+## 실험에서 반복 실행 구성하기
 
-Add the optional `num_repetitions` param to the `evaluate` / `aevaluate` function ([Python](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate), [TypeScript](https://docs.smith.langchain.com/reference/js/interfaces/evaluation.EvaluateOptions#numrepetitions)) to specify how many times to evaluate over each example in your dataset. For instance, if you have 5 examples in the dataset and set `num_repetitions=5`, each example will be run 5 times, for a total of 25 runs.
+`evaluate` / `aevaluate` 함수([Python](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate), [TypeScript](https://docs.smith.langchain.com/reference/js/interfaces/evaluation.EvaluateOptions#numrepetitions))에 선택적 매개변수인 `num_repetitions`를 추가하여 데이터셋의 각 예제를 몇 번 평가할지 지정할 수 있습니다. 예를 들어, 데이터셋에 5개의 예제가 있고 `num_repetitions=5`로 설정하면 각 예제가 5번 실행되어 총 25번의 실행이 이루어집니다.
 
 <CodeGroup>
 
@@ -36,9 +36,9 @@ await evaluate((inputs) => labelText(inputs["input"]), {
 
 </CodeGroup>
 
-## Viewing results of experiments run with repetitions
+## 반복 실행으로 실행한 실험의 결과 보기
 
-If you've run your experiment with [repetitions](/langsmith/evaluation-concepts#repetitions), there will be arrows in the output results column so you can view outputs in the table. To view each run from the repetition, hover over the output cell and click the expanded view. When you run an experiment with repetitions, LangSmith displays the average for each feedback score in the table. Click on the feedback score to view the feedback scores from individual runs, or to view the standard deviation across repetitions.
+[반복 실행](/langsmith/evaluation-concepts#repetitions)으로 실험을 실행한 경우, 출력 결과 열에 화살표가 표시되어 테이블에서 출력을 볼 수 있습니다. 반복 실행의 각 실행 결과를 보려면 출력 셀 위에 마우스를 올리고 확장 보기를 클릭하세요. 반복 실행으로 실험을 실행하면 LangSmith는 테이블에 각 피드백 점수의 평균을 표시합니다. 피드백 점수를 클릭하면 개별 실행의 피드백 점수를 보거나 반복 실행 간의 표준 편차를 확인할 수 있습니다.
 
 ![Repetitions](/langsmith/images/repetitions.png)
 

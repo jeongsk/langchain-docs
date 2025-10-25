@@ -1,13 +1,13 @@
 ---
-title: How to handle model rate limits
-sidebarTitle: Handle model rate limits
+title: 모델 속도 제한 처리 방법
+sidebarTitle: 모델 속도 제한 처리
 ---
 
-A common issue when running large evaluation jobs is running into third-party API rate limits, usually from model providers. There are a few ways to deal with rate limits.
+대규모 평가 작업을 실행할 때 흔히 발생하는 문제는 서드파티 API 속도 제한, 주로 모델 제공자의 속도 제한에 도달하는 것입니다. 속도 제한을 처리하는 몇 가지 방법이 있습니다.
 
-## Using `langchain` RateLimiters (Python only)
+## `langchain` RateLimiter 사용하기 (Python만 해당)
 
-If you're using `langchain` Python ChatModels in your application or evaluators, you can add rate limiters to your model(s) that will add client-side control of the frequency with which requests are sent to the model provider API to avoid rate limit errors.
+애플리케이션이나 평가자에서 `langchain` Python ChatModel을 사용하는 경우, 모델에 레이트 리미터를 추가하여 속도 제한 오류를 방지할 수 있도록 모델 제공자 API로 전송되는 요청 빈도를 클라이언트 측에서 제어할 수 있습니다.
 
 ```python
 from langchain.chat_models import init_chat_model
@@ -30,15 +30,15 @@ def evaluator(inputs: dict, outputs: dict, reference_outputs: dict) -> dict:
     ...
 ```
 
-See the [langchain](https://python.langchain.com/docs/how_to/chat_model_rate_limiting/) documentation for more on how to configure rate limiters.
+레이트 리미터 구성 방법에 대한 자세한 내용은 [langchain](https://python.langchain.com/docs/how_to/chat_model_rate_limiting/) 문서를 참조하세요.
 
-## Retrying with exponential backoff
+## 지수 백오프를 사용한 재시도
 
-A very common way to deal with rate limit errors is retrying with exponential backoff. Retrying with exponential backoff means repeatedly retrying failed requests with an (exponentially) increasing wait time between each retry. This continues until either the request succeeds or a maximum number of requests is made.
+속도 제한 오류를 처리하는 매우 일반적인 방법은 지수 백오프를 사용한 재시도입니다. 지수 백오프를 사용한 재시도는 실패한 요청을 각 재시도 사이에 (지수적으로) 증가하는 대기 시간을 두고 반복적으로 재시도하는 것을 의미합니다. 이는 요청이 성공하거나 최대 요청 횟수에 도달할 때까지 계속됩니다.
 
-#### With `langchain`
+#### `langchain`과 함께 사용하기
 
-If you're using `langchain` components you can add retries to all model calls with the `.with_retry(...)` / `.withRetry()` method:
+`langchain` 컴포넌트를 사용하는 경우 `.with_retry(...)` / `.withRetry()` 메서드를 사용하여 모든 모델 호출에 재시도를 추가할 수 있습니다:
 
 <CodeGroup>
 
@@ -60,15 +60,15 @@ const modelWithRetry = model.withRetry({ stopAfterAttept: 2 });
 
 </CodeGroup>
 
-See the `langchain` [Python](https://python.langchain.com/api_reference/core/language_models/langchain_core.language_models.chat_models.BaseChatModel.html#langchain_core.language_models.chat_models.BaseChatModel.with_retry) and [JS](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#withRetry) API references for more.
+자세한 내용은 `langchain` [Python](https://python.langchain.com/api_reference/core/language_models/langchain_core.language_models.chat_models.BaseChatModel.html#langchain_core.language_models.chat_models.BaseChatModel.with_retry) 및 [JS](https://v03.api.js.langchain.com/classes/_langchain_core.language_models_chat_models.BaseChatModel.html#withRetry) API 레퍼런스를 참조하세요.
 
-#### Without `langchain`
+#### `langchain` 없이 사용하기
 
-If you're not using `langchain` you can use other libraries like `tenacity` (Python) or `backoff` (Python) to implement retries with exponential backoff, or you can implement it from scratch. See some examples of how to do this in the [OpenAI docs](https://platform.openai.com/docs/guides/rate-limits#retrying-with-exponential-backoff).
+`langchain`을 사용하지 않는 경우 `tenacity` (Python) 또는 `backoff` (Python)와 같은 다른 라이브러리를 사용하여 지수 백오프를 사용한 재시도를 구현하거나, 처음부터 직접 구현할 수 있습니다. 이를 수행하는 방법에 대한 몇 가지 예시는 [OpenAI 문서](https://platform.openai.com/docs/guides/rate-limits#retrying-with-exponential-backoff)를 참조하세요.
 
-## Limiting max_concurrency
+## max_concurrency 제한하기
 
-Limiting the number of concurrent calls you're making to your application and evaluators is another way to decrease the frequency of model calls you're making, and in that way avoid rate limit errors. `max_concurrency` can be set directly on the [evaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate) / [aevaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._arunner.aevaluate) functions. This parallelizes evaluation by effectively splitting the dataset across threads.
+애플리케이션과 평가자에 대해 수행하는 동시 호출 수를 제한하는 것은 모델 호출 빈도를 줄이고 이를 통해 속도 제한 오류를 방지하는 또 다른 방법입니다. `max_concurrency`는 [evaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate) / [aevaluate()](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._arunner.aevaluate) 함수에서 직접 설정할 수 있습니다. 이는 데이터셋을 스레드 간에 효과적으로 분할하여 평가를 병렬화합니다.
 
 <CodeGroup>
 

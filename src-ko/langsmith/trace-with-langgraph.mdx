@@ -1,21 +1,21 @@
 ---
-title: Trace with LangGraph
+title: LangGraph로 추적하기
 sidebarTitle: LangGraph
 ---
 
-LangSmith smoothly integrates with LangGraph (Python and JS) to help you trace agents, whether you're using LangChain modules or other SDKs.
+LangSmith는 LangGraph(Python 및 JS)와 원활하게 통합되어 LangChain 모듈이나 다른 SDK를 사용하는지 여부에 관계없이 에이전트를 추적할 수 있도록 도와줍니다.
 
-## With LangChain
+## LangChain과 함께 사용하기
 
-If you are using LangChain modules within LangGraph, you only need to set a few environment variables to enable tracing.
+LangGraph 내에서 LangChain 모듈을 사용하는 경우, 추적을 활성화하기 위해 몇 가지 환경 변수만 설정하면 됩니다.
 
-This guide will walk through a basic example. For more detailed information on configuration, see the [Trace With LangChain](/langsmith/trace-with-langchain) guide.
+이 가이드에서는 기본적인 예제를 안내합니다. 구성에 대한 자세한 내용은 [LangChain으로 추적하기](/langsmith/trace-with-langchain) 가이드를 참조하세요.
 
-### 1. Installation
+### 1. 설치
 
-Install the LangGraph library and the OpenAI integration for Python and JS (we use the OpenAI integration for the code snippets below).
+Python과 JS용 LangGraph 라이브러리와 OpenAI 통합을 설치합니다(아래 코드 스니펫에서는 OpenAI 통합을 사용합니다).
 
-For a full list of packages available, see the [LangChain Python docs](https://python.langchain.com/docs/integrations/platforms/) and [LangChain JS docs](https://js.langchain.com/docs/integrations/platforms/).
+사용 가능한 패키지의 전체 목록은 [LangChain Python 문서](https://python.langchain.com/docs/integrations/platforms/)와 [LangChain JS 문서](https://js.langchain.com/docs/integrations/platforms/)를 참조하세요.
 
 <CodeGroup>
 
@@ -37,45 +37,45 @@ pnpm add @langchain/openai @langchain/langgraph
 
 </CodeGroup>
 
-### 2. Configure your environment
+### 2. 환경 구성하기
 
 <CodeGroup>
 
 ```bash Python
 export LANGSMITH_TRACING=true
 export LANGSMITH_API_KEY=<your-api-key>
-# This example uses OpenAI, but you can use any LLM provider of choice
+# 이 예제는 OpenAI를 사용하지만, 원하는 LLM 제공자를 사용할 수 있습니다
 export OPENAI_API_KEY=<your-openai-api-key>
-# For LangSmith API keys linked to multiple workspaces, set the LANGSMITH_WORKSPACE_ID environment variable to specify which workspace to use.
+# 여러 워크스페이스에 연결된 LangSmith API 키의 경우, 사용할 워크스페이스를 지정하기 위해 LANGSMITH_WORKSPACE_ID 환경 변수를 설정하세요.
 export LANGSMITH_WORKSPACE_ID=<your-workspace-id>
 ```
 
 ```bash TypeScript
 export LANGSMITH_TRACING=true
 export LANGSMITH_API_KEY=<your-api-key>
-# This example uses OpenAI, but you can use any LLM provider of choice
+# 이 예제는 OpenAI를 사용하지만, 원하는 LLM 제공자를 사용할 수 있습니다
 export OPENAI_API_KEY=<your-openai-api-key>
-# For LangSmith API keys linked to multiple workspaces, set the LANGSMITH_WORKSPACE_ID environment variable to specify which workspace to use.
+# 여러 워크스페이스에 연결된 LangSmith API 키의 경우, 사용할 워크스페이스를 지정하기 위해 LANGSMITH_WORKSPACE_ID 환경 변수를 설정하세요.
 export LANGSMITH_WORKSPACE_ID=<your-workspace-id>
 ```
 
 </CodeGroup>
 
 <Info>
-If you are using LangChain.js with LangSmith and are not in a serverless environment, we also recommend setting the following explicitly to reduce latency:
+서버리스 환경이 아닌 곳에서 LangSmith와 함께 LangChain.js를 사용하는 경우, 지연 시간을 줄이기 위해 다음을 명시적으로 설정하는 것을 권장합니다:
 
 `export LANGCHAIN_CALLBACKS_BACKGROUND=true`
 
-If you are in a serverless environment, we recommend setting the reverse to allow tracing to finish before your function ends:
+서버리스 환경에서는 함수가 종료되기 전에 추적이 완료될 수 있도록 반대로 설정하는 것을 권장합니다:
 
 `export LANGCHAIN_CALLBACKS_BACKGROUND=false`
 
-See [this LangChain.js guide](https://js.langchain.com/docs/how_to/callbacks_serverless) for more information.
+자세한 내용은 [이 LangChain.js 가이드](https://js.langchain.com/docs/how_to/callbacks_serverless)를 참조하세요.
 </Info>
 
-### 3. Log a trace
+### 3. 추적 로그 남기기
 
-Once you've set up your environment, you can call LangChain runnables as normal. LangSmith will infer the proper tracing config:
+환경을 설정한 후에는 평소처럼 LangChain runnable을 호출할 수 있습니다. LangSmith가 적절한 추적 구성을 자동으로 추론합니다:
 
 <CodeGroup>
 
@@ -207,19 +207,19 @@ finalState.messages[finalState.messages.length - 1].content;
 
 </CodeGroup>
 
-An example trace from running the above code [looks like this](https://smith.langchain.com/public/10863294-ee79-484a-927f-0558230f1547/r):
+위 코드를 실행한 예제 추적은 [다음과 같습니다](https://smith.langchain.com/public/10863294-ee79-484a-927f-0558230f1547/r):
 
-![Trace tree for a LangGraph run with LangChain](/langsmith/images/langgraph-with-langchain-trace.png)
+![LangChain과 함께한 LangGraph 실행의 추적 트리](/langsmith/images/langgraph-with-langchain-trace.png)
 
-## Without LangChain
+## LangChain 없이 사용하기
 
-If you are using other SDKs or custom functions within LangGraph, you will need to [wrap or decorate them appropriately](/langsmith/annotate-code#use-traceable--traceable) (with the `@traceable` decorator in Python or the `traceable` function in JS, or something like e.g. `wrap_openai` for SDKs). If you do so, LangSmith will automatically nest traces from those wrapped methods.
+LangGraph 내에서 다른 SDK나 커스텀 함수를 사용하는 경우, [적절하게 래핑하거나 데코레이팅](/langsmith/annotate-code#use-traceable--traceable)해야 합니다(Python에서는 `@traceable` 데코레이터를, JS에서는 `traceable` 함수를 사용하거나, SDK의 경우 `wrap_openai`와 같은 것을 사용). 이렇게 하면 LangSmith가 래핑된 메서드의 추적을 자동으로 중첩합니다.
 
-Here's an example. You can also see this page for more information.
+다음은 예제입니다. 자세한 내용은 이 페이지를 참조하세요.
 
-### 1. Installation
+### 1. 설치
 
-Install the LangGraph library and the OpenAI SDK for Python and JS (we use the OpenAI integration for the code snippets below).
+Python과 JS용 LangGraph 라이브러리와 OpenAI SDK를 설치합니다(아래 코드 스니펫에서는 OpenAI 통합을 사용합니다).
 
 <CodeGroup>
 
@@ -241,41 +241,41 @@ pnpm add openai langsmith @langchain/langgraph
 
 </CodeGroup>
 
-### 2. Configure your environment
+### 2. 환경 구성하기
 
 <CodeGroup>
 
 ```bash Python
 export LANGSMITH_TRACING=true
 export LANGSMITH_API_KEY=<your-api-key>
-# This example uses OpenAI, but you can use any LLM provider of choice
+# 이 예제는 OpenAI를 사용하지만, 원하는 LLM 제공자를 사용할 수 있습니다
 export OPENAI_API_KEY=<your-openai-api-key>
 ```
 
 ```bash TypeScript
 export LANGSMITH_TRACING=true
 export LANGSMITH_API_KEY=<your-api-key>
-# This example uses OpenAI, but you can use any LLM provider of choice
+# 이 예제는 OpenAI를 사용하지만, 원하는 LLM 제공자를 사용할 수 있습니다
 export OPENAI_API_KEY=<your-openai-api-key>
 ```
 
 </CodeGroup>
 
 <Info>
-If you are using LangChain.js with LangSmith and are not in a serverless environment, we also recommend setting the following explicitly to reduce latency:
+서버리스 환경이 아닌 곳에서 LangSmith와 함께 LangChain.js를 사용하는 경우, 지연 시간을 줄이기 위해 다음을 명시적으로 설정하는 것을 권장합니다:
 
 `export LANGCHAIN_CALLBACKS_BACKGROUND=true`
 
-If you are in a serverless environment, we recommend setting the reverse to allow tracing to finish before your function ends:
+서버리스 환경에서는 함수가 종료되기 전에 추적이 완료될 수 있도록 반대로 설정하는 것을 권장합니다:
 
 `export LANGCHAIN_CALLBACKS_BACKGROUND=false`
 
-See [this LangChain.js guide](https://js.langchain.com/docs/how_to/callbacks_serverless) for more information.
+자세한 내용은 [이 LangChain.js 가이드](https://js.langchain.com/docs/how_to/callbacks_serverless)를 참조하세요.
 </Info>
 
-### 3. Log a trace
+### 3. 추적 로그 남기기
 
-Once you've set up your environment, [wrap or decorate the custom functions/SDKs](/langsmith/annotate-code#use-traceable--traceable) you want to trace. LangSmith will then infer the proper tracing config:
+환경을 설정한 후, [추적하려는 커스텀 함수/SDK를 래핑하거나 데코레이팅](/langsmith/annotate-code#use-traceable--traceable)합니다. 그러면 LangSmith가 적절한 추적 구성을 자동으로 추론합니다:
 
 <CodeGroup>
 
@@ -304,7 +304,7 @@ tool_schema = {
     },
 }
 
-# Decorating the tool function will automatically trace it with the correct context
+# 도구 함수를 데코레이팅하면 올바른 컨텍스트로 자동으로 추적됩니다
 @traceable(run_type="tool", name="Search Tool")
 def search(query: str):
     """Call to surf the web."""
@@ -341,7 +341,7 @@ def should_continue(state: State) -> Literal["tools", "__end__"]:
 
 def call_model(state: State):
     messages = state["messages"]
-    # Calling the wrapped client will automatically infer the correct tracing context
+    # 래핑된 클라이언트를 호출하면 올바른 추적 컨텍스트가 자동으로 추론됩니다
     response = wrapped_client.chat.completions.create(
         messages=messages, model="gpt-4o-mini", tools=[tool_schema]
     )
@@ -374,7 +374,7 @@ final_state["messages"][-1]["content"]
 ```
 
 ```typescript TypeScript
-**Note:** The below example requires `langsmith>=0.1.39` and `@langchain/langgraph>=0.0.31`
+**참고:** 아래 예제는 `langsmith>=0.1.39` 및 `@langchain/langgraph>=0.0.31`이 필요합니다
 
 import OpenAI from "openai";
 import { StateGraph } from "@langchain/langgraph";
@@ -404,7 +404,7 @@ const toolSchema: OpenAI.ChatCompletionTool = {
   }
 };
 
-// Wrapping the tool function will automatically trace it with the correct context
+// 도구 함수를 래핑하면 올바른 컨텍스트로 자동으로 추적됩니다
 const search = traceable(async ({ query }: { query: string }) => {
   if (
     query.toLowerCase().includes("sf") ||
@@ -437,7 +437,7 @@ const callTools = async ({ messages }: GraphState) => {
 };
 
 const callModel = async ({ messages }: GraphState) => {
-  // Calling the wrapped client will automatically infer the correct tracing context
+  // 래핑된 클라이언트를 호출하면 올바른 추적 컨텍스트가 자동으로 추론됩니다
   const response = await wrappedClient.chat.completions.create({
     messages,
     model: "gpt-4o-mini",
@@ -489,6 +489,6 @@ await graph.invoke({
 
 </CodeGroup>
 
-An example trace from running the above code [looks like this](https://smith.langchain.com/public/353f27da-c221-4b67-b9ec-ede3777f3271/r):
+위 코드를 실행한 예제 추적은 [다음과 같습니다](https://smith.langchain.com/public/353f27da-c221-4b67-b9ec-ede3777f3271/r):
 
-![Trace tree for a LangGraph run without LangChain](/langsmith/images/langgraph-without-langchain-trace.png)
+![LangChain 없이 LangGraph 실행의 추적 트리](/langsmith/images/langgraph-without-langchain-trace.png)
