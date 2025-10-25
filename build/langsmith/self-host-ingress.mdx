@@ -1,82 +1,82 @@
 ---
-title: Create an Ingress for installations (Kubernetes)
-sidebarTitle: Create an Ingress for installations (Kubernetes)
+title: 설치를 위한 Ingress 생성하기 (Kubernetes)
+sidebarTitle: 설치를 위한 Ingress 생성하기 (Kubernetes)
 ---
 
-By default, LangSmith will provision a LoadBalancer service for the `langsmith-frontend`. Depending on your cloud provider, this may result in a public IP address being assigned to the service. If you would like to use a custom domain or have more control over the routing of traffic to your LangSmith installation, you can configure an Ingress, Gateway API, or Istio Gateway.
+기본적으로 LangSmith는 `langsmith-frontend`를 위한 LoadBalancer 서비스를 프로비저닝합니다. 클라우드 제공업체에 따라 서비스에 공개 IP 주소가 할당될 수 있습니다. 사용자 정의 도메인을 사용하거나 LangSmith 설치로 들어오는 트래픽 라우팅을 더 세밀하게 제어하고 싶다면, Ingress, Gateway API 또는 Istio Gateway를 구성할 수 있습니다.
 
-## Requirements
+## 요구사항
 
-* An existing Kubernetes cluster
-* One of the following installed in your Kubernetes cluster:
-  * An Ingress Controller (for standard Ingress)
-  * Gateway API CRDs and a Gateway resource (for Gateway API)
-  * Istio (for Istio Gateway)
+* 기존 Kubernetes 클러스터
+* Kubernetes 클러스터에 다음 중 하나가 설치되어 있어야 합니다:
+  * Ingress Controller (표준 Ingress용)
+  * Gateway API CRD 및 Gateway 리소스 (Gateway API용)
+  * Istio (Istio Gateway용)
 
-## Parameters
+## 매개변수
 
-You may need to provide certain parameters to your LangSmith installation to configure the Ingress. Additionally, we will want to convert the `langsmith-frontend` service to a ClusterIP service.
+Ingress를 구성하기 위해 LangSmith 설치에 특정 매개변수를 제공해야 할 수 있습니다. 또한 `langsmith-frontend` 서비스를 ClusterIP 서비스로 변환해야 합니다.
 
-* *Hostname (optional)*: The hostname that you would like to use for your LangSmith installation. E.g `"langsmith.example.com"`. If you leave this empty, the ingress will serve all traffic to the LangSmith installation.
+* *Hostname (선택사항)*: LangSmith 설치에 사용할 호스트 이름입니다. 예: `"langsmith.example.com"`. 이 값을 비워두면 ingress가 LangSmith 설치로 향하는 모든 트래픽을 처리합니다.
 
-* *BasePath (optional)*: If you would like to serve LangSmith under a URL basePath, you can specify it here. For example, adding `"langsmith"` will serve the application at `"example.hostname.com/langsmith"`. This will apply to UI paths as well as API endpoints.
+* *BasePath (선택사항)*: URL basePath 아래에서 LangSmith를 제공하려면 여기에 지정할 수 있습니다. 예를 들어 `"langsmith"`를 추가하면 애플리케이션이 `"example.hostname.com/langsmith"`에서 제공됩니다. 이는 UI 경로와 API 엔드포인트 모두에 적용됩니다.
 
-* *IngressClassName (optional)*: The name of the Ingress class that you would like to use. If not set, the default Ingress class will be used.
+* *IngressClassName (선택사항)*: 사용하려는 Ingress 클래스의 이름입니다. 설정하지 않으면 기본 Ingress 클래스가 사용됩니다.
 
-* *Annotations (optional)*: Additional annotations to add to the Ingress. Certain providers like AWS may use annotations to control things like TLS termination.
+* *Annotations (선택사항)*: Ingress에 추가할 추가 어노테이션입니다. AWS와 같은 특정 제공업체는 어노테이션을 사용하여 TLS 종료와 같은 것을 제어할 수 있습니다.
 
-  For example, you can add the following annotations using the AWS ALB Ingress Controller to attach an ACM certificate to the Ingress:
+  예를 들어 AWS ALB Ingress Controller를 사용하여 Ingress에 ACM 인증서를 연결하려면 다음 어노테이션을 추가할 수 있습니다:
 
   ```yaml
   annotations:
     alb.ingress.kubernetes.io/certificate-arn: "<your-certificate-arn>"
   ```
 
-* *Labels (optional)*: Additional labels to add to the Ingress.
+* *Labels (선택사항)*: Ingress에 추가할 추가 레이블입니다.
 
-* *TLS (optional)*: If you would like to serve LangSmith over HTTPS, you can add TLS configuration here (many Ingress controllers may have other ways of controlling TLS so this is often not needed). This should be an array of TLS configurations. Each TLS configuration should have the following fields:
+* *TLS (선택사항)*: HTTPS를 통해 LangSmith를 제공하려면 여기에 TLS 구성을 추가할 수 있습니다 (많은 Ingress 컨트롤러가 TLS를 제어하는 다른 방법을 가지고 있어 이것이 필요하지 않을 수 있습니다). 이는 TLS 구성의 배열이어야 합니다. 각 TLS 구성에는 다음 필드가 있어야 합니다:
 
-  * hosts: An array of hosts that the certificate should be valid for. E.g \["langsmith.example.com"]
+  * hosts: 인증서가 유효해야 하는 호스트의 배열입니다. 예: \["langsmith.example.com"]
 
-  * secretName: The name of the Kubernetes secret that contains the certificate and private key. This secret should have the following keys:
+  * secretName: 인증서와 개인 키를 포함하는 Kubernetes 시크릿의 이름입니다. 이 시크릿에는 다음 키가 있어야 합니다:
 
-    * tls.crt: The certificate
-    * tls.key: The private key
+    * tls.crt: 인증서
+    * tls.key: 개인 키
 
-  * You can read more about creating a TLS secret [here](https://kubernetes.io/do/langsmith/observability-concepts/services-networking/ingress/#tls).
+  * TLS 시크릿 생성에 대한 자세한 내용은 [여기](https://kubernetes.io/do/langsmith/observability-concepts/services-networking/ingress/#tls)에서 확인할 수 있습니다.
 
-## Configuration
+## 구성
 
-You can configure your LangSmith instance to use one of three routing options: standard Ingress, Gateway API, or Istio Gateway. Choose the option that best fits your infrastructure.
+LangSmith 인스턴스를 세 가지 라우팅 옵션 중 하나를 사용하도록 구성할 수 있습니다: 표준 Ingress, Gateway API 또는 Istio Gateway. 인프라에 가장 적합한 옵션을 선택하세요.
 
-### Option 1: Standard Ingress
+### 옵션 1: 표준 Ingress
 
-With these parameters in hand, you can configure your LangSmith instance to use an Ingress. You can do this by modifying the `config.yaml` file for your LangSmith Helm Chart installation.
+이러한 매개변수를 준비한 후 LangSmith 인스턴스가 Ingress를 사용하도록 구성할 수 있습니다. LangSmith Helm Chart 설치를 위한 `config.yaml` 파일을 수정하여 이를 수행할 수 있습니다.
 
 ```yaml
 config:
-  hostname: "" # Main domain for LangSmith
-  basePath: "" # If you want to serve langsmith under a URL base path (e.g., /langsmith)
+  hostname: "" # LangSmith의 주요 도메인
+  basePath: "" # URL base path 아래에서 langsmith를 제공하려는 경우 (예: /langsmith)
 ingress:
   enabled: true
-  hostname: "" # Deprecated: Use config.hostname instead after v0.12.0
-  subdomain: "" # Deprecated: Use config.hostname instead after v0.12.0
-  ingressClassName: "" # If not set, the default ingress class will be used
-  annotations: {} # Add annotations here if needed
-  labels: {} # Add labels here if needed
-  tls: [] # Add TLS configuration here if needed
+  hostname: "" # 더 이상 사용되지 않음: v0.12.0 이후 config.hostname을 대신 사용하세요
+  subdomain: "" # 더 이상 사용되지 않음: v0.12.0 이후 config.hostname을 대신 사용하세요
+  ingressClassName: "" # 설정하지 않으면 기본 ingress 클래스가 사용됩니다
+  annotations: {} # 필요한 경우 여기에 어노테이션을 추가하세요
+  labels: {} # 필요한 경우 여기에 레이블을 추가하세요
+  tls: [] # 필요한 경우 여기에 TLS 구성을 추가하세요
 frontend:
   service:
     type: ClusterIP
 ```
 
-Once configured, you will need to update your LangSmith installation. If everything is configured correctly, your LangSmith instance should now be accessible via the Ingress. You can run the following to check the status of your Ingress:
+구성이 완료되면 LangSmith 설치를 업데이트해야 합니다. 모든 것이 올바르게 구성되었다면 이제 Ingress를 통해 LangSmith 인스턴스에 액세스할 수 있어야 합니다. 다음을 실행하여 Ingress의 상태를 확인할 수 있습니다:
 
 ```bash
 kubectl get ingress
 ```
 
-You should see something like this in the output:
+출력에서 다음과 같은 내용을 볼 수 있습니다:
 
 ```
 NAME                         CLASS   HOSTS    ADDRESS          PORTS     AGE
@@ -84,86 +84,86 @@ langsmith-ingress            nginx   <host>   35.227.243.203   80, 443   95d
 ```
 
 <Warning>
-If you do not have automated DNS setup, you will need to add the IP address to your DNS provider manually.
+자동화된 DNS 설정이 없는 경우 DNS 제공업체에 IP 주소를 수동으로 추가해야 합니다.
 </Warning>
 
-### Option 2: Gateway API
+### 옵션 2: Gateway API
 
 <Note>
-Gateway API support is available as of LangSmith v0.12.0
+Gateway API 지원은 LangSmith v0.12.0부터 사용할 수 있습니다
 </Note>
 
-If your cluster uses the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/), you can configure LangSmith to provision HTTPRoute resources. This will create an HTTPRoute for LangSmith and an HTTPRoute for each [agent deployment](/langsmith/deployments).
+클러스터가 [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/)를 사용하는 경우 LangSmith가 HTTPRoute 리소스를 프로비저닝하도록 구성할 수 있습니다. 이렇게 하면 LangSmith를 위한 HTTPRoute와 각 [에이전트 배포](/langsmith/deployments)를 위한 HTTPRoute가 생성됩니다.
 
-#### Parameters
+#### 매개변수
 
-* *name (required)*: The name of the Gateway resource to reference
-* *namespace (required)*: The namespace where the Gateway resource is located
-* *hostname (optional)*: The hostname that you would like to use for your LangSmith installation. E.g `"langsmith.example.com"`
-* *basePath (optional)*: If you would like to serve LangSmith under a base path, you can specify it here. E.g "example.com/langsmith"
-* *sectionName (optional)*: The name of a specific listener section in the Gateway to use
-* *annotations (optional)*: Additional annotations to add to the HTTPRoute resources
-* *labels (optional)*: Additional labels to add to the HTTPRoute resources
+* *name (필수)*: 참조할 Gateway 리소스의 이름
+* *namespace (필수)*: Gateway 리소스가 위치한 네임스페이스
+* *hostname (선택사항)*: LangSmith 설치에 사용할 호스트 이름입니다. 예: `"langsmith.example.com"`
+* *basePath (선택사항)*: base path 아래에서 LangSmith를 제공하려면 여기에 지정할 수 있습니다. 예: "example.com/langsmith"
+* *sectionName (선택사항)*: 사용할 Gateway의 특정 리스너 섹션 이름
+* *annotations (선택사항)*: HTTPRoute 리소스에 추가할 추가 어노테이션
+* *labels (선택사항)*: HTTPRoute 리소스에 추가할 추가 레이블
 
-#### Configuration
+#### 구성
 
 ```yaml
 config:
-  hostname: "" # Main domain for LangSmith
-  basePath: "" # If you want to serve langsmith under a base path. E.g "example.com/langsmith"
+  hostname: "" # LangSmith의 주요 도메인
+  basePath: "" # base path 아래에서 langsmith를 제공하려는 경우. 예: "example.com/langsmith"
 gateway:
   enabled: true
-  name: "my-gateway" # Name of your Gateway resource
-  namespace: "gateway-system" # Namespace of your Gateway resource
-  sectionName: "" # Optional: specific listener section name
-  annotations: {} # Add annotations here if needed
-  labels: {} # Add labels here if needed
+  name: "my-gateway" # Gateway 리소스의 이름
+  namespace: "gateway-system" # Gateway 리소스의 네임스페이스
+  sectionName: "" # 선택사항: 특정 리스너 섹션 이름
+  annotations: {} # 필요한 경우 여기에 어노테이션을 추가하세요
+  labels: {} # 필요한 경우 여기에 레이블을 추가하세요
 frontend:
   service:
     type: ClusterIP
 ```
 
-Once configured, you can check the status of your HTTPRoutes:
+구성이 완료되면 HTTPRoute의 상태를 확인할 수 있습니다:
 
 ```bash
 kubectl get httproute
 ```
 
-### Option 3: Istio Gateway
+### 옵션 3: Istio Gateway
 
 <Note>
-Istio Gateway support is available as of LangSmith v0.12.0
+Istio Gateway 지원은 LangSmith v0.12.0부터 사용할 수 있습니다
 </Note>
 
-If your cluster uses [Istio](https://istio.io/), you can configure LangSmith to provision VirtualService resources. This will create a VirtualService for LangSmith and a VirtualService for each [agent deployment](/langsmith/deployments).
+클러스터가 [Istio](https://istio.io/)를 사용하는 경우 LangSmith가 VirtualService 리소스를 프로비저닝하도록 구성할 수 있습니다. 이렇게 하면 LangSmith를 위한 VirtualService와 각 [에이전트 배포](/langsmith/deployments)를 위한 VirtualService가 생성됩니다.
 
-#### Parameters
+#### 매개변수
 
-* *name (optional)*: The name of the Istio Gateway resource to reference. Defaults to `"istio-gateway"`
-* *namespace (optional)*: The namespace where the Istio Gateway resource is located. Defaults to `"istio-system"`
-* *hostname (optional)*: The hostname that you would like to use for your LangSmith installation. E.g `"langsmith.example.com"`
-* *basePath (optional)*: If you would like to serve LangSmith under a base path, you can specify it here. E.g "example.com/langsmith"
-* *annotations (optional)*: Additional annotations to add to the VirtualService resources
-* *labels (optional)*: Additional labels to add to the VirtualService resources
+* *name (선택사항)*: 참조할 Istio Gateway 리소스의 이름입니다. 기본값은 `"istio-gateway"`입니다
+* *namespace (선택사항)*: Istio Gateway 리소스가 위치한 네임스페이스입니다. 기본값은 `"istio-system"`입니다
+* *hostname (선택사항)*: LangSmith 설치에 사용할 호스트 이름입니다. 예: `"langsmith.example.com"`
+* *basePath (선택사항)*: base path 아래에서 LangSmith를 제공하려면 여기에 지정할 수 있습니다. 예: "example.com/langsmith"
+* *annotations (선택사항)*: VirtualService 리소스에 추가할 추가 어노테이션
+* *labels (선택사항)*: VirtualService 리소스에 추가할 추가 레이블
 
-#### Configuration
+#### 구성
 
 ```yaml
 config:
-  hostname: "" # Main domain for LangSmith
-  basePath: "" # If you want to serve langsmith on a separate basePath. E.g "example.com/langsmith"
+  hostname: "" # LangSmith의 주요 도메인
+  basePath: "" # 별도의 basePath에서 langsmith를 제공하려는 경우. 예: "example.com/langsmith"
 istioGateway:
   enabled: true
-  name: "istio-gateway" # Name of your Istio Gateway resource
-  namespace: "istio-system" # Namespace of your Istio Gateway resource
-  annotations: {} # Add annotations here if needed
-  labels: {} # Add labels here if needed
+  name: "istio-gateway" # Istio Gateway 리소스의 이름
+  namespace: "istio-system" # Istio Gateway 리소스의 네임스페이스
+  annotations: {} # 필요한 경우 여기에 어노테이션을 추가하세요
+  labels: {} # 필요한 경우 여기에 레이블을 추가하세요
 frontend:
   service:
     type: ClusterIP
 ```
 
-Once configured, you can check the status of your VirtualServices:
+구성이 완료되면 VirtualService의 상태를 확인할 수 있습니다:
 
 ```bash
 kubectl get virtualservice
