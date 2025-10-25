@@ -1,134 +1,134 @@
 ---
-title: Prompt Engineering Concepts
-sidebarTitle: Concepts
+title: 프롬프트 엔지니어링 개념
+sidebarTitle: 개념
 ---
 
 
-While traditional software applications are built by writing code, AI applications often derive their logic from prompts.
+전통적인 소프트웨어 애플리케이션은 코드를 작성하여 구축하지만, AI 애플리케이션은 프롬프트에서 로직을 도출하는 경우가 많습니다.
 
-This guide will walk through the key concepts of prompt engineering in LangSmith.
+이 가이드는 LangSmith의 프롬프트 엔지니어링 핵심 개념을 안내합니다.
 
-## Why prompt engineering?
+## 프롬프트 엔지니어링이 필요한 이유
 
-A prompt sets the stage for the model, like an audience member at an improv show directing the actor's next performance - it guides the model's behavior without changing its underlying capabilities. Just as telling an actor to "be a pirate" determines how they act, a prompt provides instructions, examples, and context that shape how the model responds.
+프롬프트는 즉흥 공연 관객이 배우의 다음 퍼포먼스를 지시하는 것처럼, 모델의 기본 기능을 변경하지 않으면서 모델의 동작을 안내합니다. 배우에게 "해적이 되어라"라고 말하는 것이 배우의 행동 방식을 결정하는 것처럼, 프롬프트는 지시사항, 예제, 컨텍스트를 제공하여 모델의 응답 방식을 형성합니다.
 
-Prompt engineering is important because it allows you to change the way the model behaves. While there are other ways to change the model's behavior (like fine-tuning), prompt engineering is usually the simplest to get started with and often provides the highest ROI.
+프롬프트 엔지니어링은 모델의 동작 방식을 변경할 수 있게 해주기 때문에 중요합니다. 파인튜닝과 같이 모델의 동작을 변경하는 다른 방법들도 있지만, 프롬프트 엔지니어링은 일반적으로 시작하기에 가장 간단하며 종종 가장 높은 ROI를 제공합니다.
 
-We often see that prompt engineering is multi-disciplinary. Sometimes the best prompt engineer is not the software engineer who is building the application, but rather the product manager or another domain expert. It is important to have the proper tooling and infrastructure to support this cross-disciplinary building.
+프롬프트 엔지니어링은 다학제적 접근이 필요한 경우가 많습니다. 때로는 애플리케이션을 구축하는 소프트웨어 엔지니어가 아니라 제품 매니저나 다른 도메인 전문가가 최고의 프롬프트 엔지니어일 수 있습니다. 이러한 학제 간 협업을 지원할 적절한 도구와 인프라를 갖추는 것이 중요합니다.
 
-## Prompts vs. prompt templates
+## 프롬프트 vs. 프롬프트 템플릿
 
-Although we often use these terms interchangably, it is important to understand the difference between "prompts" and "prompt templates".
+이 용어들을 혼용하여 사용하는 경우가 많지만, "프롬프트"와 "프롬프트 템플릿"의 차이를 이해하는 것이 중요합니다.
 
-Prompts refer to the messages that are passed into the language model.
+프롬프트는 언어 모델에 전달되는 메시지를 의미합니다.
 
-Prompt Templates refer to a way of formatting information to get that prompt to hold the information that you want. Prompt templates can include variables for few shot examples, outside context, or any other external data that is needed in your prompt.
+프롬프트 템플릿은 원하는 정보를 담은 프롬프트를 얻기 위해 정보를 포맷팅하는 방법을 의미합니다. 프롬프트 템플릿에는 퓨샷 예제, 외부 컨텍스트 또는 프롬프트에 필요한 기타 외부 데이터에 대한 변수가 포함될 수 있습니다.
 
 ![](/langsmith/images/prompt-vs-prompt-template.png)
 
-## Prompts in LangSmith
+## LangSmith의 프롬프트
 
-You can store and version prompts templates in LangSmith. There are few key aspects of a prompt template to understand.
+LangSmith에서 프롬프트 템플릿을 저장하고 버전 관리할 수 있습니다. 프롬프트 템플릿에서 이해해야 할 몇 가지 핵심 측면이 있습니다.
 
 ### Chat vs Completion
 
-There are two different types of prompts: `chat` style prompts and `completion` style prompts.
+프롬프트에는 `chat` 스타일 프롬프트와 `completion` 스타일 프롬프트 두 가지 유형이 있습니다.
 
-Chat style prompts are a **list of messages**. This is the prompting style supported by most model APIs these days, and so this should generally be preferred.
+Chat 스타일 프롬프트는 **메시지 목록**입니다. 요즘 대부분의 모델 API가 지원하는 프롬프트 스타일이므로 일반적으로 이 방식이 선호됩니다.
 
-Completion style prompts are just a string. This is an older style of prompting, and so mostly exists for legacy reasons.
+Completion 스타일 프롬프트는 단순히 문자열입니다. 이전 프롬프트 스타일이므로 주로 레거시 목적으로 존재합니다.
 
 ### F-string vs. mustache
 
-You can format your prompt with input variables using either [f-string](https://realpython.com/python-f-strings/) or [mustache](https://mustache.github.io/mustache.5.html) format. Here is an example prompt with f-string format:
+[f-string](https://realpython.com/python-f-strings/) 또는 [mustache](https://mustache.github.io/mustache.5.html) 형식을 사용하여 입력 변수로 프롬프트를 포맷팅할 수 있습니다. 다음은 f-string 형식의 예제 프롬프트입니다:
 
 ```python
 Hello, {name}!
 ```
 
-And here is one with mustache:
+다음은 mustache 형식입니다:
 
 ```python
 Hello, {{name}}!
 ```
 
-To add a conditional mustache prompt:
+조건부 mustache 프롬프트를 추가하려면:
 
 ```python
 {{#is_logged_in}}  Welcome back, {{name}}!{{else}}  Please log in.{{/is_logged_in}}
 ```
 
-* The playground UI will pick up `is_logged_in` variable, but any nested variables you'll need to specify yourself. Paste the following into inputs to ensure the above conditional prompt works:
+* Playground UI가 `is_logged_in` 변수를 인식하지만, 중첩된 변수는 직접 지정해야 합니다. 위의 조건부 프롬프트가 작동하도록 하려면 다음을 입력에 붙여넣으세요:
 
 ```json
 {  "name": "Alice"}
 ```
 
 <Check>
-The LangSmith Playground uses `f-string` as the default template format, but you can switch to `mustache` format in the prompt settings/template format section. `mustache` gives you more flexibility around conditional variables, loops, and nested keys. For conditional variables, you'll need to manually add json variables in the 'inputs' section. Read [the documentation](https://mustache.github.io/mustache.5.html)
+LangSmith Playground는 기본 템플릿 형식으로 `f-string`을 사용하지만, 프롬프트 설정/템플릿 형식 섹션에서 `mustache` 형식으로 전환할 수 있습니다. `mustache`는 조건부 변수, 루프, 중첩 키에 대해 더 많은 유연성을 제공합니다. 조건부 변수의 경우 'inputs' 섹션에 json 변수를 수동으로 추가해야 합니다. [문서](https://mustache.github.io/mustache.5.html)를 참조하세요.
 </Check>
 
 ### Tools
 
-Tools are interfaces the LLM can use to interact with the outside world. Tools consist of a name, description, and JSON schema of arguments used to call the tool.
+도구는 LLM이 외부 세계와 상호 작용하는 데 사용할 수 있는 인터페이스입니다. 도구는 이름, 설명, 그리고 도구를 호출하는 데 사용되는 인수의 JSON 스키마로 구성됩니다.
 
 ### Structured output
 
-Structured output is a feature of most state of the art LLMs, wherein instead of producing raw text as output they stick to a specified schema. This may or may not use [Tools](#tools) under the hood.
+구조화된 출력은 대부분의 최신 LLM의 기능으로, 원시 텍스트를 출력으로 생성하는 대신 지정된 스키마를 따릅니다. 이는 내부적으로 [Tools](#tools)를 사용할 수도 있고 사용하지 않을 수도 있습니다.
 
 <Check>
-Structured outputs are similar to tools, but different in a few key ways. With tools, the LLM choose which tool to call (or may choose not to call any); with structured output, the LLM **always** responds in this format. With tools, the LLM may select **multiple** tools; with structured output, only one response is generate.
+구조화된 출력은 도구와 유사하지만 몇 가지 핵심적인 차이점이 있습니다. 도구의 경우 LLM이 호출할 도구를 선택하거나 도구를 호출하지 않을 수 있습니다. 구조화된 출력의 경우 LLM은 **항상** 이 형식으로 응답합니다. 도구의 경우 LLM이 **여러** 도구를 선택할 수 있습니다. 구조화된 출력의 경우 하나의 응답만 생성됩니다.
 </Check>
 
 ### Model
 
-Optionally, you can store a model configuration alongside a prompt template. This includes the name of the model and any other parameters (temperature, etc).
+선택적으로 프롬프트 템플릿과 함께 모델 구성을 저장할 수 있습니다. 여기에는 모델의 이름과 기타 매개변수(temperature 등)가 포함됩니다.
 
-## Prompt versioning
+## 프롬프트 버전 관리
 
-Verisioning is a key part of iterating and collaborating on your different prompts.
+버전 관리는 다양한 프롬프트에 대한 반복 작업과 협업의 핵심 요소입니다.
 
 ### Commits
 
-Every saved update to a prompt creates a new commit. You can view previous commits, making it easy to review earlier prompt versions or revert to a previous state if needed. In the SDK, you can access a specific commit of a prompt by specifying the commit hash along with the prompt name (e.g. `prompt_name:commit_hash`).
+프롬프트에 대한 저장된 모든 업데이트는 새로운 커밋을 생성합니다. 이전 커밋을 볼 수 있어 이전 프롬프트 버전을 검토하거나 필요한 경우 이전 상태로 되돌리기 쉽습니다. SDK에서는 프롬프트 이름과 함께 커밋 해시를 지정하여 프롬프트의 특정 커밋에 액세스할 수 있습니다(예: `prompt_name:commit_hash`).
 
-In the UI, you can compare a commit with its previous version by toggling the "diff" button in the top-right corner of the Commits tab.
+UI에서는 Commits 탭의 오른쪽 상단에 있는 "diff" 버튼을 토글하여 커밋을 이전 버전과 비교할 수 있습니다.
 
 ![](/langsmith/images/commit-diff.png)
 
 ### Tags
 
-You may want to tag prompt commits with a human-readable tag so that you can refer to it even as new commits are added. Common use cases include tagging a prompt with `dev` or `prod` tags. This allows you to track which versions of prompts are used where.
+새로운 커밋이 추가되더라도 참조할 수 있도록 사람이 읽을 수 있는 태그로 프롬프트 커밋에 태그를 지정할 수 있습니다. 일반적인 사용 사례로는 프롬프트에 `dev` 또는 `prod` 태그를 지정하는 것이 있습니다. 이를 통해 어떤 버전의 프롬프트가 어디에서 사용되는지 추적할 수 있습니다.
 
-## Prompt playground
+## 프롬프트 플레이그라운드
 
-The prompt playground makes the process of iterating and testing your prompts seamless. You can enter the playground from the sidebar or directly from a saved prompt.
+프롬프트 플레이그라운드는 프롬프트를 반복하고 테스트하는 프로세스를 원활하게 만듭니다. 사이드바에서 또는 저장된 프롬프트에서 직접 플레이그라운드에 들어갈 수 있습니다.
 
-In the playground you can:
+플레이그라운드에서 다음을 수행할 수 있습니다:
 
-* Change the model being used
-* Change prompt template being used
-* Change the output schema
-* Change the tools available
-* Enter the input variables to run through the prompt template
-* Run the prompt through the model
-* Observe the outputs
+* 사용 중인 모델 변경
+* 사용 중인 프롬프트 템플릿 변경
+* 출력 스키마 변경
+* 사용 가능한 도구 변경
+* 프롬프트 템플릿을 통해 실행할 입력 변수 입력
+* 모델을 통해 프롬프트 실행
+* 출력 관찰
 
-## Testing multiple prompts
+## 여러 프롬프트 테스트
 
-You can add more prompts to your playground to easily compare outputs and decide which version is better:
+플레이그라운드에 더 많은 프롬프트를 추가하여 출력을 쉽게 비교하고 어떤 버전이 더 나은지 결정할 수 있습니다:
 
 ![](/langsmith/images/add-prompt-to-playground.gif)
 
-## Testing over a dataset
+## 데이터셋에 대한 테스트
 
-To test over a dataset, you simply select the dataset from the top right and press Start. You can modify whether the results are streamed back as well as how many repitions there are in the test.
+데이터셋에 대해 테스트하려면 오른쪽 상단에서 데이터셋을 선택하고 Start를 누르기만 하면 됩니다. 결과가 스트리밍되는지 여부와 테스트의 반복 횟수를 수정할 수 있습니다.
 
 ![](/langsmith/images/test-over-dataset-in-playground.gif)
 
-You can click on the "View Experiment" button to dive deeper into the results of the test.
+"View Experiment" 버튼을 클릭하여 테스트 결과를 더 자세히 살펴볼 수 있습니다.
 
-## Video guide
+## 비디오 가이드
 <iframe
   className="w-full aspect-video rounded-xl"
   src="https://www.youtube.com/embed/h4f6bIWGkog?si=IVJFfhldC7M3HL4G"
