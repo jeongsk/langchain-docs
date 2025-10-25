@@ -1,71 +1,71 @@
 ---
-title: Create a prompt
-sidebarTitle: Create a prompt
+title: 프롬프트 생성
+sidebarTitle: 프롬프트 생성
 ---
 
-Navigate to the  in the left-hand sidebar or from the application homepage.
+왼쪽 사이드바 또는 애플리케이션 홈페이지에서 로 이동합니다.
 
 ![](/langsmith/images/empty-playground.png)
 
-## Compose your prompt
+## 프롬프트 구성
 
-On the left is an editable view of the prompt.
+왼쪽에는 프롬프트의 편집 가능한 보기가 있습니다.
 
-The prompt is made up of messages, each of which has a "role" - including `system`, `human`, and `ai`.
+프롬프트는 메시지로 구성되며 각 메시지에는 `system`, `human` 및 `ai`를 포함한 "역할"이 있습니다.
 
-### Template format
+### 템플릿 형식
 
-The default template format is `f-string`, but you can change the prompt template format to `mustache` by clicking on the settings icon next to the model -> prompt format -> template format. Learn more about template formats [here](/langsmith/prompt-engineering-concepts#f-string-vs-mustache).
+기본 템플릿 형식은 `f-string`이지만 모델 옆에 있는 설정 아이콘을 클릭한 다음 프롬프트 형식 -> 템플릿 형식을 클릭하여 프롬프트 템플릿 형식을 `mustache`로 변경할 수 있습니다. 템플릿 형식에 대한 자세한 내용은 [여기](/langsmith/prompt-engineering-concepts#f-string-vs-mustache)를 참조하세요.
 ![](/langsmith/images/template-format.png)
 
-### Add a template variable
+### 템플릿 변수 추가
 
-The power of prompts comes from the ability to use variables in your prompt. You can use variables to add dynamic content to your prompt. Add a template variable in one of two ways:
+프롬프트의 강력함은 프롬프트에서 변수를 사용할 수 있는 능력에서 비롯됩니다. 변수를 사용하여 프롬프트에 동적 콘텐츠를 추가할 수 있습니다. 다음 두 가지 방법 중 하나로 템플릿 변수를 추가합니다:
 
-1. Add `{{variable_name}}` to your prompt (with one curly brace on each side for `f-string` and two for `mustache`). ![](/langsmith/images/prompt-with-variable.png)
+1. 프롬프트에 `{{variable_name}}`을 추가합니다(`f-string`의 경우 각 측면에 중괄호 하나, `mustache`의 경우 두 개). ![](/langsmith/images/prompt-with-variable.png)
 
-2. Highlight text you want to templatize and click the tooltip button that shows up. Enter a name for your variable, and convert. ![](/langsmith/images/convert-to-variable.gif)
+2. 템플릿화하려는 텍스트를 강조 표시하고 나타나는 툴팁 버튼을 클릭합니다. 변수 이름을 입력하고 변환합니다. ![](/langsmith/images/convert-to-variable.gif)
 
-When we add a variable, we see a place to enter sample inputs for our prompt variables. Fill these in with values to test the prompt. ![](/langsmith/images/prompt-inputs.png)
+변수를 추가하면 프롬프트 변수에 대한 샘플 입력을 입력할 수 있는 곳이 표시됩니다. 프롬프트를 테스트할 값으로 이를 채웁니다. ![](/langsmith/images/prompt-inputs.png)
 
-### Structured output
+### 구조화된 출력
 
-Adding an output schema to your prompt will get output in a structured format. Learn more about structured output [here](/langsmith/prompt-engineering-concepts#structured-output). ![](/langsmith/images/structured-output.png)
+프롬프트에 출력 스키마를 추가하면 구조화된 형식으로 출력을 얻을 수 있습니다. 구조화된 출력에 대한 자세한 내용은 [여기](/langsmith/prompt-engineering-concepts#structured-output)를 참조하세요. ![](/langsmith/images/structured-output.png)
 
-### Tools
+### 도구
 
-You can also add a tool by clicking the `+ Tool` button at the bottom of the prompt editor. See [here](/langsmith/use-tools) for more information on how to use tools.
+프롬프트 편집기 하단의 `+ Tool` 버튼을 클릭하여 도구를 추가할 수도 있습니다. 도구 사용 방법에 대한 자세한 내용은 [여기](/langsmith/use-tools)를 참조하세요.
 
-## Run the prompt
+## 프롬프트 실행
 
-Click "Start" to run the prompt.
+프롬프트를 실행하려면 "Start"를 클릭합니다.
 
 ![](/langsmith/images/create-a-prompt-run.png)
 
-## Save your prompt
+## 프롬프트 저장
 
-To save your prompt, click the "Save" button, name your prompt, and decide if you want it to be "private" or "public". Private prompts are only visible to your workspace, while public prompts are discoverable to anyone.
+프롬프트를 저장하려면 "Save" 버튼을 클릭하고 프롬프트 이름을 지정한 다음 "private" 또는 "public" 중 하나를 결정합니다. Private 프롬프트는 워크스페이스에만 표시되는 반면 public 프롬프트는 누구나 검색할 수 있습니다.
 
-The model and configuration you select in the Playground settings will be saved with the prompt. When you reopen the prompt, the model and configuration will automatically load from the saved version. ![](/langsmith/images/save-prompt.png)
+Playground 설정에서 선택한 모델 및 구성은 프롬프트와 함께 저장됩니다. 프롬프트를 다시 열면 저장된 버전에서 모델 및 구성이 자동으로 로드됩니다. ![](/langsmith/images/save-prompt.png)
 
 <Check>
-The first time you create a public prompt, you'll be asked to set a LangChain Hub handle. All your public prompts will be linked to this handle. In a shared workspace, this handle will be set for the whole workspace.
+처음으로 public 프롬프트를 생성할 때 LangChain Hub 핸들을 설정하라는 메시지가 표시됩니다. 모든 public 프롬프트는 이 핸들에 연결됩니다. 공유 워크스페이스에서 이 핸들은 전체 워크스페이스에 대해 설정됩니다.
 </Check>
 
 ![](/langsmith/images/public-handle.png)
 
-## View your prompts
+## 프롬프트 보기
 
-You've just created your first prompt! View a table of your prompts in the prompts tab.
+첫 번째 프롬프트를 생성했습니다! 프롬프트 탭에서 프롬프트 테이블을 봅니다.
 
 ![](/langsmith/images/prompt-table.png)
 
-## Add metadata
+## 메타데이터 추가
 
-To add metadata to your prompt, click the prompt and then click the "Edit" pencil icon next to the name. This brings you to where you can add additional information about the prompt, including a description, a README, and use cases. For public prompts this information will be visible to anyone who views your prompt in the LangChain Hub.
+프롬프트에 메타데이터를 추가하려면 프롬프트를 클릭한 다음 이름 옆에 있는 "Edit" 연필 아이콘을 클릭합니다. 그러면 설명, README 및 사용 사례를 포함하여 프롬프트에 대한 추가 정보를 추가할 수 있는 곳으로 이동합니다. public 프롬프트의 경우 이 정보는 LangChain Hub에서 프롬프트를 보는 모든 사람에게 표시됩니다.
 
 ![](/langsmith/images/pencil.png) ![](/langsmith/images/edit-prompt.png)
 
-# Next steps
+# 다음 단계
 
-Now that you've created a prompt, you can use it in your application code. See [how to pull a prompt programmatically](/langsmith/manage-prompts-programmatically#pull-a-prompt).
+이제 프롬프트를 생성했으므로 애플리케이션 코드에서 사용할 수 있습니다. [프로그래매틱 방식으로 프롬프트를 가져오는 방법](/langsmith/manage-prompts-programmatically#pull-a-prompt)을 참조하세요.
