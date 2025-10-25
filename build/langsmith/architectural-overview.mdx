@@ -1,13 +1,13 @@
 ---
-title: Architectural overview
-sidebarTitle: Overview
+title: 아키텍처 개요
+sidebarTitle: 개요
 ---
 
 <Info>
-Self-hosted LangSmith is an add-on to the Enterprise Plan designed for our largest, most security-conscious customers. See our [pricing page](https://www.langchain.com/pricing) for more detail, and [contact our sales team](https://www.langchain.com/contact-sales) if you want to get a license key to trial LangSmith in your environment.
+Self-hosted LangSmith는 가장 규모가 크고 보안을 중요시하는 고객을 위해 설계된 Enterprise Plan의 추가 기능입니다. 자세한 내용은 [가격 페이지](https://www.langchain.com/pricing)를 참조하시고, 귀하의 환경에서 LangSmith를 체험해보실 라이선스 키를 원하시면 [영업팀에 문의](https://www.langchain.com/contact-sales)해 주세요.
 </Info>
 
-You can run LangSmith in Kubernetes (recommended) or Docker in a cloud environment that you control. The LangSmith application consists of several components including LangSmith servers and stateful services:
+귀하가 제어하는 클라우드 환경에서 Kubernetes(권장) 또는 Docker로 LangSmith를 실행할 수 있습니다. LangSmith 애플리케이션은 LangSmith 서버와 상태 저장 서비스를 포함한 여러 구성 요소로 이루어져 있습니다:
 
 - [LangSmith frontend](#langsmith-frontend)
 - [LangSmith backend](#langsmith-backend)
@@ -18,79 +18,79 @@ You can run LangSmith in Kubernetes (recommended) or Docker in a cloud environme
 - [ClickHouse](#clickhouse)
 - [PostgreSQL](#postgresql)
 - [Redis](#redis)
-- [Blob storage](#blob-storage) (Optional, but recommended)
+- [Blob storage](#blob-storage) (선택사항이지만 권장됨)
 
 <div style={{ textAlign: 'center' }}>
 <img
     className="block dark:hidden"
     src="/langsmith/images/cloud-arch-light.png"
-    alt="Light mode overview"
+    alt="라이트 모드 개요"
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/cloud-arch-dark.png"
-    alt="Dark mode overview"
+    alt="다크 모드 개요"
 />
 </div>
 
-To access the LangSmith UI and send API requests, you will need to expose the [LangSmith frontend](#langsmith-frontend) service. Depending on your installation method, this can be a load balancer or a port exposed on the host machine.
+LangSmith UI에 접근하고 API 요청을 보내려면 [LangSmith frontend](#langsmith-frontend) 서비스를 노출해야 합니다. 설치 방법에 따라 로드 밸런서 또는 호스트 머신에서 노출된 포트를 사용할 수 있습니다.
 
-## Storage Services
+## 스토리지 서비스
 
 <Note>
-LangSmith Self-Hosted will bundle all storage services by default. You can configure LangSmith to use external versions of all storage services. In a production setting, we **strongly recommend using external storage services**.
+LangSmith Self-Hosted는 기본적으로 모든 스토리지 서비스를 번들로 제공합니다. 모든 스토리지 서비스의 외부 버전을 사용하도록 LangSmith를 구성할 수 있습니다. 프로덕션 환경에서는 **외부 스토리지 서비스를 사용할 것을 강력히 권장합니다**.
 </Note>
 
 ### ClickHouse
 
-[ClickHouse](https://clickhouse.com/docs/en/intro) is a high-performance, column-oriented SQL database management system (DBMS) for online analytical processing (OLAP).
+[ClickHouse](https://clickhouse.com/docs/en/intro)는 온라인 분석 처리(OLAP)를 위한 고성능 열 지향 SQL 데이터베이스 관리 시스템(DBMS)입니다.
 
-LangSmith uses ClickHouse as the primary data store for traces and feedback (high-volume data).
+LangSmith는 ClickHouse를 트레이스 및 피드백(대용량 데이터)의 주요 데이터 저장소로 사용합니다.
 
 ### PostgreSQL
 
-[PostgreSQL](https://www.postgresql.org/about/) is a powerful, open source object-relational database system that uses and extends the SQL language combined with many features that safely store and scale the most complicated data workloads
+[PostgreSQL](https://www.postgresql.org/about/)은 강력한 오픈 소스 객체-관계형 데이터베이스 시스템으로, SQL 언어를 사용하고 확장하며 가장 복잡한 데이터 워크로드를 안전하게 저장하고 확장할 수 있는 많은 기능을 결합한 시스템입니다.
 
-LangSmith uses PostgreSQL as the primary data store for transactional workloads and operational data (almost everything besides traces and feedback).
+LangSmith는 PostgreSQL을 트랜잭션 워크로드 및 운영 데이터(트레이스 및 피드백을 제외한 거의 모든 것)의 주요 데이터 저장소로 사용합니다.
 
 ### Redis
 
-[Redis](https://github.com/redis/redis) is a powerful in-memory key-value database that persists on disk. By holding data in memory, Redis offers high performance for operations like caching.
+[Redis](https://github.com/redis/redis)는 디스크에 지속되는 강력한 인메모리 키-값 데이터베이스입니다. 데이터를 메모리에 보관함으로써 Redis는 캐싱과 같은 작업에 대해 높은 성능을 제공합니다.
 
-LangSmith uses Redis to back queuing and caching operations.
+LangSmith는 Redis를 큐잉 및 캐싱 작업의 백엔드로 사용합니다.
 
 ### Blob storage
 
-LangSmith supports several blob storage providers, including [AWS S3](https://aws.amazon.com/s3/), [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/), and [Google Cloud Storage](https://cloud.google.com/storage).
+LangSmith는 [AWS S3](https://aws.amazon.com/s3/), [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/), [Google Cloud Storage](https://cloud.google.com/storage)를 포함한 여러 blob 스토리지 제공업체를 지원합니다.
 
-LangSmith uses blob storage to store large files, such as trace artifacts, feedback attachments, and other large data objects. Blob storage is optional, but highly recommended for production deployments.
+LangSmith는 blob 스토리지를 사용하여 트레이스 아티팩트, 피드백 첨부 파일 및 기타 대용량 데이터 객체와 같은 대용량 파일을 저장합니다. Blob 스토리지는 선택사항이지만 프로덕션 배포에 매우 권장됩니다.
 
-## Services
+## 서비스
 
 ### LangSmith frontend
 
-The frontend uses Nginx to serve the LangSmith UI and route API requests to the other servers. This serves as the entrypoint for the application and is the only component that must be exposed to users.
+프론트엔드는 Nginx를 사용하여 LangSmith UI를 제공하고 API 요청을 다른 서버로 라우팅합니다. 이는 애플리케이션의 진입점 역할을 하며 사용자에게 노출되어야 하는 유일한 구성 요소입니다.
 
 ### LangSmith backend
 
-The backend is the main entrypoint for CRUD API requests and handles the majority of the business logic for the application. This includes handling requests from the frontend and SDK, preparing traces for ingestion, and supporting the hub API.
+백엔드는 CRUD API 요청의 주요 진입점이며 애플리케이션의 비즈니스 로직 대부분을 처리합니다. 여기에는 프론트엔드 및 SDK로부터의 요청 처리, 수집을 위한 트레이스 준비, hub API 지원이 포함됩니다.
 
 ### LangSmith queue
 
-The queue handles incoming traces and feedback to ensure that they are ingested and persisted into the traces and feedback datastore asynchronously, handling checks for data integrity and ensuring successful insert into the datastore, handling retries in situations such as database errors or the temporary inability to connect to the database.
+큐는 들어오는 트레이스와 피드백을 처리하여 비동기적으로 트레이스 및 피드백 데이터 저장소에 수집되고 저장되도록 합니다. 데이터 무결성 검사를 처리하고 데이터 저장소에 성공적으로 삽입되도록 보장하며, 데이터베이스 오류나 데이터베이스 연결 일시적 불가 등의 상황에서 재시도를 처리합니다.
 
 ### LangSmith platform backend
 
-The platform backend is another critical service that primarily handles authentication, run ingestion, and other high-volume tasks.
+플랫폼 백엔드는 주로 인증, 실행 수집 및 기타 대용량 작업을 처리하는 또 다른 중요한 서비스입니다.
 
 ### LangSmith playground
 
-The playground is a service that handles forwarding requests to various LLM APIs to support the LangSmith Playground feature. This can also be used to connect to your own custom model servers.
+플레이그라운드는 LangSmith Playground 기능을 지원하기 위해 다양한 LLM API로 요청을 전달하는 서비스입니다. 이는 자체 커스텀 모델 서버에 연결하는 데에도 사용될 수 있습니다.
 
 ### LangSmith ACE (Arbitrary Code Execution) backend
 
-The ACE backend is a service that handles executing arbitrary code in a secure environment. This is used to support running custom code within LangSmith.
+ACE 백엔드는 안전한 환경에서 임의 코드를 실행하는 서비스입니다. 이는 LangSmith 내에서 커스텀 코드를 실행하는 것을 지원하는 데 사용됩니다.
 
 ---
 

@@ -1,25 +1,25 @@
 ---
-title: Evaluate a complex agent
-sidebarTitle: Evaluate a complex agent
+title: 복잡한 에이전트 평가하기
+sidebarTitle: 복잡한 에이전트 평가하기
 ---
 
 <Info>
-[Agent evaluation](/langsmith/evaluation-concepts#agents) | [Evaluators](/langsmith/evaluation-concepts#evaluators) | [LLM-as-judge evaluators](/langsmith/evaluation-concepts#llm-as-judge)
+[에이전트 평가](/langsmith/evaluation-concepts#agents) | [평가자](/langsmith/evaluation-concepts#evaluators) | [LLM-as-judge 평가자](/langsmith/evaluation-concepts#llm-as-judge)
 </Info>
 
-In this tutorial, we'll build a customer support bot that helps users navigate a digital music store. Then, we'll go through the three most effective types of evaluations to run on chat bots:
+이 튜토리얼에서는 사용자가 디지털 음악 스토어를 탐색하는 데 도움을 주는 고객 지원 봇을 구축한 다음, 챗봇에 대해 실행할 수 있는 가장 효과적인 세 가지 평가 유형을 살펴보겠습니다:
 
-* [Final response](/langsmith/evaluation-concepts#evaluating-an-agents-final-response): Evaluate the agent's final response.
-* [Trajectory](/langsmith/evaluation-concepts#evaluating-an-agents-trajectory): Evaluate whether the agent took the expected path (e.g., of tool calls) to arrive at the final answer.
-* [Single step](/langsmith/evaluation-concepts#evaluating-a-single-step-of-an-agent): Evaluate any agent step in isolation (e.g., whether it selects the appropriate first tool for a given step).
+* [최종 응답](/langsmith/evaluation-concepts#evaluating-an-agents-final-response): 에이전트의 최종 응답을 평가합니다.
+* [궤적](/langsmith/evaluation-concepts#evaluating-an-agents-trajectory): 에이전트가 최종 답변에 도달하기 위해 예상된 경로(예: 도구 호출)를 따랐는지 평가합니다.
+* [단일 단계](/langsmith/evaluation-concepts#evaluating-a-single-step-of-an-agent): 에이전트의 모든 단계를 독립적으로 평가합니다(예: 특정 단계에 적절한 첫 번째 도구를 선택했는지).
 
-We'll build our agent using [LangGraph](https://github.com/langchain-ai/langgraph), but the techniques and LangSmith functionality shown here are framework-agnostic.
+[LangGraph](https://github.com/langchain-ai/langgraph)를 사용하여 에이전트를 구축하지만, 여기에 표시된 기술과 LangSmith 기능은 프레임워크에 구애받지 않습니다.
 
-## Setup
+## 설정
 
-### Configure the environment
+### 환경 구성하기
 
-Let's install the required dependencies:
+필요한 종속성을 설치합니다:
 
 <CodeGroup>
 ```bash pip
@@ -31,7 +31,7 @@ uv add langgraph langchain[openai]
 ```
 </CodeGroup>
 
-Let's set up environment variables for OpenAI and [LangSmith](https://smith.langchain.com):
+OpenAI와 [LangSmith](https://smith.langchain.com)를 위한 환경 변수를 설정합니다:
 
 ```python
 import getpass
@@ -46,11 +46,11 @@ _set_env("LANGSMITH_API_KEY")
 _set_env("OPENAI_API_KEY")
 ```
 
-### Download the database
+### 데이터베이스 다운로드하기
 
-We will create a SQLite database for this tutorial. SQLite is a lightweight database that is easy to set up and use. We will load the `chinook` database, which is a sample database that represents a digital media store. Find more information about the database [here](https://www.sqlitetutorial.net/sqlite-sample-database/).
+이 튜토리얼을 위해 SQLite 데이터베이스를 생성할 것입니다. SQLite는 설정과 사용이 쉬운 경량 데이터베이스입니다. 디지털 미디어 스토어를 나타내는 샘플 데이터베이스인 `chinook` 데이터베이스를 로드할 것입니다. 데이터베이스에 대한 자세한 내용은 [여기](https://www.sqlitetutorial.net/sqlite-sample-database/)에서 확인할 수 있습니다.
 
-For convenience, we have hosted the database in a public GCS bucket:
+편의를 위해 공개 GCS 버킷에 데이터베이스를 호스팅했습니다:
 
 ```python
 import requests
@@ -68,7 +68,7 @@ else:
     print(f"Failed to download the file. Status code: {response.status_code}")
 ```
 
-Here's a sample of the data in the db:
+데이터베이스의 데이터 샘플은 다음과 같습니다:
 
 ```python
 import sqlite3
@@ -79,34 +79,34 @@ import sqlite3
 [(1, 'AC/DC'), (2, 'Accept'), (3, 'Aerosmith'), (4, 'Alanis Morissette'), (5, 'Alice In Chains'), (6, 'Antônio Carlos Jobim'), (7, 'Apocalyptica'), (8, 'Audioslave'), (9, 'BackBeat'), (10, 'Billy Cobham')]
 ```
 
-And here's the database schema (image from [https://github.com/lerocha/chinook-database](https://github.com/lerocha/chinook-database)):
+다음은 데이터베이스 스키마입니다([https://github.com/lerocha/chinook-database](https://github.com/lerocha/chinook-database)의 이미지):
 
 ![Chinook DB](/langsmith/images/chinook-diagram.png)
 
-### Define the customer support agent
+### 고객 지원 에이전트 정의하기
 
-We'll create a [LangGraph](https://langchain-ai.github.io/langgraph/) agent with limited access to our database. For demo purposes, our agent will support two basic types of requests:
+데이터베이스에 대한 제한된 액세스 권한을 가진 [LangGraph](https://langchain-ai.github.io/langgraph/) 에이전트를 생성할 것입니다. 데모 목적으로 에이전트는 다음 두 가지 기본 요청 유형을 지원합니다:
 
-* Lookup: The customer can look up song titles, artist names, and albums based on other identifying information. For example: "What songs do you have by Jimi Hendrix?"
-* Refund: The customer can request a refund on their past purchases. For example: "My name is Claude Shannon and I'd like a refund on a purchase I made last week, could you help me?"
+* 조회: 고객은 다른 식별 정보를 기반으로 노래 제목, 아티스트 이름, 앨범을 조회할 수 있습니다. 예: "Jimi Hendrix의 노래는 어떤 게 있나요?"
+* 환불: 고객은 과거 구매에 대한 환불을 요청할 수 있습니다. 예: "제 이름은 Claude Shannon이고 지난주에 구매한 것을 환불받고 싶은데 도와주시겠어요?"
 
-For simplicity in this demo, we'll implement refunds by deleting the corresponding database records. We'll skip implementing user authentication and other production security measures.
+이 데모에서는 간단하게 해당 데이터베이스 레코드를 삭제하는 방식으로 환불을 구현할 것입니다. 사용자 인증 및 기타 프로덕션 보안 조치는 생략하겠습니다.
 
-The agent's logic will be structured as two separate subgraphs (one for lookups and one for refunds), with a parent graph that routes requests to the appropriate subgraph.
+에이전트의 로직은 두 개의 별도 서브그래프(조회용과 환불용)로 구성되며, 상위 그래프가 요청을 적절한 서브그래프로 라우팅합니다.
 
-#### Refund agent
+#### 환불 에이전트
 
-Let's build the refund processing agent. This agent needs to:
+환불 처리 에이전트를 구축해 보겠습니다. 이 에이전트는 다음을 수행해야 합니다:
 
-1. Find the customer's purchase records in the database
-2. Delete the relevant Invoice and InvoiceLine records to process the refund
+1. 데이터베이스에서 고객의 구매 기록 찾기
+2. 환불을 처리하기 위해 관련 Invoice 및 InvoiceLine 레코드 삭제하기
 
-We'll create two SQL helper functions:
+두 개의 SQL 헬퍼 함수를 생성할 것입니다:
 
-1. A function to execute the refund by deleting records
-2. A function to look up a customer's purchase history
+1. 레코드를 삭제하여 환불을 실행하는 함수
+2. 고객의 구매 내역을 조회하는 함수
 
-To make testing easier, we'll add a "mock" mode to these functions. When mock mode is enabled, the functions will simulate database operations without actually modifying any data.
+테스트를 쉽게 하기 위해 이러한 함수에 "mock" 모드를 추가할 것입니다. mock 모드가 활성화되면 함수는 실제로 데이터를 수정하지 않고 데이터베이스 작업을 시뮬레이션합니다.
 
 ```python
 import sqlite3
@@ -117,21 +117,21 @@ def _refund(invoice_id: int | None, invoice_line_ids: list[int] | None, mock: bo
 def _lookup( ...
 ```
 
-Now let's define our graph. We'll use a simple architecture with three main paths:
+이제 그래프를 정의해 보겠습니다. 세 가지 주요 경로를 가진 간단한 아키텍처를 사용할 것입니다:
 
-1. Extract customer and purchase information from the conversation
+1. 대화에서 고객 및 구매 정보 추출
 
-2. Route the request to one of three paths:
+2. 요청을 세 가지 경로 중 하나로 라우팅:
 
-   * Refund path: If we have sufficient purchase details (Invoice ID or Invoice Line IDs) to process a refund
-   * Lookup path: If we have enough customer information (name and phone) to search their purchase history
-   * Response path: If we need more information, respond to the user requesting the specific details needed
+   * 환불 경로: 환불을 처리하기에 충분한 구매 세부 정보(Invoice ID 또는 Invoice Line ID)가 있는 경우
+   * 조회 경로: 구매 내역을 검색하기에 충분한 고객 정보(이름 및 전화번호)가 있는 경우
+   * 응답 경로: 더 많은 정보가 필요한 경우, 필요한 구체적인 세부 정보를 요청하는 응답을 사용자에게 전송
 
-The graph's state will track:
+그래프의 상태는 다음을 추적합니다:
 
-* The conversation history (messages between user and agent)
-* All customer and purchase information extracted from the conversation
-* The next message to send to the user (followup text)
+* 대화 기록(사용자와 에이전트 간의 메시지)
+* 대화에서 추출된 모든 고객 및 구매 정보
+* 사용자에게 전송할 다음 메시지(후속 텍스트)
 
 ```python
 from typing import Literal
@@ -282,7 +282,7 @@ graph_builder.add_edge("refund", END)
 refund_graph = graph_builder.compile()
 ```
 
-We can visualize our refund graph:
+환불 그래프를 시각화할 수 있습니다:
 
 ```
 # Assumes you're in an interactive Python environmentfrom IPython.display import Image, display ...
@@ -290,9 +290,9 @@ We can visualize our refund graph:
 
 ![Refund graph](/langsmith/images/refund-graph.png)
 
-#### Lookup agent
+#### 조회 에이전트
 
-For the lookup (i.e. question-answering) agent, we'll use a simple ReACT architecture and give the agent tools for looking up track names, artist names, and album names based on various filters. For example, you can look up albums by a particular artist, artists who released songs with a specific name, etc.
+조회(즉, 질문 답변) 에이전트의 경우 간단한 ReACT 아키텍처를 사용하고, 다양한 필터를 기반으로 트랙 이름, 아티스트 이름, 앨범 이름을 조회할 수 있는 도구를 에이전트에 제공할 것입니다. 예를 들어, 특정 아티스트의 앨범, 특정 이름의 노래를 발표한 아티스트 등을 조회할 수 있습니다.
 
 ```python
 from langchain.embeddings import init_embeddings
@@ -334,9 +334,9 @@ display(Image(qa_graph.get_graph(xray=True).draw_mermaid_png()))
 
 ![QA Graph](/langsmith/images/qa-graph.png)
 
-#### Parent agent
+#### 상위 에이전트
 
-Now let's define a parent agent that combines our two task-specific agents. The only job of the parent agent is to route to one of the sub-agents by classifying the user's current intent, and to compile the output into a followup message.
+이제 두 개의 작업별 에이전트를 결합하는 상위 에이전트를 정의해 보겠습니다. 상위 에이전트의 유일한 역할은 사용자의 현재 의도를 분류하여 서브 에이전트 중 하나로 라우팅하고, 출력을 후속 메시지로 컴파일하는 것입니다.
 
 ```python
 # Schema for routing user intent.
@@ -398,7 +398,7 @@ graph_builder.add_edge("compile_followup", END)
 graph = graph_builder.compile()
 ```
 
-We can visualize our compiled parent graph including all of its subgraphs:
+모든 서브그래프를 포함한 컴파일된 상위 그래프를 시각화할 수 있습니다:
 
 ```python
 display(Image(graph.get_graph().draw_mermaid_png()))
@@ -406,9 +406,9 @@ display(Image(graph.get_graph().draw_mermaid_png()))
 
 ![graph](/langsmith/images/agent-tutorial-graph.png)
 
-#### Try it out
+#### 사용해 보기
 
-Let's give our custom support agent a whirl!
+맞춤 지원 에이전트를 사용해 보겠습니다!
 
 ```python
 state = await graph.ainvoke(
@@ -434,19 +434,19 @@ print(state["followup"])
 Which of the following purchases would you like to be refunded for? ...
 ```
 
-## Evaluations
+## 평가
 
-Now that we've got a testable version of our agent, let's run some evaluations. Agent evaluation can focus on at least 3 things:
+이제 테스트 가능한 버전의 에이전트를 확보했으므로 몇 가지 평가를 실행해 보겠습니다. 에이전트 평가는 최소 3가지에 초점을 맞출 수 있습니다:
 
-* [Final response](/langsmith/evaluation-concepts#evaluating-an-agents-final-response): The inputs are a prompt and an optional list of tools. The output is the final agent response.
-* [Trajectory](/langsmith/evaluation-concepts#evaluating-an-agents-trajectory): As before, the inputs are a prompt and an optional list of tools. The output is the list of tool calls
-* [Single step](/langsmith/evaluation-concepts#evaluating-a-single-step-of-an-agent): As before, the inputs are a prompt and an optional list of tools. The output is the tool call.
+* [최종 응답](/langsmith/evaluation-concepts#evaluating-an-agents-final-response): 입력은 프롬프트와 선택적 도구 목록입니다. 출력은 최종 에이전트 응답입니다.
+* [궤적](/langsmith/evaluation-concepts#evaluating-an-agents-trajectory): 이전과 마찬가지로 입력은 프롬프트와 선택적 도구 목록입니다. 출력은 도구 호출 목록입니다.
+* [단일 단계](/langsmith/evaluation-concepts#evaluating-a-single-step-of-an-agent): 이전과 마찬가지로 입력은 프롬프트와 선택적 도구 목록입니다. 출력은 도구 호출입니다.
 
-Let's run each type of evaluation:
+각 유형의 평가를 실행해 보겠습니다:
 
-### Final response evaluator
+### 최종 응답 평가자
 
-First, let's create a [dataset](/langsmith/evaluation-concepts#datasets) that evaluates end-to-end performance of the agent. For simplicity we'll use the same dataset for final response and trajectory evaluation, so we'll add both ground-truth responses and trajectories for each example question. We'll cover the trajectories in the next section.
+먼저 에이전트의 엔드투엔드 성능을 평가하는 [데이터셋](/langsmith/evaluation-concepts#datasets)을 생성해 보겠습니다. 간단하게 최종 응답과 궤적 평가에 동일한 데이터셋을 사용할 것이므로 각 예제 질문에 대해 ground-truth 응답과 궤적을 모두 추가할 것입니다. 궤적은 다음 섹션에서 다루겠습니다.
 
 ```python
 from langsmith import Client
@@ -512,7 +512,7 @@ if not client.has_dataset(dataset_name=dataset_name):
     )
 ```
 
-We'll create a custom [LLM-as-judge](/langsmith/evaluation-concepts#llm-as-judge) evaluator that uses another model to compare our agent's output on each example to the reference response, and judge if they're equivalent or not:
+다른 모델을 사용하여 각 예제에 대한 에이전트의 출력을 참조 응답과 비교하고 동등한지 여부를 판단하는 맞춤형 [LLM-as-judge](/langsmith/evaluation-concepts#llm-as-judge) 평가자를 생성할 것입니다:
 
 ```python
 # LLM-as-judge instructions
@@ -554,9 +554,9 @@ async def final_answer_correct(inputs: dict, outputs: dict, reference_outputs: d
     return grade["is_correct"]
 ```
 
-Now we can run our evaluation. Our evaluator assumes that our target function returns a 'response' key, so lets define a target function that does so.
+이제 평가를 실행할 수 있습니다. 평가자는 대상 함수가 'response' 키를 반환한다고 가정하므로 그렇게 하는 대상 함수를 정의해 보겠습니다.
 
-Also remember that in our refund graph we made the refund node configurable, so that if we specified `config={"env": "test"}`, we would mock out the refunds without actually updating the DB. We'll use this configurable variable in our target `run_graph` method when invoking our graph:
+또한 환불 그래프에서 환불 노드를 구성 가능하게 만들어서 `config={"env": "test"}`를 지정하면 실제로 DB를 업데이트하지 않고 환불을 모의 실행할 수 있도록 했다는 점을 기억하세요. 그래프를 호출할 때 대상 `run_graph` 메서드에서 이 구성 가능한 변수를 사용할 것입니다:
 
 ```python
 # Target function
@@ -579,18 +579,18 @@ experiment_results = await client.aevaluate(
 experiment_results.to_pandas()
 ```
 
-You can see what these results look like here: [LangSmith link](https://smith.langchain.com/public/708d08f4-300e-4c75-9677-c6b71b0d28c9/d).
+이러한 결과가 어떻게 나타나는지는 여기에서 확인할 수 있습니다: [LangSmith 링크](https://smith.langchain.com/public/708d08f4-300e-4c75-9677-c6b71b0d28c9/d).
 
-### Trajectory evaluator
+### 궤적 평가자
 
-As agents become more complex, they have more potential points of failure. Rather than using simple pass/fail evaluations, it's often better to use evaluations that can give partial credit when an agent takes some correct steps, even if it doesn't reach the right final answer.
+에이전트가 복잡해질수록 잠재적 실패 지점이 더 많아집니다. 단순한 합격/불합격 평가를 사용하는 대신, 에이전트가 올바른 최종 답변에 도달하지 못하더라도 일부 올바른 단계를 수행한 경우 부분 점수를 부여할 수 있는 평가를 사용하는 것이 더 나은 경우가 많습니다.
 
-This is where trajectory evaluations come in. A trajectory evaluation:
+이것이 궤적 평가가 필요한 이유입니다. 궤적 평가는:
 
-1. Compares the actual sequence of steps the agent took against an expected sequence
-2. Calculates a score based on how many of the expected steps were completed correctly
+1. 에이전트가 수행한 실제 단계 순서를 예상 순서와 비교합니다
+2. 예상 단계 중 얼마나 많은 단계가 올바르게 완료되었는지를 기반으로 점수를 계산합니다
 
-For this example, our end-to-end dataset contains an ordered list of steps that we expect the agent to take. Let's create an evaluator that checks the agent's actual trajectory against these expected steps and calculates what percentage were completed:
+이 예제에서 엔드투엔드 데이터셋에는 에이전트가 수행할 것으로 예상되는 순서가 지정된 단계 목록이 포함되어 있습니다. 에이전트의 실제 궤적을 이러한 예상 단계와 비교하고 완료된 비율을 계산하는 평가자를 생성해 보겠습니다:
 
 
 ```python
@@ -608,9 +608,9 @@ def trajectory_subsequence(outputs: dict, reference_outputs: dict) -> float:
     return i / len(reference_outputs['trajectory'])
 ```
 
-Now we can run our evaluation. Our evaluator assumes that our target function returns a 'trajectory' key, so lets define a target function that does so. We'll need to usage [LangGraph's streaming capabilities](https://langchain-ai.github.io/langgra/langsmith/observability-concepts/streaming/) to record the trajectory.
+이제 평가를 실행할 수 있습니다. 평가자는 대상 함수가 'trajectory' 키를 반환한다고 가정하므로 그렇게 하는 대상 함수를 정의해 보겠습니다. 궤적을 기록하려면 [LangGraph의 스트리밍 기능](https://langchain-ai.github.io/langgra/langsmith/observability-concepts/streaming/)을 사용해야 합니다.
 
-Note that we are reusing the same dataset as for our final response evaluation, so we could have run both evaluators together and defined a target function that returns both "response" and "trajectory". In practice it's often useful to have separate datasets for each type of evaluation, which is why we show them separately here:
+최종 응답 평가와 동일한 데이터셋을 재사용하므로 두 평가자를 함께 실행하고 "response"와 "trajectory"를 모두 반환하는 대상 함수를 정의할 수도 있습니다. 실제로는 각 유형의 평가에 대해 별도의 데이터셋을 갖는 것이 유용한 경우가 많으며, 이것이 여기에서 별도로 표시하는 이유입니다:
 
 ```python
 async def run_graph(inputs: dict) -> dict:
@@ -648,13 +648,13 @@ experiment_results = await client.aevaluate(
 experiment_results.to_pandas()
 ```
 
-You can see what these results look like here: [LangSmith link](https://smith.langchain.com/public/708d08f4-300e-4c75-9677-c6b71b0d28c9/d).
+이러한 결과가 어떻게 나타나는지는 여기에서 확인할 수 있습니다: [LangSmith 링크](https://smith.langchain.com/public/708d08f4-300e-4c75-9677-c6b71b0d28c9/d).
 
-### Single step evaluators
+### 단일 단계 평가자
 
-While end-to-end tests give you the most signal about your agents performance, for the sake of debugging and iterating on your agent it can be helpful to pinpoint specific steps that are difficult and evaluate them directly.
+엔드투엔드 테스트는 에이전트 성능에 대한 가장 많은 신호를 제공하지만, 에이전트를 디버깅하고 반복 개선하기 위해서는 어려운 특정 단계를 정확히 찾아내어 직접 평가하는 것이 도움이 될 수 있습니다.
 
-In our case, a crucial part of our agent is that it routes the user's intention correctly into either the "refund" path or the "question answering" path. Let's create a dataset and run some evaluations to directly stress test this one component.
+우리의 경우 에이전트의 중요한 부분은 사용자의 의도를 "환불" 경로 또는 "질문 답변" 경로로 올바르게 라우팅하는 것입니다. 데이터셋을 생성하고 이 하나의 구성 요소를 직접 스트레스 테스트하기 위한 평가를 실행해 보겠습니다.
 
 ```python
 # Create dataset
@@ -706,13 +706,13 @@ experiment_results = await client.aevaluate(
 )
 ```
 
-You can see what these results look like here: [LangSmith link](https://smith.langchain.com/public/f133dae2-8a88-43a0-9bfd-ab45bfa3920b/d).
+이러한 결과가 어떻게 나타나는지는 여기에서 확인할 수 있습니다: [LangSmith 링크](https://smith.langchain.com/public/f133dae2-8a88-43a0-9bfd-ab45bfa3920b/d).
 
-## Reference code
+## 참조 코드
 
-Here's a consolidated script with all the above code:
+다음은 위의 모든 코드를 통합한 스크립트입니다:
 
-<Accordion title="Reference code">
+<Accordion title="참조 코드">
 ```python
 import json
 import sqlite3

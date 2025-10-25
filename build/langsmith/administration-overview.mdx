@@ -1,375 +1,375 @@
 ---
-title: Overview
-sidebarTitle: Overview
+title: 개요
+sidebarTitle: 개요
 ---
 
-This overview covers topics related to managing users, organizations, and workspaces within LangSmith.
+이 개요에서는 LangSmith 내에서 사용자, 조직 및 워크스페이스를 관리하는 것과 관련된 주제를 다룹니다.
 
-## Resource Hierarchy
+## 리소스 계층 구조
 
-### Organizations
+### 조직
 
-An organization is a logical grouping of users within LangSmith with its own billing configuration. Typically, there is one organization per company. An organization can have multiple workspaces. For more details, see the [setup guide](/langsmith/set-up-a-workspace#set-up-an-organization).
+조직은 자체 청구 구성을 가진 LangSmith 내 사용자의 논리적 그룹입니다. 일반적으로 회사당 하나의 조직이 있습니다. 조직은 여러 워크스페이스를 가질 수 있습니다. 자세한 내용은 [설정 가이드](/langsmith/set-up-a-workspace#set-up-an-organization)를 참조하세요.
 
-When you log in for the first time, a personal organization will be created for you automatically. If you'd like to collaborate with others, you can create a separate organization and invite your team members to join. There are a few important differences between your personal organization and shared organizations:
+처음 로그인하면 개인 조직이 자동으로 생성됩니다. 다른 사람들과 협업하고 싶다면 별도의 조직을 만들고 팀원을 초대할 수 있습니다. 개인 조직과 공유 조직 간에는 몇 가지 중요한 차이점이 있습니다:
 
-| Feature             | Personal            | Shared                                                                                       |
+| 기능             | 개인            | 공유                                                                                       |
 | ------------------- | ------------------- | -------------------------------------------------------------------------------------------- |
-| Maximum workspaces  | 1                   | Variable, depending on plan (see [pricing page](https://www.langchain.com/pricing-langsmith) |
-| Collaboration       | Cannot invite users | Can invite users                                                                             |
-| Billing: paid plans | Developer plan only | All other plans available                                                                    |
+| 최대 워크스페이스 수  | 1                   | 플랜에 따라 가변 ([가격 페이지](https://www.langchain.com/pricing-langsmith) 참조) |
+| 협업       | 사용자 초대 불가 | 사용자 초대 가능                                                                             |
+| 청구: 유료 플랜 | Developer 플랜만 가능 | 다른 모든 플랜 사용 가능                                                                    |
 
-### Workspaces
+### 워크스페이스
 
 <Info>
-Workspaces were formerly called Tenants. Some code and APIs may still reference the old name for a period of time during the transition.
+워크스페이스는 이전에 Tenant라고 불렸습니다. 전환 기간 동안 일부 코드 및 API에서 여전히 이전 이름을 참조할 수 있습니다.
 </Info>
 
-A workspace is a logical grouping of users and resources within an organization. A workspace separates trust boundaries for resources and access control. Users may have permissions in a workspace that grant them access to the resources in that workspace, including tracing projects, datasets, annotation queues, and prompts. For more details, see the [setup guide](/langsmith/set-up-a-workspace).
+워크스페이스는 조직 내 사용자와 리소스의 논리적 그룹입니다. 워크스페이스는 리소스 및 액세스 제어를 위한 신뢰 경계를 분리합니다. 사용자는 워크스페이스에서 권한을 가질 수 있으며, 이를 통해 트레이싱 프로젝트, 데이터셋, 주석 큐 및 프롬프트를 포함한 해당 워크스페이스의 리소스에 액세스할 수 있습니다. 자세한 내용은 [설정 가이드](/langsmith/set-up-a-workspace)를 참조하세요.
 
-It is recommended to create a separate workspace for each team within your organization. To organize resources even further, you can use [Resource Tags](#resource-tags) to group resources within a workspace.
+조직 내 각 팀에 대해 별도의 워크스페이스를 만드는 것이 좋습니다. 리소스를 더욱 체계적으로 구성하려면 [리소스 태그](#resource-tags)를 사용하여 워크스페이스 내에서 리소스를 그룹화할 수 있습니다.
 
-The following image shows a sample workspace settings page: ![Sample Workspace](/langsmith/images/sample-workspace.png)
+다음 이미지는 샘플 워크스페이스 설정 페이지를 보여줍니다: ![Sample Workspace](/langsmith/images/sample-workspace.png)
 
-The following diagram explains the relationship between organizations, workspaces, and the different resources scoped to and within a workspace: ![Resource Hierarchy](/langsmith/images/resource-hierarchy.png)
+다음 다이어그램은 조직, 워크스페이스 및 워크스페이스에 속하고 워크스페이스 내에 있는 다양한 리소스 간의 관계를 설명합니다: ![Resource Hierarchy](/langsmith/images/resource-hierarchy.png)
 
-See the table below for details on which features are available in which scope (organization or workspace):
+어떤 기능이 어떤 범위(조직 또는 워크스페이스)에서 사용 가능한지에 대한 자세한 내용은 아래 표를 참조하세요:
 
-| Resource/Setting                                                            | Scope            |
+| 리소스/설정                                                            | 범위            |
 | --------------------------------------------------------------------------- | ---------------- |
-| Trace Projects                                                              | Workspace        |
-| Annotation Queues                                                           | Workspace        |
-| Deployments                                                                 | Workspace        |
-| Datasets & Experiments                                                      | Workspace        |
-| Prompts                                                                     | Workspace        |
-| Resource Tags                                                               | Workspace        |
-| API Keys                                                                    | Workspace        |
-| Settings including Secrets, Feedback config, Models, Rules, and Shared URLs | Workspace        |
-| User management: Invite User to Workspace                                   | Workspace        |
-| RBAC: Assigning Workspace Roles                                             | Workspace        |
-| Data Retention, Usage Limits                                                | Workspace\*      |
-| Plans and Billing, Credits, Invoices                                        | Organization     |
-| User management: Invite User to Organization                                | Organization\*\* |
-| Adding Workspaces                                                           | Organization     |
-| Assigning Organization Roles                                                | Organization     |
-| RBAC: Creating/Editing/Deleting Custom Roles                                | Organization     |
+| 트레이스 프로젝트                                                              | 워크스페이스        |
+| 주석 큐                                                           | 워크스페이스        |
+| 배포                                                                 | 워크스페이스        |
+| 데이터셋 및 실험                                                      | 워크스페이스        |
+| 프롬프트                                                                     | 워크스페이스        |
+| 리소스 태그                                                               | 워크스페이스        |
+| API 키                                                                    | 워크스페이스        |
+| 시크릿, 피드백 구성, 모델, 규칙 및 공유 URL을 포함한 설정 | 워크스페이스        |
+| 사용자 관리: 워크스페이스에 사용자 초대                                   | 워크스페이스        |
+| RBAC: 워크스페이스 역할 할당                                             | 워크스페이스        |
+| 데이터 보존, 사용량 제한                                                | 워크스페이스\*      |
+| 플랜 및 청구, 크레딧, 인보이스                                        | 조직     |
+| 사용자 관리: 조직에 사용자 초대                                | 조직\*\* |
+| 워크스페이스 추가                                                           | 조직     |
+| 조직 역할 할당                                                | 조직     |
+| RBAC: 커스텀 역할 생성/편집/삭제                                | 조직     |
 
-\* Data retention settings and usage limits will be available soon for the organization level as well \*\* Self-hosted installations may enable workspace-level invites of users to the organization via a feature flag. See the [self-hosted user management docs](/langsmith/self-host-user-management) for details.
+\* 데이터 보존 설정 및 사용량 제한은 곧 조직 수준에서도 사용할 수 있습니다 \*\* 셀프 호스팅 설치는 기능 플래그를 통해 워크스페이스 수준에서 조직에 사용자를 초대할 수 있습니다. 자세한 내용은 [셀프 호스팅 사용자 관리 문서](/langsmith/self-host-user-management)를 참조하세요.
 
-### Resource tags
+### 리소스 태그
 
-Resource tags allow you to organize resources within a workspace. Each tag is a key-value pair that can be assigned to a resource. Tags can be used to filter workspace-scoped resources in the UI and API: Projects, Datasets, Annotation Queues, Deployments, and Experiments.
+리소스 태그를 사용하면 워크스페이스 내에서 리소스를 구성할 수 있습니다. 각 태그는 리소스에 할당될 수 있는 키-값 쌍입니다. 태그는 UI 및 API에서 워크스페이스 범위 리소스를 필터링하는 데 사용할 수 있습니다: 프로젝트, 데이터셋, 주석 큐, 배포 및 실험.
 
-Each new workspace comes with two default tag keys: `Application` and `Environment`; as the names suggest, these tags can be used to categorize resources based on the application and environment they belong to. More tags can be added as needed.
+각 새 워크스페이스에는 두 개의 기본 태그 키가 제공됩니다: `Application` 및 `Environment`; 이름에서 알 수 있듯이 이러한 태그는 애플리케이션과 환경에 따라 리소스를 분류하는 데 사용할 수 있습니다. 필요에 따라 더 많은 태그를 추가할 수 있습니다.
 
-LangSmith resource tags are very similar to tags in cloud services like [AWS](https://docs.aws.amazon.com/tag-editor/latest/userguide/tagging.html).
+LangSmith 리소스 태그는 [AWS](https://docs.aws.amazon.com/tag-editor/latest/userguide/tagging.html)와 같은 클라우드 서비스의 태그와 매우 유사합니다.
 
 ![Sample Resource Tags](/langsmith/images/resource-tags.png)
 
-## User Management and RBAC
+## 사용자 관리 및 RBAC
 
-### Users
+### 사용자
 
-A user is a person who has access to LangSmith. Users can be members of one or more organizations and workspaces within those organizations.
+사용자는 LangSmith에 액세스할 수 있는 사람입니다. 사용자는 하나 이상의 조직 및 해당 조직 내의 워크스페이스의 구성원이 될 수 있습니다.
 
-Organization members are managed in organization settings:
+조직 구성원은 조직 설정에서 관리됩니다:
 
 ![Sample Organization Members](/langsmith/images/org-members-settings.png)
 
-And workspace members are managed in workspace settings:
+그리고 워크스페이스 구성원은 워크스페이스 설정에서 관리됩니다:
 
 ![Sample Workspace Members](/langsmith/images/org-settings-workspaces-tab.png)
 
-### API keys
+### API 키
 
 <Warning>
-We ended support for legacy API keys prefixed with `ls__` on October 22, 2024 in favor of personal access tokens (PATs) and service keys. We require using PATs and service keys for all new integrations. API keys prefixed with `ls__` will no longer work as of October 22, 2024.
+우리는 개인 액세스 토큰(PAT) 및 서비스 키를 위해 `ls__`로 시작하는 레거시 API 키에 대한 지원을 2024년 10월 22일에 종료했습니다. 모든 새로운 통합에는 PAT 및 서비스 키를 사용해야 합니다. `ls__`로 시작하는 API 키는 2024년 10월 22일부터 더 이상 작동하지 않습니다.
 </Warning>
 
-#### Expiration Dates
+#### 만료일
 
-When you create an API key, you have the option to set an expiration date. Adding an expiration date to keys enhances security and minimizes the risk of unauthorized access. For example, you may set expiration dates on keys for temporary tasks that require elevated access.
+API 키를 생성할 때 만료일을 설정할 수 있는 옵션이 있습니다. 키에 만료일을 추가하면 보안이 강화되고 무단 액세스 위험이 최소화됩니다. 예를 들어, 승격된 액세스가 필요한 임시 작업을 위한 키에 만료일을 설정할 수 있습니다.
 
-By default, keys never expire. Once expired, an API key is no longer valid and cannot be reactivated or have its expiration modified.
+기본적으로 키는 만료되지 않습니다. 만료되면 API 키는 더 이상 유효하지 않으며 재활성화하거나 만료를 수정할 수 없습니다.
 
-#### Personal Access Tokens (PATs)
+#### 개인 액세스 토큰(PAT)
 
-Personal Access Tokens (PATs) are used to authenticate requests to the LangSmith API. They are created by users and scoped to a user. The PAT will have the same permissions as the user that created it. We recommend not using these to authenticate requests from your application, but rather using them for personal scripts or tools that interact with the LangSmith API. If the user associated with the PAT is removed from the organization, the PAT will no longer work.
+개인 액세스 토큰(PAT)은 LangSmith API에 대한 요청을 인증하는 데 사용됩니다. 사용자가 생성하고 사용자로 범위가 지정됩니다. PAT는 이를 생성한 사용자와 동일한 권한을 갖습니다. 애플리케이션의 요청을 인증하는 데 이를 사용하지 말고, LangSmith API와 상호 작용하는 개인 스크립트나 도구에 사용하는 것이 좋습니다. PAT와 연결된 사용자가 조직에서 제거되면 PAT는 더 이상 작동하지 않습니다.
 
-PATs are prefixed with `lsv2_pt_`
+PAT는 `lsv2_pt_`로 시작합니다
 
-#### Service keys
+#### 서비스 키
 
-Service keys are similar to PATs, but are used to authenticate requests to the LangSmith API on behalf of a service account. Only admins can create service keys. We recommend using these for applications / services that need to interact with the LangSmith API, such as LangGraph agents or other integrations. Service keys may be scoped to a single workspace, multiple workspaces, or the entire organization, and can be used to authenticate requests to the LangSmith API for whichever workspace(s) it has access to.
+서비스 키는 PAT와 유사하지만 서비스 계정을 대신하여 LangSmith API에 대한 요청을 인증하는 데 사용됩니다. 관리자만 서비스 키를 생성할 수 있습니다. LangGraph 에이전트 또는 기타 통합과 같이 LangSmith API와 상호 작용해야 하는 애플리케이션/서비스에 이를 사용하는 것이 좋습니다. 서비스 키는 단일 워크스페이스, 여러 워크스페이스 또는 전체 조직으로 범위를 지정할 수 있으며, 액세스 권한이 있는 워크스페이스에 대해 LangSmith API에 대한 요청을 인증하는 데 사용할 수 있습니다.
 
-Service keys are prefixed with `lsv2_sk_`
+서비스 키는 `lsv2_sk_`로 시작합니다
 
 <Warning>
-Use the `X-Tenant-Id` header to specify the target workspace.
+`X-Tenant-Id` 헤더를 사용하여 대상 워크스페이스를 지정하세요.
 
-- **When using PATs**: If this header is omitted, requests will run against the default workspace associated with the key.
-- **When using organization-scoped service keys**: You must include the `X-Tenant-Id` header when accessing workspace-scoped resources. Without it, the request will fail with a `403 Forbidden` error.
+- **PAT 사용 시**: 이 헤더를 생략하면 키와 연결된 기본 워크스페이스에 대해 요청이 실행됩니다.
+- **조직 범위 서비스 키 사용 시**: 워크스페이스 범위 리소스에 액세스할 때 `X-Tenant-Id` 헤더를 포함해야 합니다. 이 헤더가 없으면 요청이 `403 Forbidden` 오류와 함께 실패합니다.
 </Warning>
 
 <Note>
-To see how to create a service key or Personal Access Token, see the [setup guide](/langsmith/create-account-api-key)
+서비스 키 또는 개인 액세스 토큰을 생성하는 방법을 보려면 [설정 가이드](/langsmith/create-account-api-key)를 참조하세요
 </Note>
 
-### Organization roles
+### 조직 역할
 
-Organization roles are distinct from the Enterprise feature (RBAC) below and are used in the context of multiple [workspaces](#workspaces). Your organization role determines your workspace membership characteristics and your organization-level permissions. See the [organization setup guide](/langsmith/set-up-a-workspace#organization-roles) for more information.
+조직 역할은 아래의 엔터프라이즈 기능(RBAC)과 구별되며 여러 [워크스페이스](#workspaces)의 컨텍스트에서 사용됩니다. 조직 역할은 워크스페이스 멤버십 특성과 조직 수준 권한을 결정합니다. 자세한 내용은 [조직 설정 가이드](/langsmith/set-up-a-workspace#organization-roles)를 참조하세요.
 
-The organization role selected also impacts workspace membership as described here:
+선택한 조직 역할은 다음과 같이 워크스페이스 멤버십에도 영향을 미칩니다:
 
-* `Organization Admin` grants full access to manage all organization configuration, users, billing, and workspaces. **An `Organization Admin` has `Admin` access to all workspaces in an organization**
-* `Organization User` may read organization information but cannot execute any write actions at the organization level. **An `Organization User` can be added to a subset of workspaces and assigned workspace roles as usual (if RBAC is enabled), which specify permissions at the workspace level.**
+* `Organization Admin`은 모든 조직 구성, 사용자, 청구 및 워크스페이스를 관리할 수 있는 전체 액세스 권한을 부여합니다. **`Organization Admin`은 조직의 모든 워크스페이스에 대한 `Admin` 액세스 권한을 갖습니다**
+* `Organization User`는 조직 정보를 읽을 수 있지만 조직 수준에서 쓰기 작업을 실행할 수 없습니다. **`Organization User`는 워크스페이스의 하위 집합에 추가될 수 있으며 워크스페이스 수준에서 권한을 지정하는 일반적인 방식으로 워크스페이스 역할을 할당받을 수 있습니다(RBAC가 활성화된 경우).**
 
 <Info>
-The `Organization User` role is only available in organizations on plans with multiple workspaces. In organizations limited to a single workspace, all users are `Organization Admins`. Custom organization-scoped roles are not available yet.
+`Organization User` 역할은 여러 워크스페이스가 있는 플랜의 조직에서만 사용할 수 있습니다. 단일 워크스페이스로 제한된 조직에서는 모든 사용자가 `Organization Admin`입니다. 커스텀 조직 범위 역할은 아직 사용할 수 없습니다.
 </Info>
 
-See the table below for all organization permissions:
+모든 조직 권한에 대한 내용은 아래 표를 참조하세요:
 
 |                                             | Organization User | Organization Admin |
 | ------------------------------------------- | ----------------- | ------------------ |
-| View organization configuration             | ✅                 | ✅                  |
-| View organization roles                     | ✅                 | ✅                  |
-| View organization members                   | ✅                 | ✅                  |
-| View data retention settings                | ✅                 | ✅                  |
-| View usage limits                           | ✅                 | ✅                  |
-| Admin access to all workspaces              |                   | ✅                  |
-| Manage billing settings                     |                   | ✅                  |
-| Create workspaces                           |                   | ✅                  |
-| Create, edit, and delete organization roles |                   | ✅                  |
-| Invite new users to organization            |                   | ✅                  |
-| Delete user invites                         |                   | ✅                  |
-| Remove users from an organization           |                   | ✅                  |
-| Update data retention settings\*            |                   | ✅                  |
-| Update usage limits\*                       |                   | ✅                  |
+| 조직 구성 보기             | ✅                 | ✅                  |
+| 조직 역할 보기                     | ✅                 | ✅                  |
+| 조직 구성원 보기                   | ✅                 | ✅                  |
+| 데이터 보존 설정 보기                | ✅                 | ✅                  |
+| 사용량 제한 보기                           | ✅                 | ✅                  |
+| 모든 워크스페이스에 대한 관리자 액세스              |                   | ✅                  |
+| 청구 설정 관리                     |                   | ✅                  |
+| 워크스페이스 생성                           |                   | ✅                  |
+| 조직 역할 생성, 편집 및 삭제 |                   | ✅                  |
+| 조직에 새 사용자 초대            |                   | ✅                  |
+| 사용자 초대 삭제                         |                   | ✅                  |
+| 조직에서 사용자 제거           |                   | ✅                  |
+| 데이터 보존 설정 업데이트\*            |                   | ✅                  |
+| 사용량 제한 업데이트\*                       |                   | ✅                  |
 
-### Workspace roles (RBAC)
+### 워크스페이스 역할(RBAC)
 
 <Note>
-RBAC (Role-Based Access Control) is a feature that is only available to Enterprise customers. If you are interested in this feature, [contact our sales team](https://www.langchain.com/contact-sales). Other plans default to using the Admin role for all users.
+RBAC(역할 기반 액세스 제어)는 엔터프라이즈 고객만 사용할 수 있는 기능입니다. 이 기능에 관심이 있으시면 [영업팀에 문의](https://www.langchain.com/contact-sales)하세요. 다른 플랜은 모든 사용자에 대해 기본적으로 Admin 역할을 사용합니다.
 </Note>
 
-Roles are used to define the set of permissions that a user has within a workspace. There are three built-in system roles that cannot be edited:
+역할은 워크스페이스 내에서 사용자가 가진 권한 집합을 정의하는 데 사용됩니다. 편집할 수 없는 세 가지 기본 제공 시스템 역할이 있습니다:
 
-* `Admin` - has full access to all resources within the workspace
-* `Viewer` - has read-only access to all resources within the workspace
-* `Editor` - has full permissions except for workspace management (adding/removing users, changing roles, configuring service keys)
+* `Admin` - 워크스페이스 내 모든 리소스에 대한 전체 액세스 권한을 갖습니다
+* `Viewer` - 워크스페이스 내 모든 리소스에 대한 읽기 전용 액세스 권한을 갖습니다
+* `Editor` - 워크스페이스 관리(사용자 추가/제거, 역할 변경, 서비스 키 구성)를 제외한 모든 권한을 갖습니다
 
-Organization admins can also create/edit custom roles with specific permissions for different resources.
+조직 관리자는 다양한 리소스에 대한 특정 권한을 가진 커스텀 역할을 생성/편집할 수도 있습니다.
 
-Roles can be managed in organization settings under the `Roles` tab:
+역할은 `Roles` 탭의 조직 설정에서 관리할 수 있습니다:
 
 ![Roles](/langsmith/images/roles-tab-rbac.png)
 
-For more details on assigning and creating roles, see the [access control setup guide](/langsmith/user-management).
+역할 할당 및 생성에 대한 자세한 내용은 [액세스 제어 설정 가이드](/langsmith/user-management)를 참조하세요.
 
-## Best Practices
+## 모범 사례
 
-### Environment Separation
+### 환경 분리
 
-Use [resource tags](#resource-tags) to organize resources by environment using the default tag key `Environment` and different values for the environment (e.g. `dev`, `staging`, `prod`). This tagging structure will allow you to organize your tracing projects today and easily enforce permissions when we release attribute based access control (ABAC). ABAC on the resource tag will provide a fine-grained way to restrict access to production tracing projects, for example. We do not recommend that you use Workspaces for environment separation as you cannot share resources across Workspaces. If you would like to promote a prompt from `staging` to `prod`, we recommend you use commit tags instead. See [docs](/langsmith/prompt-engineering-concepts#tags) for more information.
+기본 태그 키 `Environment`와 환경에 대한 다른 값(예: `dev`, `staging`, `prod`)을 사용하여 [리소스 태그](#resource-tags)를 통해 환경별로 리소스를 구성하세요. 이 태그 지정 구조를 사용하면 오늘날 트레이싱 프로젝트를 구성할 수 있으며, 속성 기반 액세스 제어(ABAC)를 릴리스할 때 권한을 쉽게 적용할 수 있습니다. 리소스 태그의 ABAC는 예를 들어 프로덕션 트레이싱 프로젝트에 대한 액세스를 제한하는 세분화된 방법을 제공합니다. 워크스페이스 간에 리소스를 공유할 수 없으므로 환경 분리를 위해 워크스페이스를 사용하는 것은 권장하지 않습니다. `staging`에서 `prod`로 프롬프트를 승격하려면 대신 커밋 태그를 사용하는 것이 좋습니다. 자세한 내용은 [문서](/langsmith/prompt-engineering-concepts#tags)를 참조하세요.
 
-## Usage and Billing
+## 사용량 및 청구
 
-### Data Retention
+### 데이터 보존
 
-This section covers how data retention works and how it's priced in LangSmith.
+이 섹션에서는 데이터 보존이 작동하는 방식과 LangSmith에서 가격이 책정되는 방식을 다룹니다.
 
-#### Why retention matters
+#### 보존이 중요한 이유
 
-* **Privacy**: Many data privacy regulations, such as GDPR in Europe or CCPA in California, require organizations to delete personal data once it's no longer necessary for the purposes for which it was collected. Setting retention periods aids in compliance with such regulations.
-* **Cost**: LangSmith charges less for traces that have low data retention. See our tutorial on how to [optimize spend](/langsmith/billing#optimize-your-tracing-spend) for details.
+* **개인정보 보호**: 유럽의 GDPR이나 캘리포니아의 CCPA와 같은 많은 데이터 개인정보 보호 규정은 조직이 수집 목적에 더 이상 필요하지 않은 개인 데이터를 삭제하도록 요구합니다. 보존 기간을 설정하면 이러한 규정을 준수하는 데 도움이 됩니다.
+* **비용**: LangSmith는 데이터 보존 기간이 짧은 트레이스에 대해 더 낮은 요금을 부과합니다. 자세한 내용은 [지출 최적화](/langsmith/billing#optimize-your-tracing-spend) 튜토리얼을 참조하세요.
 
-#### How it works
+#### 작동 방식
 
-LangSmith has two tiers of traces based on Data Retention with the following characteristics:
+LangSmith는 다음과 같은 특성을 가진 데이터 보존에 따라 두 가지 트레이스 티어를 제공합니다:
 
 |                      | Base             | Extended       |
 | -------------------- | ---------------- | -------------- |
-| **Price**            | $.50 / 1k traces | $5 / 1k traces |
-| **Retention Period** | 14 days          | 400 days       |
+| **가격**            | 트레이스 1천 개당 $0.50 | 트레이스 1천 개당 $5 |
+| **보존 기간** | 14일          | 400일       |
 
-**Data deletion after retention ends**
+**보존 종료 후 데이터 삭제**
 
-After the specified retention period, traces are no longer accessible in the tracing project UI or via the API. All user data associated with the trace (e.g. inputs and outputs) is deleted from our internal systems within a day thereafter. Some metadata associated with each trace may be retained indefinitely for analytics and billing purposes.
+지정된 보존 기간이 지나면 트레이싱 프로젝트 UI 또는 API를 통해 트레이스에 더 이상 액세스할 수 없습니다. 트레이스와 관련된 모든 사용자 데이터(예: 입력 및 출력)는 그 이후 하루 이내에 내부 시스템에서 삭제됩니다. 각 트레이스와 관련된 일부 메타데이터는 분석 및 청구 목적으로 무기한 보존될 수 있습니다.
 
-**Data retention auto-upgrades**
+**데이터 보존 자동 업그레이드**
 
 <Warning>
-Auto upgrades can have an impact on your bill. Please read this section carefully to fully understand your estimated LangSmith tracing costs.
+자동 업그레이드는 청구서에 영향을 미칠 수 있습니다. 예상 LangSmith 트레이싱 비용을 완전히 이해하려면 이 섹션을 주의 깊게 읽어보세요.
 </Warning>
 
-When you use certain features with `base` tier traces, their data retention will be automatically upgraded to `extended` tier. This will increase both the retention period, and the cost of the trace.
+`base` 티어 트레이스와 함께 특정 기능을 사용하면 데이터 보존이 자동으로 `extended` 티어로 업그레이드됩니다. 이렇게 하면 보존 기간과 트레이스 비용이 모두 증가합니다.
 
-The complete list of scenarios in which a trace will upgrade when:
+다음과 같은 경우 트레이스가 업그레이드됩니다:
 
-* **Feedback** is added to any run on the trace (or any trace in the thread), whether through [manual annotation](/langsmith/annotate-traces-inline#annotate-traces-and-runs-inline), automatically with [an online evaluator](/langsmith/online-evaluations), or programmatically [via the SDK](/langsmith/attach-user-feedback#log-user-feedback-using-the-sdk).
-* An **[annotation queue](/langsmith/annotation-queues#assign-runs-to-an-annotation-queue)** receives any run from the trace.
-* An **[automation rule](/langsmith/rules#set-up-automation-rules)** matches any run within a trace.
+* **피드백**이 트레이스의 실행(또는 스레드의 트레이스)에 추가될 때, [수동 주석](/langsmith/annotate-traces-inline#annotate-traces-and-runs-inline), [온라인 평가자](/langsmith/online-evaluations)를 사용한 자동 또는 [SDK를 통한](/langsmith/attach-user-feedback#log-user-feedback-using-the-sdk) 프로그래밍 방식으로 추가될 때.
+* **[주석 큐](/langsmith/annotation-queues#assign-runs-to-an-annotation-queue)**가 트레이스의 실행을 수신할 때.
+* **[자동화 규칙](/langsmith/rules#set-up-automation-rules)**이 트레이스 내의 실행과 일치할 때.
 
-**Why auto-upgrade traces?**
+**왜 트레이스를 자동 업그레이드하나요?**
 
-We have two reasons behind the auto-upgrade model for tracing:
+트레이싱을 위한 자동 업그레이드 모델에는 두 가지 이유가 있습니다:
 
-1. We think that traces that match any of these conditions are fundamentally more interesting than other traces, and therefore it is good for users to be able to keep them around longer.
-2. We philosophically want to charge customers an order of magnitude lower for traces that may not be interacted with meaningfully. We think auto-upgrades align our pricing model with the value that LangSmith brings, where only traces with meaningful interaction are charged at a higher rate.
+1. 이러한 조건 중 하나라도 충족하는 트레이스는 다른 트레이스보다 근본적으로 더 흥미롭다고 생각하며, 따라서 사용자가 더 오래 보관할 수 있도록 하는 것이 좋습니다.
+2. 우리는 철학적으로 의미 있는 상호 작용이 없을 수 있는 트레이스에 대해 고객에게 한 자릿수 더 낮은 요금을 부과하고자 합니다. 자동 업그레이드는 의미 있는 상호 작용이 있는 트레이스만 더 높은 요금으로 부과되는 LangSmith가 제공하는 가치와 가격 모델을 일치시킨다고 생각합니다.
 
-If you have questions or concerns about our pricing model, please feel free to reach out to [support@langchain.dev](mailto:support@langchain.dev) and let us know your thoughts!
+가격 모델에 대해 질문이나 우려 사항이 있으시면 언제든지 [support@langchain.dev](mailto:support@langchain.dev)로 연락하여 의견을 알려주세요!
 
-**How does data retention affect downstream features?**
+**데이터 보존이 다운스트림 기능에 어떻게 영향을 미치나요?**
 
-* **Annotation Queues, Run Rules, and Feedback**: Traces that use these features will be [auto-upgraded](#data-retention-auto-upgrades).
-* **Monitoring**: The monitoring tab will continue to work even after a base tier trace's data retention period ends. It is powered by trace metadata that exists for >30 days, meaning that your monitoring graphs will continue to stay accurate even on `base` tier traces.
-* **Datasets**: Datasets have an indefinite data retention period. Restated differently, if you add a trace's inputs and outputs to a dataset, they will never be deleted. We suggest that if you are using LangSmith for data collection, you take advantage of the datasets feature.
+* **주석 큐, 실행 규칙 및 피드백**: 이러한 기능을 사용하는 트레이스는 [자동 업그레이드](#data-retention-auto-upgrades)됩니다.
+* **모니터링**: 모니터링 탭은 base 티어 트레이스의 데이터 보존 기간이 종료된 후에도 계속 작동합니다. 30일 이상 존재하는 트레이스 메타데이터에 의해 구동되므로 `base` 티어 트레이스에서도 모니터링 그래프가 계속 정확하게 유지됩니다.
+* **데이터셋**: 데이터셋은 무기한 데이터 보존 기간을 갖습니다. 다시 말해, 트레이스의 입력 및 출력을 데이터셋에 추가하면 절대 삭제되지 않습니다. 데이터 수집을 위해 LangSmith를 사용하는 경우 데이터셋 기능을 활용하는 것이 좋습니다.
 
-#### Billing model
+#### 청구 모델
 
-**Billable metrics**
+**청구 가능한 메트릭**
 
-On your LangSmith invoice, you will see two metrics that we charge for:
+LangSmith 인보이스에는 다음 두 가지 메트릭에 대한 요금이 표시됩니다:
 
 * LangSmith Traces (Base Charge)
 * LangSmith Traces (Extended Data Retention Upgrades).
 
-The first metric includes all traces, regardless of tier. The second metric just counts the number of extended retention traces.
+첫 번째 메트릭에는 티어에 관계없이 모든 트레이스가 포함됩니다. 두 번째 메트릭은 확장 보존 트레이스의 수만 계산합니다.
 
-**Why measure all traces + upgrades instead of base and extended traces?**
+**왜 base 및 extended 트레이스 대신 모든 트레이스 + 업그레이드를 측정하나요?**
 
-A natural question to ask when considering our pricing is why not just show the number of `base` tier and `extended` tier traces directly on the invoice?
+가격 책정을 고려할 때 자연스럽게 제기되는 질문은 왜 인보이스에 `base` 티어와 `extended` 티어 트레이스의 수를 직접 표시하지 않느냐는 것입니다.
 
-While we understand this would be more straightforward, it doesn't fit trace upgrades properly. Consider a `base` tier trace that was recorded on June 30, and upgraded to `extended` tier on July 3. The `base` tier trace occurred in the June billing period, but the upgrade occurred in the July billing period. Therefore, we need to be able to measure these two events independently to properly bill our customers.
+우리는 이것이 더 간단할 것이라는 것을 이해하지만 트레이스 업그레이드에 제대로 맞지 않습니다. 6월 30일에 기록된 `base` 티어 트레이스가 7월 3일에 `extended` 티어로 업그레이드된 경우를 고려하세요. `base` 티어 트레이스는 6월 청구 기간에 발생했지만 업그레이드는 7월 청구 기간에 발생했습니다. 따라서 고객에게 올바르게 청구하려면 이 두 이벤트를 독립적으로 측정할 수 있어야 합니다.
 
-If your trace was recorded as an extended retention trace, then the `base` and `extended` metrics will both be recorded with the same timestamp.
+트레이스가 확장 보존 트레이스로 기록된 경우 `base` 및 `extended` 메트릭이 모두 동일한 타임스탬프로 기록됩니다.
 
-**Cost breakdown**
+**비용 세부 정보**
 
-The Base Charge for a trace is .05¢ per trace. We priced the upgrade such that an `extended` retention trace costs 10x the price of a base tier trace (.50¢ per trace) including both metrics. Thus, each upgrade costs .45¢.
+트레이스에 대한 기본 요금은 트레이스당 0.05¢입니다. 우리는 두 메트릭을 모두 포함하여 `extended` 보존 트레이스가 base 티어 트레이스 가격의 10배(트레이스당 0.50¢)가 되도록 업그레이드 가격을 책정했습니다. 따라서 각 업그레이드는 0.45¢입니다.
 
-### Rate Limits
+### 요율 제한
 
-LangSmith has rate limits which are designed to ensure the stability of the service for all users.
+LangSmith는 모든 사용자에게 서비스의 안정성을 보장하도록 설계된 요율 제한을 갖고 있습니다.
 
-To ensure access and stability, LangSmith will respond with HTTP Status Code 429 indicating that rate or usage limits have been exceeded under the following circumstances:
+액세스와 안정성을 보장하기 위해 LangSmith는 다음과 같은 상황에서 요율 또는 사용량 제한을 초과했음을 나타내는 HTTP 상태 코드 429로 응답합니다:
 
-#### Scenarios
+#### 시나리오
 
-###### Temporary throughput limit over a 1 minute period at our application load balancer
+###### 애플리케이션 로드 밸런서의 1분 동안 임시 처리량 제한
 
-This 429 is the the result of exceeding a fixed number of API calls over a 1 minute window on a per API key/access token basis. The start of the window will vary slightly — it is not guaranteed to start at the start of a clock minute — and may change depending on application deployment events.
+이 429는 API 키/액세스 토큰별로 1분 윈도우에서 고정된 수의 API 호출을 초과한 결과입니다. 윈도우의 시작은 약간 다를 수 있습니다. 즉, 정각 분의 시작 시 시작된다는 보장이 없으며 애플리케이션 배포 이벤트에 따라 변경될 수 있습니다.
 
-After the max events are received we will respond with a 429 until 60 seconds from the start of the evaluation window has been reached and then the process repeats.
+최대 이벤트가 수신된 후 평가 윈도우 시작부터 60초가 경과할 때까지 429로 응답한 다음 프로세스가 반복됩니다.
 
-This 429 is thrown by our application load balancer and is a mechanism in place for all LangSmith users independent of plan tier to ensure continuity of service for all users.
+이 429는 애플리케이션 로드 밸런서에서 발생하며 플랜 티어와 무관하게 모든 LangSmith 사용자를 위한 모든 사용자의 서비스 연속성을 보장하기 위한 메커니즘입니다.
 
-| Method        | Endpoint | Limit | Window   |
+| 메서드        | 엔드포인트 | 제한 | 윈도우   |
 | ------------- | -------- | ----- | -------- |
-| DELETE        | Sessions | 30    | 1 minute |
-| POST OR PATCH | Runs     | 5000  | 1 minute |
-| POST          | Feedback | 5000  | 1 minute |
-| \*            | \*       | 2000  | 1 minute |
+| DELETE        | Sessions | 30    | 1분 |
+| POST OR PATCH | Runs     | 5000  | 1분 |
+| POST          | Feedback | 5000  | 1분 |
+| \*            | \*       | 2000  | 1분 |
 
 <Note>
-The LangSmith SDK takes steps to minimize the likelihood of reaching these limits on run-related endpoints by batching up to 100 runs from a single session ID into a single API call.
+LangSmith SDK는 단일 세션 ID의 최대 100개의 실행을 단일 API 호출로 일괄 처리하여 실행 관련 엔드포인트에서 이러한 제한에 도달할 가능성을 최소화하기 위한 조치를 취합니다.
 </Note>
 
-###### Plan-level hourly trace event limit
+###### 플랜 수준 시간당 트레이스 이벤트 제한
 
-This 429 is the result of reaching your maximum hourly events ingested and is evaluated in a fixed window starting at the beginning of each clock hour in UTC and resets at the top of each new hour.
+이 429는 최대 시간당 이벤트가 수집되어 도달한 결과이며 UTC의 각 정각 시간 시작 시 고정된 윈도우에서 평가되고 각 새 시간의 시작 시 재설정됩니다.
 
-An event in this context is the creation or update of a run. So if run is created, then subsequently updated in the same hourly window, that will count as 2 events against this limit.
+이 컨텍스트에서 이벤트는 실행의 생성 또는 업데이트입니다. 따라서 실행이 생성된 다음 동일한 시간 윈도우에서 후속 업데이트되면 이 제한에 대해 2개의 이벤트로 계산됩니다.
 
-This is thrown by our application and varies by plan tier, with organizations on our Startup/Plus and Enterprise plan tiers having higher hourly limits than our Free and Developer Plan Tiers which are designed for personal use.
+이것은 애플리케이션에서 발생하며 플랜 티어에 따라 다르며, Startup/Plus 및 Enterprise 플랜 티어의 조직은 개인 사용을 위해 설계된 Free 및 Developer Plan Tier보다 높은 시간당 제한을 갖습니다.
 
-| Plan                             | Limit          | Window |
+| 플랜                             | 제한          | 윈도우 |
 | -------------------------------- | -------------- | ------ |
-| Developer (no payment on file)   | 50,000 events  | 1 hour |
-| Developer (with payment on file) | 250,000 events | 1 hour |
-| Startup/Plus                     | 500,000 events | 1 hour |
-| Enterprise                       | Custom         | Custom |
+| Developer (결제 정보 없음)   | 50,000 이벤트  | 1시간 |
+| Developer (결제 정보 있음) | 250,000 이벤트 | 1시간 |
+| Startup/Plus                     | 500,000 이벤트 | 1시간 |
+| Enterprise                       | 커스텀         | 커스텀 |
 
-###### Plan-level hourly trace data ingest limit
+###### 플랜 수준 시간당 트레이스 데이터 수집 제한
 
-This 429 is the result of reaching the maximum amount of data ingested across your trace inputs, outputs, and metadata and is evaluated in a fixed window starting at the beginning of each clock hour in UTC and resets at the top of each new hour.
+이 429는 트레이스 입력, 출력 및 메타데이터에서 수집된 최대 데이터 양에 도달한 결과이며 UTC의 각 정각 시간 시작 시 고정된 윈도우에서 평가되고 각 새 시간의 시작 시 재설정됩니다.
 
-Typically, inputs, outputs, and metadata are send on both run creation and update events. So if a run is created and is 2.0MB in size at creation, and 3.0MB in size when updated in the same hourly window, that will count as 5.0MB of storage against this limit.
+일반적으로 입력, 출력 및 메타데이터는 실행 생성 및 업데이트 이벤트 모두에서 전송됩니다. 따라서 실행이 생성 시 크기가 2.0MB이고 동일한 시간 윈도우에서 업데이트될 때 크기가 3.0MB인 경우 이 제한에 대해 5.0MB의 저장소로 계산됩니다.
 
-This is thrown by our application and varies by plan tier, with organizations on our Startup/Plus and Enterprise plan tiers having higher hourly limits than our Free and Developer Plan Tiers which are designed for personal use.
+이것은 애플리케이션에서 발생하며 플랜 티어에 따라 다르며, Startup/Plus 및 Enterprise 플랜 티어의 조직은 개인 사용을 위해 설계된 Free 및 Developer Plan Tier보다 높은 시간당 제한을 갖습니다.
 
-| Plan                             | Limit  | Window |
+| 플랜                             | 제한  | 윈도우 |
 | -------------------------------- | ------ | ------ |
-| Developer (no payment on file)   | 500MB  | 1 hour |
-| Developer (with payment on file) | 2.5GB  | 1 hour |
-| Startup/Plus                     | 5.0GB  | 1 hour |
-| Enterprise                       | Custom | Custom |
+| Developer (결제 정보 없음)   | 500MB  | 1시간 |
+| Developer (결제 정보 있음) | 2.5GB  | 1시간 |
+| Startup/Plus                     | 5.0GB  | 1시간 |
+| Enterprise                       | 커스텀 | 커스텀 |
 
-###### Plan-level monthly unique traces limit
+###### 플랜 수준 월간 고유 트레이스 제한
 
-This 429 is the result of reaching your maximum monthly traces ingested and is evaluated in a fixed window starting at the beginning of each calendar month in UTC and resets at the beginning of each new month.
+이 429는 최대 월간 수집 트레이스에 도달한 결과이며 UTC의 각 월의 시작 시 고정된 윈도우에서 평가되고 각 새 월의 시작 시 재설정됩니다.
 
-This is thrown by our application and applies only to the Developer Plan Tier when there is no payment method on file.
+이것은 애플리케이션에서 발생하며 결제 방법이 등록되지 않은 경우에만 Developer Plan Tier에 적용됩니다.
 
-| Plan                           | Limit        | Window  |
+| 플랜                           | 제한        | 윈도우  |
 | ------------------------------ | ------------ | ------- |
-| Developer (no payment on file) | 5,000 traces | 1 month |
+| Developer (결제 정보 없음) | 5,000 트레이스 | 1개월 |
 
-###### Self-configured monthly usage limits
+###### 자체 구성 월간 사용량 제한
 
-This 429 is the result of reaching your usage limit as configured by your organization admin and is evaluated in a fixed window starting at the beginning of each calendar month in UTC and resets at the beginning of each new month.
+이 429는 조직 관리자가 구성한 사용량 제한에 도달한 결과이며 UTC의 각 월의 시작 시 고정된 윈도우에서 평가되고 각 새 월의 시작 시 재설정됩니다.
 
-This is thrown by our application and varies by organization based on their configured settings.
+이것은 애플리케이션에서 발생하며 구성된 설정에 따라 조직마다 다릅니다.
 
-#### Handling 429s responses in your application
+#### 애플리케이션에서 429 응답 처리
 
-Since some 429 responses are temporary and may succeed on a successive call, if you are directly calling the LangSmith API in your application we recommend implementing retry logic with exponential backoff and jitter.
+일부 429 응답은 일시적이며 후속 호출에서 성공할 수 있으므로 애플리케이션에서 LangSmith API를 직접 호출하는 경우 지수 백오프 및 지터를 사용한 재시도 로직을 구현하는 것이 좋습니다.
 
-For convenience, LangChain applications built with the LangSmith SDK has this capability built-in.
+편의를 위해 LangSmith SDK로 빌드된 LangChain 애플리케이션에는 이 기능이 내장되어 있습니다.
 
 <Note>
-It is important to note that if you are saturating the endpoints for extended periods of time, retries may not be effective as your application will eventually run large enough backlogs to exhaust all retries.
+장기간 엔드포인트를 포화시키는 경우 재시도가 효과적이지 않을 수 있습니다. 애플리케이션이 결국 모든 재시도를 소진할 만큼 충분히 큰 백로그를 실행하게 됩니다.
 
-If that is the case, we would like to discuss your needs more specifically. Please reach out to [LangSmith Support](mailto:support@langchain.dev) with details about your applications throughput needs and sample code and we can work with you to better understand whether the best approach is fixing a bug, changes to your application code, or a different LangSmith plan.
+그런 경우 귀하의 요구 사항에 대해 더 구체적으로 논의하고 싶습니다. 애플리케이션의 처리량 요구 사항 및 샘플 코드에 대한 세부 정보와 함께 [LangSmith 지원팀](mailto:support@langchain.dev)에 연락주시면 최선의 접근 방식이 버그 수정인지, 애플리케이션 코드 변경인지, 다른 LangSmith 플랜인지 더 잘 이해할 수 있도록 협력할 수 있습니다.
 </Note>
 
-### Usage Limits
+### 사용량 제한
 
-LangSmith lets you configure usage limits on tracing. Note that these are *usage* limits, not *spend* limits, which mean they let you limit the quantity of occurrences of some event rather than the total amount you will spend.
+LangSmith를 사용하면 트레이싱에 대한 사용량 제한을 구성할 수 있습니다. 이는 *사용량* 제한이지 *지출* 제한이 아니므로 지출할 총 금액이 아니라 일부 이벤트의 발생 수량을 제한할 수 있습니다.
 
-LangSmith lets you set two different monthly limits, mirroring our Billable Metrics discussed in the aforementioned data retention guide:
+LangSmith를 사용하면 앞서 언급한 데이터 보존 가이드에서 논의한 청구 가능한 메트릭을 반영하여 두 가지 다른 월간 제한을 설정할 수 있습니다:
 
-* All traces limit
-* Extended data retention traces limit
+* 모든 트레이스 제한
+* 확장 데이터 보존 트레이스 제한
 
-These let you limit the number of total traces, and extended data retention traces respectively.
+이를 통해 각각 총 트레이스 수와 확장 데이터 보존 트레이스 수를 제한할 수 있습니다.
 
-#### Properties of usage limiting
+#### 사용량 제한의 속성
 
-Usage limiting is approximate, meaning that we do not guarantee the exactness of the limit. In rare cases, there may be a small period of time where additional traces are processed above the limit threshold before usage limiting begins to apply.
+사용량 제한은 근사치입니다. 즉, 제한의 정확성을 보장하지 않습니다. 드문 경우지만 사용량 제한이 적용되기 시작하기 전에 제한 임계값을 초과하여 추가 트레이스가 처리되는 짧은 기간이 있을 수 있습니다.
 
-#### Side effects of extended data retention traces limit
+#### 확장 데이터 보존 트레이스 제한의 부작용
 
-The extended data retention traces limit has side effects. If the limit is already reached, any feature that could cause an auto-upgrade of tracing tiers becomes inaccessible. This is because an auto-upgrade of a trace would cause another extended retention trace to be created, which in turn should not be allowed by the limit. Therefore, you can no longer:
+확장 데이터 보존 트레이스 제한에는 부작용이 있습니다. 제한에 이미 도달한 경우 트레이싱 티어의 자동 업그레이드를 유발할 수 있는 모든 기능에 액세스할 수 없게 됩니다. 트레이스의 자동 업그레이드는 다른 확장 보존 트레이스를 생성하게 되며, 이는 제한에 의해 허용되어서는 안 되기 때문입니다. 따라서 더 이상 다음을 수행할 수 없습니다:
 
-1. match run rules
-2. add feedback to traces
-3. add runs to annotation queues
+1. 실행 규칙 일치
+2. 트레이스에 피드백 추가
+3. 주석 큐에 실행 추가
 
-Each of these features may cause an auto upgrade, so we shut them off when the limit is reached.
+이러한 각 기능은 자동 업그레이드를 유발할 수 있으므로 제한에 도달하면 이를 차단합니다.
 
-#### Updating usage limits
+#### 사용량 제한 업데이트
 
-Usage limits can be updated from the `Settings` page under `Usage and Billing`. Limit values are cached, so it may take a minute or two before the new limits apply.
+사용량 제한은 `Usage and Billing` 아래의 `Settings` 페이지에서 업데이트할 수 있습니다. 제한 값은 캐시되므로 새 제한이 적용되기까지 1~2분 정도 걸릴 수 있습니다.
 
-### Related content
+### 관련 콘텐츠
 
-* Tutorial on how to [optimize spend](/langsmith/billing#optimize-your-tracing-spend)
+* [지출 최적화](/langsmith/billing#optimize-your-tracing-spend) 튜토리얼
 
-## Additional Resources
+## 추가 리소스
 
-* **[Release Versions](/langsmith/release-versions)**: Learn about LangSmith's version support policy, including Active, Critical, End of Life, and Deprecated support levels.
+* **[릴리스 버전](/langsmith/release-versions)**: Active, Critical, End of Life 및 Deprecated 지원 수준을 포함한 LangSmith의 버전 지원 정책에 대해 알아보세요.
 
 ---
 

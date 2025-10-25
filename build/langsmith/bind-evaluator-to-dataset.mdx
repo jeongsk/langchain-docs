@@ -1,39 +1,39 @@
 ---
-title: Automatically run evaluators on experiments
-sidebarTitle: Run evaluators on experiments
+title: 실험에서 평가자 자동 실행하기
+sidebarTitle: 실험에서 평가자 실행하기
 ---
 
-LangSmith supports two ways to grade experiments created via the SDK:
+LangSmith는 SDK를 통해 생성된 실험을 평가하는 두 가지 방법을 지원합니다:
 
-* **Programmatically**, by specifying evaluators in your code (see [this guide](/langsmith/evaluate-llm-application) for details)
-* By **binding evaluators to a dataset** in the UI. This will automatically run the evaluators on any new experiments created, in addition to any evaluators you've set up via the SDK. This is useful when you're iterating on your application (target function), and have a standard set of evaluators you want to run for all experiments.
+* **프로그래밍 방식**: 코드에서 평가자를 지정하는 방법 (자세한 내용은 [이 가이드](/langsmith/evaluate-llm-application)를 참조하세요)
+* **데이터셋에 평가자를 바인딩**하는 방법: UI에서 데이터셋에 평가자를 바인딩합니다. 이렇게 하면 SDK를 통해 설정한 평가자 외에도 새로 생성되는 모든 실험에서 평가자가 자동으로 실행됩니다. 이는 애플리케이션(대상 함수)을 반복 개발할 때 모든 실험에 대해 실행하려는 표준 평가자 세트가 있는 경우에 유용합니다.
 
-## Configuring an evaluator on a dataset
+## 데이터셋에 평가자 구성하기
 
-1. Click on the **Datasets and Experiments** tab in the sidebar.
-2. Select the dataset you want to configure the evaluator for.
-3. Click on the **+ Evaluator** button to add an evaluator to the dataset. This will open a pane you can use to configure the evaluator.
+1. 사이드바에서 **데이터셋 및 실험** 탭을 클릭합니다.
+2. 평가자를 구성할 데이터셋을 선택합니다.
+3. **+ 평가자** 버튼을 클릭하여 데이터셋에 평가자를 추가합니다. 그러면 평가자를 구성할 수 있는 창이 열립니다.
 
 <Note>
-When you configure an evaluator for a dataset, it will only affect the experiment runs that are created after the evaluator is configured. It will not affect the evaluation of experiment runs that were created before the evaluator was configured.
+데이터셋에 평가자를 구성하면 평가자가 구성된 이후에 생성된 실험 실행에만 영향을 미칩니다. 평가자가 구성되기 전에 생성된 실험 실행의 평가에는 영향을 주지 않습니다.
 </Note>
 
-## LLM-as-a-judge evaluators
+## LLM-as-a-judge 평가자
 
-The process for binding evaluators to a dataset is very similar to the process for configuring a LLM-as-a-judge evaluator in the Playground. View instructions for [configuring an LLM-as-a-judge evaluator in the Playground.](/langsmith/llm-as-judge?mode=ui)
+데이터셋에 평가자를 바인딩하는 프로세스는 Playground에서 LLM-as-a-judge 평가자를 구성하는 프로세스와 매우 유사합니다. [Playground에서 LLM-as-a-judge 평가자 구성하기](/langsmith/llm-as-judge?mode=ui)에 대한 지침을 확인하세요.
 
-## Custom code evaluators
+## 커스텀 코드 평가자
 
-The process for binding a code evaluators to a dataset is very similar to the process for configuring a code evaluator in online evaluation. View instruction for [configuring code evaluators](/langsmith/online-evaluations#configure-a-custom-code-evaluator).
+데이터셋에 코드 평가자를 바인딩하는 프로세스는 온라인 평가에서 코드 평가자를 구성하는 프로세스와 매우 유사합니다. [코드 평가자 구성하기](/langsmith/online-evaluations#configure-a-custom-code-evaluator)에 대한 지침을 확인하세요.
 
-The only difference between configuring a code evaluator in online evaluation and binding a code evaluator to a dataset is that the custom code evaluator can reference outputs that are part of the dataset's `Example`.
+온라인 평가에서 코드 평가자를 구성하는 것과 데이터셋에 코드 평가자를 바인딩하는 것의 유일한 차이점은 커스텀 코드 평가자가 데이터셋의 `Example`에 포함된 출력을 참조할 수 있다는 점입니다.
 
-For custom code evaluators bound to a dataset, the evaluator function takes in two arguments:
+데이터셋에 바인딩된 커스텀 코드 평가자의 경우, 평가자 함수는 두 개의 인수를 받습니다:
 
-* A `Run` ([reference](/langsmith/run-data-format)). This represents the new run in your experiment. For example, if you ran an experiment via SDK, this would contain the input/output from your chain or model you are testing.
-* An `Example` ([reference](/langsmith/example-data-format)). This represents the reference example in your dataset that the chain or model you are testing uses. The `inputs` to the Run and Example should be the same. If your Example has a reference `outputs`, then you can use this to compare to the run's output for scoring.
+* `Run` ([참조](/langsmith/run-data-format)): 실험의 새 실행을 나타냅니다. 예를 들어, SDK를 통해 실험을 실행한 경우 테스트 중인 체인 또는 모델의 입력/출력을 포함합니다.
+* `Example` ([참조](/langsmith/example-data-format)): 테스트 중인 체인 또는 모델이 사용하는 데이터셋의 참조 예제를 나타냅니다. Run과 Example의 `inputs`는 동일해야 합니다. Example에 참조 `outputs`가 있는 경우 이를 사용하여 실행의 출력과 비교하여 점수를 매길 수 있습니다.
 
-The code below shows an example of a simple evaluator function that checks that the outputs exactly equal the reference outputs.
+아래 코드는 출력이 참조 출력과 정확히 일치하는지 확인하는 간단한 평가자 함수의 예를 보여줍니다.
 
 <CodeGroup>
 
@@ -66,10 +66,10 @@ function perform_eval(run, example) {
 
 </CodeGroup>
 
-## Next steps
+## 다음 단계
 
-* Analyze your experiment results in the [experiments tab](/langsmith/analyze-an-experiment)
-* Compare your experiment results in the [comparison view](/langsmith/compare-experiment-results)
+* [실험 탭](/langsmith/analyze-an-experiment)에서 실험 결과 분석하기
+* [비교 보기](/langsmith/compare-experiment-results)에서 실험 결과 비교하기
 
 ---
 
