@@ -2,7 +2,7 @@
 title: Hugging Face
 ---
 
-All LangChain integrations with [Hugging Face Hub](https://huggingface.co/) and libraries like [transformers](https://huggingface.co/docs/transformers/index), [sentence transformers](https://sbert.net/), and [datasets](https://huggingface.co/docs/datasets/index).
+[Hugging Face Hub](https://huggingface.co/) 및 [transformers](https://huggingface.co/docs/transformers/index), [sentence transformers](https://sbert.net/), [datasets](https://huggingface.co/docs/datasets/index)와 같은 라이브러리와의 모든 LangChain 통합을 제공합니다.
 
 {/* ## Installation and setup
 
@@ -16,25 +16,25 @@ All LangChain integrations with [Hugging Face Hub](https://huggingface.co/) and 
     ```
 </CodeGroup> */}
 
-## Chat models
+## 채팅 모델
 
 ### ChatHuggingFace
 
-We can use the `Hugging Face` LLM classes or directly use the `ChatHuggingFace` class.
+`Hugging Face` LLM 클래스를 사용하거나 `ChatHuggingFace` 클래스를 직접 사용할 수 있습니다.
 
-See a [usage example](/oss/python/integrations/chat/huggingface).
+[사용 예시](/oss/python/integrations/chat/huggingface)를 참조하세요.
 
 ```python
 from langchain_huggingface import ChatHuggingFace
 ```
 
-## LLMs
+## LLM
 
 ### HuggingFaceEndpoint
 
-We can use the `HuggingFaceEndpoint` class to run open source models via serverless [Inference Providers](https://huggingface.co/docs/inference-providers) or via dedicated [Inference Endpoints](https://huggingface.co/inference-endpoints/dedicated).
+`HuggingFaceEndpoint` 클래스를 사용하여 서버리스 [Inference Providers](https://huggingface.co/docs/inference-providers) 또는 전용 [Inference Endpoints](https://huggingface.co/inference-endpoints/dedicated)를 통해 오픈소스 모델을 실행할 수 있습니다.
 
-See a [usage example](/oss/python/integrations/llms/huggingface_endpoint).
+[사용 예시](/oss/python/integrations/llms/huggingface_endpoint)를 참조하세요.
 
 ```python
 from langchain_huggingface import HuggingFaceEndpoint
@@ -42,21 +42,21 @@ from langchain_huggingface import HuggingFaceEndpoint
 
 ### HuggingFacePipeline
 
-We can use the `HuggingFacePipeline` class to run open source models locally.
+`HuggingFacePipeline` 클래스를 사용하여 오픈소스 모델을 로컬에서 실행할 수 있습니다.
 
-See a [usage example](/oss/python/integrations/llms/huggingface_pipelines).
+[사용 예시](/oss/python/integrations/llms/huggingface_pipelines)를 참조하세요.
 
 ```python
 from langchain_huggingface import HuggingFacePipeline
 ```
 
-## Embedding Models
+## 임베딩 모델
 
 ### HuggingFaceEmbeddings
 
-We can use the `HuggingFaceEmbeddings` class to run open source embedding models locally.
+`HuggingFaceEmbeddings` 클래스를 사용하여 오픈소스 임베딩 모델을 로컬에서 실행할 수 있습니다.
 
-See a [usage example](/oss/python/integrations/text_embedding/huggingfacehub).
+[사용 예시](/oss/python/integrations/text_embedding/huggingfacehub)를 참조하세요.
 
 ```python
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -64,9 +64,9 @@ from langchain_huggingface import HuggingFaceEmbeddings
 
 ### HuggingFaceEndpointEmbeddings
 
-We can use the `HuggingFaceEndpointEmbeddings` class to run open source embedding models via a dedicated [Inference Endpoint](https://huggingface.co/inference-endpoints/dedicated).
+`HuggingFaceEndpointEmbeddings` 클래스를 사용하여 전용 [Inference Endpoint](https://huggingface.co/inference-endpoints/dedicated)를 통해 오픈소스 임베딩 모델을 실행할 수 있습니다.
 
-See a [usage example](/oss/python/integrations/text_embedding/huggingfacehub).
+[사용 예시](/oss/python/integrations/text_embedding/huggingfacehub)를 참조하세요.
 
 ```python
 from langchain_huggingface import HuggingFaceEndpointEmbeddings
@@ -74,9 +74,9 @@ from langchain_huggingface import HuggingFaceEndpointEmbeddings
 
 ### HuggingFaceInferenceAPIEmbeddings
 
-We can use the `HuggingFaceInferenceAPIEmbeddings` class to run open source embedding models via [Inference Providers](https://huggingface.co/docs/inference-providers).
+`HuggingFaceInferenceAPIEmbeddings` 클래스를 사용하여 [Inference Providers](https://huggingface.co/docs/inference-providers)를 통해 오픈소스 임베딩 모델을 실행할 수 있습니다.
 
-See a [usage example](/oss/python/integrations/text_embedding/huggingfacehub).
+[사용 예시](/oss/python/integrations/text_embedding/huggingfacehub)를 참조하세요.
 
 ```python
 from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
@@ -84,9 +84,9 @@ from langchain_community.embeddings import HuggingFaceInferenceAPIEmbeddings
 
 ### HuggingFaceInstructEmbeddings
 
-We can use the `HuggingFaceInstructEmbeddings` class to run open source embedding models locally.
+`HuggingFaceInstructEmbeddings` 클래스를 사용하여 오픈소스 임베딩 모델을 로컬에서 실행할 수 있습니다.
 
-See a [usage example](/oss/python/integrations/text_embedding/instruct_embeddings).
+[사용 예시](/oss/python/integrations/text_embedding/instruct_embeddings)를 참조하세요.
 
 ```python
 from langchain_community.embeddings import HuggingFaceInstructEmbeddings
@@ -94,26 +94,24 @@ from langchain_community.embeddings import HuggingFaceInstructEmbeddings
 
 ### HuggingFaceBgeEmbeddings
 
->[BGE models on the HuggingFace](https://huggingface.co/BAAI/bge-large-en-v1.5) are one of [the best open-source embedding models](https://huggingface.co/spaces/mteb/leaderboard).
->BGE model is created by the [Beijing Academy of Artificial Intelligence (BAAI)](https://en.wikipedia.org/wiki/Beijing_Academy_of_Artificial_Intelligence). `BAAI` is a private non-profit organization engaged in AI research and development.
+>[HuggingFace의 BGE 모델](https://huggingface.co/BAAI/bge-large-en-v1.5)은 [최고의 오픈소스 임베딩 모델](https://huggingface.co/spaces/mteb/leaderboard) 중 하나입니다.
+>BGE 모델은 [베이징 인공지능 연구원(Beijing Academy of Artificial Intelligence, BAAI)](https://en.wikipedia.org/wiki/Beijing_Academy_of_Artificial_Intelligence)에서 개발했습니다. `BAAI`는 AI 연구 및 개발에 종사하는 민간 비영리 조직입니다.
 
-See a [usage example](/oss/python/integrations/text_embedding/bge_huggingface).
+[사용 예시](/oss/python/integrations/text_embedding/bge_huggingface)를 참조하세요.
 
 ```python
 from langchain_community.embeddings import HuggingFaceBgeEmbeddings
 ```
 
-## Document loaders
+## 문서 로더
 
 ### Hugging Face dataset
 
->[Hugging Face Hub](https://huggingface.co/docs/hub/index) is home to over 75,000
-> [datasets](https://huggingface.co/docs/hub/index#datasets) in more than 100 languages
-> that can be used for a broad range of tasks across NLP, Computer Vision, and Audio.
-> They used for a diverse range of tasks such as translation, automatic speech
-> recognition, and image classification.
+>[Hugging Face Hub](https://huggingface.co/docs/hub/index)에는 100개 이상의 언어로 작성된 75,000개 이상의
+> [datasets](https://huggingface.co/docs/hub/index#datasets)이 있으며, 이는 NLP, 컴퓨터 비전, 오디오 분야의 광범위한 작업에 사용될 수 있습니다.
+> 이러한 데이터셋은 번역, 자동 음성 인식, 이미지 분류와 같은 다양한 작업에 사용됩니다.
 
-We need to install `datasets` python package.
+`datasets` Python 패키지를 설치해야 합니다.
 
 <CodeGroup>
     ```bash pip
@@ -125,7 +123,7 @@ We need to install `datasets` python package.
     ```
 </CodeGroup>
 
-See a [usage example](/oss/python/integrations/document_loaders/hugging_face_dataset).
+[사용 예시](/oss/python/integrations/document_loaders/hugging_face_dataset)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders.hugging_face_dataset import HuggingFaceDatasetLoader
@@ -133,12 +131,10 @@ from langchain_community.document_loaders.hugging_face_dataset import HuggingFac
 
 ### Hugging Face model loader
 
->Load model information from `Hugging Face Hub`, including README content.
+>`Hugging Face Hub`에서 README 콘텐츠를 포함한 모델 정보를 로드합니다.
 >
->This loader interfaces with the `Hugging Face Models API` to fetch
-> and load model metadata and README files.
-> The API allows you to search and filter models based on
-> specific criteria such as model tags, authors, and more.
+>이 로더는 `Hugging Face Models API`와 인터페이스하여 모델 메타데이터와 README 파일을 가져오고 로드합니다.
+> API를 사용하면 모델 태그, 작성자 등과 같은 특정 기준에 따라 모델을 검색하고 필터링할 수 있습니다.
 
 ```python
 from langchain_community.document_loaders import HuggingFaceModelLoader
@@ -146,9 +142,9 @@ from langchain_community.document_loaders import HuggingFaceModelLoader
 
 ### Image captions
 
-It uses the Hugging Face models to generate image captions.
+Hugging Face 모델을 사용하여 이미지 캡션을 생성합니다.
 
-We need to install several python packages.
+여러 Python 패키지를 설치해야 합니다.
 
 <CodeGroup>
     ```bash pip
@@ -160,20 +156,20 @@ We need to install several python packages.
     ```
 </CodeGroup>
 
-See a [usage example](/oss/python/integrations/document_loaders/image_captions).
+[사용 예시](/oss/python/integrations/document_loaders/image_captions)를 참조하세요.
 
 ```python
 from langchain_community.document_loaders import ImageCaptionLoader
 ```
 
-## Tools
+## 도구
 
 ### Hugging Face Hub Tools
 
->[Hugging Face Tools](https://huggingface.co/docs/transformers/v4.29.0/en/custom_tools)
-> support text I/O and are loaded using the `load_huggingface_tool` function.
+>[Hugging Face Tools](https://huggingface.co/docs/transformers/v4.29.0/en/custom_tools)는
+> 텍스트 I/O를 지원하며 `load_huggingface_tool` 함수를 사용하여 로드됩니다.
 
-We need to install several python packages.
+여러 Python 패키지를 설치해야 합니다.
 
 <CodeGroup>
     ```bash pip
@@ -185,7 +181,7 @@ We need to install several python packages.
     ```
 </CodeGroup>
 
-See a [usage example](/oss/python/integrations/tools/huggingface_tools).
+[사용 예시](/oss/python/integrations/tools/huggingface_tools)를 참조하세요.
 
 ```python
 from langchain_community.agent_toolkits.load_tools import load_huggingface_tool
@@ -193,7 +189,7 @@ from langchain_community.agent_toolkits.load_tools import load_huggingface_tool
 
 ### Hugging Face Text-to-Speech Model Inference.
 
-> It is a wrapper around `OpenAI Text-to-Speech API`.
+> `OpenAI Text-to-Speech API`를 래핑한 도구입니다.
 
 ```python
 from langchain_community.tools.audio import HuggingFaceTextToSpeechModelInference
