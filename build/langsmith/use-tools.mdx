@@ -1,75 +1,75 @@
 ---
-title: Use tools in a prompt
-sidebarTitle: Use tools in a prompt
+title: 프롬프트에서 도구 사용하기
+sidebarTitle: 프롬프트에서 도구 사용하기
 ---
 
-Tools allow language models to interact with external systems and perform actions beyond just generating text. In the LangSmith playground, you can use two types of tools:
+도구를 사용하면 언어 모델이 외부 시스템과 상호작용하고 텍스트 생성을 넘어선 작업을 수행할 수 있습니다. LangSmith 플레이그라운드에서는 두 가지 유형의 도구를 사용할 수 있습니다:
 
-1. **Built-in tools**: Pre-configured tools provided by model providers (like OpenAI and Anthropic) that are ready to use. These include capabilities like web search, code interpretation, and more.
+1. **내장 도구**: 모델 제공업체(OpenAI, Anthropic 등)가 제공하는 사전 구성된 도구로, 즉시 사용할 수 있습니다. 웹 검색, 코드 해석 등의 기능이 포함됩니다.
 
-2. **Custom tools**: Functions you define to perform specific tasks. These are useful when you need to integrate with your own systems or create specialized functionality. When you define custom tools within the LangSmith Playground, you can verify that the model correctly identifies and calls these tools with the correct arguments. Soon we plan to support executing these custom tool calls directly.
+2. **커스텀 도구**: 특정 작업을 수행하기 위해 사용자가 정의하는 함수입니다. 자체 시스템과 통합하거나 특화된 기능을 만들어야 할 때 유용합니다. LangSmith 플레이그라운드에서 커스텀 도구를 정의하면 모델이 올바른 인수를 사용하여 해당 도구를 정확하게 식별하고 호출하는지 확인할 수 있습니다. 곧 이러한 커스텀 도구 호출을 직접 실행할 수 있도록 지원할 예정입니다.
 
-## When to use tools
+## 도구를 사용하는 시점
 
-* Use **built-in tools** when you need common capabilities like web search or code interpretation. These are built and maintained by the model providers.
+* **내장 도구**는 웹 검색이나 코드 해석과 같은 일반적인 기능이 필요할 때 사용하세요. 이러한 도구는 모델 제공업체가 구축하고 유지 관리합니다.
 
-* Use **custom tools** when you want to test and validate your own tool designs, including:
+* **커스텀 도구**는 자체 도구 설계를 테스트하고 검증하고자 할 때 사용하세요. 다음과 같은 경우에 활용할 수 있습니다:
 
-  * Validating which tools the model chooses to use and seeing the specific arguments it provides in tool calls
-  * Simulating tool interactions
+  * 모델이 어떤 도구를 사용하도록 선택하는지 검증하고, 도구 호출 시 제공하는 구체적인 인수를 확인할 때
+  * 도구 상호작용을 시뮬레이션할 때
 
-## Built-in tools
+## 내장 도구
 
-The LangSmith Playground has native support for a variety of tools from OpenAI and Anthropic. If you want to use a tool that isn't explicitly listed in the Playground, you can still add it by manually specifying its `type` and any required arguments.
+LangSmith 플레이그라운드는 OpenAI와 Anthropic의 다양한 도구를 기본적으로 지원합니다. 플레이그라운드에 명시적으로 나열되지 않은 도구를 사용하려면 `type`과 필요한 인수를 수동으로 지정하여 추가할 수 있습니다.
 
-### OpenAI Tools
+### OpenAI 도구
 
-* **Web search**: [Search the web for real-time information](https://platform.openai.com/docs/guides/tools-web-search?api-mode=responses)
-* **Image generation**: [Generate images based on a text prompt](https://platform.openai.com/docs/guides/tools-image-generation)
-* **MCP**: [Gives the model access to tools hosted on a remote MCP server](https://platform.openai.com/docs/guides/tools-remote-mcp)
-* [View all OpenAI tools](https://platform.openai.com/docs/guides/tools?api-mode=responses)
+* **웹 검색**: [실시간 정보를 위한 웹 검색](https://platform.openai.com/docs/guides/tools-web-search?api-mode=responses)
+* **이미지 생성**: [텍스트 프롬프트를 기반으로 이미지 생성](https://platform.openai.com/docs/guides/tools-image-generation)
+* **MCP**: [원격 MCP 서버에서 호스팅되는 도구에 모델이 액세스할 수 있도록 함](https://platform.openai.com/docs/guides/tools-remote-mcp)
+* [모든 OpenAI 도구 보기](https://platform.openai.com/docs/guides/tools?api-mode=responses)
 
-### Anthropic Tools
+### Anthropic 도구
 
-* **Web search**: [Search the web for up-to-date information](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool)
-* [View all Anthropic tools](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview)
+* **웹 검색**: [최신 정보를 위한 웹 검색](https://docs.claude.com/en/docs/agents-and-tools/tool-use/web-search-tool)
+* [모든 Anthropic 도구 보기](https://docs.claude.com/en/docs/agents-and-tools/tool-use/overview)
 
-## Adding and using tools
+## 도구 추가 및 사용하기
 
-### Add a tool
+### 도구 추가하기
 
-To add a tool to your prompt, click the `+ Tool` button at the bottom of the prompt editor. ![](/langsmith/images/add-tool.png)
+프롬프트에 도구를 추가하려면 프롬프트 편집기 하단의 `+ Tool` 버튼을 클릭하세요. ![](/langsmith/images/add-tool.png)
 
-### Use a built-in tool
+### 내장 도구 사용하기
 
-1. In the tool section, select the built-in tool you want to use. You'll only see the tools that are compatible with the provider and model you've chosen.
-2. When the model calls the tool, the playground will display the response
+1. 도구 섹션에서 사용하려는 내장 도구를 선택합니다. 선택한 제공업체 및 모델과 호환되는 도구만 표시됩니다.
+2. 모델이 도구를 호출하면 플레이그라운드에 응답이 표시됩니다.
 
 ![](/langsmith/images/web-search-tool.gif)
 
-### Create a custom tool
+### 커스텀 도구 만들기
 
-To create a custom tool, you'll need to provide:
+커스텀 도구를 만들려면 다음을 제공해야 합니다:
 
-* Name: A descriptive name for your tool
-* Description: Clear explanation of what the tool does
-* Arguments: The inputs your tool requires
+* 이름: 도구에 대한 설명적인 이름
+* 설명: 도구가 수행하는 작업에 대한 명확한 설명
+* 인수: 도구에 필요한 입력값
 
 ![](/langsmith/images/custom-tool.gif)
 
-Note: When running a custom tool in the playground, the model will respond with a JSON object containing the tool name and the tool call. Currently, there's no way to connect this to a hosted tool via MCP.
+참고: 플레이그라운드에서 커스텀 도구를 실행할 때 모델은 도구 이름과 도구 호출이 포함된 JSON 객체로 응답합니다. 현재로서는 MCP를 통해 호스팅된 도구에 연결할 수 있는 방법이 없습니다.
 
 ![](/langsmith/images/tool-call.png)
 
-## Tool choice settings
+## 도구 선택 설정
 
-Some models provide control over which tools are called. To configure this:
+일부 모델은 호출할 도구에 대한 제어 기능을 제공합니다. 이를 구성하려면:
 
-1. Go to prompt settings
-2. Navigate to tool settings
-3. Select tool choice
+1. 프롬프트 설정으로 이동합니다.
+2. 도구 설정으로 이동합니다.
+3. 도구 선택을 선택합니다.
 
-To understand the available tool choice options, check the documentation for your specific provider. For example, [OpenAI's documentation on tool choice](https://platform.openai.com/docs/guides/function-calling/function-calling-behavior?api-mode=responses#tool-choice).
+사용 가능한 도구 선택 옵션을 이해하려면 특정 제공업체의 문서를 확인하세요. 예를 들어, [도구 선택에 대한 OpenAI 문서](https://platform.openai.com/docs/guides/function-calling/function-calling-behavior?api-mode=responses#tool-choice)를 참조하세요.
 
 ![](/langsmith/images/tool-choice.png)
 

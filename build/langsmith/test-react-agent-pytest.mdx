@@ -1,17 +1,17 @@
 ---
-title: Test a ReAct agent with Pytest/Vitest and LangSmith
-sidebarTitle: Test a ReAct agent with Pytest/Vitest and LangSmith
+title: Pytest/Vitest와 LangSmith로 ReAct 에이전트 테스트하기
+sidebarTitle: Pytest/Vitest와 LangSmith로 ReAct 에이전트 테스트하기
 ---
 
-This tutorial will show you how to use LangSmith's integrations with popular testing tools (Pytest, Vitest, and Jest) to evaluate your LLM application. We will create a ReAct agent that answers questions about publicly traded stocks and write a comprehensive test suite for it.
+이 튜토리얼에서는 LangSmith와 인기 있는 테스트 도구(Pytest, Vitest, Jest)의 통합을 사용하여 LLM 애플리케이션을 평가하는 방법을 보여드립니다. 상장 주식에 대한 질문에 답변하는 ReAct 에이전트를 만들고 이에 대한 포괄적인 테스트 스위트를 작성하겠습니다.
 
-## Setup
+## 설정
 
-This tutorial uses [LangGraph](https://langchain-ai.github.io/langgraph/tutorials/introduction/) for agent orchestration, [OpenAI's GPT-4o](https://platform.openai.com/docs/models#gpt-4o), [Tavily](https://tavily.com/) for search, [E2B's](https://e2b.dev/) code interpreter, and [Polygon](https://polygon.io/stocks) to retrieve stock data but it can be adapted for other frameworks, models and tools with minor modifications. Tavily, E2B and Polygon are free to sign up for.
+이 튜토리얼은 에이전트 오케스트레이션을 위해 [LangGraph](https://langchain-ai.github.io/langgraph/tutorials/introduction/)를, [OpenAI의 GPT-4o](https://platform.openai.com/docs/models#gpt-4o)를, 검색을 위해 [Tavily](https://tavily.com/)를, [E2B의](https://e2b.dev/) 코드 인터프리터를, 주식 데이터를 가져오기 위해 [Polygon](https://polygon.io/stocks)을 사용하지만 약간의 수정을 통해 다른 프레임워크, 모델, 도구에도 적용할 수 있습니다. Tavily, E2B, Polygon은 무료로 가입할 수 있습니다.
 
-### Installation
+### 설치
 
-First, install the packages required for making the agent:
+먼저 에이전트를 만드는 데 필요한 패키지를 설치합니다:
 
 <CodeGroup>
 
@@ -25,12 +25,12 @@ yarn add @langchain/openai @langchain/community @langchain/langgraph @langchain/
 
 </CodeGroup>
 
-Next, install the testing framework:
+다음으로 테스트 프레임워크를 설치합니다:
 
 <CodeGroup>
 
 ```bash Pytest
-# Make sure you have langsmith>=0.3.1
+# langsmith>=0.3.1 버전이 설치되어 있는지 확인하세요
 pip install -U "langsmith[pytest]"
 ```
 
@@ -44,9 +44,9 @@ yarn add -D langsmith jest
 
 </CodeGroup>
 
-### Environment Variables
+### 환경 변수
 
-Set the following environment variables:
+다음 환경 변수를 설정합니다:
 
 ```bash
 export LANGSMITH_TRACING=true
@@ -57,17 +57,17 @@ export E2B_API_KEY=<YOUR_E2B_API_KEY>
 export POLYGON_API_KEY=<YOUR_POLYGON_API_KEY>
 ```
 
-## Create your app
+## 애플리케이션 만들기
 
-To define our React agent, we will use LangGraph/LangGraph.js for the orchestation and LangChain for the LLM and tools.
+ReAct 에이전트를 정의하기 위해 오케스트레이션에는 LangGraph/LangGraph.js를, LLM과 도구에는 LangChain을 사용하겠습니다.
 
-### Define tools
+### 도구 정의
 
-First we are going to define the tools we are going to use in our agent. There are going to be 3 tools:
+먼저 에이전트에서 사용할 도구를 정의하겠습니다. 3가지 도구가 사용됩니다:
 
-* A search tool using Tavily
-* A code interpreter tool using E2B
-* A stock information tool using Polygon
+* Tavily를 사용하는 검색 도구
+* E2B를 사용하는 코드 인터프리터 도구
+* Polygon을 사용하는 주식 정보 도구
 
 <CodeGroup>
 
@@ -78,15 +78,15 @@ from langchain_community.tools.polygon.aggregates import PolygonAggregates
 from langchain_community.utilities.polygon import PolygonAPIWrapper
 from typing_extensions import Annotated, TypedDict, Optional, Literal
 
-# Define search tool
+# 검색 도구 정의
 search_tool = TavilySearchResults(
   max_results=5,
   include_raw_content=True,
 )
 
-# Define code tool
+# 코드 도구 정의
 def code_tool(code: str) -> str:
-  """Execute python code and return the result."""
+  """파이썬 코드를 실행하고 결과를 반환합니다."""
   sbx = Sandbox()
   execution = sbx.run_code(code)
 
@@ -94,23 +94,23 @@ def code_tool(code: str) -> str:
       return f"Error: {execution.error}"
   return f"Results: {execution.results}, Logs: {execution.logs}"
 
-# Define input schema for stock ticker tool
+# 주식 티커 도구의 입력 스키마 정의
 class TickerToolInput(TypedDict):
-  """Input format for the ticker tool.
-    The tool will pull data in aggregate blocks (timespan_multiplier * timespan) from the from_date to the to_date
+  """티커 도구의 입력 형식입니다.
+    이 도구는 from_date부터 to_date까지 집계 블록(timespan_multiplier * timespan)으로 데이터를 가져옵니다.
   """
-  ticker: Annotated[str, ..., "The ticker symbol of the stock"]
-  timespan: Annotated[Literal["minute", "hour", "day", "week", "month", "quarter", "year"], ..., "The size of the time window."]
-  timespan_multiplier: Annotated[int, ..., "The multiplier for the time window"]
-  from_date: Annotated[str, ..., "The date to start pulling data from, YYYY-MM-DD format - ONLY include the year month and day"]
-  to_date: Annotated[str, ..., "The date to stop pulling data, YYYY-MM-DD format - ONLY include the year month and day"]
+  ticker: Annotated[str, ..., "주식의 티커 심볼"]
+  timespan: Annotated[Literal["minute", "hour", "day", "week", "month", "quarter", "year"], ..., "시간 윈도우의 크기"]
+  timespan_multiplier: Annotated[int, ..., "시간 윈도우의 배수"]
+  from_date: Annotated[str, ..., "데이터를 가져올 시작 날짜, YYYY-MM-DD 형식 - 년, 월, 일만 포함"]
+  to_date: Annotated[str, ..., "데이터를 가져올 종료 날짜, YYYY-MM-DD 형식 - 년, 월, 일만 포함"]
 
 api_wrapper = PolygonAPIWrapper()
 polygon_aggregate = PolygonAggregates(api_wrapper=api_wrapper)
 
-# Define stock ticker tool
+# 주식 티커 도구 정의
 def ticker_tool(query: TickerToolInput) -> str:
-  """Pull data for the ticker."""
+  """티커 데이터를 가져옵니다."""
   return polygon_aggregate.invoke(query)
 ```
 
@@ -121,12 +121,12 @@ import { tool } from "@langchain/core/tools";
 import { z } from "zod";
 import { restClient } from "@polygon.io/client-js";
 
-// Define search tool
+// 검색 도구 정의
 const searchTool = new TavilySearchResults({
   maxResults: 5,
 });
 
-// Define code tool
+// 코드 도구 정의
 const codeTool = tool(async (input) => {
   const sbx = await Sandbox.create();
   const execution = await sbx.runCode(input.code);
@@ -142,7 +142,7 @@ const codeTool = tool(async (input) => {
   }),
 });
 
-// Define input schema for stock ticker tool
+// 주식 티커 도구의 입력 스키마 정의
 const TickerToolInputSchema = z.object({
   ticker: z.string().describe("The ticker symbol of the stock"),
   timespan: z.enum(["minute", "hour", "day", "week", "month", "quarter", "year"]).describe("The size of the time window."),
@@ -157,7 +157,7 @@ const TickerToolInputSchema = z.object({
 
 const rest = restClient(process.env.POLYGON_API_KEY);
 
-// Define stock ticker tool
+// 주식 티커 도구 정의
 const tickerTool = tool(async (query) => {
   const parsed = TickerToolInputSchema.parse(query);
   const result = await rest.stocks.aggregates(
@@ -177,9 +177,9 @@ const tickerTool = tool(async (query) => {
 
 </CodeGroup>
 
-### Define agent
+### 에이전트 정의
 
-Now that we have defined all of our tools, we can use [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent) to create our agent.
+이제 모든 도구를 정의했으므로 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)를 사용하여 에이전트를 만들 수 있습니다.
 
 <CodeGroup>
 
@@ -189,9 +189,9 @@ from langchain.agents import create_agent
 
 
 class AgentOutputFormat(TypedDict):
-    numeric_answer: Annotated[float | None, ..., "The numeric answer, if the user asked for one"]
-    text_answer: Annotated[str | None, ..., "The text answer, if the user asked for one"]
-    reasoning: Annotated[str, ..., "The reasoning behind the answer"]
+    numeric_answer: Annotated[float | None, ..., "사용자가 숫자 답변을 요청한 경우 숫자 답변"]
+    text_answer: Annotated[str | None, ..., "사용자가 텍스트 답변을 요청한 경우 텍스트 답변"]
+    reasoning: Annotated[str, ..., "답변의 근거"]
 
 agent = create_agent(
     model="openai:gpt-4o-mini",
@@ -226,76 +226,76 @@ export default agent;
 
 </CodeGroup>
 
-## Write tests
+## 테스트 작성
 
-Now that we have defined our agent, let's write a few tests to ensure basic functionality. In this tutorial we are going to test whether the agent's tool calling abilities are working, whether the agent knows to ignore irrelevant questions, and whether it is able to answer complex questions that involve using all of the tools.
+이제 에이전트를 정의했으므로 기본 기능을 확인하기 위한 몇 가지 테스트를 작성해 보겠습니다. 이 튜토리얼에서는 에이전트의 도구 호출 기능이 작동하는지, 에이전트가 관련 없는 질문을 무시하는지, 모든 도구를 사용해야 하는 복잡한 질문에 답변할 수 있는지를 테스트하겠습니다.
 
-We need to first set up a test file and add the imports needed at the top of the file.
+먼저 테스트 파일을 설정하고 파일 상단에 필요한 import를 추가해야 합니다.
 
 <CodeGroup>
 
 ```python Pytest
-Create a `tests/test_agent.py` file.
+`tests/test_agent.py` 파일을 생성합니다.
 
-from app import agent, polygon_aggregates, search_tool # import from wherever your agent is defined
+from app import agent, polygon_aggregates, search_tool # 에이전트가 정의된 곳에서 import합니다
 import pytest
 from langsmith import testing as t
 ```
 
 ```typescript Vitest
-Name your test file `agent.vitest.eval.ts`
+테스트 파일 이름을 `agent.vitest.eval.ts`로 지정합니다
 
 import { expect } from "vitest";
 import * as ls from "langsmith/vitest";
-import agent from "../agent"; // import from wherever your agent is defined
+import agent from "../agent"; // 에이전트가 정의된 곳에서 import합니다
 
-// Optional, but recommended to group tests together
+// 선택 사항이지만 테스트를 그룹화하는 것이 권장됩니다
 ls.describe("Agent Tests", () => {
-  // PLACE TESTS Here
+  // 여기에 테스트를 배치합니다
 });
 ```
 
 ```typescript Jest
-Name your test file `agent.jest.eval.ts`
+테스트 파일 이름을 `agent.jest.eval.ts`로 지정합니다
 
 import { expect } from "@jest/globals";
 import * as ls from "langsmith/jest";
-import agent from "../agent"; // import from wherever your agent is defined
+import agent from "../agent"; // 에이전트가 정의된 곳에서 import합니다
 
-// Optional, but recommended to group tests together
+// 선택 사항이지만 테스트를 그룹화하는 것이 권장됩니다
 ls.describe("Agent Tests", () => {
-  // PLACE TESTS Here
+  // 여기에 테스트를 배치합니다
 });
 ```
 
 </CodeGroup>
 
-### Test 1: Handle off-topic questions
+### 테스트 1: 주제에서 벗어난 질문 처리
 
-The first test will be a simple check that the agent does not use tools on irrelevant queries.
+첫 번째 테스트는 에이전트가 관련 없는 쿼리에 대해 도구를 사용하지 않는지 확인하는 간단한 검사입니다.
 
 <CodeGroup>
 
 ```python Pytest
 @pytest.mark.langsmith
 @pytest.mark.parametrize(
-  # <-- Can still use all normal pytest markers
+  # <-- 모든 일반 pytest 마커를 계속 사용할 수 있습니다
   "query",
   ["Hello!", "How are you doing?"],
 )
 def test_no_tools_on_offtopic_query(query: str) -> None:
-  """Test that the agent does not use tools on offtopic queries."""
-  # Log the test example
+  """에이전트가 주제에서 벗어난 쿼리에 대해 도구를 사용하지 않는지 테스트합니다."""
+  # 테스트 예제를 기록합니다
   t.log_inputs({"query": query})
   expected = []
   t.log_reference_outputs({"tool_calls": expected})
-  # Call the agent's model node directly instead of running the ReACT loop.
+  # ReACT 루프를 실행하는 대신 에이전트의 모델 노드를 직접 호출합니다.
   result = agent.nodes["agent"].invoke(
       {"messages": [{"role": "user", "content": query}]}
   )
   actual = result["messages"][0].tool_calls
   t.log_outputs({"tool_calls": actual})
-  # Check that no tool calls were made.
+  # 도구 호출이 없었는지 확인합니다.
   assert actual == expected
 ```
 
@@ -309,7 +309,7 @@ ls.test.each([
     const result = await agent.invoke({ messages: [{ role: "user", content: query }] });
     ls.logOutputs(result);
 
-    // Check that the flow was HUMAN -> AI FINAL RESPONSE (no tools called)
+    // 흐름이 HUMAN -> AI 최종 응답(도구 호출 없음)인지 확인합니다
     expect(result.messages).toHaveLength(numMessages);
   }
 );
@@ -325,7 +325,7 @@ ls.test.each([
     const result = await agent.invoke({ messages: [{ role: "user", content: query }] });
     ls.logOutputs(result);
 
-    // Check that the flow was HUMAN -> AI FINAL RESPONSE (no tools called)
+    // 흐름이 HUMAN -> AI 최종 응답(도구 호출 없음)인지 확인합니다
     expect(result.messages).toHaveLength(numMessages);
   }
 );
@@ -333,22 +333,22 @@ ls.test.each([
 
 </CodeGroup>
 
-### Test 2: Simple tool calling
+### 테스트 2: 간단한 도구 호출
 
-For tool calling, we are going to verify that the agent calls the correct tool with the correct parameters.
+도구 호출의 경우 에이전트가 올바른 도구를 올바른 파라미터로 호출하는지 확인하겠습니다.
 
 <CodeGroup>
 
 ```python Pytest
 @pytest.mark.langsmith
 def test_searches_for_correct_ticker() -> None:
-  """Test that the model looks up the correct ticker on simple query."""
-  # Log the test example
+  """모델이 간단한 쿼리에 대해 올바른 티커를 조회하는지 테스트합니다."""
+  # 테스트 예제를 기록합니다
   query = "What is the price of Apple?"
   t.log_inputs({"query": query})
   expected = "AAPL"
   t.log_reference_outputs({"ticker": expected})
-  # Call the agent's model node directly instead of running the full ReACT loop.
+  # 전체 ReACT 루프를 실행하는 대신 에이전트의 모델 노드를 직접 호출합니다.
   result = agent.nodes["agent"].invoke(
       {"messages": [{"role": "user", "content": query}]}
   )
@@ -358,7 +358,7 @@ def test_searches_for_correct_ticker() -> None:
   else:
       actual = None
   t.log_outputs({"ticker": actual})
-  # Check that the right ticker was queried
+  # 올바른 티커가 쿼리되었는지 확인합니다
   assert actual == expected
 ```
 
@@ -376,13 +376,13 @@ ls.test(
 
     ls.logOutputs(result);
 
-    // The agent should have made a single tool call to the ticker tool
+    // 에이전트는 티커 도구에 대한 단일 도구 호출을 수행해야 합니다
     const toolCalls = (result.messages[1] as AIMessage).tool_calls || [];
     const tickerQuery = JSON.parse(toolCalls[0].function.arguments).query.ticker;
-    // Check that the right ticker was queried
+    // 올바른 티커가 쿼리되었는지 확인합니다
     expect(tickerQuery).toBe("AAPL");
 
-    // Check that the flow was HUMAN -> AI -> TOOL -> AI FINAL RESPONSE
+    // 흐름이 HUMAN -> AI -> TOOL -> AI 최종 응답인지 확인합니다
     expect(result.messages).toHaveLength(numMessages);
   }
 );
@@ -402,13 +402,13 @@ ls.test(
 
     ls.logOutputs(result);
 
-    // The agent should have made a single tool call to the ticker tool
+    // 에이전트는 티커 도구에 대한 단일 도구 호출을 수행해야 합니다
     const toolCalls = (result.messages[1] as AIMessage).tool_calls || [];
     const tickerQuery = JSON.parse(toolCalls[0].function.arguments).query.ticker;
-    // Check that the right ticker was queried
+    // 올바른 티커가 쿼리되었는지 확인합니다
     expect(tickerQuery).toBe("AAPL");
 
-    // Check that the flow was HUMAN -> AI -> TOOL -> AI FINAL RESPONSE
+    // 흐름이 HUMAN -> AI -> TOOL -> AI 최종 응답인지 확인합니다
     expect(result.messages).toHaveLength(numMessages);
   }
 );
@@ -416,9 +416,9 @@ ls.test(
 
 </CodeGroup>
 
-### Test 3: Complex tool calling
+### 테스트 3: 복잡한 도구 호출
 
-Some tool calls are easier to test than others. With the ticker lookup, we can assert that the correct ticker is searched. With the coding tool, the inputs and outputs of the tool are much less constrained, and there are lots of ways to get to the right answer. In this case, it's simpler to test that the tool is used correctly by running the full agent and asserting that it both calls the coding tool and that it ends up with the right answer.
+일부 도구 호출은 다른 것보다 테스트하기 쉽습니다. 티커 조회의 경우 올바른 티커가 검색되었는지 확인할 수 있습니다. 코딩 도구의 경우 도구의 입력과 출력이 훨씬 덜 제약적이며 올바른 답변에 도달하는 방법이 많습니다. 이 경우 전체 에이전트를 실행하여 코딩 도구를 호출하고 올바른 답변에 도달하는지 확인하여 도구가 올바르게 사용되는지 테스트하는 것이 더 간단합니다.
 
 <CodeGroup>
 
@@ -434,23 +434,23 @@ def test_executes_code_when_needed() -> None:
   t.log_inputs({"query": query})
   expected = 50.988
   t.log_reference_outputs({"response": expected})
-  # Test that the agent executes code when needed
+  # 필요할 때 에이전트가 코드를 실행하는지 테스트합니다
   result = agent.invoke({"messages": [{"role": "user", "content": query}]})
   t.log_outputs({"result": result["structured_response"].get("numeric_answer")})
-  # Grab all the tool calls made by the LLM
+  # LLM이 수행한 모든 도구 호출을 가져옵니다
   tool_calls = [
       tc["name"]
       for msg in result["messages"]
       for tc in getattr(msg, "tool_calls", [])
   ]
-  # This will log the number of steps taken by the agent, which is useful for
-  # determining how efficiently the agent gets to an answer.
+  # 에이전트가 수행한 단계 수를 기록합니다. 이는 에이전트가 답변에 도달하는
+  # 효율성을 판단하는 데 유용합니다.
   t.log_feedback(key="num_steps", score=len(result["messages"]) - 1)
-  # Assert that the code tool was used
+  # 코드 도구가 사용되었는지 확인합니다
   assert "code_tool" in tool_calls
-  # Assert that a numeric answer was provided:
+  # 숫자 답변이 제공되었는지 확인합니다:
   assert result["structured_response"].get("numeric_answer") is not None
-  # Assert that the answer is correct
+  # 답변이 정확한지 확인합니다
   assert abs(result["structured_response"]["numeric_answer"] - expected) <= 0.01
 ```
 
@@ -468,18 +468,18 @@ ls.test(
 
     ls.logOutputs(result);
 
-    // Grab all the tool calls made by the LLM
+    // LLM이 수행한 모든 도구 호출을 가져옵니다
     const toolCalls = result.messages
       .filter(m => (m as AIMessage).tool_calls)
       .flatMap(m => (m as AIMessage).tool_calls?.map(tc => tc.name));
-    // This will log the number of steps taken by the LLM, which we can track over time to measure performance
+    // LLM이 수행한 단계 수를 기록하여 시간 경과에 따른 성능을 추적할 수 있습니다
     ls.logFeedback({
       key: "num_steps",
-      score: result.messages.length - 1, // The first message is the user message
+      score: result.messages.length - 1, // 첫 번째 메시지는 사용자 메시지입니다
     });
-    // Assert that the tool calls include the "code_tool" function
+    // 도구 호출에 "code_tool" 함수가 포함되어 있는지 확인합니다
     expect(toolCalls).toContain("code_tool");
-    // Assert that the answer is within 1 of the expected answer
+    // 답변이 예상 답변의 1 이내인지 확인합니다
     expect(Math.abs(result.structured_response.numeric_answer - answer)).toBeLessThanOrEqual(1);
   }
 );
@@ -498,18 +498,18 @@ ls.test(
     });
 
     ls.logOutputs(result);
-    // Grab all the tool calls made by the LLM
+    // LLM이 수행한 모든 도구 호출을 가져옵니다
     const toolCalls = result.messages
       .filter(m => (m as AIMessage).tool_calls)
       .flatMap(m => (m as AIMessage).tool_calls?.map(tc => tc.name));
-    // This will log the number of steps taken by the LLM, which we can track over time to measure performance
+    // LLM이 수행한 단계 수를 기록하여 시간 경과에 따른 성능을 추적할 수 있습니다
     ls.logFeedback({
       key: "num_steps",
-      score: result.messages.length - 1, // The first message is the user message
+      score: result.messages.length - 1, // 첫 번째 메시지는 사용자 메시지입니다
     });
-    // Assert that the tool calls include the "code_tool" function
+    // 도구 호출에 "code_tool" 함수가 포함되어 있는지 확인합니다
     expect(toolCalls).toContain("code_tool");
-    // Assert that the answer is within 1 of the expected answer
+    // 답변이 예상 답변의 1 이내인지 확인합니다
     expect(Math.abs(result.structured_response.numeric_answer - answer)).toBeLessThanOrEqual(1);
   }
 );
@@ -517,9 +517,9 @@ ls.test(
 
 </CodeGroup>
 
-### Test 4: LLM-as-a-judge
+### 테스트 4: LLM-as-a-judge
 
-We are going to ensure that the agent's answer is grounded in the search results by running an LLM-as-a-judge evaluation. In order to trace the LLM as a judge call separately from our agent, we will use the LangSmith provided `trace_feedback` context manager in Python and `wrapEvaluator` function in JS/TS.
+LLM-as-a-judge 평가를 실행하여 에이전트의 답변이 검색 결과에 근거하고 있는지 확인하겠습니다. LLM as a judge 호출을 에이전트와 별도로 추적하기 위해 Python에서는 LangSmith에서 제공하는 `trace_feedback` 컨텍스트 매니저를, JS/TS에서는 `wrapEvaluator` 함수를 사용합니다.
 
 <CodeGroup>
 
@@ -528,22 +528,22 @@ from typing_extensions import Annotated, TypedDict
 from langchain.chat_models import init_chat_model
 
 class Grade(TypedDict):
-  """Evaluate the groundedness of an answer in source documents."""
+  """소스 문서에서 답변의 근거를 평가합니다."""
   score: Annotated[
       bool,
       ...,
-      "Return True if the answer is fully grounded in the source documents, otherwise False.",
+      "답변이 소스 문서에 완전히 근거한 경우 True를, 그렇지 않으면 False를 반환합니다.",
   ]
 
 judge_llm = init_chat_model("gpt-4o").with_structured_output(Grade)
 
 @pytest.mark.langsmith
 def test_grounded_in_source_info() -> None:
-  """Test that response is grounded in the tool outputs."""
+  """응답이 도구 출력에 근거하고 있는지 테스트합니다."""
   query = "How did Nvidia stock do in 2024 according to analysts?"
   t.log_inputs({"query": query})
   result = agent.invoke({"messages": [{"role": "user", "content": query}]})
-  # Grab all the search calls made by the LLM
+  # LLM이 수행한 모든 검색 호출을 가져옵니다
   search_results = "\n\n".join(
       msg.content
       for msg in result["messages"]
@@ -555,9 +555,9 @@ def test_grounded_in_source_info() -> None:
           "search_results": search_results,
       }
   )
-  # Trace the feedback LLM run separately from the agent run.
+  # 피드백 LLM 실행을 에이전트 실행과 별도로 추적합니다.
   with t.trace_feedback():
-      # Instructions for the LLM judge
+      # LLM judge를 위한 지침
       instructions = (
           "Grade the following ANSWER. "
           "The ANSWER should be fully grounded in (i.e. supported by) the source DOCUMENTS. "
@@ -568,7 +568,7 @@ def test_grounded_in_source_info() -> None:
           f"ANSWER: {result['structured_response'].get('text_answer', '')}\n"
           f"DOCUMENTS:\n{search_results}"
       )
-      # Run the judge LLM
+      # judge LLM을 실행합니다
       grade = judge_llm.invoke(
           [
               {"role": "system", "content": instructions},
@@ -580,19 +580,19 @@ def test_grounded_in_source_info() -> None:
 ```
 
 ```typescript Vitest
-// THIS CODE GOES OUTSIDE THE TEST - IT IS JUST A HELPER FUNCTION
+// 이 코드는 테스트 외부에 있습니다 - 단지 헬퍼 함수입니다
 const judgeLLM = new ChatOpenAI({ model: "gpt-4o" });
 const groundedEvaluator = async (params: {
   answer: string;
   referenceDocuments: string,
 }) => {
-  // Instructions for the LLM judge
+  // LLM judge를 위한 지침
   const instructions = [
     "Return 1 if the ANSWER is grounded in the DOCUMENTS",
     "Return 0 if the ANSWER is not grounded in the DOCUMENTS",
   ].join("\n");
 
-  // Run the judge LLM
+  // judge LLM을 실행합니다
   const grade = await judgeLLM.invoke([
     { role: "system", content: instructions },
     { role: "user", content: `ANSWER: ${params.answer}\nDOCUMENTS: ${params.referenceDocuments}` },
@@ -601,7 +601,7 @@ const groundedEvaluator = async (params: {
   return { key: "groundedness", score };
 };
 
-// THIS CODE GOES INSIDE THE TEST
+// 이 코드는 테스트 내부에 있습니다
 ls.test(
   "grounded in the source",
   {
@@ -622,19 +622,19 @@ ls.test(
 ```
 
 ```typescript Jest
-// THIS CODE GOES OUTSIDE THE TEST - IT IS JUST A HELPER FUNCTION
+// 이 코드는 테스트 외부에 있습니다 - 단지 헬퍼 함수입니다
 const judgeLLM = new ChatOpenAI({ model: "gpt-4o" });
 const groundedEvaluator = async (params: {
   answer: string;
   referenceDocuments: string,
 }) => {
-  // Instructions for the LLM judge
+  // LLM judge를 위한 지침
   const instructions = [
     "Return 1 if the ANSWER is grounded in the DOCUMENTS",
     "Return 0 if the ANSWER is not grounded in the DOCUMENTS",
   ].join("\n");
 
-  // Run the judge LLM
+  // judge LLM을 실행합니다
   const grade = await judgeLLM.invoke([
     { role: "system", content: instructions },
     { role: "user", content: `ANSWER: ${params.answer}\nDOCUMENTS: ${params.referenceDocuments}` },
@@ -643,7 +643,7 @@ const groundedEvaluator = async (params: {
   return { key: "groundedness", score };
 };
 
-// THIS CODE GOES INSIDE THE TEST
+// 이 코드는 테스트 내부에 있습니다
 ls.test(
   "grounded in the source",
   {
@@ -665,15 +665,15 @@ ls.test(
 
 </CodeGroup>
 
-## Run tests
+## 테스트 실행
 
-Once you have setup your config files (if you are using Vitest or Jest), you can run your tests using the following commands:
+구성 파일을 설정한 후(Vitest 또는 Jest를 사용하는 경우), 다음 명령을 사용하여 테스트를 실행할 수 있습니다:
 
-<Accordion title="Config files for Vitest/Jest">
+<Accordion title="Vitest/Jest를 위한 구성 파일">
     <CodeGroup>
 
   ```typescript Vitest
-  Create a `ls.vitest.config.ts` file:
+  `ls.vitest.config.ts` 파일을 생성합니다:
 
   import { defineConfig } from "vitest/config";
 
@@ -687,7 +687,7 @@ Once you have setup your config files (if you are using Vitest or Jest), you can
   ```
 
   ```javascript Jest
-  Create a `ls.jest.config.ts` file:
+  `ls.jest.config.ts` 파일을 생성합니다:
 
   require('dotenv').config();
 
@@ -723,13 +723,13 @@ yarn jest --config ls.jest.config.ts
 
 </CodeGroup>
 
-## Reference code
+## 참고 코드
 
-Remember to also add the config files for [Vitest](#config-files-for-vitestjest) and [Jest](#config-files-for-vitestjest) to your project.
+프로젝트에 [Vitest](#config-files-for-vitestjest) 및 [Jest](#config-files-for-vitestjest)용 구성 파일도 추가하는 것을 잊지 마세요.
 
-### Agent
+### 에이전트
 
-<Accordion title="Agent code">
+<Accordion title="에이전트 코드">
     <CodeGroup>
 
     ```python Python
@@ -852,13 +852,13 @@ Remember to also add the config files for [Vitest](#config-files-for-vitestjest)
     </CodeGroup>
 </Accordion>
 
-### Tests
+### 테스트
 
-<Accordion title="Test code">
+<Accordion title="테스트 코드">
     <CodeGroup>
 
   ```python Pytest
-  # from app import agent, polygon_aggregates, search_tool # import from wherever your agent is defined
+  # from app import agent, polygon_aggregates, search_tool # 에이전트가 정의된 곳에서 import합니다
   import pytest
   from langchain.chat_models import init_chat_model
   from langsmith import testing as t
@@ -866,34 +866,34 @@ Remember to also add the config files for [Vitest](#config-files-for-vitestjest)
 
   @pytest.mark.langsmith
   @pytest.mark.parametrize(
-    # <-- Can still use all normal pytest markers
+    # <-- 모든 일반 pytest 마커를 계속 사용할 수 있습니다
     "query",
     ["Hello!", "How are you doing?"],
   )
   def test_no_tools_on_offtopic_query(query: str) -> None:
-    """Test that the agent does not use tools on offtopic queries."""
-    # Log the test example
+    """에이전트가 주제에서 벗어난 쿼리에 대해 도구를 사용하지 않는지 테스트합니다."""
+    # 테스트 예제를 기록합니다
     t.log_inputs({"query": query})
     expected = []
     t.log_reference_outputs({"tool_calls": expected})
-    # Call the agent's model node directly instead of running the ReACT loop.
+    # ReACT 루프를 실행하는 대신 에이전트의 모델 노드를 직접 호출합니다.
     result = agent.nodes["agent"].invoke(
         {"messages": [{"role": "user", "content": query}]}
     )
     actual = result["messages"][0].tool_calls
     t.log_outputs({"tool_calls": actual})
-    # Check that no tool calls were made.
+    # 도구 호출이 없었는지 확인합니다.
     assert actual == expected
 
   @pytest.mark.langsmith
   def test_searches_for_correct_ticker() -> None:
-    """Test that the model looks up the correct ticker on simple query."""
-    # Log the test example
+    """모델이 간단한 쿼리에 대해 올바른 티커를 조회하는지 테스트합니다."""
+    # 테스트 예제를 기록합니다
     query = "What is the price of Apple?"
     t.log_inputs({"query": query})
     expected = "AAPL"
     t.log_reference_outputs({"ticker": expected})
-    # Call the agent's model node directly instead of running the full ReACT loop.
+    # 전체 ReACT 루프를 실행하는 대신 에이전트의 모델 노드를 직접 호출합니다.
     result = agent.nodes["agent"].invoke(
         {"messages": [{"role": "user", "content": query}]}
     )
@@ -903,7 +903,7 @@ Remember to also add the config files for [Vitest](#config-files-for-vitestjest)
     else:
         actual = None
     t.log_outputs({"ticker": actual})
-    # Check that the right ticker was queried
+    # 올바른 티커가 쿼리되었는지 확인합니다
     assert actual == expected
 
   @pytest.mark.langsmith
@@ -917,42 +917,42 @@ Remember to also add the config files for [Vitest](#config-files-for-vitestjest)
     t.log_inputs({"query": query})
     expected = 50.988
     t.log_reference_outputs({"response": expected})
-    # Test that the agent executes code when needed
+    # 필요할 때 에이전트가 코드를 실행하는지 테스트합니다
     result = agent.invoke({"messages": [{"role": "user", "content": query}]})
     t.log_outputs({"result": result["structured_response"].get("numeric_answer")})
-    # Grab all the tool calls made by the LLM
+    # LLM이 수행한 모든 도구 호출을 가져옵니다
     tool_calls = [
         tc["name"]
         for msg in result["messages"]
         for tc in getattr(msg, "tool_calls", [])
     ]
-    # This will log the number of steps taken by the agent, which is useful for
-    # determining how efficiently the agent gets to an answer.
+    # 에이전트가 수행한 단계 수를 기록합니다. 이는 에이전트가 답변에 도달하는
+    # 효율성을 판단하는 데 유용합니다.
     t.log_feedback(key="num_steps", score=len(result["messages"]) - 1)
-    # Assert that the code tool was used
+    # 코드 도구가 사용되었는지 확인합니다
     assert "code_tool" in tool_calls
-    # Assert that a numeric answer was provided:
+    # 숫자 답변이 제공되었는지 확인합니다:
     assert result["structured_response"].get("numeric_answer") is not None
-    # Assert that the answer is correct
+    # 답변이 정확한지 확인합니다
     assert abs(result["structured_response"]["numeric_answer"] - expected) <= 0.01
 
   class Grade(TypedDict):
-    """Evaluate the groundedness of an answer in source documents."""
+    """소스 문서에서 답변의 근거를 평가합니다."""
     score: Annotated[
         bool,
         ...,
-        "Return True if the answer is fully grounded in the source documents, otherwise False.",
+        "답변이 소스 문서에 완전히 근거한 경우 True를, 그렇지 않으면 False를 반환합니다.",
     ]
 
   judge_llm = init_chat_model("gpt-4o").with_structured_output(Grade)
 
   @pytest.mark.langsmith
   def test_grounded_in_source_info() -> None:
-    """Test that response is grounded in the tool outputs."""
+    """응답이 도구 출력에 근거하고 있는지 테스트합니다."""
     query = "How did Nvidia stock do in 2024 according to analysts?"
     t.log_inputs({"query": query})
     result = agent.invoke({"messages": [{"role": "user", "content": query}]})
-    # Grab all the search calls made by the LLM
+    # LLM이 수행한 모든 검색 호출을 가져옵니다
     search_results = "\n\n".join(
         msg.content
         for msg in result["messages"]
@@ -964,9 +964,9 @@ Remember to also add the config files for [Vitest](#config-files-for-vitestjest)
             "search_results": search_results,
         }
     )
-    # Trace the feedback LLM run separately from the agent run.
+    # 피드백 LLM 실행을 에이전트 실행과 별도로 추적합니다.
     with t.trace_feedback():
-        # Instructions for the LLM judge
+        # LLM judge를 위한 지침
         instructions = (
             "Grade the following ANSWER. "
             "The ANSWER should be fully grounded in (i.e. supported by) the source DOCUMENTS. "
@@ -977,7 +977,7 @@ Remember to also add the config files for [Vitest](#config-files-for-vitestjest)
             f"ANSWER: {result['structured_response'].get('text_answer', '')}\n"
             f"DOCUMENTS:\n{search_results}"
         )
-        # Run the judge LLM
+        # judge LLM을 실행합니다
         grade = judge_llm.invoke(
             [
                 {"role": "system", "content": instructions},
