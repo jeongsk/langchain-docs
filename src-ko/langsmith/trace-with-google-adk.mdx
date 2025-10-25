@@ -1,13 +1,13 @@
 ---
-title: Trace with Google ADK
+title: Google ADK로 추적하기
 sidebarTitle: Google ADK
 ---
 
-LangSmith supports tracing Google Agent Development Kit (ADK) applications through the OpenTelemetry integration. This guide shows you how to automatically capture traces from your [Google ADK](https://github.com/google/adk-python) agents and send them to LangSmith for monitoring and analysis.
+LangSmith는 OpenTelemetry 통합을 통해 Google Agent Development Kit(ADK) 애플리케이션 추적을 지원합니다. 이 가이드에서는 [Google ADK](https://github.com/google/adk-python) 에이전트에서 추적을 자동으로 캡처하여 모니터링 및 분석을 위해 LangSmith로 전송하는 방법을 설명합니다.
 
-## Installation
+## 설치
 
-Install the required packages using your preferred package manager:
+선호하는 패키지 매니저를 사용하여 필요한 패키지를 설치하세요:
 
 <CodeGroup>
 
@@ -22,14 +22,14 @@ uv add langsmith google-adk
 </CodeGroup>
 
 <Info>
-Requires LangSmith Python SDK version `langsmith>=0.4.26` for optimal OpenTelemetry support.
+최적의 OpenTelemetry 지원을 위해서는 LangSmith Python SDK 버전 `langsmith>=0.4.26`이 필요합니다.
 </Info>
 
-## Setup
+## 설정
 
-### 1. Configure environment variables
+### 1. 환경 변수 구성
 
-Set your LangSmith API key and project name:
+LangSmith API 키와 프로젝트 이름을 설정하세요:
 
 <CodeGroup>
 
@@ -40,39 +40,39 @@ export LANGSMITH_PROJECT=<your_project_name>
 
 </CodeGroup>
 
-### 2. Configure OpenTelemetry integration
+### 2. OpenTelemetry 통합 구성
 
-In your Google ADK application, import and configure the LangSmith OpenTelemetry integration. This will automatically instrument Google ADK spans for OpenTelemetry.
+Google ADK 애플리케이션에서 LangSmith OpenTelemetry 통합을 가져와 구성하세요. 이렇게 하면 OpenTelemetry용 Google ADK 스팬이 자동으로 계측됩니다.
 
 ```python
 from langsmith.integrations.otel import configure
 
-# Configure LangSmith tracing
-configure(project_name="adk-example")  # Optional: can also use LANGSMITH_PROJECT and LANGSMITH_API_KEY environment variables
+# LangSmith 추적 구성
+configure(project_name="adk-example")  # 선택사항: LANGSMITH_PROJECT 및 LANGSMITH_API_KEY 환경 변수를 사용할 수도 있습니다
 ```
 
-Alternatively, you can use the Openinference GoogleADKInstrumentor:
+또는 Openinference GoogleADKInstrumentor를 사용할 수 있습니다:
 
 ```python
 from langsmith.integrations.otel import configure
 from openinference.instrumentation.google_adk import GoogleADKInstrumentor
 
-# Configure LangSmith tracing
+# LangSmith 추적 구성
 configure(project_name="adk-example")
 
-# Instrument Google ADK directly
+# Google ADK를 직접 계측
 GoogleADKInstrumentor().instrument()
 ```
 
 <Note>
-You do not need to set any OpenTelemetry environment variables or configure exporters manually—`configure()` handles everything automatically.
+OpenTelemetry 환경 변수를 설정하거나 내보내기를 수동으로 구성할 필요가 없습니다. `configure()`가 모든 것을 자동으로 처리합니다.
 </Note>
 
-### 3. Create and run your ADK agent
+### 3. ADK 에이전트 생성 및 실행
 
-Once configured, your Google ADK application will automatically send traces to LangSmith:
+구성이 완료되면 Google ADK 애플리케이션이 자동으로 LangSmith로 추적을 전송합니다:
 
-This example includes a minimal app that sets up an agent, session, and runner, then sends a message and streams events.
+다음 예제는 에이전트, 세션, 러너를 설정한 다음 메시지를 보내고 이벤트를 스트리밍하는 최소한의 앱을 포함합니다.
 
 ```python
 import asyncio
@@ -82,12 +82,12 @@ from google.adk.agents import LlmAgent
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
 
-# Configure LangSmith tracing
+# LangSmith 추적 구성
 configure(project_name="travel-assistant")
 
-# Define your tools
+# 도구 정의
 def get_flight_info(destination: str, departure_date: str) -> dict:
-    """Get flight information for a destination."""
+    """목적지에 대한 항공편 정보를 가져옵니다."""
     return {
         "destination": destination,
         "departure_date": departure_date,
@@ -97,7 +97,7 @@ def get_flight_info(destination: str, departure_date: str) -> dict:
     }
 
 def get_hotel_recommendations(city: str, check_in: str) -> dict:
-    """Get hotel recommendations for a city."""
+    """도시에 대한 호텔 추천을 가져옵니다."""
     return {
         "city": city,
         "check_in": check_in,
@@ -108,7 +108,7 @@ def get_hotel_recommendations(city: str, check_in: str) -> dict:
     }
 
 async def main():
-    # Create your ADK agent
+    # ADK 에이전트 생성
     agent = LlmAgent(
         name="travel_assistant",
         tools=[get_flight_info, get_hotel_recommendations],
@@ -116,7 +116,7 @@ async def main():
         instruction="You are a helpful travel assistant that can help with flights and hotels.",
     )
 
-    # Set up session service and runner
+    # 세션 서비스 및 러너 설정
     session_service = InMemorySessionService()
     runner = Runner(
         app_name="travel_app",
@@ -124,7 +124,7 @@ async def main():
         session_service=session_service
     )
 
-    # Create a session
+    # 세션 생성
     user_id = "traveler_456"
     session_id = "session_789"
     await session_service.create_session(
@@ -133,13 +133,13 @@ async def main():
         session_id=session_id
     )
 
-    # Send a message to the agent
+    # 에이전트에게 메시지 전송
     new_message = types.Content(
         parts=[types.Part(text="I need to book a flight to Paris for March 15th and find a good hotel.")],
         role="user",
     )
 
-    # Run the agent and process events
+    # 에이전트 실행 및 이벤트 처리
     events = runner.run(
         user_id=user_id,
         session_id=session_id,
@@ -153,31 +153,30 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-## View traces in LangSmith
+## LangSmith에서 추적 보기
 
-- **Agent conversations**: Complete conversation flows between users and your ADK agents.
-- **Tool calls**: Individual function calls made by your agents.
-- **Model interactions**: LLM requests and responses using Gemini models.
-- **Session information**: User and session context for organizing related traces.
-- **Model interactions**: LLM requests and responses using Gemini models
+- **에이전트 대화**: 사용자와 ADK 에이전트 간의 완전한 대화 흐름
+- **도구 호출**: 에이전트가 수행한 개별 함수 호출
+- **모델 상호작용**: Gemini 모델을 사용한 LLM 요청 및 응답
+- **세션 정보**: 관련 추적을 구성하기 위한 사용자 및 세션 컨텍스트
 
-![LangSmith dashboard with raw input from run and trace information.](/langsmith/images/adk.png)
+![실행의 원시 입력 및 추적 정보가 포함된 LangSmith 대시보드.](/langsmith/images/adk.png)
 
-## Advanced usage
+## 고급 사용법
 
-### Custom metadata and tags
+### 커스텀 메타데이터 및 태그
 
-You can add custom metadata to your traces by setting span attributes in your ADK application:
+ADK 애플리케이션에서 스팬 속성을 설정하여 추적에 커스텀 메타데이터를 추가할 수 있습니다:
 
 ```python
 from opentelemetry import trace
 
-# Get the current tracer
+# 현재 추적기 가져오기
 tracer = trace.get_tracer(__name__)
 
 async def main():
     with tracer.start_as_current_span("travel_booking_session") as span:
-        # Add custom metadata
+        # 커스텀 메타데이터 추가
         span.set_attribute("langsmith.metadata.user_type", "premium")
         span.set_attribute("langsmith.metadata.booking_source", "mobile_app")
         span.set_attribute("langsmith.span.tags", "travel,booking,premium")
@@ -196,6 +195,6 @@ async def main():
             session_service=session_service
         )
 
-        # Continue with your ADK workflow
+        # ADK 워크플로우 계속
         # ...
 ```
