@@ -1,15 +1,15 @@
 ---
-title: Enqueue concurrent
+title: 동시 실행 큐에 추가
 sidebarTitle: Enqueue
 ---
 
-This guide assumes knowledge of what double-texting is, which you can learn about in the [double-texting conceptual guide](/langsmith/double-texting).
+이 가이드는 double-texting이 무엇인지에 대한 지식을 전제로 합니다. 이에 대해서는 [double-texting 개념 가이드](/langsmith/double-texting)에서 배울 수 있습니다.
 
-The guide covers the `enqueue` option for double texting, which adds the interruptions to a queue and executes them in the order they are received by the client. Below is a quick example of using the `enqueue` option.
+이 가이드는 double-texting을 위한 `enqueue` 옵션을 다룹니다. 이 옵션은 중단 요청을 큐에 추가하고 클라이언트가 수신한 순서대로 실행합니다. 다음은 `enqueue` 옵션을 사용하는 간단한 예제입니다.
 
-## Setup
+## 설정
 
-First, we will define a quick helper function for printing out JS and CURL model outputs (you can skip this if using Python):
+먼저, JS 및 CURL 모델 출력을 출력하기 위한 간단한 헬퍼 함수를 정의하겠습니다 (Python을 사용하는 경우 이 단계를 건너뛸 수 있습니다):
 
 <Tabs>
     <Tab title="Javascript">
@@ -49,7 +49,7 @@ First, we will define a quick helper function for printing out JS and CURL model
     </Tab>
 </Tabs>
 
-Then, let's import our required packages and instantiate our client, assistant, and thread.
+그런 다음, 필요한 패키지를 임포트하고 클라이언트, 어시스턴트, 스레드를 인스턴스화하겠습니다.
 
 <Tabs>
     <Tab title="Python">
@@ -87,9 +87,9 @@ Then, let's import our required packages and instantiate our client, assistant, 
     </Tab>
 </Tabs>
 
-## Create runs
+## 실행 생성
 
-Now let's start two runs, with the second interrupting the first one with a multitask strategy of "enqueue":
+이제 두 개의 실행을 시작하겠습니다. 두 번째 실행은 "enqueue" 멀티태스크 전략으로 첫 번째 실행을 중단합니다:
 
 <Tabs>
     <Tab title="Python">
@@ -143,9 +143,9 @@ Now let's start two runs, with the second interrupting the first one with a mult
     </Tab>
 </Tabs>
 
-## View run results
+## 실행 결과 확인
 
-Verify that the thread has data from both runs:
+스레드에 두 실행의 데이터가 모두 있는지 확인합니다:
 
 <Tabs>
     <Tab title="Python">
@@ -184,7 +184,7 @@ Verify that the thread has data from both runs:
     </Tab>
 </Tabs>
 
-Output:
+출력:
 
 ```
 ================================ Human Message =================================
