@@ -1,21 +1,21 @@
 ---
-title: Trace JS functions in serverless environments
-sidebarTitle: Trace JS functions in serverless environments
+title: 서버리스 환경에서 JS 함수 추적하기
+sidebarTitle: 서버리스 환경에서 JS 함수 추적하기
 ---
 
 <Note>
-This section is relevant for those using the LangSmith JS SDK version 0.2.0 and higher. If you are tracing using LangChain.js or LangGraph.js in serverless environments, see [this guide](https://js.langchain.com/docs/how_to/callbacks_serverless).
+이 섹션은 LangSmith JS SDK 버전 0.2.0 이상을 사용하는 분들과 관련이 있습니다. 서버리스 환경에서 LangChain.js 또는 LangGraph.js를 사용하여 추적하는 경우 [이 가이드](https://js.langchain.com/docs/how_to/callbacks_serverless)를 참조하세요.
 </Note>
 
-When tracing JavaScript functions, LangSmith will trace runs in the background by default to avoid adding latency. In serverless environments where the execution context may be terminated abruptly, it's important to ensure that all tracing data is properly flushed before the function completes.
+JavaScript 함수를 추적할 때, LangSmith는 지연 시간 추가를 방지하기 위해 기본적으로 백그라운드에서 실행을 추적합니다. 실행 컨텍스트가 갑자기 종료될 수 있는 서버리스 환경에서는 함수가 완료되기 전에 모든 추적 데이터가 적절히 플러시되는지 확인하는 것이 중요합니다.
 
-To make sure this occurs, you can either:
+이를 보장하기 위해 다음 중 하나를 수행할 수 있습니다:
 
-* Set an environment variable named `LANGSMITH_TRACING_BACKGROUND` to `"false"`. This will cause your traced functions to wait for tracing to complete before returning.
-  * Note that this is named differently from the [environment variable](https://js.langchain.com/docs/how_to/callbacks_serverless) in LangChain.js because LangSmith can be used without LangChain.
-* Pass a custom client into your traced runs and `await` the `client.awaitPendingTraceBatches();` method.
+* `LANGSMITH_TRACING_BACKGROUND`라는 환경 변수를 `"false"`로 설정합니다. 이렇게 하면 추적된 함수가 반환되기 전에 추적이 완료될 때까지 대기하게 됩니다.
+  * 이 환경 변수의 이름은 LangSmith가 LangChain 없이도 사용될 수 있기 때문에 LangChain.js의 [환경 변수](https://js.langchain.com/docs/how_to/callbacks_serverless)와 다르게 명명되었습니다.
+* 추적된 실행에 사용자 정의 클라이언트를 전달하고 `client.awaitPendingTraceBatches();` 메서드를 `await`합니다.
 
-Here's an example of using `awaitPendingTraceBatches` alongside the [`traceable`](/langsmith/annotate-code) method:
+다음은 [`traceable`](/langsmith/annotate-code) 메서드와 함께 `awaitPendingTraceBatches`를 사용하는 예제입니다:
 
 ```typescript
 import { Client } from "langsmith";
@@ -33,26 +33,26 @@ const res = await tracedFn();
 await langsmithClient.awaitPendingTraceBatches();
 ```
 
-## Rate limits at high concurrency[](#rate-limits-at-high-concurrency "Direct link to Rate limits at high concurrency")
+## 높은 동시성에서의 속도 제한[](#rate-limits-at-high-concurrency "높은 동시성에서의 속도 제한에 대한 직접 링크")
 
-By default, the LangSmith client will batch operations as your traced run executions, sending a new batch every few milliseconds.
+기본적으로 LangSmith 클라이언트는 추적된 실행이 실행되는 동안 작업을 일괄 처리하여 몇 밀리초마다 새로운 배치를 전송합니다.
 
-This works well in most situations, but if your traced function is long-running and you have very high concurrency, you may also hit rate limits related to overall request count.
+이는 대부분의 상황에서 잘 작동하지만, 추적된 함수가 오래 실행되고 동시성이 매우 높은 경우 전체 요청 수와 관련된 속도 제한에 도달할 수 있습니다.
 
-If you are seeing rate limit errors related to this, you can try setting `manualFlushMode: true` in your client like this:
+이와 관련된 속도 제한 오류가 발생하는 경우 다음과 같이 클라이언트에서 `manualFlushMode: true`를 설정해 볼 수 있습니다:
 
 ```typescript
 import { Client } from "langsmith";
 const langsmithClient = new Client({  manualFlushMode: true,});
 const myTracedFunc = traceable(
   async () => {
-    // Your logic here...
+    // 여기에 로직 작성...
   },
   { client: langsmithClient }
 );
 ```
 
-And then manually calling `client.flush()` like this before your serverless function closes:
+그런 다음 서버리스 함수가 종료되기 전에 다음과 같이 `client.flush()`를 수동으로 호출합니다:
 
 ```typescript
 try {
@@ -62,4 +62,4 @@ try {
 }
 ```
 
-Note that this will prevent runs from appearing in the LangSmith UI until you call `.flush()`.
+이 경우 `.flush()`를 호출할 때까지 실행이 LangSmith UI에 나타나지 않습니다.

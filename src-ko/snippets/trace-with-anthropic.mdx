@@ -1,13 +1,13 @@
-The `wrap_anthropic` methods in Python allows you to wrap your Anthropic client in order to automatically log traces -- no decorator or function wrapping required! Using the wrapper ensures that messages, including tool calls and multimodal content blocks will be rendered nicely in LangSmith. The wrapper works seamlessly with the `@traceable` decorator or `traceable` function and you can use both in the same application.
+Python의 `wrap_anthropic` 메서드를 사용하면 데코레이터나 함수 래핑 없이도 Anthropic 클라이언트를 래핑하여 자동으로 트레이스를 기록할 수 있습니다! 래퍼를 사용하면 도구 호출 및 멀티모달 콘텐츠 블록을 포함한 메시지가 LangSmith에서 깔끔하게 렌더링됩니다. 래퍼는 `@traceable` 데코레이터 또는 `traceable` 함수와 원활하게 작동하며, 동일한 애플리케이션에서 두 가지 모두를 사용할 수 있습니다.
 
 <Note>
-The `LANGSMITH_TRACING` environment variable must be set to `'true'` in order for traces to be logged to LangSmith, even when using `wrap_anthropic`. This allows you to toggle tracing on and off without changing your code.
+`wrap_anthropic`을 사용하는 경우에도 트레이스를 LangSmith에 기록하려면 `LANGSMITH_TRACING` 환경 변수를 `'true'`로 설정해야 합니다. 이를 통해 코드를 변경하지 않고도 트레이싱을 켜고 끌 수 있습니다.
 
-Additionally, you will need to set the `LANGSMITH_API_KEY` environment variable to your API key (see [Setup](/) for more information).
+또한 `LANGSMITH_API_KEY` 환경 변수를 API 키로 설정해야 합니다(자세한 내용은 [설정](/)을 참조하세요).
 
-If your LangSmith API key is linked to multiple workspaces, set the `LANGSMITH_WORKSPACE_ID` environment variable to specify which workspace to use.
+LangSmith API 키가 여러 워크스페이스에 연결된 경우, `LANGSMITH_WORKSPACE_ID` 환경 변수를 설정하여 사용할 워크스페이스를 지정하세요.
 
-By default, the traces will be logged to a project named `default`. To log traces to a different project, see [this section](/langsmith/log-traces-to-project).
+기본적으로 트레이스는 `default`라는 이름의 프로젝트에 기록됩니다. 다른 프로젝트에 트레이스를 기록하려면 [이 섹션](/langsmith/log-traces-to-project)을 참조하세요.
 </Note>
 
 ```python

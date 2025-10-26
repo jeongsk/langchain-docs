@@ -1,13 +1,13 @@
 ---
-title: Troubleshoot variable caching
-sidebarTitle: Troubleshoot variable caching
+title: 변수 캐싱 문제 해결
+sidebarTitle: 변수 캐싱 문제 해결
 ---
 
-If you're not seeing traces in your tracing project or notice traces logged to the wrong project/workspace, the issue might be due to LangSmith's default environment variable caching. This is especially common when running LangSmith within a Jupyter notebook. Follow these steps to diagnose and resolve the issue:
+추적 프로젝트에서 트레이스가 표시되지 않거나 잘못된 프로젝트/워크스페이스에 트레이스가 기록되는 경우, LangSmith의 기본 환경 변수 캐싱으로 인한 문제일 수 있습니다. 이는 특히 Jupyter 노트북 내에서 LangSmith를 실행할 때 자주 발생합니다. 다음 단계에 따라 문제를 진단하고 해결하세요:
 
-## 1. Verify Your Environment Variables
+## 1. 환경 변수 확인
 
-First, check that the environment variables are set correctly by running:
+먼저 다음을 실행하여 환경 변수가 올바르게 설정되어 있는지 확인합니다:
 
 ```python
 import os
@@ -17,19 +17,19 @@ print(os.getenv("LANGSMITH_ENDPOINT"))
 print(os.getenv("LANGSMITH_API_KEY"))
 ```
 
-If the output does not match what's defined in your .env file, it's likely due to environment variable caching.
+출력 결과가 .env 파일에 정의된 내용과 일치하지 않으면, 환경 변수 캐싱으로 인한 문제일 가능성이 높습니다.
 
-## 2. Clear the cache
+## 2. 캐시 지우기
 
-Clear the cached environment variables with the following command:
+다음 명령어로 캐시된 환경 변수를 지웁니다:
 
 ```python
 utils.get_env_var.cache_clear()
 ```
 
-## 3. Reload the Environment Variables
+## 3. 환경 변수 다시 로드
 
-Reload your environment variables from the .env file by executing:
+다음을 실행하여 .env 파일에서 환경 변수를 다시 로드합니다:
 
 ```python
 from dotenv import load_dotenv
@@ -37,6 +37,6 @@ import os
 load_dotenv(<path to .env file>, override=True)
 ```
 
-After reloading, your environment variables should be set correctly.
+다시 로드한 후에는 환경 변수가 올바르게 설정되어야 합니다.
 
-If you continue to experience issues, please reach out to us via a shared Slack channel or email support (available for Plus and Enterprise plans), or in the [LangChain Forum](https://forum.langchain.com/).
+문제가 계속 발생하면 공유 Slack 채널이나 이메일 지원(Plus 및 Enterprise 플랜에서 이용 가능)을 통해 문의하시거나 [LangChain 포럼](https://forum.langchain.com/)에서 도움을 요청하세요.

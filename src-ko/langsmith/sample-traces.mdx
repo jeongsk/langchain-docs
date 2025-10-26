@@ -1,48 +1,48 @@
 ---
-title: Set a sampling rate for traces
-sidebarTitle: Set a sampling rate for traces
+title: 트레이스 샘플링 비율 설정
+sidebarTitle: 트레이스 샘플링 비율 설정
 ---
 
-When working with high-volume applications, you may not want to log every trace to LangSmith. Sampling rates allow you to control what percentage of traces are logged, helping you balance observability needs with cost considerations.
+대용량 애플리케이션을 운영할 때는 모든 트레이스를 LangSmith에 기록하지 않을 수도 있습니다. 샘플링 비율을 사용하면 로그에 기록할 트레이스의 비율을 제어하여 관찰 가능성 요구 사항과 비용 고려 사항 간의 균형을 맞출 수 있습니다.
 
-## Set a global sampling rate
+## 전역 샘플링 비율 설정
 
 <Note>
-This section is relevant for those using the LangSmith SDK or LangChain, not for those logging directly with the LangSmith API.
+이 섹션은 LangSmith API로 직접 로깅하는 사용자가 아닌 LangSmith SDK 또는 LangChain을 사용하는 사용자에게 해당됩니다.
 </Note>
 
-By default, all traces are logged to LangSmith. To down-sample the number of traces logged to LangSmith, set the `LANGSMITH_TRACING_SAMPLING_RATE` environment variable to any float between `0` (no traces) and `1` (all traces). For instance, setting the following environment variable will log 75% of the traces.
+기본적으로 모든 트레이스는 LangSmith에 기록됩니다. LangSmith에 기록되는 트레이스 수를 다운샘플링하려면 `LANGSMITH_TRACING_SAMPLING_RATE` 환경 변수를 `0`(트레이스 없음)과 `1`(모든 트레이스) 사이의 부동 소수점 값으로 설정하세요. 예를 들어, 다음 환경 변수를 설정하면 트레이스의 75%가 기록됩니다.
 
 ```bash
 export LANGSMITH_TRACING_SAMPLING_RATE=0.75
 ```
 
-This works for the `traceable` decorator and `RunTree` objects.
+이 설정은 `traceable` 데코레이터와 `RunTree` 객체에 적용됩니다.
 
-## Set different sampling rates per client
+## 클라이언트별로 다른 샘플링 비율 설정
 
-You can also set sampling rates on specific `Client` instances and use the `tracing_context` context manager:
+특정 `Client` 인스턴스에 샘플링 비율을 설정하고 `tracing_context` 컨텍스트 매니저를 사용할 수도 있습니다:
 
 ```python
 from langsmith import Client, tracing_context
 
-# Create clients with different sampling rates
-client_1 = Client(tracing_sampling_rate=0.5)  # 50% sampling
-client_2 = Client(tracing_sampling_rate=0.25)  # 25% sampling
-client_no_trace = Client(tracing_sampling_rate=0.0)  # No tracing
+# 다양한 샘플링 비율로 클라이언트 생성
+client_1 = Client(tracing_sampling_rate=0.5)  # 50% 샘플링
+client_2 = Client(tracing_sampling_rate=0.25)  # 25% 샘플링
+client_no_trace = Client(tracing_sampling_rate=0.0)  # 트레이싱 없음
 
-# Use different sampling rates for different operations
+# 작업별로 다른 샘플링 비율 사용
 with tracing_context(client=client_1):
-    # Your code here - will be traced with 50% sampling rate
+    # 여기에 코드 작성 - 50% 샘플링 비율로 트레이싱됨
     agent_1.invoke(...)
 
 with tracing_context(client=client_2):
-    # Your code here - will be traced with 25% sampling rate
+    # 여기에 코드 작성 - 25% 샘플링 비율로 트레이싱됨
     agent_1.invoke(...)
 
 with tracing_context(client=client_no_trace):
-    # Your code here - will not be traced
+    # 여기에 코드 작성 - 트레이싱되지 않음
     agent_1.invoke(...)
 ```
 
-This allows you to control sampling rates at the operation level.
+이를 통해 작업 수준에서 샘플링 비율을 제어할 수 있습니다.

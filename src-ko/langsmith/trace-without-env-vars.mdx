@@ -1,24 +1,24 @@
 ---
-title: Trace without setting environment variables
-sidebarTitle: Trace without env vars
+title: 환경 변수를 설정하지 않고 트레이싱하기
+sidebarTitle: 환경 변수 없이 트레이싱
 keywords: cloudflare, cloudflare workers, serverless
 ---
 
-As mentioned in other guides, the following environment variables allow you to configure tracing enabled, the api endpoint, the api key, and the tracing project:
+다른 가이드에서 설명한 것처럼, 다음 환경 변수를 사용하여 트레이싱 활성화, API 엔드포인트, API 키 및 트레이싱 프로젝트를 구성할 수 있습니다:
 
 * `LANGSMITH_TRACING`
 * `LANGSMITH_API_KEY`
 * `LANGSMITH_ENDPOINT`
 * `LANGSMITH_PROJECT`
 
-If you need to trace runs with a custom configuration, are working in an environment that doesn’t support typical environment variables (such as Cloudflare Workers), or would simply prefer not to rely on environment variables, LangSmith allows you to configure tracing programmatically.
+커스텀 구성으로 실행을 트레이싱해야 하거나, Cloudflare Workers와 같이 일반적인 환경 변수를 지원하지 않는 환경에서 작업하거나, 단순히 환경 변수에 의존하지 않으려는 경우, LangSmith를 사용하면 프로그래밍 방식으로 트레이싱을 구성할 수 있습니다.
 
 <Warning>
-Due to a number of asks for finer-grained control of tracing using the `trace` context manager, **we changed the behavior** of `with trace` to honor the `LANGSMITH_TRACING` environment variable in version **0.1.95** of the Python SDK. You can find more details in the [release notes](https://github.com/langchain-ai/langsmith-sdk/releases/tag/v0.1.95). The recommended way to disable/enable tracing without setting environment variables is to use the `with tracing_context` context manager, as shown in the example below.
+`trace` 컨텍스트 매니저를 사용한 트레이싱의 세밀한 제어에 대한 여러 요청으로 인해, Python SDK 버전 **0.1.95**에서 **`with trace`의 동작이 변경**되어 `LANGSMITH_TRACING` 환경 변수를 준수하도록 했습니다. 자세한 내용은 [릴리스 노트](https://github.com/langchain-ai/langsmith-sdk/releases/tag/v0.1.95)에서 확인할 수 있습니다. 환경 변수를 설정하지 않고 트레이싱을 비활성화/활성화하는 권장 방법은 아래 예제와 같이 `with tracing_context` 컨텍스트 매니저를 사용하는 것입니다.
 </Warning>
 
-- Python: The recommended way to do this in Python is to use the `tracing_context` context manager. This works for both code annotated with `traceable` and code within the `trace` context manager.
-- TypeScript: You can pass in both the client and the `tracingEnabled` flag to the `traceable` decorator.
+- Python: Python에서 이를 수행하는 권장 방법은 `tracing_context` 컨텍스트 매니저를 사용하는 것입니다. 이는 `traceable`로 주석이 달린 코드와 `trace` 컨텍스트 매니저 내의 코드 모두에서 작동합니다.
+- TypeScript: `traceable` 데코레이터에 클라이언트와 `tracingEnabled` 플래그를 모두 전달할 수 있습니다.
 
 <CodeGroup>
 
@@ -96,4 +96,4 @@ await pipeline("Can you summarize this morning's meetings?");
 
 </CodeGroup>
 
-If you prefer a video tutorial, check out the [Alternative Ways to Trace video](https://academy.langchain.com/pages/intro-to-langsmith-preview) from the Introduction to LangSmith Course.
+비디오 튜토리얼을 선호하는 경우, Introduction to LangSmith Course의 [Alternative Ways to Trace 비디오](https://academy.langchain.com/pages/intro-to-langsmith-preview)를 확인하세요.
