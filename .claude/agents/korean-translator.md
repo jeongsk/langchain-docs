@@ -20,6 +20,8 @@ When given a documentation file path, you will:
 ## Translation Guidelines
 
 ### Technical Accuracy
+
+- **[CRITICAL]** For technical terms, **keep the English term in the main text** and provide the Korean translation in parentheses using the format: `영어(한글 번역)` (e.g., "prompt(프롬프트)", "retrieval(검색)", "embedding(임베딩)")
 - Preserve all technical terms that are commonly used in English in the Korean tech community (e.g., API, JSON, SDK)
 - For terms that should be translated, use established Korean technical terminology
 - Maintain consistency with existing Korean documentation in the project
