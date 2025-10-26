@@ -1,27 +1,27 @@
 ---
-title: Share or unshare a trace publicly
-sidebarTitle: Share or unshare a trace publicly
+title: 트레이스 공개적으로 공유하기 또는 공유 해제하기
+sidebarTitle: 트레이스 공개 공유/공유 해제
 ---
 
 <Warning>
-**Sharing a trace publicly will make it accessible to anyone with the link. Make sure you're not sharing sensitive information.**
+**트레이스를 공개적으로 공유하면 링크를 가진 모든 사람이 접근할 수 있습니다. 민감한 정보를 공유하지 않도록 주의하세요.**
 
-If your self-hosted or hybrid LangSmith deployment is within a VPC, then the public link is accessible only to members authenticated within your VPC. For enhanced security, we recommend configuring your instance with a private URL accessible only to users with access to your network.
+자체 호스팅 또는 하이브리드 LangSmith 배포가 VPC 내에 있는 경우, 공개 링크는 VPC 내에서 인증된 멤버만 접근할 수 있습니다. 보안 강화를 위해 네트워크에 대한 접근 권한이 있는 사용자만 접근할 수 있는 프라이빗 URL로 인스턴스를 구성하는 것을 권장합니다.
 </Warning>
 
-To share a trace publicly, simply click on the **Share** button in the upper right hand side of any trace view.
+트레이스를 공개적으로 공유하려면, 트레이스 뷰의 오른쪽 상단에 있는 **Share** 버튼을 클릭하면 됩니다.
 ![](/langsmith/images/share-trace.png)
 
-This will open a dialog where you can copy the link to the trace.
+이 작업을 수행하면 트레이스 링크를 복사할 수 있는 대화 상자가 열립니다.
 
-Shared traces will be accessible to anyone with the link, even if they don't have a LangSmith account. They will be able to view the trace, but not edit it.
+공유된 트레이스는 LangSmith 계정이 없는 사람도 링크만 있으면 접근할 수 있습니다. 트레이스를 볼 수는 있지만 편집할 수는 없습니다.
 
-To "unshare" a trace, either:
+트레이스 공유를 "해제"하려면 다음 중 하나를 수행하세요:
 
-1. Click on **Unshare** by clicking on **Public** in the upper right hand corner of any publicly shared trace, then **Unshare** in the dialog.
+1. 공개적으로 공유된 트레이스의 오른쪽 상단 모서리에 있는 **Public**을 클릭한 다음, 대화 상자에서 **Unshare**를 클릭하여 공유를 해제합니다.
    ![](/langsmith/images/unshare-trace.png)
 
-2. Navigate to your organization's list of publicly shared traces, by clicking on **Settings** -> **Shared URLs**, then click on **Unshare** next to the trace you want to unshare.
+2. **Settings** -> **Shared URLs**를 클릭하여 조직의 공개 공유된 트레이스 목록으로 이동한 다음, 공유를 해제하려는 트레이스 옆의 **Unshare**를 클릭합니다.
    ![](/langsmith/images/unshare-trace-list-share.png)
 
 ---

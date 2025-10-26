@@ -1,39 +1,39 @@
 ---
-title: How to run evaluations with Vitest/Jest (beta)
-sidebarTitle: Run evals with Vitest/Jest
+title: Vitest/Jest로 평가를 실행하는 방법 (베타)
+sidebarTitle: Vitest/Jest로 평가 실행
 ---
 
-LangSmith provides integrations with Vitest and Jest that allow JavaScript and TypeScript developers define their datasets and evaluate using familiar syntax.
+LangSmith는 JavaScript 및 TypeScript 개발자가 익숙한 구문을 사용하여 dataset을 정의하고 평가할 수 있도록 Vitest 및 Jest와의 통합을 제공합니다.
 
-![Jest/Vitest reporter output](/langsmith/images/jest-vitest-reporter-output.png)
+![Jest/Vitest 리포터 출력](/langsmith/images/jest-vitest-reporter-output.png)
 
-Compared to the `evaluate()` evaluation flow, this is useful when:
+`evaluate()` 평가 흐름과 비교했을 때, 다음과 같은 경우에 유용합니다:
 
-* Each example requires different evaluation logic
-* You want to assert binary expectations, and both track these assertions in LangSmith and raise assertion errors locally (e.g. in CI pipelines)
-* You want to take advantage of mocks, watch mode, local results, or other features of the Vitest/Jest ecosystems
+* 각 예제가 서로 다른 평가 로직을 필요로 하는 경우
+* 이진 예상 결과를 단언하고, 이러한 단언을 LangSmith에서 추적하면서 동시에 로컬에서(예: CI 파이프라인) 단언 오류를 발생시키려는 경우
+* Vitest/Jest 에코시스템의 mock, watch 모드, 로컬 결과 또는 기타 기능을 활용하고 싶은 경우
 
 <Info>
-Requires JS/TS SDK version `langsmith>=0.3.1`.
+JS/TS SDK 버전 `langsmith>=0.3.1`이 필요합니다.
 </Info>
 
 <Warning>
-The Vitest/Jest integrations are in beta and are subject to change in upcoming releases.
+Vitest/Jest 통합은 베타 버전이며 향후 릴리스에서 변경될 수 있습니다.
 </Warning>
 
 <Info>
-The Python SDK has an analogous [pytest integration](/langsmith/pytest).
+Python SDK에는 유사한 [pytest 통합](/langsmith/pytest)이 있습니다.
 </Info>
 
-## Setup
+## 설정 {#setup}
 
-Set up the integrations as follows. Note that while you can add LangSmith evals alongside your other unit tests (as standard `*.test.ts` files) using your existing test config files, the below examples will also set up a separate test config file and command to run your evals. It will assume you end your test files with `.eval.ts`.
+다음과 같이 통합을 설정합니다. 기존 테스트 설정 파일을 사용하여 다른 단위 테스트와 함께 LangSmith 평가를 추가할 수 있지만(표준 `*.test.ts` 파일로), 아래 예제에서는 평가를 실행하기 위한 별도의 테스트 설정 파일과 명령을 설정합니다. 테스트 파일이 `.eval.ts`로 끝난다고 가정합니다.
 
-This ensures that the custom test reporter and other LangSmith touchpoints do not modify your existing test outputs.
+이렇게 하면 사용자 정의 테스트 리포터 및 기타 LangSmith 터치포인트가 기존 테스트 출력을 수정하지 않습니다.
 
 ### Vitest
 
-Install the required development dependencies if you have not already:
+아직 설치하지 않았다면 필요한 개발 의존성을 설치합니다:
 
 <CodeGroup>
 
@@ -51,7 +51,7 @@ pnpm add -D vitest dotenv
 
 </CodeGroup>
 
-The examples below also require `openai` (and of course `langsmith`!) as a dependency:
+아래 예제에서는 `openai`(그리고 물론 `langsmith`!)도 의존성으로 필요합니다:
 
 <CodeGroup>
 
@@ -69,7 +69,7 @@ pnpm add langsmith openai
 
 </CodeGroup>
 
-Then create a separate `ls.vitest.config.ts` file with the following base config:
+그런 다음 다음 기본 설정으로 별도의 `ls.vitest.config.ts` 파일을 생성합니다:
 
 ```typescript
 import { defineConfig } from "vitest/config";
@@ -83,15 +83,15 @@ export default defineConfig({
 });
 ```
 
-* `include` ensures that only files ending with some variation of `eval.ts` in your project are run
-* `reporters` is responsible for nicely formatting your output as shown above
-* `setupFiles` runs `dotenv` to load environment variables before running your evals
+* `include`는 프로젝트에서 `eval.ts`의 변형으로 끝나는 파일만 실행되도록 보장합니다
+* `reporters`는 위에 표시된 대로 출력을 깔끔하게 포맷하는 역할을 합니다
+* `setupFiles`는 평가를 실행하기 전에 환경 변수를 로드하기 위해 `dotenv`를 실행합니다
 
 <Warning>
-JSDom environments are not supported at this time. You should either omit the `"environment"` field from your config or set it to `"node"`.
+현재 JSDom 환경은 지원되지 않습니다. 설정에서 `"environment"` 필드를 생략하거나 `"node"`로 설정해야 합니다.
 </Warning>
 
-Finally, add the following to the `scripts` field in your `package.json` to run Vitest with the config you just created:
+마지막으로, 방금 생성한 설정으로 Vitest를 실행하기 위해 `package.json`의 `scripts` 필드에 다음을 추가합니다:
 
 ```json
 {
@@ -108,11 +108,11 @@ Finally, add the following to the `scripts` field in your `package.json` to run 
 }
 ```
 
-Note that the above script disables Vitest's default watch mode for running evals since many evaluators may include longer running LLM calls.
+위 스크립트는 많은 evaluator가 더 오래 실행되는 LLM 호출을 포함할 수 있으므로 평가 실행을 위한 Vitest의 기본 watch 모드를 비활성화합니다.
 
 ### Jest
 
-Install the required development dependencies if you have not already:
+아직 설치하지 않았다면 필요한 개발 의존성을 설치합니다:
 
 <CodeGroup>
 
@@ -130,7 +130,7 @@ pnpm add -D jest dotenv
 
 </CodeGroup>
 
-The examples below also require `openai` (and of course `langsmith`!) as a dependency:
+아래 예제에서는 `openai`(그리고 물론 `langsmith`!)도 의존성으로 필요합니다:
 
 <CodeGroup>
 
@@ -149,10 +149,10 @@ pnpm add langsmith openai
 </CodeGroup>
 
 <Info>
-The setup instructions below are for basic JS files and CJS. To add support for TypeScript and ESM, see Jest's official docs or use [Vitest](#vitest).
+아래 설정 지침은 기본 JS 파일 및 CJS용입니다. TypeScript 및 ESM 지원을 추가하려면 Jest의 공식 문서를 참조하거나 [Vitest](#vitest)를 사용하세요.
 </Info>
 
-Then create a separate config file named `ls.jest.config.cjs`:
+그런 다음 `ls.jest.config.cjs`라는 별도의 설정 파일을 생성합니다:
 
 ```javascript
 module.exports = {
@@ -162,15 +162,15 @@ module.exports = {
 };
 ```
 
-* `testMatch` ensures that only files ending with some variation of `eval.js` in your project are run
-* `reporters` is responsible for nicely formatting your output as shown above
-* `setupFiles` runs `dotenv` to load environment variables before running your evals
+* `testMatch`는 프로젝트에서 `eval.js`의 변형으로 끝나는 파일만 실행되도록 보장합니다
+* `reporters`는 위에 표시된 대로 출력을 깔끔하게 포맷하는 역할을 합니다
+* `setupFiles`는 평가를 실행하기 전에 환경 변수를 로드하기 위해 `dotenv`를 실행합니다
 
 <Warning>
-JSDom environments are not supported at this time. You should either omit the `"testEnvironment"` field from your config or set it to `"node"`.
+현재 JSDom 환경은 지원되지 않습니다. 설정에서 `"testEnvironment"` 필드를 생략하거나 `"node"`로 설정해야 합니다.
 </Warning>
 
-Finally, add the following to the `scripts` field in your `package.json` to run Jest with the config you just created:
+마지막으로, 방금 생성한 설정으로 Jest를 실행하기 위해 `package.json`의 `scripts` 필드에 다음을 추가합니다:
 
 ```json
 {
@@ -187,15 +187,15 @@ Finally, add the following to the `scripts` field in your `package.json` to run 
 }
 ```
 
-## Define and run evals
+## 평가 정의 및 실행 {#define-and-run-evals}
 
-You can now define evals as tests using familiar Vitest/Jest syntax, with a few caveats:
+이제 익숙한 Vitest/Jest 구문을 사용하여 평가를 테스트로 정의할 수 있습니다. 몇 가지 주의 사항이 있습니다:
 
-* You should import `describe` and `test` from the `langsmith/jest` or `langsmith/vitest` entrypoint
-* You must wrap your test cases in a `describe` block
-* When declaring tests, the signature is slightly different - there is an extra argument containing example inputs and expected outputs
+* `langsmith/jest` 또는 `langsmith/vitest` 엔트리포인트에서 `describe`와 `test`를 import해야 합니다
+* 테스트 케이스를 `describe` 블록으로 래핑해야 합니다
+* 테스트를 선언할 때 서명이 약간 다릅니다 - 예제 입력 및 예상 출력을 포함하는 추가 인수가 있습니다
 
-Try it out by creating a file named `sql.eval.ts` (or `sql.eval.js` if you are using Jest without TypeScript) and pasting the below contents into it:
+`sql.eval.ts`라는 파일을 생성하여(TypeScript 없이 Jest를 사용하는 경우 `sql.eval.js`) 아래 내용을 붙여넣어 시도해 보세요:
 
 ```typescript
 import * as ls from "langsmith/vitest";
@@ -246,16 +246,16 @@ ls.describe("generate sql demo", () => {
 });
 ```
 
-You can think of each `ls.test()` case as corresponding to a dataset example, and `ls.describe()` as defining a LangSmith dataset. If you have LangSmith [tracing environment variables](/#3-set-up-your-environment) set when you run the test suite, the SDK does the following:
+각 `ls.test()` 케이스는 dataset 예제에 해당하고, `ls.describe()`는 LangSmith dataset을 정의하는 것으로 생각할 수 있습니다. 테스트 스위트를 실행할 때 LangSmith [추적 환경 변수](/#3-set-up-your-environment)가 설정되어 있으면 SDK는 다음을 수행합니다:
 
-* creates a [dataset](/langsmith/evaluation-concepts#datasets) with the same name as the name passed to `ls.describe()` in LangSmith if it does not exist
-* creates an example in the dataset for each input and expected output passed into a test case if a matching one does not already exist
-* creates a new [experiment](/langsmith/evaluation-concepts#experiment) with one result for each test case
-* collects the pass/fail rate under the `pass` feedback key for each test case
+* LangSmith에 `ls.describe()`에 전달된 이름과 동일한 이름을 가진 [dataset](/langsmith/evaluation-concepts#datasets)이 존재하지 않으면 생성합니다
+* 일치하는 예제가 아직 존재하지 않으면 각 입력 및 예상 출력에 대해 dataset에 예제를 생성합니다
+* 각 테스트 케이스에 대해 하나의 결과를 가진 새로운 [experiment](/langsmith/evaluation-concepts#experiment)를 생성합니다
+* 각 테스트 케이스에 대해 `pass` 피드백 키 아래에 통과/실패율을 수집합니다
 
-When you run this test it will have a default `pass` boolean feedback key based on the test case passing / failing. It will also track any outputs that you log with the `ls.logOutputs()` or return from the test function as "actual" result values from your app for the experiment.
+이 테스트를 실행하면 테스트 케이스의 통과/실패를 기반으로 기본 `pass` boolean 피드백 키가 생성됩니다. 또한 `ls.logOutputs()`로 기록하거나 테스트 함수에서 반환하는 모든 출력을 experiment에 대한 앱의 "실제" 결과 값으로 추적합니다.
 
-Create a `.env` file with your `OPENAI_API_KEY` and LangSmith credentials if you don't already have one:
+아직 없다면 `OPENAI_API_KEY` 및 LangSmith 자격 증명으로 `.env` 파일을 생성합니다:
 
 ```bash
 OPENAI_API_KEY="YOUR_KEY_HERE"
@@ -263,7 +263,7 @@ LANGSMITH_API_KEY="YOUR_LANGSMITH_KEY"
 LANGSMITH_TRACING="true"
 ```
 
-Now use the `eval` script we set up in the previous step to run the test:
+이제 이전 단계에서 설정한 `eval` 스크립트를 사용하여 테스트를 실행합니다:
 
 <CodeGroup>
 
@@ -281,17 +281,17 @@ pnpm run eval
 
 </CodeGroup>
 
-And your declared test should run!
+선언한 테스트가 실행됩니다!
 
-Once it finishes, if you've set your LangSmith environment variables, you should see a link directing you to an experiment created in LangSmith alongside the test results.
+완료되면 LangSmith 환경 변수를 설정한 경우 테스트 결과와 함께 LangSmith에 생성된 experiment로 연결되는 링크가 표시됩니다.
 
-Here's what an experiment against that test suite looks like:
+해당 테스트 스위트에 대한 experiment는 다음과 같습니다:
 
 ![Experiment](/langsmith/images/simple-vitest.png)
 
-## Trace feedback
+## 추적 피드백 {#trace-feedback}
 
-By default LangSmith collects the pass/fail rate under the `pass` feedback key for each test case. You can add additional feedback with either `ls.logFeedback()` or `wrapEvaluator()`. To do so, try the following as your `sql.eval.ts` file (or `sql.eval.js` if you are using Jest without TypeScript):
+기본적으로 LangSmith는 각 테스트 케이스에 대해 `pass` 피드백 키 아래에 통과/실패율을 수집합니다. `ls.logFeedback()` 또는 `wrapEvaluator()`를 사용하여 추가 피드백을 추가할 수 있습니다. 이를 수행하려면 `sql.eval.ts` 파일(TypeScript 없이 Jest를 사용하는 경우 `sql.eval.js`)로 다음을 시도해 보세요:
 
 ```typescript
 import * as ls from "langsmith/vitest";
@@ -398,13 +398,13 @@ ls.describe("generate sql demo", () => {
 });
 ```
 
-Note the use of `ls.wrapEvaluator()` around the `myEvaluator` function. This makes it so that the LLM-as-judge call is traced separately from the rest of the test case to avoid clutter, and conveniently creates feedback if the return value from the wrapped function matches `{ key: string; score: number | boolean }`. In this case, instead of showing up in the main test case run, the evaluator trace will instead show up in a trace associated with the `correctness` feedback key.
+`myEvaluator` 함수 주변의 `ls.wrapEvaluator()` 사용에 주목하세요. 이렇게 하면 LLM-as-judge 호출이 나머지 테스트 케이스와 별도로 추적되어 혼란을 방지하고, 래핑된 함수의 반환 값이 `{ key: string; score: number | boolean }`과 일치하면 편리하게 피드백을 생성합니다. 이 경우 주요 테스트 케이스 실행에 표시되는 대신 evaluator 추적은 `correctness` 피드백 키와 연결된 추적에 표시됩니다.
 
-You can see the evaluator runs in LangSmith by clicking their corresponding feedback chips in the UI.
+UI에서 해당 피드백 칩을 클릭하여 LangSmith에서 evaluator 실행을 볼 수 있습니다.
 
-## Running multiple examples against a test case
+## 테스트 케이스에 대해 여러 예제 실행 {#running-multiple-examples-against-a-test-case}
 
-You can run the same test case over multiple examples and parameterize your tests using `ls.test.each()`. This is useful when you want to evaluate your app the same way against different inputs:
+`ls.test.each()`를 사용하여 여러 예제에 대해 동일한 테스트 케이스를 실행하고 테스트를 매개변수화할 수 있습니다. 이는 서로 다른 입력에 대해 동일한 방식으로 앱을 평가하려는 경우에 유용합니다:
 
 ```typescript
 import * as ls from "langsmith/vitest";
@@ -435,11 +435,11 @@ ls.describe("generate sql demo", () => {
 });
 ```
 
-If you have tracking enabled, each example in the local dataset will be synced to the one created in LangSmith.
+추적이 활성화되어 있으면 로컬 dataset의 각 예제가 LangSmith에 생성된 dataset과 동기화됩니다.
 
-## Log outputs
+## 출력 기록 {#log-outputs}
 
-Every time we run a test we're syncing it to a dataset example and tracing it as a run. To trace final outputs for the run, you can use `ls.logOutputs()` like this:
+테스트를 실행할 때마다 dataset 예제와 동기화하고 실행으로 추적합니다. 실행에 대한 최종 출력을 추적하려면 다음과 같이 `ls.logOutputs()`를 사용할 수 있습니다:
 
 ```typescript
 import * as ls from "langsmith/vitest";
@@ -459,9 +459,9 @@ ls.describe("generate sql demo", () => {
 });
 ```
 
-The logged outputs will appear in your reporter summary and in LangSmith.
+기록된 출력은 리포터 요약 및 LangSmith에 표시됩니다.
 
-You can also directly return a value from your test function:
+테스트 함수에서 직접 값을 반환할 수도 있습니다:
 
 ```typescript
 import * as ls from "langsmith/vitest";
@@ -481,15 +481,15 @@ ls.describe("generate sql demo", () => {
 });
 ```
 
-However keep in mind if you do this that if your test fails to complete due to a failed assertion or other error, your output will not appear.
+그러나 이렇게 하면 실패한 단언 또는 기타 오류로 인해 테스트가 완료되지 않으면 출력이 표시되지 않는다는 점을 유의하세요.
 
-## Trace intermediate calls
+## 중간 호출 추적 {#trace-intermediate-calls}
 
-LangSmith will automatically trace any traceable intermediate calls that happen in the course of test case execution.
+LangSmith는 테스트 케이스 실행 중에 발생하는 모든 추적 가능한 중간 호출을 자동으로 추적합니다.
 
-## Focusing or skipping tests
+## 테스트 집중 또는 건너뛰기 {#focusing-or-skipping-tests}
 
-You can chain the Vitest/Jest `.skip` and `.only` methods on `ls.test()` and `ls.describe()`:
+`ls.test()` 및 `ls.describe()`에서 Vitest/Jest `.skip` 및 `.only` 메서드를 체이닝할 수 있습니다:
 
 ```typescript
 import * as ls from "langsmith/vitest";
@@ -519,9 +519,9 @@ ls.describe("generate sql demo", () => {
 });
 ```
 
-## Configuring test suites
+## 테스트 스위트 구성 {#configuring-test-suites}
 
-You can configure test suites with values like metadata or a custom client by passing an extra argument to `ls.describe()` for the full suite or by passing a `config` field into `ls.test()` for individual tests:
+전체 스위트에 대해 `ls.describe()`에 추가 인수를 전달하거나 개별 테스트에 대해 `ls.test()`에 `config` 필드를 전달하여 메타데이터 또는 사용자 정의 클라이언트와 같은 값으로 테스트 스위트를 구성할 수 있습니다:
 
 ```typescript
 ls.describe("test suite name", () => {
@@ -548,15 +548,15 @@ ls.describe("test suite name", () => {
 });
 ```
 
-The test suite will also automatically extract environment variables from `process.env.ENVIRONMENT`, `process.env.NODE_ENV` and `process.env.LANGSMITH_ENVIRONMENT` and set them as metadata on created experiments. You can then filter experiments by metadata in LangSmith's UI.
+테스트 스위트는 또한 `process.env.ENVIRONMENT`, `process.env.NODE_ENV` 및 `process.env.LANGSMITH_ENVIRONMENT`에서 환경 변수를 자동으로 추출하고 생성된 experiment의 메타데이터로 설정합니다. 그런 다음 LangSmith의 UI에서 메타데이터로 experiment를 필터링할 수 있습니다.
 
-See [the API refs](https://docs.smith.langchain.com/reference/js/functions/vitest.describe) for a full list of configuration options.
+전체 구성 옵션 목록은 [API 참조](https://docs.smith.langchain.com/reference/js/functions/vitest.describe)를 참조하세요.
 
-## Dry-run mode
+## 드라이런 모드 {#dry-run-mode}
 
-If you want to run the tests without syncing the results to LangSmith, you can set omit your LangSmith tracing environment variables or set `LANGSMITH_TEST_TRACKING=false` in your environment.
+LangSmith에 결과를 동기화하지 않고 테스트를 실행하려면 LangSmith 추적 환경 변수를 생략하거나 환경에서 `LANGSMITH_TEST_TRACKING=false`를 설정할 수 있습니다.
 
-The tests will run as normal, but the experiment logs will not be sent to LangSmith.
+테스트는 정상적으로 실행되지만 experiment 로그는 LangSmith로 전송되지 않습니다.
 
 ---
 
