@@ -1,0 +1,61 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "aspen",
+  "name": "Nothing",
+  "description": "",
+  "colors": {
+    "primary": "#2F6868",
+    "light": "#84C4C0",
+    "dark": "#2F6868"
+  },
+  "logo": {
+  },
+  "favicon": {
+  },
+  "fonts": {
+    "heading": {
+      "family": "Inter"
+    }
+  },
+  "appearance": {
+    "default": "system",
+    "strict": false
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs"
+  },
+  "contextual": {
+  },
+  "integrations": {
+  },
+  "head": [
+    "<link rel=\"stylesheet\" href=\"/style.css\">"
+  ],
+  "footer": {
+  },
+  "banner": {
+  },
+  "navbar": {
+  },
+  "navigation": {
+    "products": [
+      {
+        "product": "Home",
+        "icon": "house",
+        "pages": [
+          "index"
+        ]
+      }
+    ]
+  },
+  "interaction": {
+    "drilldown": true
+  },
+  "errors": {
+    "404": {
+      "redirect": false,
+      "title": "Page not found",
+      "description": "We couldn't find the page you were looking for."
+    }
+  }
+}
