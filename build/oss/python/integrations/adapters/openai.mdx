@@ -1,12 +1,12 @@
 ---
-title: OpenAI 어댑터
+title: OpenAI Adapter
 ---
 
-**OpenAI 라이브러리 버전이 1.0.0 이상인지 확인해 주세요. 이전 버전을 사용하는 경우 [OpenAI Adapter(Old)](/oss/python/integrations/adapters/openai-old/) 문서를 참고하세요.**
+**Please ensure OpenAI library is version 1.0.0 or higher; otherwise, refer to the older doc [OpenAI Adapter(Old)](/oss/python/integrations/adapters/openai-old/).**
 
-많은 사용자가 OpenAI로 시작하지만 다른 모델을 탐색하고 싶어 합니다. LangChain은 다양한 모델 제공자와의 통합을 제공하여 이를 쉽게 만듭니다. LangChain은 자체 메시지 및 모델 API를 제공하지만, LangChain 모델을 OpenAI API에 맞추는 어댑터를 제공하여 다른 모델을 최대한 쉽게 탐색할 수 있도록 합니다.
+A lot of people get started with OpenAI but want to explore other models. LangChain's integrations with many model providers make this easy to do so. While LangChain has it's own message and model APIs, we've also made it as easy as possible to explore other models by exposing an adapter to adapt LangChain models to the OpenAI api.
 
-현재 이 어댑터는 출력만 처리하며 다른 정보(토큰 수, 중지 이유 등)는 반환하지 않습니다.
+At the moment this only deals with output and does not return other information (token counts, stop reasons, etc).
 
 ```python
 import openai
@@ -19,7 +19,7 @@ from langchain_community.adapters import openai as lc_openai
 messages = [{"role": "user", "content": "hi"}]
 ```
 
-원본 OpenAI 호출
+Original OpenAI call
 
 ```python
 result = openai.chat.completions.create(
@@ -35,7 +35,7 @@ result.choices[0].message.model_dump()
  'tool_calls': None}
 ```
 
-LangChain OpenAI 래퍼 호출
+LangChain OpenAI wrapper call
 
 ```python
 lc_result = lc_openai.chat.completions.create(
@@ -57,7 +57,7 @@ lc_result["choices"][0]["message"]  # Also compatible with index access
 {'role': 'assistant', 'content': 'Hello! How can I help you today?'}
 ```
 
-모델 제공자 교체하기
+Swapping out model providers
 
 ```python
 lc_result = lc_openai.chat.completions.create(
@@ -72,7 +72,7 @@ lc_result.choices[0].message
 
 ## chat.completions.stream
 
-원본 OpenAI 호출
+Original OpenAI call
 
 ```python
 for c in openai.chat.completions.create(
@@ -95,7 +95,7 @@ for c in openai.chat.completions.create(
 {'content': None, 'function_call': None, 'role': None, 'tool_calls': None}
 ```
 
-LangChain OpenAI 래퍼 호출
+LangChain OpenAI wrapper call
 
 ```python
 for c in lc_openai.chat.completions.create(
@@ -118,7 +118,7 @@ for c in lc_openai.chat.completions.create(
 {}
 ```
 
-모델 제공자 교체하기
+Swapping out model providers
 
 ```python
 for c in lc_openai.chat.completions.create(

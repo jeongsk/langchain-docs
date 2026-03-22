@@ -1,18 +1,18 @@
 ---
-title: REST API를 사용하여 LangSmith 외부에서 실행한 실험을 업로드하는 방법
-sidebarTitle: LangSmith 외부에서 실행한 실험 업로드
+title: How to upload experiments run outside of LangSmith with the REST API
+sidebarTitle: Upload experiments run outside of LangSmith
 ---
 
-일부 사용자는 데이터셋을 관리하고 실험을 LangSmith 외부에서 실행하지만, 결과를 보기 위해 LangSmith UI를 사용하고자 합니다. 이는 엔드포인트를 통해 지원됩니다.
+Some users prefer to manage their datasets and run their experiments outside of LangSmith, but want to use the LangSmith UI to view the results. This is supported via our endpoint.
 
 
-이 가이드에서는 Python의 `requests` 라이브러리를 예시로 사용하여 REST API를 통해 평가를 업로드하는 방법을 보여드립니다. 하지만 동일한 원칙이 모든 언어에 적용됩니다.
+This guide will show you how to upload evals using the REST API, using the `requests` library in Python as an example. However, the same principles apply to any language.
 
-## 요청 본문 스키마
+## Request body schema
 
-실험을 업로드하려면 실험과 데이터셋에 대한 관련 상위 수준 정보와 함께, 실험 내의 개별 예제 및 실행에 대한 데이터를 지정해야 합니다. `results`의 각 객체는 실험의 "행"을 나타냅니다 - 단일 데이터셋 예제와 연관된 실행입니다. `dataset_id`와 `dataset_name`은 외부 시스템의 데이터셋 식별자를 참조하며, 외부 실험들을 단일 데이터셋으로 그룹화하는 데 사용됩니다. 이들은 LangSmith의 기존 데이터셋을 참조해서는 안 됩니다(이 엔드포인트를 통해 생성된 데이터셋이 아닌 한).
+Uploading an experiment requires specifying the relevant high-level information for your experiment and dataset, along with the individual data for your examples and runs within the experiment. Each object in the `results` represents a "row" in the experiment - a single dataset example, along with an associated run. Note that `dataset_id` and `dataset_name` refer to your dataset identifier in your external system and will be used to group external experiments together in a single dataset. They should not refer to an existing dataset in LangSmith (unless that dataset was created via this endpoint).
 
-다음 스키마를 사용하여 `/datasets/upload-experiment` 엔드포인트에 실험을 업로드할 수 있습니다:
+You may use the following schema to upload experiments to the `/datasets/upload-experiment` endpoint:
 
 ```json
 {
@@ -100,21 +100,21 @@ sidebarTitle: LangSmith 외부에서 실행한 실험 업로드
 }
 ```
 
-응답 JSON은 `experiment`와 `dataset` 키를 가진 딕셔너리이며, 각각은 생성된 실험과 데이터셋에 대한 관련 정보를 포함하는 객체입니다.
+The response JSON will be a dict with keys `experiment` and `dataset`, each of which is an object that contains relevant information about the experiment and dataset that was created.
 
-## 고려 사항
+## Considerations
 
-동일한 dataset\_id 또는 dataset\_name을 여러 호출 간에 제공하여 동일한 데이터셋에 여러 실험을 업로드할 수 있습니다. 실험들은 단일 데이터셋 아래 그룹화되며, [비교 뷰를 사용하여 실험 간 결과를 비교](/langsmith/compare-experiment-results)할 수 있습니다.
+You may upload multiple experiments to the same dataset by providing the same dataset\_id or dataset\_name between multiple calls. Your experiments will be grouped together under a single dataset, and you will be able to [use the comparison view to compare results between experiments](/langsmith/compare-experiment-results).
 
-개별 행의 시작 시간과 종료 시간이 모두 실험의 시작 시간과 종료 시간 사이에 있는지 확인하세요.
+Ensure that the start and end times of your individual rows are all between the start and end time of your experiment.
 
-dataset\_id 또는 dataset\_name 중 하나를 반드시 제공해야 합니다. ID만 제공하고 데이터셋이 아직 존재하지 않는 경우, 이름을 자동으로 생성해 드리며, 이름만 제공하는 경우도 마찬가지입니다.
+You must provide either a dataset\_id or a dataset\_name. If you only provide an ID and the dataset does not yet exist, we will generate a name for you, and vice versa if you only provide a name.
 
-이 엔드포인트를 통해 생성되지 않은 데이터셋에는 실험을 업로드할 수 없습니다. 실험 업로드는 외부에서 관리되는 데이터셋에만 지원됩니다.
+You may not upload experiments to a dataset that was not created via this endpoint. Uploading experiments is only supported for externally-managed datasets.
 
-## 요청 예제
+## Example request
 
-다음은 `/datasets/upload-experiment`에 대한 간단한 호출 예제입니다. 이는 설명을 위해 가장 중요한 필드만 사용한 기본 예제입니다.
+Below is an example of a simple call to the `/datasets/upload-experiment`. This is a basic example that just uses the most important fields as an illustration.
 
 ```python
 import os
@@ -193,7 +193,7 @@ resp = requests.post(
 print(resp.json())
 ```
 
-다음은 받은 응답입니다:
+Below is the response received:
 
 ```json
 {
@@ -246,17 +246,17 @@ print(resp.json())
 }
 ```
 
-실험 결과의 지연 시간과 피드백 통계가 null인 이유는 실행이 아직 저장될 기회가 없었기 때문이며, 이는 몇 초가 걸릴 수 있습니다. 실험 ID를 저장하고 몇 초 후에 다시 조회하면 모든 통계를 볼 수 있습니다(다만, 요청 본문에서 이 정보를 요청하지 않았기 때문에 토큰/비용은 여전히 null일 것입니다).
+Note that the latency and feedback stats in the experiment results are null because the runs haven't had a chance to be persisted yet, which may take a few seconds. If you save the experiment id and query again in a few seconds, you will see all the stats (although tokens/cost will still be null, because we don't ask for this information in the request body).
 
-## UI에서 실험 보기
+## View the experiment in the UI
 
-이제 UI에 로그인하여 새로 생성된 데이터셋을 클릭하세요! 단일 실험이 보일 것입니다: ![업로드된 실험 테이블](/langsmith/images/uploaded-dataset.png)
+Now, login to the UI and click on your newly-created dataset! You should see a single experiment: ![Uploaded experiments table](/langsmith/images/uploaded-dataset.png)
 
-예제들이 업로드되어 있습니다: ![업로드된 예제](/langsmith/images/uploaded-dataset-examples.png)
+Your examples will have been uploaded: ![Uploaded examples](/langsmith/images/uploaded-dataset-examples.png)
 
-실험을 클릭하면 비교 뷰로 이동합니다: ![업로드된 실험 비교 뷰](/langsmith/images/uploaded-experiment.png)
+Clicking on your experiment will bring you to the comparison view: ![Uploaded experiment comparison view](/langsmith/images/uploaded-experiment.png)
 
-데이터셋에 더 많은 실험을 업로드할수록 비교 뷰에서 결과를 비교하고 회귀를 쉽게 식별할 수 있습니다.
+As you upload more experiments to your dataset, you will be able to compare the results and easily identify regressions in the comparison view.
 
 ---
 

@@ -1,18 +1,18 @@
 ---
-title: 분산 추적 구현하기
-sidebarTitle: 분산 추적 구현하기
+title: Implement distributed tracing
+sidebarTitle: Implement distributed tracing
 ---
 
-여러 서비스에 걸쳐 요청을 추적해야 하는 경우가 있습니다.
+Sometimes, you need to trace a request across multiple services.
 
-LangSmith는 컨텍스트 전파 헤더(`langsmith-trace` 및 메타데이터/태그를 위한 선택적 `baggage`)를 사용하여 서비스 간 추적 내 실행을 연결하는 분산 추적을 기본적으로 지원합니다.
+LangSmith supports distributed tracing out of the box, linking runs within a trace across services using context propagation headers (`langsmith-trace` and optional `baggage` for metadata/tags).
 
-클라이언트-서버 설정 예시:
+Example client-server setup:
 
-* 추적이 클라이언트에서 시작됩니다
-* 서버에서 추적이 계속됩니다
+* Trace starts on client
+* Continues on server
 
-## Python에서의 분산 추적
+## Distributed tracing in Python
 
 ```python
 # client.py
@@ -29,13 +29,13 @@ async def my_client_function():
         return await client.post("/my-route", headers=headers)
 ```
 
-그런 다음 서버(또는 다른 서비스)가 헤더를 적절히 처리하여 추적을 계속할 수 있습니다. Starlette 또는 FastAPI와 같은 ASGI 앱을 사용하는 경우 LangSmith의 `TracingMiddleware`를 사용하여 분산 추적을 연결할 수 있습니다.
+Then the server (or other service) can continue the trace by handling the headers appropriately. If you are using an asgi app Starlette or FastAPI, you can connect the distributed trace using LangSmith's `TracingMiddleware`.
 
 <Info>
-`TracingMiddleware` 클래스는 `langsmith==0.1.133`에 추가되었습니다.
+The `TracingMiddleware` class was added in `langsmith==0.1.133`.
 </Info>
 
-FastAPI 사용 예시:
+Example using FastAPI:
 
 ```python
 from langsmith import traceable
@@ -54,7 +54,7 @@ async def fake_route(request: Request):
     return await some_function()
 ```
 
-또는 Starlette에서:
+Or in Starlette:
 
 ```python
 from starlette.applications import Starlette
@@ -68,7 +68,7 @@ middleware = [
 app = Starlette(..., middleware=middleware)
 ```
 
-다른 서버 프레임워크를 사용하는 경우 `langsmith_extra`를 통해 헤더를 전달하여 분산 추적을 항상 "수신"할 수 있습니다:
+If you are using other server frameworks, you can always "receive" the distributed trace by passing the headers in through `langsmith_extra`:
 
 ```python
 # server.py
@@ -89,7 +89,7 @@ async def fake_route(request: Request):
         return await my_application()
 ```
 
-위 예제는 `tracing_context` 컨텍스트 매니저를 사용합니다. `@traceable`로 래핑된 메서드의 `langsmith_extra` 매개변수에서 상위 실행 컨텍스트를 직접 지정할 수도 있습니다.
+The example above uses the `tracing_context` context manager. You can also directly specify the parent run context in the `langsmith_extra` parameter of a method wrapped with `@traceable`.
 
 ```python
 # ... same as above
@@ -100,13 +100,13 @@ async def fake_route(request: Request):
     my_application(langsmith_extra={"parent": request.headers})
 ```
 
-## TypeScript에서의 분산 추적
+## Distributed tracing in TypeScript
 
 <Note>
-TypeScript에서의 분산 추적은 `langsmith` 버전 `>=0.1.31`이 필요합니다
+Distributed tracing in TypeScript requires `langsmith` version `>=0.1.31`
 </Note>
 
-먼저 클라이언트에서 현재 실행 트리를 가져와 `langsmith-trace` 및 `baggage` 헤더 값으로 변환하고 서버에 전달할 수 있습니다:
+First, we obtain the current run tree from the client and convert it to `langsmith-trace` and `baggage` header values, which we can pass to the server:
 
 ```typescript
 // client.mts
@@ -126,9 +126,9 @@ const client = traceable(
 await client();
 ```
 
-그런 다음 서버는 헤더를 다시 실행 트리로 변환하여 추적을 계속 진행합니다.
+Then, the server converts the headers back to a run tree, which it uses to further continue the tracing.
 
-새로 생성된 실행 트리를 traceable 함수에 전달하려면 `withRunTree` 헬퍼를 사용할 수 있으며, 이는 traceable 호출 내에서 실행 트리가 전파되도록 보장합니다.
+To pass the newly created run tree to a traceable function, we can use the `withRunTree` helper, which will ensure the run tree is propagated within traceable invocations.
 
 <CodeGroup>
 

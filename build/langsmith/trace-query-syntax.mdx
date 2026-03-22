@@ -1,47 +1,47 @@
 ---
-title: 트레이스 쿼리 구문
-sidebarTitle: 트레이스 쿼리 구문
+title: Trace query syntax
+sidebarTitle: Trace query syntax
 ---
 
-SDK의 메서드 또는 API의 엔드포인트를 사용하여 분석 및 내보내기할 실행을 필터링할 수 있습니다.
+Using the method in the SDK or endpoint in the API, you can filter runs to analyze and export.
 
-## 필터 인수
+## Filter arguments
 
-| 키                            | 설명                                                                                                                                                                                                                    |
+| Keys                          | Description                                                                                                                                                                                                                    |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `project_id` / `project_name` | 실행을 가져올 프로젝트 - 단일 프로젝트 또는 프로젝트 목록일 수 있습니다.                                                                                                                                             |
-| `trace_id`                    | 특정 트레이스의 일부인 실행을 가져옵니다.                                                                                                                                                                                  |
-| `run_type`                    | 가져올 실행 유형으로, `llm`, `chain`, `tool`, `retriever` 등이 있습니다.                                                                                                                                                      |
-| `dataset_name` / `dataset_id` | 지정된 데이터셋의 예제 행과 연결된 실행을 가져옵니다. 주어진 데이터셋에 대해 프롬프트나 모델을 비교할 때 유용합니다.                                                                              |
-| `reference_example_id`        | 특정 예제 행과 연결된 실행을 가져옵니다. 주어진 입력에 대해 프롬프트나 모델을 비교할 때 유용합니다.                                                                                                   |
-| `parent_run_id`               | 주어진 실행의 하위 실행을 가져옵니다. 컨텍스트 매니저를 사용하여 그룹화된 실행을 가져오거나 에이전트 궤적을 가져올 때 유용합니다.                                                                  |
-| `error`                       | 오류가 발생했거나 발생하지 않은 실행을 가져옵니다.                                                                                                                                                                                      |
-| `run_ids`                     | 주어진 실행 ID 목록과 일치하는 실행을 가져옵니다. 참고: **이 옵션은 다른 모든 필터링 인수를 무시합니다.**                                                                                                                             |
-| `filter`                      | 주어진 구조화된 필터 문과 일치하는 실행을 가져옵니다. 자세한 내용은 아래 가이드를 참조하세요.                                                                                                                           |
-| `trace_filter`                | 트레이스 트리의 ROOT 실행에 적용할 필터입니다. 이는 일반 `filter` 매개변수와 함께 사용하여 트레이스 내 루트 실행의 속성으로 실행을 필터링할 수 있도록 합니다.                            |
-| `tree_filter`                 | 형제 실행 및 하위 실행을 포함하여 트레이스 트리의 다른 실행에 적용할 필터입니다. 이는 일반 `filter` 매개변수와 함께 사용하여 트레이스 내 모든 실행의 속성으로 실행을 필터링할 수 있도록 합니다. |
-| `is_root`                     | 루트 실행만 반환합니다.                                                                                                                                                                                                         |
-| `select`                      | 응답에서 반환할 필드를 선택합니다. 기본적으로 모든 필드가 반환됩니다.                                                                                                                                              |
-| `query` (_실험적_)      | 자연어 쿼리로, 쿼리를 필터 문으로 변환합니다.                                                                                                                                   |
+| `project_id` / `project_name` | The project(s) to fetch runs from - can be a single project or a list of projects.                                                                                                                                             |
+| `trace_id`                    | Fetch runs that are part of a specific trace.                                                                                                                                                                                  |
+| `run_type`                    | The type of run to get, such as `llm`, `chain`, `tool`, `retriever`, etc.                                                                                                                                                      |
+| `dataset_name` / `dataset_id` | Fetch runs that are associated with an example row in the specified dataset. This is useful for comparing prompts or models over a given dataset.                                                                              |
+| `reference_example_id`        | Fetch runs that are associated with a specific example row. This is useful for comparing prompts or models on a given input.                                                                                                   |
+| `parent_run_id`               | Fetch runs that are children of a given run. This is useful for fetching runs grouped together using the context manager or for fetching an agent trajectory.                                                                  |
+| `error`                       | Fetch runs that errored or did not error.                                                                                                                                                                                      |
+| `run_ids`                     | Fetch runs with a given list of run ids. Note: **This will ignore all other filtering arguments.**                                                                                                                             |
+| `filter`                      | Fetch runs that match a given structured filter statement. See the guide below for more information.                                                                                                                           |
+| `trace_filter`                | Filter to apply to the ROOT run in the trace tree. This is meant to be used in conjunction with the regular `filter` parameter to let you filter runs by attributes of the root run within a trace.                            |
+| `tree_filter`                 | Filter to apply to OTHER runs in the trace tree, including sibling and child runs. This is meant to be used in conjunction with the regular `filter` parameter to let you filter runs by attributes of any run within a trace. |
+| `is_root`                     | Only return root runs.                                                                                                                                                                                                         |
+| `select`                      | Select the fields to return in the response. By default, all fields are returned.                                                                                                                                              |
+| `query` (_experimental_)      | Natural language query, which translates your query into a filter statement.                                                                                                                                                   |
 
-## 필터 쿼리 언어
+## Filter query language
 
-LangSmith는 실행을 가져올 때 복잡한 필터링 작업을 수행할 수 있는 필터 쿼리 언어를 통해 강력한 필터링 기능을 지원합니다.
+LangSmith supports powerful filtering capabilities with a filter query language to permit complex filtering operations when fetching runs.
 
-필터링 문법은 실행 객체의 필드에 대한 일반적인 비교 연산자를 기반으로 합니다. 지원되는 비교 연산자는 다음과 같습니다:
+The filtering grammar is based on common comparators on fields in the run object. Supported comparators include:
 
--   `gte` (크거나 같음)
--   `gt` (큼)
--   `lte` (작거나 같음)
--   `lt` (작음)
--   `eq` (같음)
--   `neq` (같지 않음)
--   `has` (실행에 태그 또는 메타데이터 JSON blob이 포함되어 있는지 확인)
--   `search` (문자열 필드에서 하위 문자열 검색)
+-   `gte` (greater than or equal to)
+-   `gt` (greater than)
+-   `lte` (less than or equal to)
+-   `lt` (less than)
+-   `eq` (equal to)
+-   `neq` (not equal to)
+-   `has` (check if run contains a tag or metadata json blob)
+-   `search` (search for a substring in a string field)
 
-또한 `and` 연산자를 통해 여러 비교를 결합할 수 있습니다.
+Additionally, you can combine multiple comparisons through the `and` operator.
 
-이들은 실행 객체의 `id`, `name`, `run_type`, `start_time` / `end_time`, `latency`, `total_tokens`, `error`, `execution_order`, `tags` 등의 필드와 `feedback_key` 및 `feedback_score`를 통한 관련 피드백에 적용할 수 있습니다.
+These can be applied on fields of the run object, such as its `id`, `name`, `run_type`, `start_time` / `end_time`, `latency`, `total_tokens`, `error`, `execution_order`, `tags`, and any associated feedback through `feedback_key` and `feedback_score`.
 
 ---
 

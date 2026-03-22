@@ -1,29 +1,29 @@
 ---
-title: LangSmith Deployment를 위한 Control plane API 레퍼런스
+title: Control plane API reference for LangSmith Deployment
 sidebarTitle: Control plane API
 ---
 
-Control plane API는 [LangSmith Deployment](/langsmith/deployments)의 일부입니다. Control plane API를 사용하면 [LangGraph Server](/langsmith/langgraph-server) 배포를 프로그래밍 방식으로 생성, 관리 및 자동화할 수 있습니다. 예를 들어, 사용자 정의 CI/CD 워크플로의 일부로 활용할 수 있습니다.
+The control plane API is part of [LangSmith Deployment](/langsmith/deployments). With the control plane API, you can programmatically create, manage, and automate your [LangGraph Server](/langsmith/langgraph-server) deployments—for example, as part of a custom CI/CD workflow.
 
 <Card title="API Reference" href="https://api.host.langchain.com/docs" icon="book">
-  전체 Control Plane API 레퍼런스 문서 보기
+  View the full Control Plane API reference documentation
 </Card>
 
-## 호스트
+## Host
 
-클라우드 데이터 지역별 control plane 호스트:
+The control plane hosts for Cloud data regions:
 
 | US | EU |
 |----|----|
 | `https://api.host.langchain.com` | `https://eu.api.host.langchain.com` |
 
-**참고**: 자체 호스팅되는 LangSmith 배포의 경우 control plane에 대한 사용자 정의 호스트가 있습니다. Control plane API는 `/api-host` 경로에서 액세스할 수 있습니다. 예를 들어, `http(s)://<host>/api-host/v2/deployments`입니다. 자세한 내용은 [여기](../langsmith/self-host-usage#configuring-the-application-you-want-to-use-with-langsmith)를 참조하세요.
+**Note**: Self-hosted deployments of LangSmith will have a custom host for the control plane. The control plane APIs can be accessed at the path `/api-host`. For example, `http(s)://<host>/api-host/v2/deployments`. See [here](../langsmith/self-host-usage#configuring-the-application-you-want-to-use-with-langsmith) for more details.
 
-## 인증
+## Authentication
 
-Control plane API로 인증하려면 `X-Api-Key` 헤더를 유효한 LangSmith API 키로 설정하세요.
+To authenticate with the control plane API, set the `X-Api-Key` header to a valid LangSmith API key.
 
-`curl` 명령어 예시:
+Example `curl` command:
 
 ```shell
 curl --request GET \
@@ -31,20 +31,20 @@ curl --request GET \
   --header 'X-Api-Key: LANGSMITH_API_KEY'
 ```
 
-## 버전 관리
+## Versioning
 
-각 엔드포인트 경로에는 버전(예: `v1`, `v2`)이 접두사로 붙습니다.
+Each endpoint path is prefixed with a version (e.g. `v1`, `v2`).
 
-## 빠른 시작
+## Quick Start
 
-1. `POST /v2/deployments`를 호출하여 새 Deployment를 생성합니다. 응답 본문에는 Deployment ID(`id`)와 최신(그리고 첫 번째) 리비전의 ID(`latest_revision_id`)가 포함됩니다.
-2. `GET /v2/deployments/{deployment_id}`를 호출하여 Deployment를 조회합니다. URL의 `deployment_id`를 Deployment ID(`id`) 값으로 설정합니다.
-3. `GET /v2/deployments/{deployment_id}/revisions/{latest_revision_id}`를 호출하여 `status`가 `DEPLOYED`가 될 때까지 리비전 `status`를 폴링합니다.
-4. `PATCH /v2/deployments/{deployment_id}`를 호출하여 배포를 업데이트합니다.
+1. Call `POST /v2/deployments` to create a new Deployment. The response body contains the Deployment ID (`id`) and the ID of the latest (and first) revision (`latest_revision_id`).
+2. Call `GET /v2/deployments/{deployment_id}` to retrieve the Deployment. Set `deployment_id` in the URL to the value of Deployment ID (`id`).
+3. Poll for revision `status` until `status` is `DEPLOYED` by calling `GET /v2/deployments/{deployment_id}/revisions/{latest_revision_id}`.
+4. Call `PATCH /v2/deployments/{deployment_id}` to update the deployment.
 
-## 예제 코드
+## Example Code
 
-다음은 control plane API를 조율하여 배포를 생성, 업데이트 및 삭제하는 방법을 보여주는 Python 예제 코드입니다.
+Below is example Python code that demonstrates how to orchestrate the control plane APIs to create a deployment, update the deployment, and delete the deployment.
 
 ```python
 import os
@@ -56,22 +56,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# 필수 환경 변수
+# required environment variables
 CONTROL_PLANE_HOST = os.getenv("CONTROL_PLANE_HOST")
 LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
 INTEGRATION_ID = os.getenv("INTEGRATION_ID")
-MAX_WAIT_TIME = 1800  # 30분
+MAX_WAIT_TIME = 1800  # 30 mins
 
 
 def get_headers() -> dict:
-    """control plane API 요청에 대한 공통 헤더를 반환합니다."""
+    """Return common headers for requests to the control plane API."""
     return {
         "X-Api-Key": LANGSMITH_API_KEY,
     }
 
 
 def create_deployment() -> str:
-    """배포를 생성합니다. 배포 ID를 반환합니다."""
+    """Create deployment. Return deployment ID."""
     headers = get_headers()
     headers["Content-Type"] = "application/json"
 
@@ -124,7 +124,7 @@ def create_deployment() -> str:
 
 
 def get_deployment(deployment_id: str) -> dict:
-    """배포를 조회합니다."""
+    """Get deployment."""
     response = requests.get(
         url=f"{CONTROL_PLANE_HOST}/v2/deployments/{deployment_id}",
         headers=get_headers(),
@@ -137,9 +137,9 @@ def get_deployment(deployment_id: str) -> dict:
 
 
 def list_revisions(deployment_id: str) -> list[dict]:
-    """리비전을 나열합니다.
+    """List revisions.
 
-    반환 목록은 created_at을 기준으로 내림차순(최신순)으로 정렬됩니다.
+    Return list is sorted by created_at in descending order (latest first).
     """
     response = requests.get(
         url=f"{CONTROL_PLANE_HOST}/v2/deployments/{deployment_id}/revisions",
@@ -158,7 +158,7 @@ def get_revision(
     deployment_id: str,
     revision_id: str,
 ) -> dict:
-    """리비전을 조회합니다."""
+    """Get revision."""
     response = requests.get(
         url=f"{CONTROL_PLANE_HOST}/v2/deployments/{deployment_id}/revisions/{revision_id}",
         headers=get_headers(),
@@ -171,11 +171,11 @@ def get_revision(
 
 
 def patch_deployment(deployment_id: str) -> None:
-    """배포를 패치합니다."""
+    """Patch deployment."""
     headers = get_headers()
     headers["Content-Type"] = "application/json"
 
-    # source_revision_config가 포함되어 있으므로 새 리비전이 생성됩니다
+    # This creates a new revision because source_revision_config is included
     response = requests.patch(
         url=f"{CONTROL_PLANE_HOST}/v2/deployments/{deployment_id}",
         headers=headers,
@@ -197,7 +197,7 @@ def patch_deployment(deployment_id: str) -> None:
 
 
 def wait_for_deployment(deployment_id: str, revision_id: str) -> None:
-    """리비전 상태가 DEPLOYED가 될 때까지 대기합니다."""
+    """Wait for revision status to be DEPLOYED."""
     start_time = time.time()
     revision, status = None, None
     while time.time() - start_time < MAX_WAIT_TIME:
@@ -218,7 +218,7 @@ def wait_for_deployment(deployment_id: str, revision_id: str) -> None:
 
 
 def delete_deployment(deployment_id: str) -> None:
-    """배포를 삭제합니다."""
+    """Delete deployment."""
     response = requests.delete(
         url=f"{CONTROL_PLANE_HOST}/v2/deployments/{deployment_id}",
         headers=get_headers(),
@@ -233,25 +233,25 @@ def delete_deployment(deployment_id: str) -> None:
 
 
 if __name__ == "__main__":
-    # 배포를 생성하고 최신 리비전을 가져옵니다
+    # create deployment and get the latest revision
     deployment_id = create_deployment()
     revisions = list_revisions(deployment_id)
     latest_revision = revisions["resources"][0]
     latest_revision_id = latest_revision["id"]
 
-    # 최신 리비전이 DEPLOYED가 될 때까지 대기합니다
+    # wait for latest revision to be DEPLOYED
     wait_for_deployment(deployment_id, latest_revision_id)
 
-    # 배포를 패치하고 최신 리비전을 가져옵니다
+    # patch the deployment and get the latest revision
     patch_deployment(deployment_id)
     revisions = list_revisions(deployment_id)
     latest_revision = revisions["resources"][0]
     latest_revision_id = latest_revision["id"]
 
-    # 최신 리비전이 DEPLOYED가 될 때까지 대기합니다
+    # wait for latest revision to be DEPLOYED
     wait_for_deployment(deployment_id, latest_revision_id)
 
-    # 배포를 삭제합니다
+    # delete the deployment
     delete_deployment(deployment_id)
 ```
 

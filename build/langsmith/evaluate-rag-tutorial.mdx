@@ -1,41 +1,41 @@
 ---
-title: RAG 애플리케이션 평가하기
-sidebarTitle: RAG 애플리케이션 평가하기
+title: Evaluate a RAG application
+sidebarTitle: Evaluate a RAG application
 ---
 
 <Info>
-[RAG 평가](/langsmith/evaluation-concepts#retrieval-augmented-generation-rag) | [평가자](/langsmith/evaluation-concepts#evaluators) | [LLM-as-judge 평가자](/langsmith/evaluation-concepts#llm-as-judge)
+[RAG evaluation](/langsmith/evaluation-concepts#retrieval-augmented-generation-rag) | [Evaluators](/langsmith/evaluation-concepts#evaluators) | [LLM-as-judge evaluators](/langsmith/evaluation-concepts#llm-as-judge)
 </Info>
 
-검색 증강 생성(Retrieval Augmented Generation, RAG)은 관련 외부 지식을 제공하여 대규모 언어 모델(LLM)을 향상시키는 기술입니다. 이는 LLM 애플리케이션을 구축하는 데 가장 널리 사용되는 접근 방식 중 하나가 되었습니다.
+Retrieval Augmented Generation (RAG) is a technique that enhances Large Language Models (LLMs) by providing them with relevant external knowledge. It has become one of the most widely used approaches for building LLM applications.
 
-이 튜토리얼에서는 LangSmith를 사용하여 RAG 애플리케이션을 평가하는 방법을 보여드립니다. 다음 내용을 학습하게 됩니다:
+This tutorial will show you how to evaluate your RAG applications using LangSmith. You'll learn:
 
-1. 테스트 데이터셋 생성 방법
-2. 데이터셋에서 RAG 애플리케이션 실행 방법
-3. 다양한 평가 지표를 사용하여 애플리케이션 성능 측정 방법
+1. How to create test datasets
+2. How to run your RAG application on those datasets
+3. How to measure your application's performance using different evaluation metrics
 
-## 개요
+## Overview
 
-일반적인 RAG 평가 워크플로우는 세 가지 주요 단계로 구성됩니다:
+A typical RAG evaluation workflow consists of three main steps:
 
-1. 질문과 예상 답변이 포함된 데이터셋 생성
+1. Creating a dataset with questions and their expected answers
 
-2. 해당 질문에 대해 RAG 애플리케이션 실행
+2. Running your RAG application on those questions
 
-3. 평가자를 사용하여 애플리케이션이 얼마나 잘 수행되었는지 측정하며, 다음과 같은 요소를 살펴봅니다:
+3. Using evaluators to measure how well your application performed, looking at factors like:
 
-   * 답변 관련성
-   * 답변 정확도
-   * 검색 품질
+   * Answer relevance
+   * Answer accuracy
+   * Retrieval quality
 
-이 튜토리얼에서는 [Lilian Weng의](https://lilianweng.github.io/) 통찰력 있는 블로그 게시물 몇 개에 대한 질문에 답변하는 봇을 생성하고 평가합니다.
+For this tutorial, we'll create and evaluate a bot that answers questions about a few of [Lilian Weng's](https://lilianweng.github.io/) insightful blog posts.
 
-## 설정
+## Setup
 
-### 환경
+### Environment
 
-먼저 환경 변수를 설정하겠습니다:
+First, let's set our environment variables:
 
 <CodeGroup>
 
@@ -54,7 +54,7 @@ process.env.OPENAI_API_KEY = "YOUR OPENAI API KEY";
 
 </CodeGroup>
 
-그리고 필요한 종속성을 설치합니다:
+And install the dependencies we'll need:
 
 <CodeGroup>
 
@@ -68,23 +68,23 @@ yarn add langsmith langchain @langchain/community @langchain/openai
 
 </CodeGroup>
 
-### 애플리케이션
+### Application
 
 <Info>
-이 튜토리얼에서는 LangChain을 사용하지만, 여기서 시연하는 평가 기법과 LangSmith 기능은 모든 프레임워크에서 작동합니다. 원하시는 도구와 라이브러리를 자유롭게 사용하세요.
+While this tutorial uses LangChain, the evaluation techniques and LangSmith functionality demonstrated here work with any framework. Feel free to use your preferred tools and libraries.
 </Info>
 
-이 섹션에서는 기본적인 검색 증강 생성(RAG) 애플리케이션을 구축하겠습니다.
+In this section, we'll build a basic Retrieval-Augmented Generation (RAG) application.
 
-다음과 같은 간단한 구현을 유지하겠습니다:
+We'll stick to a simple implementation that:
 
-* 인덱싱: Lilian Weng의 블로그 몇 개를 벡터 스토어에 청크로 나누고 인덱싱
-* 검색: 사용자 질문을 기반으로 해당 청크 검색
-* 생성: 질문과 검색된 문서를 LLM에 전달
+* Indexing: chunks and indexes a few of Lilian Weng's blogs in a vector store
+* Retrieval: retrieves those chunks based on the user question
+* Generation: passes the question and retrieved docs to an LLM.
 
-#### 인덱싱 및 검색
+#### Indexing and retrieval
 
-먼저 챗봇을 구축할 블로그 게시물을 로드하고 인덱싱하겠습니다.
+First, lets load the blog posts we want to build a chatbot for and index them.
 
 <CodeGroup>
 
@@ -158,9 +158,9 @@ await vectorStore.addDocuments(allSplits)
 
 </CodeGroup>
 
-#### 생성
+#### Generation
 
-이제 생성 파이프라인을 정의할 수 있습니다.
+We can now define the generative pipeline.
 
 <CodeGroup>
 
@@ -233,9 +233,9 @@ const ragBot = traceable(
 
 </CodeGroup>
 
-## 데이터셋
+## Dataset
 
-이제 애플리케이션이 준비되었으니 이를 평가할 데이터셋을 구축하겠습니다. 이 경우 데이터셋은 매우 간단합니다: 예제 질문과 참조 답변을 가지게 됩니다.
+Now that we've got our application, let's build a dataset to evaluate it. Our dataset will be very simple in this case: we'll have example questions and reference answers.
 
 <CodeGroup>
 
@@ -305,37 +305,37 @@ await client.createExamples({ inputs, outputs, datasetId: dataset.id })
 
 </CodeGroup>
 
-## 평가자
+## Evaluators
 
-다양한 유형의 RAG 평가자를 생각하는 한 가지 방법은 무엇을 평가하는지 X 무엇과 비교하여 평가하는지의 튜플로 생각하는 것입니다:
+One way to think about different types of RAG evaluators is as a tuple of what is being evaluated X what its being evaluated against:
 
-1. **정확성**: 응답 vs 참조 답변
+1. **Correctness**: Response vs reference answer
 
-* `목표`: "*RAG 체인 답변이 정답(ground-truth answer)과 비교하여 얼마나 유사한지/올바른지*" 측정
-* `모드`: 데이터셋을 통해 제공되는 정답(참조) 답변이 필요
-* `평가자`: LLM-as-judge를 사용하여 답변 정확성 평가
+* `Goal`: Measure "*how similar/correct is the RAG chain answer, relative to a ground-truth answer*"
+* `Mode`: Requires a ground truth (reference) answer supplied through a dataset
+* `Evaluator`: Use LLM-as-judge to assess answer correctness.
 
-2. **관련성**: 응답 vs 입력
+2. **Relevance**: Response vs input
 
-* `목표`: "*생성된 응답이 초기 사용자 입력을 얼마나 잘 다루는지*" 측정
-* `모드`: 답변을 입력 질문과 비교하므로 참조 답변이 필요하지 않음
-* `평가자`: LLM-as-judge를 사용하여 답변 관련성, 유용성 등을 평가
+* `Goal`: Measure "*how well does the generated response address the initial user input*"
+* `Mode`: Does not require reference answer, because it will compare the answer to the input question
+* `Evaluator`: Use LLM-as-judge to assess answer relevance, helpfulness, etc.
 
-3. **근거성**: 응답 vs 검색된 문서
+3. **Groundedness**: Response vs retrieved docs
 
-* `목표`: "*생성된 응답이 검색된 컨텍스트와 얼마나 일치하는지*" 측정
-* `모드`: 답변을 검색된 컨텍스트와 비교하므로 참조 답변이 필요하지 않음
-* `평가자`: LLM-as-judge를 사용하여 충실도, 환각 등을 평가
+* `Goal`: Measure "*to what extent does the generated response agree with the retrieved context*"
+* `Mode`: Does not require reference answer, because it will compare the answer to the retrieved context
+* `Evaluator`: Use LLM-as-judge to assess faithfulness, hallucinations, etc.
 
-4. **검색 관련성**: 검색된 문서 vs 입력
+4. **Retrieval relevance**: Retrieved docs vs input
 
-* `목표`: "*이 쿼리에 대해 검색된 결과가 얼마나 관련성이 있는지*" 측정
-* `모드`: 질문을 검색된 컨텍스트와 비교하므로 참조 답변이 필요하지 않음
-* `평가자`: LLM-as-judge를 사용하여 관련성 평가
+* `Goal`: Measure "*how relevant are my retrieved results for this query*"
+* `Mode`: Does not require reference answer, because it will compare the question to the retrieved context
+* `Evaluator`: Use LLM-as-judge to assess relevance
 
 ![](/langsmith/images/rag-eval-overview.png)
 
-### 정확성: 응답 vs 참조 답변
+### Correctness: Response vs reference answer
 
 <CodeGroup>
 
@@ -432,9 +432,9 @@ async function correctness({
 
 </CodeGroup>
 
-### 관련성: 응답 vs 입력
+### Relevance: Response vs input
 
-흐름은 위와 유사하지만, `reference_outputs` 없이 `inputs`와 `outputs`만 살펴봅니다. 참조 답변이 없으면 정확도를 평가할 수 없지만, 관련성은 여전히 평가할 수 있습니다—즉, 모델이 사용자의 질문을 다루었는지 여부를 평가할 수 있습니다.
+The flow is similar to above, but we simply look at the `inputs` and `outputs` without needing the `reference_outputs`. Without a reference answer we can't grade accuracy, but can still grade relevance—as in, did the model address the user's question or not.
 
 <CodeGroup>
 
@@ -522,9 +522,9 @@ STUDENT ANSWER: ${outputs.answer}`
 
 </CodeGroup>
 
-### 근거성: 응답 vs 검색된 문서
+### Groundedness: Response vs retrieved docs
 
-참조 답변 없이 응답을 평가하는 또 다른 유용한 방법은 응답이 검색된 문서에 의해 정당화되는지(또는 "근거가 있는지") 확인하는 것입니다.
+Another useful way to evaluate responses without needing reference answers is to check if the response is justified by (or "grounded in") the retrieved documents.
 
 <CodeGroup>
 
@@ -612,7 +612,7 @@ async function grounded({
 
 </CodeGroup>
 
-### 검색 관련성: 검색된 문서 vs 입력
+### Retrieval relevance: Retrieved docs vs input
 
 <CodeGroup>
 
@@ -706,9 +706,9 @@ async function retrievalRelevance({
 
 </CodeGroup>
 
-## 평가 실행
+## Run evaluation
 
-이제 모든 다양한 평가자를 사용하여 평가 작업을 시작할 수 있습니다.
+We can now kick off our evaluation job with all of our different evaluators.
 
 <CodeGroup>
 
@@ -745,11 +745,11 @@ const experimentResults = await evaluate(targetFunc, {
 
 </CodeGroup>
 
-이러한 결과가 어떻게 보이는지 예제를 여기에서 확인할 수 있습니다: [LangSmith 링크](https://smith.langchain.com/public/302573e2-20bf-4f8c-bdad-e97c20f33f1b/d)
+You can see an example of what these results look like here: [LangSmith link](https://smith.langchain.com/public/302573e2-20bf-4f8c-bdad-e97c20f33f1b/d)
 
-## 참조 코드
+## Reference code
 
-<Accordion title="위의 모든 코드를 통합한 스크립트입니다:">
+<Accordion title="Here's a consolidated script with all the above code:">
     <CodeGroup>
 
 ```python Python

@@ -2,23 +2,23 @@
 title: Fiddler
 ---
 
->[Fiddler](https://www.fiddler.ai/)는 엔터프라이즈 생성형 및 예측 시스템 운영의 선구자로, 데이터 과학, MLOps, 리스크, 컴플라이언스, 분석 및 기타 LOB 팀이 엔터프라이즈 규모에서 ML 배포를 모니터링, 설명, 분석 및 개선할 수 있도록 통합 플랫폼을 제공합니다.
+>[Fiddler](https://www.fiddler.ai/) is the pioneer in enterprise Generative and Predictive system ops, offering a unified platform that enables Data Science, MLOps, Risk, Compliance, Analytics, and other LOB teams to monitor, explain, analyze, and improve ML deployments at enterprise scale.
 
-## 1. 설치 및 설정
+## 1. Installation and Setup
 
 ```python
 #!pip install langchain langchain-community langchain-openai fiddler-client
 ```
 
-## 2. Fiddler 연결 정보
+## 2. Fiddler connection details
 
-*Fiddler에 모델 정보를 추가하기 전에*
+*Before you can add information about your model with Fiddler*
 
-1. Fiddler에 연결하는 데 사용하는 URL
-2. 조직 ID
-3. 인증 토큰
+1. The URL you're using to connect to Fiddler
+2. Your organization ID
+3. Your authorization token
 
-이 정보는 Fiddler 환경의 *Settings* 페이지로 이동하여 확인할 수 있습니다.
+These can be found by navigating to the *Settings* page of your Fiddler environment.
 
 ```python
 URL = ""  # Your Fiddler instance URL, Make sure to include the full URL (including https://). For example: https://demo.fiddler.ai
@@ -30,7 +30,7 @@ PROJECT_NAME = ""
 MODEL_NAME = ""  # Model name in Fiddler
 ```
 
-## 3. Fiddler 콜백 핸들러 인스턴스 생성
+## 3. Create a fiddler callback handler instance
 
 ```python
 from langchain_community.callbacks.fiddler_callback import FiddlerCallbackHandler
@@ -44,7 +44,7 @@ fiddler_handler = FiddlerCallbackHandler(
 )
 ```
 
-## 예제 1 : 기본 체인
+## Example 1 : Basic Chain
 
 ```python
 from langchain_core.output_parsers import StrOutputParser
@@ -70,7 +70,7 @@ chain.invoke("How are you doing today?")
 chain.invoke("What is the meaning of life?")
 ```
 
-## 예제 2 : 프롬프트 템플릿을 사용한 체인
+## Example 2 : Chain with prompt templates
 
 ```python
 from langchain_core.prompts import (

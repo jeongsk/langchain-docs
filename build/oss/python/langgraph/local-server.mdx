@@ -1,28 +1,28 @@
 ---
-title: 로컬 서버 실행
-sidebarTitle: 로컬 서버
+title: Run a local server
+sidebarTitle: Local server
 ---
 
 
 
-이 가이드에서는 LangGraph 애플리케이션을 로컬에서 실행하는 방법을 보여줍니다.
+This guide shows you how to run a LangGraph application locally.
 
-## 사전 요구 사항
+## Prerequisites
 
-시작하기 전에 다음을 준비해야 합니다:
+Before you begin, ensure you have the following:
 
-* [LangSmith](https://smith.langchain.com/settings) API 키 - 무료로 가입할 수 있습니다
+* An API key for [LangSmith](https://smith.langchain.com/settings) - free to sign up
 
-## 1. LangGraph CLI 설치
+## 1. Install the LangGraph CLI
 
 <CodeGroup>
 ```bash pip
-# Python >= 3.11이 필요합니다.
+# Python >= 3.11 is required.
 pip install -U "langgraph-cli[inmem]"
 ```
 
 ```bash uv
-# Python >= 3.11이 필요합니다.
+# Python >= 3.11 is required.
 uv add langgraph-cli[inmem]
 ```
 </CodeGroup>
@@ -30,25 +30,25 @@ uv add langgraph-cli[inmem]
 
 
 
-## 2. LangGraph 앱 생성 🌱
+## 2. Create a LangGraph app 🌱
 
-[`new-langgraph-project-python` 템플릿](https://github.com/langchain-ai/new-langgraph-project)에서 새 앱을 생성합니다. 이 템플릿은 자신의 로직으로 확장할 수 있는 단일 노드 애플리케이션을 보여줍니다.
+Create a new app from the [`new-langgraph-project-python` template](https://github.com/langchain-ai/new-langgraph-project). This template demonstrates a single-node application you can extend with your own logic.
 
 ```shell
 langgraph new path/to/your/app --template new-langgraph-project-python
 ```
 
 <Tip>
-**추가 템플릿**
-템플릿을 지정하지 않고 `langgraph new`를 사용하면 사용 가능한 템플릿 목록에서 선택할 수 있는 대화형 메뉴가 표시됩니다.
+**Additional templates**
+If you use `langgraph new` without specifying a template, you will be presented with an interactive menu that will allow you to choose from a list of available templates.
 </Tip>
 
 
 
 
-## 3. 종속성 설치
+## 3. Install dependencies
 
-새로운 LangGraph 앱의 루트에서 `edit` 모드로 종속성을 설치하여 서버가 로컬 변경 사항을 사용하도록 합니다:
+In the root of your new LangGraph app, install the dependencies in `edit` mode so your local changes are used by the server:
 
 <CodeGroup>
 ```bash pip
@@ -65,17 +65,17 @@ uv add .
 
 
 
-## 4. `.env` 파일 생성
+## 4. Create a `.env` file
 
-새로운 LangGraph 앱의 루트에 `.env.example` 파일이 있습니다. 루트에 `.env` 파일을 생성하고 `.env.example` 파일의 내용을 복사한 다음 필요한 API 키를 입력합니다:
+You will find a `.env.example` in the root of your new LangGraph app. Create a `.env` file in the root of your new LangGraph app and copy the contents of the `.env.example` file into it, filling in the necessary API keys:
 
 ```bash
 LANGSMITH_API_KEY=lsv2...
 ```
 
-## 5. LangGraph Server 실행 🚀
+## 5. Launch LangGraph Server 🚀
 
-LangGraph API 서버를 로컬에서 시작합니다:
+Start the LangGraph API server locally:
 
 ```shell
 langgraph dev
@@ -84,7 +84,7 @@ langgraph dev
 
 
 
-샘플 출력:
+Sample output:
 
 ```
 >    Ready!
@@ -96,35 +96,35 @@ langgraph dev
 >    - LangGraph Studio Web UI: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 ```
 
-`langgraph dev` 명령은 인메모리 모드로 LangGraph Server를 시작합니다. 이 모드는 개발 및 테스트 목적에 적합합니다. 프로덕션 사용을 위해서는 영구 스토리지 백엔드에 액세스할 수 있는 LangGraph Server를 배포하세요. 자세한 내용은 [호스팅 개요](/langsmith/hosting)를 참조하세요.
+The `langgraph dev` command starts LangGraph Server in an in-memory mode. This mode is suitable for development and testing purposes. For production use, deploy LangGraph Server with access to a persistent storage backend. For more information, see the [Hosting overview](/langsmith/hosting).
 
-## 6. Studio에서 애플리케이션 테스트
+## 6. Test your application in Studio
 
-[Studio](/langsmith/studio)는 LangGraph API 서버에 연결하여 애플리케이션을 시각화하고 상호 작용하며 로컬에서 디버그할 수 있는 전용 UI입니다. `langgraph dev` 명령의 출력에 제공된 URL을 방문하여 Studio에서 그래프를 테스트하세요:
+[Studio](/langsmith/studio) is a specialized UI that you can connect to LangGraph API server to visualize, interact with, and debug your application locally. Test your graph in Studio by visiting the URL provided in the output of the `langgraph dev` command:
 
 ```
 >    - LangGraph Studio Web UI: https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024
 ```
 
-사용자 지정 호스트/포트에서 실행되는 LangGraph Server의 경우 baseURL 매개변수를 업데이트하세요.
+For a LangGraph Server running on a custom host/port, update the baseURL parameter.
 
-<Accordion title="Safari 호환성">
-  Safari는 localhost 서버에 연결할 때 제한이 있으므로 명령에 `--tunnel` 플래그를 사용하여 보안 터널을 생성하세요:
+<Accordion title="Safari compatibility">
+  Use the `--tunnel` flag with your command to create a secure tunnel, as Safari has limitations when connecting to localhost servers:
 
   ```shell
   langgraph dev --tunnel
   ```
 </Accordion>
 
-## 7. API 테스트
+## 7. Test the API
 
 <Tabs>
     <Tab title="Python SDK (async)">
-    1. LangGraph Python SDK를 설치합니다:
+    1. Install the LangGraph Python SDK:
       ```shell
       pip install langgraph-sdk
       ```
-    2. 어시스턴트에 메시지를 보냅니다 (스레드 없는 실행):
+    2. Send a message to the assistant (threadless run):
       ```python
       from langgraph_sdk import get_client
       import asyncio
@@ -150,11 +150,11 @@ langgraph dev
       ```
     </Tab>
     <Tab title="Python SDK (sync)">
-    1. LangGraph Python SDK를 설치합니다:
+    1. Install the LangGraph Python SDK:
       ```shell
       pip install langgraph-sdk
       ```
-    2. 어시스턴트에 메시지를 보냅니다 (스레드 없는 실행):
+    2. Send a message to the assistant (threadless run):
       ```python
       from langgraph_sdk import get_sync_client
 
@@ -200,14 +200,14 @@ langgraph dev
 
 
 
-## 다음 단계
+## Next steps
 
-이제 로컬에서 실행되는 LangGraph 앱이 있으므로 배포 및 고급 기능을 탐색하여 여정을 더욱 발전시키세요:
+Now that you have a LangGraph app running locally, take your journey further by exploring deployment and advanced features:
 
-* [배포 빠른 시작](/langsmith/deployment-quickstart): LangSmith를 사용하여 LangGraph 앱을 배포합니다.
-* [LangSmith](/langsmith/home): 기본적인 LangSmith 개념을 학습합니다.
+* [Deployment quickstart](/langsmith/deployment-quickstart): Deploy your LangGraph app using LangSmith.
+* [LangSmith](/langsmith/home): Learn about foundational LangSmith concepts.
 
-* [Python SDK Reference](https://langchain-ai.github.io/langgraph/cloud/reference/sdk/python_sdk_ref/): Python SDK API Reference를 탐색합니다.
+* [Python SDK Reference](https://reference.langchain.com/python/platform/python_sdk/): Explore the Python SDK API Reference.
 
 ---
 

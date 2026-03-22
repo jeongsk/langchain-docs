@@ -1,19 +1,19 @@
 ---
-title: 실험의 성능 메트릭을 가져오는 방법
-sidebarTitle: 실험의 성능 메트릭 가져오기
+title: How to fetch performance metrics for an experiment
+sidebarTitle: Fetch performance metrics for an experiment
 ---
 
 <Check>
-트레이싱 프로젝트와 실험은 백엔드에서 "세션"이라고 불리는 동일한 기본 데이터 구조를 사용합니다.
+Tracing projects and experiments use the same underlying data structure in our backend, which is called a "session."
 
-문서에서 이러한 용어가 혼용되어 사용되는 것을 볼 수 있지만, 모두 동일한 기본 데이터 구조를 나타냅니다.
+You might see these terms interchangeably in our documentation, but they all refer to the same underlying data structure.
 
-문서와 API 전반에 걸쳐 용어를 통일하는 작업을 진행하고 있습니다.
+We are working on unifying the terminology across our documentation and APIs.
 </Check>
 
-Python 또는 TypeScript SDK에서 `evaluate`를 사용하여 실험을 실행하는 경우, `read_project`/`readProject` 메서드를 사용하여 실험의 성능 메트릭을 가져올 수 있습니다.
+When you run an experiment using `evaluate` with the Python or TypeScript SDK, you can fetch the performance metrics for the experiment using the `read_project`/`readProject` methods.
 
-실험 세부 정보에 대한 페이로드에는 다음 값들이 포함됩니다:
+The payload for experiment details includes the following values:
 
 ```json
 {
@@ -75,24 +75,24 @@ Python 또는 TypeScript SDK에서 `evaluate`를 사용하여 실험을 실행�
 }
 ```
 
-이 페이로드에서 다음과 같은 성능 메트릭을 추출할 수 있습니다:
+From here, you can extract performance metrics such as:
 
-* `latency_p50`: 50번째 백분위수 지연 시간(초 단위).
-* `latency_p99`: 99번째 백분위수 지연 시간(초 단위).
-* `total_tokens`: 사용된 총 토큰 수.
-* `prompt_tokens`: 사용된 프롬프트 토큰 수.
-* `completion_tokens`: 사용된 완료 토큰 수.
-* `total_cost`: 실험의 총 비용.
-* `prompt_cost`: 프롬프트 토큰의 비용.
-* `completion_cost`: 완료 토큰의 비용.
-* `feedback_stats`: 실험에 대한 피드백 통계.
-* `error_rate`: 실험의 오류율.
-* `first_token_p50`: 첫 번째 토큰 생성 시간의 50번째 백분위수 지연 시간(스트리밍 사용 시).
-* `first_token_p99`: 첫 번째 토큰 생성 시간의 99번째 백분위수 지연 시간(스트리밍 사용 시).
+* `latency_p50`: The 50th percentile latency in seconds.
+* `latency_p99`: The 99th percentile latency in seconds.
+* `total_tokens`: The total number of tokens used.
+* `prompt_tokens`: The number of prompt tokens used.
+* `completion_tokens`: The number of completion tokens used.
+* `total_cost`: The total cost of the experiment.
+* `prompt_cost`: The cost of the prompt tokens.
+* `completion_cost`: The cost of the completion tokens.
+* `feedback_stats`: The feedback statistics for the experiment.
+* `error_rate`: The error rate for the experiment.
+* `first_token_p50`: The 50th percentile latency for the time to generate the first token (if using streaming).
+* `first_token_p99`: The 99th percentile latency for the time to generate the first token (if using streaming).
 
-다음은 Python 및 TypeScript SDK를 사용하여 실험의 성능 메트릭을 가져오는 방법의 예시입니다.
+Here is an example of how you can fetch the performance metrics for an experiment using the Python and TypeScript SDKs.
 
-먼저 사전 요구 사항으로 간단한 데이터셋을 생성합니다. 여기서는 Python으로만 시연하지만, TypeScript에서도 동일하게 수행할 수 있습니다. 평가에 대한 자세한 내용은 [how-to 가이드](/langsmith/evaluate-llm-application)를 참조하세요.
+First, as a prerequisite, we will create a trivial dataset. Here, we only demonstrate this in Python, but you can do the same in TypeScript. Please view the [how-to guide](/langsmith/evaluate-llm-application) on evaluation for more details.
 
 ```python
 from langsmith import Client
@@ -117,7 +117,7 @@ examples = [
 client.create_examples(dataset_id=dataset.id, examples=examples)
 ```
 
-다음으로, 실험을 생성하고 `evaluate`의 결과에서 실험 이름을 가져온 후 실험의 성능 메트릭을 가져옵니다.
+Next, we will create an experiment, retrieve the experiment name from the result of `evaluate`, then fetch the performance metrics for the experiment.
 
 <CodeGroup>
 

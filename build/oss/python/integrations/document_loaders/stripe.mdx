@@ -2,32 +2,32 @@
 title: Stripe
 ---
 
->[Stripe](https://stripe.com/en-ca)는 아일랜드계 미국 금융 서비스 및 SaaS(Software as a Service) 기업입니다. 전자상거래 웹사이트 및 모바일 애플리케이션을 위한 결제 처리 소프트웨어와 애플리케이션 프로그래밍 인터페이스를 제공합니다.
+>[Stripe](https://stripe.com/en-ca) is an Irish-American financial services and software as a service (SaaS) company. It offers payment-processing software and application programming interfaces for e-commerce websites and mobile applications.
 
-이 노트북은 `Stripe REST API`로부터 데이터를 로드하여 LangChain에 수집할 수 있는 형식으로 변환하는 방법과 벡터화를 위한 사용 예제를 다룹니다.
+This notebook covers how to load data from the `Stripe REST API` into a format that can be ingested into LangChain, along with example usage for vectorization.
 
 ```python
 from langchain.indexes import VectorstoreIndexCreator
 from langchain_community.document_loaders import StripeLoader
 ```
 
-Stripe API는 Stripe 대시보드 내에서 찾을 수 있는 액세스 토큰이 필요합니다.
+The Stripe API requires an access token, which can be found inside of the Stripe dashboard.
 
-이 문서 로더는 로드하려는 데이터를 정의하는 `resource` 옵션도 필요합니다.
+This document loader also requires a `resource` option which defines what data you want to load.
 
-다음 리소스를 사용할 수 있습니다:
+Following resources are available:
 
-`balance_transations` [문서](https://stripe.com/docs/api/balance_transactions/list)
+`balance_transations` [Documentation](https://stripe.com/docs/api/balance_transactions/list)
 
-`charges` [문서](https://stripe.com/docs/api/charges/list)
+`charges` [Documentation](https://stripe.com/docs/api/charges/list)
 
-`customers` [문서](https://stripe.com/docs/api/customers/list)
+`customers` [Documentation](https://stripe.com/docs/api/customers/list)
 
-`events` [문서](https://stripe.com/docs/api/events/list)
+`events` [Documentation](https://stripe.com/docs/api/events/list)
 
-`refunds` [문서](https://stripe.com/docs/api/refunds/list)
+`refunds` [Documentation](https://stripe.com/docs/api/refunds/list)
 
-`disputes` [문서](https://stripe.com/docs/api/disputes/list)
+`disputes` [Documentation](https://stripe.com/docs/api/disputes/list)
 
 ```python
 stripe_loader = StripeLoader("charges")

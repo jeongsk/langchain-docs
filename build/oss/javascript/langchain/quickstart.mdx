@@ -1,14 +1,14 @@
 ---
-title: 빠른 시작
+title: Quickstart
 ---
 
 
 
-이 빠른 시작 가이드는 간단한 설정에서 완전히 작동하는 AI 에이전트를 단 몇 분 만에 구축하는 방법을 안내합니다.
+This quickstart takes you from a simple setup to a fully functional AI agent in just a few minutes.
 
-## 기본 에이전트 구축하기
+## Build a basic agent
 
-질문에 답하고 도구를 호출할 수 있는 간단한 에이전트를 만들어 보겠습니다. 이 에이전트는 언어 모델로 Claude Sonnet 4.5를 사용하고, 도구로 기본적인 날씨 함수를 사용하며, 동작을 안내하는 간단한 프롬프트를 사용합니다.
+Start by creating a simple agent that can answer questions and call tools. The agent will use Claude Sonnet 4.5 as its language model, a basic weather function as a tool, and a simple prompt to guide its behavior.
 
 
 
@@ -41,25 +41,25 @@ console.log(
 
 
 <Info>
-    이 예제를 실행하려면 [Claude (Anthropic)](https://www.anthropic.com/) 계정을 설정하고 API 키를 발급받아야 합니다. 그런 다음 터미널에서 `ANTHROPIC_API_KEY` 환경 변수를 설정하세요.
+    For this example, you will need to set up a [Claude (Anthropic)](https://www.anthropic.com/) account and get an API key. Then, set the `ANTHROPIC_API_KEY` environment variable in your terminal.
 </Info>
 
-## 실전 에이전트 구축하기
+## Build a real-world agent
 
-이제 주요 프로덕션 개념을 보여주는 실용적인 날씨 예보 에이전트를 구축해 보겠습니다:
+Next, build a practical weather forecasting agent that demonstrates key production concepts:
 
-1. **상세한 시스템 프롬프트**로 더 나은 에이전트 동작 구현
-2. **외부 데이터와 통합되는 도구 생성**
-3. **일관된 응답을 위한 모델 구성**
-4. **예측 가능한 결과를 위한 구조화된 출력**
-5. **대화형 상호작용을 위한 대화 메모리**
-6. **완전히 기능하는 에이전트 생성 및 실행**
+1. **Detailed system prompts** for better agent behavior
+2. **Create tools** that integrate with external data
+3. **Model configuration** for consistent responses
+4. **Structured output** for predictable results
+5. **Conversational memory** for chat-like interactions
+6. **Create and run the agent** create a fully functional agent
 
-각 단계를 차례대로 살펴보겠습니다:
+Let's walk through each step:
 
 <Steps>
-    <Step title="시스템 프롬프트 정의하기">
-        시스템 프롬프트는 에이전트의 역할과 동작을 정의합니다. 구체적이고 실행 가능하게 작성하세요:
+    <Step title="Define the system prompt">
+        The system prompt defines your agent’s role and behavior. Keep it specific and actionable:
 
 
 
@@ -75,7 +75,7 @@ console.log(
         ```
 
     </Step>
-    <Step title="도구 생성하기">
+    <Step title="Create tools">
 
 
         [Tools](/oss/javascript/langchain/tools) are functions your agent can call. Oftentimes tools will want to connect to external systems, and will rely on runtime configuration to do so. Notice here how the `getUserLocation` tool does exactly that:

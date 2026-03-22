@@ -1,23 +1,23 @@
 ---
 title: Deep Agents
-sidebarTitle: 개요
+sidebarTitle: Overview
 ---
 
-LLM을 사용하여 루프 내에서 도구를 호출하는 방식은 에이전트의 가장 단순한 형태입니다. 그러나 이러한 아키텍처는 "얕은" 에이전트를 생성할 수 있으며, 더 길고 복잡한 작업에 대한 계획 수립과 실행에 실패할 수 있습니다. "Deep Research", "Manus", "Claude Code"와 같은 애플리케이션들은 **계획 도구**, **서브 에이전트**, **파일 시스템** 접근, 그리고 **상세한 프롬프트**라는 네 가지 요소의 조합을 구현함으로써 이러한 한계를 극복했습니다.
+Using an LLM to call tools in a loop is the simplest form of an agent. This architecture, however, can yield agents that are "shallow" and fail to plan and act over longer, more complex tasks. Applications like "Deep Research", "Manus", and "Claude Code" have gotten around this limitation by implementing a combination of four things: a **planning tool**, **sub agents**, access to a **file system**, and a **detailed prompt**.
 
-Deep Agents는 이러한 구성 요소들을 범용적인 방식으로 구현하여, **Python**과 **JavaScript/TypeScript** 모두에서 애플리케이션을 위한 정교한 에이전트를 쉽게 생성할 수 있도록 합니다.
+Deep Agents implements these components in a general purpose way so that you can easily create sophisticated agents for your application, available in both **Python** and **JavaScript/TypeScript**.
 
-## 주요 기능
+## Key features
 
-- **계획 도구**: 복잡한 작업을 세분화하고 장기 계획을 가능하게 하는 내장 계획 기능.
-- **영구 상태**: 대화 기록을 넘어서는 도구 호출 간의 메모리.
-- **서브 에이전트**: 컨텍스트 격리가 적용된 특정 작업을 위한 전문 에이전트.
-- **가상 파일 시스템**: 충돌 없이 영구 상태를 관리하는 모의 파일 시스템.
-- **상세한 시스템 프롬프트**: Claude Code에서 크게 영감을 받은 프롬프트로, 검증된 패턴을 활용합니다.
+- **Planning Tool**: Built-in planning capabilities to break down complex tasks and enable long-term planning.
+- **Persistent state**: Memory between tool calls beyond conversation history.
+- **Sub-agents**: Specialized agents for specific tasks with context quarantine.
+- **Virtual File System**: Mock file system for persistent state without conflicts.
+- **Detailed System Prompt**: Prompts, heavily inspired by Claude Code, leverage proven patterns.
 
-Deep Agents는 Claude Code와 같은 정교한 에이전트를 효과적으로 만드는 아키텍처 패턴을 구현합니다.
+Deep Agents implements the architectural patterns that make sophisticated agents like Claude Code effective.
 
-## 설치
+## Installation
 
 <CodeGroup>
 
@@ -35,13 +35,13 @@ npm install deepagents
 
 </CodeGroup>
 
-## 구현
+## Implementations
 
-Deep Agents는 [**Python**](https://github.com/hwchase17/deepagents)과 [**JavaScript**](https://www.npmjs.com/package/deepagents) 모두에서 사용할 수 있습니다.
+Deep Agents is available in both [**Python**](https://github.com/hwchase17/deepagents) and [**JavaScript**](https://www.npmjs.com/package/deepagents).
 
-## 감사의 말
+## Acknowledgements
 
-이 프로젝트는 주로 Claude Code에서 영감을 받았으며, Claude Code를 더 잘 이해하고 확장하려는 시도입니다.
+This project was primarily inspired by Claude Code and is an attempt to better understand Claude Code and extend it.
 
 ---
 

@@ -1,58 +1,58 @@
 ---
-title: 평가 빠른 시작
-sidebarTitle: 빠른 시작
+title: Evaluation quickstart
+sidebarTitle: Quickstart
 ---
 
 import WorkspaceSecret from '/snippets/langsmith/set-workspace-secrets.mdx';
 
-[_평가_](/langsmith/evaluation-concepts)는 LLM 애플리케이션의 성능을 정량적으로 측정하는 방법입니다. LLM은 예측할 수 없는 동작을 보일 수 있으며, 프롬프트, 모델 또는 입력에 대한 작은 변경도 결과에 상당한 영향을 미칠 수 있습니다. 평가는 실패를 식별하고, 버전을 비교하며, 더 신뢰할 수 있는 AI 애플리케이션을 구축하기 위한 체계적인 방법을 제공합니다.
+[_Evaluations_](/langsmith/evaluation-concepts) are a quantitative way to measure the performance of LLM applications. LLMs can behave unpredictably, even small changes to prompts, models, or inputs can significantly affect results. Evaluations provide a structured way to identify failures, compare versions, and build more reliable AI applications.
 
-LangSmith에서 평가를 실행하려면 다음 세 가지 핵심 구성 요소가 필요합니다:
+Running an evaluation in LangSmith requires three key components:
 
-- [_데이터셋_](/langsmith/evaluation-concepts#datasets): 테스트 입력(및 선택적으로 예상 출력) 세트입니다.
-- [_대상 함수_](/langsmith/define-target-function): 테스트하려는 애플리케이션의 일부로, 단일 LLM 호출, 하나의 모듈 또는 전체 워크플로일 수 있습니다.
-- [_평가자_](/langsmith/evaluation-concepts#evaluators): 대상 함수의 출력을 점수화하는 함수입니다.
+- [_Dataset_](/langsmith/evaluation-concepts#datasets): A set of test inputs (and optionally, expected outputs).
+- [_Target function_](/langsmith/define-target-function): The part of your application you want to test—this might be a single LLM call with a new prompt, one module, or your entire workflow.
+- [_Evaluators_](/langsmith/evaluation-concepts#evaluators): Functions that score your target function’s outputs.
 
-이 빠른 시작 가이드는 LangSmith SDK 또는 UI를 사용하여 LLM 응답의 정확성을 확인하는 기본 평가를 실행하는 과정을 안내합니다.
+This quickstart guides you through running a starter evaluation that checks the correctness of LLM responses, using either the LangSmith SDK or UI.
 
 <Tip>
-추적을 시작하는 것에 대한 비디오를 선호하신다면, 데이터셋 및 평가 [비디오 가이드](#video-guide)를 참조하세요.
+If you prefer to watch a video on getting started with tracing, refer to the datasets and evaluations [Video guide](#video-guide).
 </Tip>
 
-## 사전 요구 사항
+## Prerequisites
 
-시작하기 전에 다음 사항을 확인하세요:
+Before you begin, make sure you have:
 
-- **LangSmith 계정**: [smith.langchain.com](https://smith.langchain.com)에서 가입하거나 로그인하세요.
-- **LangSmith API 키**: [API 키 생성](/langsmith/create-account-api-key#create-an-api-key) 가이드를 따르세요.
-- **OpenAI API 키**: [OpenAI 대시보드](https://platform.openai.com/account/api-keys)에서 생성하세요.
+- **A LangSmith account**: Sign up or log in at [smith.langchain.com](https://smith.langchain.com).
+- **A LangSmith API key**: Follow the [Create an API key](/langsmith/create-account-api-key#create-an-api-key) guide.
+- **An OpenAI API key**: Generate this from the [OpenAI dashboard](https://platform.openai.com/account/api-keys).
 
-**지침을 보려면 UI 또는 SDK 필터를 선택하세요:**
+**Select the UI or SDK filter for instructions:**
 
 <Tabs>
 <Tab title="UI" icon="window">
 
-## 1. 워크스페이스 시크릿 설정
+## 1. Set workspace secrets
 
 <WorkspaceSecret/>
 
-## 2. 프롬프트 생성
+## 2. Create a prompt
 
-LangSmith의 [프롬프트 플레이그라운드](/langsmith/observability-concepts#prompt-playground)를 사용하면 다양한 프롬프트, 새로운 모델 또는 다양한 모델 구성에 대해 평가를 실행할 수 있습니다.
+LangSmith's [Prompt Playground](/langsmith/observability-concepts#prompt-playground) makes it possible to run evaluations over different prompts, new models, or test different model configurations.
 
-1. [LangSmith UI](https://smith.langchain.com)에서 **Prompt Engineering** 아래의 **Playground**로 이동합니다.
-1. **Prompts** 패널에서 **system** 프롬프트를 다음과 같이 수정합니다:
+1. In the [LangSmith UI](https://smith.langchain.com), navigate to the **Playground** under **Prompt Engineering**.
+1. Under the **Prompts** panel, modify the **system** prompt to:
 
     ```
     Answer the following question accurately:
     ```
 
-    **Human** 메시지는 그대로 둡니다: `{question}`.
+    Leave the **Human** message as is: `{question}`.
 
-## 3. 데이터셋 생성
+## 3. Create a dataset
 
-1. **Set up Evaluation**을 클릭하면 페이지 하단에 **New Experiment** 테이블이 열립니다.
-1. **Select or create a new dataset** 드롭다운에서 **+ New** 버튼을 클릭하여 새 데이터셋을 생성합니다.
+1. Click **Set up Evaluation**, which will open a **New Experiment** table at the bottom of the page.
+1. In the **Select or create a new dataset** dropdown, click the **+ New** button to create a new dataset.
 
     <div style={{ textAlign: 'center' }}>
     <img
@@ -68,23 +68,23 @@ LangSmith의 [프롬프트 플레이그라운드](/langsmith/observability-conce
     />
     </div>
 
-1. 데이터셋에 다음 예제를 추가합니다:
+1. Add the following examples to the dataset:
 
     | Inputs                                                   | Reference Outputs                                 |
     | -------------------------------------------------------- | ------------------------------------------------- |
     | question: Which country is Mount Kilimanjaro located in? | output: Mount Kilimanjaro is located in Tanzania. |
     | question: What is Earth's lowest point?                  | output: Earth's lowest point is The Dead Sea.     |
 
-1. **Save**를 클릭하고 이름을 입력하여 새로 생성한 데이터셋을 저장합니다.
+1. Click **Save** and enter a name to save your newly created dataset.
 
-## 4. 평가자 추가
+## 4. Add an evaluator
 
-1. **+ Evaluator**를 클릭하고 **Pre-built Evaluator** 옵션에서 **Correctness**를 선택합니다.
-1. **Correctness** 패널에서 **Save**를 클릭합니다.
+1. Click **+ Evaluator** and select **Correctness** from the **Pre-built Evaluator** options.
+1. In the **Correctness** panel, click **Save**.
 
-## 5. 평가 실행
+## 5. Run your evaluation
 
-1. 오른쪽 상단의 <Icon icon="circle-play" /> **Start**를 선택하여 평가를 실행합니다. 이렇게 하면 **New Experiment** 테이블에 미리보기가 포함된 [_실험_](/langsmith/evaluation-concepts#experiment)이 생성됩니다. 실험 이름을 클릭하면 전체 보기를 볼 수 있습니다.
+1. Select <Icon icon="circle-play" /> **Start** on the top right to run your evaluation. This will create an [_experiment_](/langsmith/evaluation-concepts#experiment) with a preview in the **New Experiment** table. You can view in full by clicking the experiment name.
 
     <div style={{ textAlign: 'center' }}>
     <img
@@ -100,27 +100,27 @@ LangSmith의 [프롬프트 플레이그라운드](/langsmith/observability-conce
     />
     </div>
 
-## 다음 단계
+## Next steps
 
 <Tip>
-LangSmith에서 실험을 실행하는 방법에 대해 자세히 알아보려면 [평가 개념 가이드](/langsmith/evaluation-concepts)를 읽어보세요.
+To learn more about running experiments in LangSmith, read the [evaluation conceptual guide](/langsmith/evaluation-concepts).
 </Tip>
 
-- 평가에 대한 자세한 내용은 [평가 문서](/langsmith/evaluation)를 참조하세요.
-- [UI에서 데이터셋 생성 및 관리](/langsmith/manage-datasets-in-application#set-up-your-dataset)하는 방법을 알아보세요.
-- [프롬프트 플레이그라운드에서 평가 실행](/langsmith/run-evaluation-from-prompt-playground)하는 방법을 알아보세요.
+- For more details on evaluations, refer to the [Evaluation documentation](/langsmith/evaluation).
+- Learn how to [create and manage datasets in the UI](/langsmith/manage-datasets-in-application#set-up-your-dataset).
+- Learn how to [run an evaluation from the prompt playground](/langsmith/run-evaluation-from-prompt-playground).
 
 </Tab>
 
 <Tab title="SDK" icon="code">
 
 <Tip>
-이 가이드는 오픈 소스 [`openevals`](https://github.com/langchain-ai/openevals) 패키지의 사전 구축된 LLM-as-judge 평가자를 사용합니다. OpenEvals는 일반적으로 사용되는 평가자 세트를 포함하며, 평가를 처음 시작하는 경우 훌륭한 출발점입니다. 앱 평가 방법에 더 많은 유연성을 원한다면 [완전히 사용자 정의 평가자를 정의](/langsmith/code-evaluator)할 수도 있습니다.
+This guide uses prebuilt LLM-as-judge evaluators from the open-source [`openevals`](https://github.com/langchain-ai/openevals) package. OpenEvals includes a set of commonly used evaluators and is a great starting point if you're new to evaluations. If you want greater flexibility in how you evaluate your apps, you can also [define completely custom evaluators](/langsmith/code-evaluator).
 </Tip>
 
-## 1. 의존성 설치
+## 1. Install dependencies
 
-터미널에서 프로젝트용 디렉토리를 생성하고 환경에 의존성을 설치합니다:
+In your terminal, create a directory for your project and install the dependencies in your environment:
 
 <CodeGroup>
 
@@ -141,17 +141,17 @@ npx tsc --init
 </CodeGroup>
 
 <Info>
-패키지 관리자로 `yarn`을 사용하는 경우, `openevals`의 피어 의존성으로 `@langchain/core`도 수동으로 설치해야 합니다. 이는 일반적인 LangSmith 평가에는 필요하지 않으며, [임의의 사용자 정의 코드를 사용하여](/langsmith/code-evaluator) 평가자를 정의할 수 있습니다.
+If you are using `yarn` as your package manager, you will also need to manually install `@langchain/core` as a peer dependency of `openevals`. This is not required for LangSmith evals in general, you may define evaluators [using arbitrary custom code](/langsmith/code-evaluator).
 </Info>
 
-## 2. 환경 변수 설정
+## 2. Set up environment variables
 
-다음 환경 변수를 설정합니다:
+Set the following environment variables:
 
 - `LANGSMITH_TRACING`
 - `LANGSMITH_API_KEY`
-- `OPENAI_API_KEY` (또는 LLM 제공자의 API 키)
-- (선택 사항) `LANGSMITH_WORKSPACE_ID`: LangSmith API가 여러 [워크스페이스](/langsmith/administration-overview#workspaces)에 연결되어 있는 경우 사용할 워크스페이스를 지정하려면 이 변수를 설정하세요.
+- `OPENAI_API_KEY` (or your LLM provider's API key)
+- (optional) `LANGSMITH_WORKSPACE_ID`: If your LangSmith API is linked to multiple [workspaces](/langsmith/administration-overview#workspaces), set this variable to specify which workspace to use.
 
 ``` bash
 export LANGSMITH_TRACING=true
@@ -160,17 +160,17 @@ export OPENAI_API_KEY="<your-openai-api-key>"
 export LANGSMITH_WORKSPACE_ID="<your-workspace-id>"
 ```
 <Note>
-Anthropic을 사용하는 경우 [Anthropic 래퍼](/langsmith/annotate-code#wrap-the-anthropic-client-python-only)를 사용하여 호출을 추적하세요. 다른 제공자의 경우 [traceable 래퍼](/langsmith/annotate-code#use-%40traceable-%2F-traceable)를 사용하세요.
+If you're using Anthropic, use the [Anthropic wrapper](/langsmith/annotate-code#wrap-the-anthropic-client-python-only) to trace your calls. For other providers, use [the traceable wrapper](/langsmith/annotate-code#use-%40traceable-%2F-traceable).
 </Note>
 
-## 3. 데이터셋 생성
+## 3. Create a dataset
 
-1. 파일을 생성하고 다음 코드를 추가합니다. 이 코드는:
+1. Create a file and add the following code, which will:
 
-    - LangSmith에 연결하기 위해 `Client`를 가져옵니다.
-    - 데이터셋을 생성합니다.
-    - 예제 [_입력 및 출력_](/langsmith/evaluation-concepts#examples)을 정의합니다.
-    - 평가에 사용할 수 있도록 입력 및 출력 쌍을 LangSmith의 데이터셋과 연결합니다.
+    - Import the `Client` to connect to LangSmith.
+    - Create a dataset.
+    - Define example [_inputs_ and _outputs_](/langsmith/evaluation-concepts#examples).
+    - Associate the input and output pairs with that dataset in LangSmith so they can be used in evaluations.
 
     <CodeGroup>
 
@@ -249,7 +249,7 @@ Anthropic을 사용하는 경우 [Anthropic 래퍼](/langsmith/annotate-code#wra
 
     </CodeGroup>
 
-1. 터미널에서 `dataset` 파일을 실행하여 앱 평가에 사용할 데이터셋을 생성합니다:
+1. In your terminal, run the `dataset` file to create the datasets you'll use to evaluate your app:
 
     <CodeGroup>
     ```bash Python
@@ -261,17 +261,17 @@ Anthropic을 사용하는 경우 [Anthropic 래퍼](/langsmith/annotate-code#wra
 
     </CodeGroup>
 
-    다음 출력이 표시됩니다:
+    You'll see the following output:
 
     ```bash
     Created dataset: Sample dataset
     ```
 
-## 4. 대상 함수 생성
+## 4. Create your target function
 
-평가하려는 내용이 포함된 [대상 함수](/langsmith/define-target-function)를 정의합니다. 이 가이드에서는 질문에 답변하기 위한 단일 LLM 호출이 포함된 대상 함수를 정의합니다.
+Define a [target function](/langsmith/define-target-function) that contains what you're evaluating. In this guide, you'll define a target function that contains a single LLM call to answer a question.
 
-`eval` 파일에 다음을 추가합니다:
+Add the following to an `eval` file:
 
 <CodeGroup>
 
@@ -320,23 +320,23 @@ async function target(inputs: Record<string, any>): Promise<Record<string, any>>
 </CodeGroup>
 
 
-## 5. 평가자 정의
+## 5. Define an evaluator
 
-이 단계에서는 앱이 생성하는 답변을 평가하는 방법을 LangSmith에 알려줍니다.
+In this step, you’re telling LangSmith how to grade the answers your app produces.
 
-[`openevals`](https://github.com/langchain-ai/openevals)에서 사전 구축된 평가 프롬프트(`CORRECTNESS_PROMPT`)와 이를 [_LLM-as-judge 평가자_](/langsmith/evaluation-concepts#llm-as-judge)로 래핑하는 헬퍼를 가져옵니다. 이는 애플리케이션의 출력을 점수화합니다.
+Import a prebuilt evaluation prompt (`CORRECTNESS_PROMPT`) from [`openevals`](https://github.com/langchain-ai/openevals) and a helper that wraps it into an [_LLM-as-judge evaluator_](/langsmith/evaluation-concepts#llm-as-judge), which will score the application's output.
 
 <Info>
-`CORRECTNESS_PROMPT`는 `"inputs"`, `"outputs"`, `"reference_outputs"`에 대한 변수가 있는 f-string입니다. OpenEvals 프롬프트 사용자 정의에 대한 자세한 내용은 [여기](https://github.com/langchain-ai/openevals#customizing-prompts)를 참조하세요.
+`CORRECTNESS_PROMPT` is just an f-string with variables for `"inputs"`, `"outputs"`, and `"reference_outputs"`. See [here](https://github.com/langchain-ai/openevals#customizing-prompts) for more information on customizing OpenEvals prompts.
 </Info>
 
-평가자는 다음을 비교합니다:
+The evaluator compares:
 
-- `inputs`: 대상 함수에 전달된 내용(예: 질문 텍스트).
-- `outputs`: 대상 함수가 반환한 내용(예: 모델의 답변).
-- `reference_outputs`: [3단계](#3-create-a-dataset)에서 각 데이터셋 예제에 첨부한 정답입니다.
+- `inputs`: what was passed into your target function (e.g., the question text).
+- `outputs`: what your target function returned (e.g., the model’s answer).
+- `reference_outputs`: the ground truth answers you attached to each dataset example in [Step 3](#3-create-a-dataset).
 
-`eval` 파일에 다음 강조 표시된 코드를 추가합니다:
+Add the following highlighted code to your `eval` file:
 
 <CodeGroup>
 
@@ -416,17 +416,17 @@ async function correctnessEvaluator(run: {
 
 </CodeGroup>
 
-## 6. 실행 및 결과 보기
+## 6. Run and view results
 
-평가 실험을 실행하려면 `evaluate(...)`를 호출합니다. 이 함수는:
+To run the evaluation experiment, you'll call `evaluate(...)`, which:
 
-- [3단계](#3-create-a-dataset)에서 생성한 데이터셋에서 예제를 가져옵니다.
-- 각 예제의 입력을 [4단계](#4-add-an-evaluator)의 대상 함수로 보냅니다.
-- 출력(모델의 답변)을 수집합니다.
-- [5단계](#5-define-an-evaluator)의 평가자에게 `reference_outputs`와 함께 출력을 전달합니다.
-- UI에서 볼 수 있도록 모든 결과를 실험으로 LangSmith에 기록합니다.
+- Pulls example from the dataset you created in [Step 3](#3-create-a-dataset).
+- Sends each example's inputs to your target function from [Step 4](#4-add-an-evaluator).
+- Collects the outputs (the model's answers).
+- Passes the outputs along with the `reference_outputs` to your evaluator from [Step 5](#5-define-an-evaluator).
+- Records all results in LangSmith as an experiment, so you can view them in the UI.
 
-1. `eval` 파일에 강조 표시된 코드를 추가합니다:
+1. Add the highlighted code to your `eval` file:
 
     <CodeGroup>
 
@@ -544,7 +544,7 @@ async function correctnessEvaluator(run: {
 
     </CodeGroup>
 
-1. 평가자를 실행합니다:
+1. Run your evaluator:
 
     <CodeGroup>
 
@@ -558,7 +558,7 @@ async function correctnessEvaluator(run: {
 
     </CodeGroup>
 
-1. 평가 결과를 보기 위한 링크와 실험 결과에 대한 메타데이터를 받게 됩니다:
+1. You'll receive a link to view the evaluation results and metadata for the experiment results:
 
     ```
     View the evaluation results for experiment: 'first-eval-in-langsmith-00000000' at: https://smith.langchain.com/o/6551f9c4-2685-4a08-86b9-1b29643deb3d/datasets/e5fde557-c274-4e49-b39d-000000000000/compare?selectedSessions=70b11778-6a28-4cdb-be81-000000000000
@@ -566,7 +566,7 @@ async function correctnessEvaluator(run: {
     <ExperimentResults first-eval-in-langsmith-00000000>
     ```
 
-1. 평가 실행 출력의 링크를 따라 [LangSmith UI](https://smith.langchain.com)의 **Datasets & Experiments** 페이지로 이동하여 실험 결과를 탐색합니다. 이렇게 하면 **Inputs**, **Reference Output**, **Outputs**를 보여주는 테이블이 있는 생성된 실험으로 이동합니다. 데이터셋을 선택하면 결과의 확장 보기를 열 수 있습니다.
+1. Follow the link in the output of your evaluation run to access the **Datasets & Experiments** page in the [LangSmith UI](https://smith.langchain.com), and explore the results of the experiment. This will direct you to the created experiment with a table showing the **Inputs**, **Reference Output**, and **Outputs**. You can select a dataset to open an expanded view of the results.
 
     <div style={{ textAlign: 'center' }}>
     <img
@@ -582,19 +582,19 @@ async function correctnessEvaluator(run: {
     />
     </div>
 
-## 다음 단계
+## Next steps
 
-다음으로 탐색할 수 있는 주제는 다음과 같습니다:
+Here are some topics you might want to explore next:
 
-- [평가 개념](/langsmith/evaluation-concepts)은 LangSmith의 평가에 대한 주요 용어 설명을 제공합니다.
-- [OpenEvals README](https://github.com/langchain-ai/openevals)에서 사용 가능한 모든 사전 구축 평가자와 사용자 정의 방법을 확인하세요.
-- [사용자 정의 평가자 정의](/langsmith/code-evaluator)하기.
-- 모든 클래스와 함수에 대한 포괄적인 설명은 [Python](https://docs.smith.langchain.com/reference/python/reference) 또는 [TypeScript](https://docs.smith.langchain.com/reference/js) SDK 참조를 확인하세요.
+- [Evaluation concepts](/langsmith/evaluation-concepts) provides descriptions of the key terminology for evaluations in LangSmith.
+- [OpenEvals README](https://github.com/langchain-ai/openevals) to see all available prebuilt evaluators and how to customize them.
+- [Define custom evaluators](/langsmith/code-evaluator).
+- [Python](https://docs.smith.langchain.com/reference/python/reference) or [TypeScript](https://docs.smith.langchain.com/reference/js) SDK references for comprehensive descriptions of every class and function.
 
 </Tab>
 </Tabs>
 
-## 비디오 가이드
+## Video guide
 <iframe
   className="w-full aspect-video rounded-xl"
   src="https://www.youtube.com/embed/iEgjJyk3aTw?si=C7BPKXPmdE1yAflv"

@@ -2,26 +2,26 @@
 title: MongoDB
 ---
 
-[MongoDB](https://www.mongodb.com/)는 동적 스키마를 가진 JSON과 유사한 문서를 지원하는 NoSQL 문서 지향 데이터베이스입니다.
+[MongoDB](https://www.mongodb.com/) is a NoSQL , document-oriented database that supports JSON-like documents with a dynamic schema.
 
-## 개요
+## Overview
 
-MongoDB Document Loader는 MongoDB 데이터베이스에서 LangChain 문서 목록을 반환합니다.
+The MongoDB Document Loader returns a list of LangChain Documents from a MongoDB database.
 
-로더에는 다음 매개변수가 필요합니다:
+The Loader requires the following parameters:
 
-* MongoDB 연결 문자열
-* MongoDB 데이터베이스 이름
-* MongoDB 컬렉션 이름
-* (선택 사항) 콘텐츠 필터 딕셔너리
-* (선택 사항) 출력에 포함할 필드 이름 목록
+* MongoDB connection string
+* MongoDB database name
+* MongoDB collection name
+* (Optional) Content Filter dictionary
+* (Optional) List of field names to include in the output
 
-출력은 다음 형식을 따릅니다:
+The output takes the following format:
 
-* pageContent= Mongo 문서
+* pageContent= Mongo Document
 * metadata=\{'database': '[database_name]', 'collection': '[collection_name]'\}
 
-## Document Loader 로드
+## Load the Document Loader
 
 ```python
 # add this import for running in jupyter notebook

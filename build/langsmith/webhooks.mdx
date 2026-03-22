@@ -1,20 +1,20 @@
 ---
-title: 규칙에 대한 웹훅 알림 구성
-sidebarTitle: 웹훅 알림 구성
+title: Configure webhook notifications for rules
+sidebarTitle: Configure webhook notifications for rules
 ---
 
-자동화 작업에 웹훅 URL을 추가하면, 정의한 규칙이 새로운 실행과 일치할 때마다 웹훅 엔드포인트로 POST 요청을 전송합니다.
+When you add a webhook URL on an automation action, we will make a POST request to your webhook endpoint any time the rules you defined match any new runs.
 
 ![](/langsmith/images/webhook.png)
 
-## 웹훅 페이로드
+## Webhook payload
 
-웹훅 엔드포인트로 전송되는 페이로드에는 다음이 포함됩니다:
+The payload we send to your webhook endpoint contains:
 
-- `"rule_id"`: 이 페이로드를 전송한 자동화의 ID입니다
-- `"start_time"` 및 `"end_time"`: 일치하는 실행을 발견한 시간 범위입니다
-- `"runs"`: 실행의 배열이며, 각 실행은 딕셔너리입니다. 각 실행에 대한 추가 정보가 필요한 경우 엔드포인트에서 SDK를 사용하여 API에서 가져오는 것을 권장합니다.
-- `"feedback_stats"`: 실행에 대한 피드백 통계가 포함된 딕셔너리입니다. 이 필드에 대한 예시 페이로드는 아래에 나와 있습니다.
+- `"rule_id"`: this is the ID of the automation that sent this payload
+- `"start_time"` and `"end_time"`: these are the time boundaries where we found matching runs
+- `"runs"`: this is an array of runs, where each run is a dictionary. If you need more information about each run we suggest using our SDK in your endpoint to fetch it from our API.
+- `"feedback_stats"`: this is a dictionary with the feedback statistics for the runs. An example payload for this field is shown below.
 
 ```json
 "feedback_stats": {
@@ -48,14 +48,14 @@ sidebarTitle: 웹훅 알림 구성
 ```
 
 <Note>
-**S3 URL에서 가져오기**
+**fetching from S3 URLs**
 
-실행이 얼마나 최근인지에 따라 `inputs_s3_urls` 및 `outputs_s3_urls` 필드에 실제 데이터 대신 S3 URL이 포함될 수 있습니다.
+Depending on how recent your runs are, the `inputs_s3_urls` and `outputs_s3_urls` fields may contain S3 URLs to the actual data instead of the data itself.
 
-`inputs` 및 `outputs`는 각각 `inputs_s3_urls` 및 `outputs_s3_urls`에 제공된 `ROOT.presigned_url`을 통해 가져올 수 있습니다.
+The `inputs` and `outputs` can be fetched by the `ROOT.presigned_url` provided in `inputs_s3_urls` and `outputs_s3_urls` respectively.
 </Note>
 
-다음은 웹훅 엔드포인트로 전송되는 전체 페이로드의 예시입니다:
+This is an example of the entire payload we send to your webhook endpoint:
 
 ```json
 {
@@ -103,43 +103,43 @@ sidebarTitle: 웹훅 알림 구성
 }
 ```
 
-## 보안
+## Security
 
-웹훅 URL에 비밀 쿼리 문자열 매개변수를 추가하고 수신 요청마다 이를 확인하는 것을 강력히 권장합니다. 이를 통해 누군가가 웹훅 URL을 발견하더라도 해당 호출을 진짜 웹훅 알림과 구별할 수 있습니다.
+We strongly recommend you add a secret query string parameter to the webhook URL, and verify it on any incoming request. This ensures that if someone discovers your webhook URL you can distinguish those calls from authentic webhook notifications.
 
-예시는 다음과 같습니다:
+An example would be
 
 ```
 https://api.example.com/langsmith_webhook?secret=38ee77617c3a489ab6e871fbeb2ec87d
 ```
 
-### 웹훅 사용자 지정 HTTP 헤더
+### Webhook custom HTTP headers
 
-웹훅과 함께 특정 헤더를 전송하려는 경우 URL별로 구성할 수 있습니다. 이를 설정하려면 URL 필드 옆에 있는 `Headers` 옵션을 클릭하고 헤더를 추가하세요.
+If you'd like to send any specific headers with your webhook, this can be configured per URL. To set this up, click on the `Headers` option next to the URL field and add your headers.
 
 <Note>
-헤더는 암호화된 형식으로 저장됩니다.
+Headers are stored in encrypted format.
 </Note>
 
 ![](/langsmith/images/webhook-headers.png)
 
-### 웹훅 전달
+### Webhook Delivery
 
-웹훅 엔드포인트로 이벤트를 전달할 때 다음 지침을 따릅니다:
+When delivering events to your webhook endpoint we follow these guidelines
 
-- 엔드포인트 연결에 실패하면 전달 실패를 선언하기 전에 전송 연결을 최대 2회까지 재시도합니다.
-- 엔드포인트가 응답하는 데 5초 이상 걸리면 전달 실패를 선언하고 재시도하지 않습니다.
-- 엔드포인트가 5초 이내에 5xx 상태 코드를 반환하면 지수 백오프를 사용하여 최대 2회까지 재시도합니다.
-- 엔드포인트가 4xx 상태 코드를 반환하면 전달 실패를 선언하고 재시도하지 않습니다.
-- 엔드포인트가 본문에 반환하는 모든 내용은 무시됩니다
+- If we fail to connect to your endpoint, we retry the transport connection up to 2 times, before declaring the delivery failed.
+- If your endpoint takes longer than 5 seconds to reply we declare the delivery failed and do not .
+- If your endpoint returns a 5xx status code in less than 5 seconds we retry up to 2 times with exponential backoff.
+- If your endpoint returns a 4xx status code, we declare the delivery failed and do not retry.
+- Anything your endpoint returns in the body will be ignored
 
-## Modal을 사용한 예시
+## Example with Modal
 
-### 설정
+### Setup
 
-이를 설정하는 방법에 대한 예시로 [Modal](https://modal.com/)을 사용하겠습니다. Modal은 추론 및 파인튜닝을 위한 자동 스케일링 GPU, 코드 에이전트를 위한 안전한 컨테이너화, 서버리스 Python 웹 엔드포인트를 제공합니다. 여기서는 웹 엔드포인트에 중점을 둡니다.
+For an example of how to set this up, we will use [Modal](https://modal.com/). Modal provides autoscaling GPUs for inference and fine-tuning, secure containerization for code agents, and serverless Python web endpoints. We'll focus on the web endpoints here.
 
-먼저 Modal 계정을 생성합니다. 그런 다음 로컬에 Modal SDK를 설치합니다:
+First, create a Modal account. Then, locally install the Modal SDK:
 
 <CodeGroup>
 ```bash pip
@@ -151,33 +151,33 @@ uv add modal
 ```
 </CodeGroup>
 
-계정 설정을 완료하려면 다음 명령을 실행합니다:
+To finish setting up your account, run the command:
 
 ```shell
 modal setup
 ```
 
-그리고 지침을 따릅니다
+and follow the instructions
 
-### 시크릿
+### Secrets
 
-다음으로 Modal에서 몇 가지 시크릿을 설정해야 합니다.
+Next, you will need to set up some secrets in Modal.
 
-먼저 LangSmith는 시크릿을 전달하여 Modal에 인증해야 합니다.
-가장 쉬운 방법은 쿼리 매개변수에 시크릿을 전달하는 것입니다.
-이 시크릿을 검증하려면 _Modal_에 시크릿을 추가하여 검증해야 합니다.
-Modal 시크릿을 생성하여 이를 수행합니다.
-시크릿에 대한 지침은 [여기](https://modal.com/docs/guide/secrets)에서 확인할 수 있습니다.
-이를 위해 시크릿을 `ls-webhook`이라고 부르고 `LS_WEBHOOK`이라는 이름의 환경 변수를 설정하도록 하겠습니다.
+First, LangSmith will need to authenticate to Modal by passing in a secret.
+The easiest way to do this is to pass in a secret in the query parameters.
+To validate this secret, we will need to add a secret in _Modal_ to validate it.
+We will do that by creating a Modal secret.
+You can see instructions for secrets [here](https://modal.com/docs/guide/secrets).
+For this purpose, let's call our secret `ls-webhook` and have it set an environment variable with the name `LS_WEBHOOK`.
 
-LangSmith 시크릿도 설정할 수 있습니다. 다행히 이를 위한 통합 템플릿이 이미 있습니다!
+We can also set up a LangSmith secret - luckily there is already an integration template for this!
 
 ![LangSmith Modal Template](/langsmith/images/modal-langsmith-secret.png)
 
-### 서비스
+### Service
 
-그 후 엔드포인트 역할을 할 Python 파일을 생성할 수 있습니다.
-다음은 진행 과정을 설명하는 주석과 함께 예시입니다:
+After that, you can create a Python file that will serve as your endpoint.
+An example is below, with comments explaining what is going on:
 
 ```python
 from fastapi import HTTPException, status, Request, Query
@@ -224,9 +224,9 @@ def f(data: dict, secret: str = Query(...)):
     return "success!"
 ```
 
-이제 `modal deploy ...`를 사용하여 쉽게 배포할 수 있습니다 (문서는 [여기](https://modal.com/docs/guide/managing-deployments) 참조).
+We can now deploy this easily with `modal deploy ...` (see docs [here](https://modal.com/docs/guide/managing-deployments)).
 
-다음과 같은 결과가 나타납니다:
+You should now get something like:
 
 ```
 ✓ Created objects.
@@ -238,20 +238,20 @@ def f(data: dict, secret: str = Query(...)):
 View Deployment: https://modal.com/apps/hwchase17/auth-example
 ```
 
-기억해야 할 중요한 사항은 `https://hwchase17--auth-example-f.modal.run`입니다. 이것이 우리가 실행하기 위해 생성한 함수입니다.
-참고: 이것은 최종 배포 URL이 아니므로 실수로 사용하지 않도록 주의하세요.
+The important thing to remember is `https://hwchase17--auth-example-f.modal.run` - the function we created to run.
+NOTE: this is NOT the final deployment URL, make sure not to accidentally use that.
 
-### 연결하기
+### Hooking it up
 
-이제 위에서 생성한 함수 URL을 가져와서 웹훅으로 추가할 수 있습니다.
-비밀 키를 쿼리 매개변수로 전달하는 것도 기억해야 합니다.
-모두 합치면 다음과 같이 보입니다:
+We can now take the function URL we create above and add it as a webhook.
+We have to remember to also pass in the secret key as a query parameter.
+Putting it all together, it should look something like:
 
 ```
 https://hwchase17--auth-example-f-dev.modal.run?secret={SECRET}
 ```
 
-`{SECRET}`을 Modal 서비스에 액세스하기 위해 생성한 비밀 키로 바꾸세요.
+Replace `{SECRET}` with the secret key you created to access the Modal service.
 
 ---
 

@@ -5,14 +5,14 @@ title: Model Context Protocol (MCP)
 
 
 
-[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction)은 애플리케이션이 LLM에 도구와 컨텍스트를 제공하는 방식을 표준화하는 개방형 프로토콜입니다. LangChain 에이전트는 [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-mcp-adapters/adapters) 라이브러리를 사용하여 MCP 서버에 정의된 도구를 사용할 수 있습니다.
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) is an open protocol that standardizes how applications provide tools and context to LLMs. LangChain agents can use tools defined on MCP servers using the [`langchain-mcp-adapters`](https://github.com/langchain-ai/langchainjs/tree/main/libs/langchain-mcp-adapters/adapters) library.
 
 
-## 설치
+## Install
 
 
 
-LangGraph에서 MCP 도구를 사용하려면 `@langchain/mcp-adapters` 라이브러리를 설치하세요:
+Install the `@langchain/mcp-adapters` library to use MCP tools in LangGraph:
 
 <CodeGroup>
 ```bash npm
@@ -33,21 +33,21 @@ bun add @langchain/mcp-adapters
 </CodeGroup>
 
 
-## 전송 유형
+## Transport types
 
-MCP는 클라이언트-서버 통신을 위한 다양한 전송 메커니즘을 지원합니다:
+MCP supports different transport mechanisms for client-server communication:
 
-- stdio: 클라이언트가 서버를 서브프로세스로 실행하고 표준 입력/출력을 통해 통신합니다. 로컬 도구와 간단한 설정에 가장 적합합니다.
-- Streamable HTTP: 서버가 독립적인 프로세스로 실행되어 HTTP 요청을 처리합니다. 원격 연결과 여러 클라이언트를 지원합니다.
-- Server-Sent Events (SSE): 실시간 스트리밍 통신에 최적화된 streamable HTTP의 변형입니다.
+- stdio: Client launches server as a subprocess and communicates via standard input/output. Best for local tools and simple setups.
+- Streamable HTTP: Server runs as an independent process handling HTTP requests. Supports remote connections and multiple clients.
+- Server-Sent Events (SSE): a variant of streamable HTTP optimized for real-time streaming communication.
 
-## MCP 도구 사용
+## Use MCP tools
 
 
 
-`@langchain/mcp-adapters`는 에이전트가 하나 이상의 MCP 서버에 정의된 도구를 사용할 수 있도록 합니다.
+`@langchain/mcp-adapters` enables agents to use tools defined across one or more MCP server.
 
-```ts 여러 MCP 서버 접근 icon="server"
+```ts Accessing multiple MCP servers icon="server"
 import { MultiServerMCPClient } from "@langchain/mcp-adapters";  // [!code highlight]
 import { ChatAnthropic } from "@langchain/anthropic";
 import { createAgent } from "langchain";

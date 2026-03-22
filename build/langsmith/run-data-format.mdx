@@ -1,61 +1,61 @@
 ---
-title: Run (span) 데이터 형식
-sidebarTitle: Run (span) 데이터 형식
+title: Run (span) data format
+sidebarTitle: Run (span) data format
 ---
 
 <Check>
-본 문서를 읽기 전에 다음 문서를 먼저 읽어보시면 도움이 됩니다:
+Before diving into this content, it might be helpful to read the following:
 
-* [트레이싱 및 실행에 대한 개념 가이드](/langsmith/observability-concepts)
+* [Conceptual guide on tracing and runs](/langsmith/observability-concepts)
 </Check>
 
-LangSmith는 내보내기와 가져오기가 쉬운 간단한 형식으로 트레이스 데이터를 저장하고 처리합니다.
+LangSmith stores and processes trace data in a simple format that is easy to export and import.
 
-이러한 필드 중 다수는 선택 사항이거나 알아야 할 중요도가 낮지만 완전성을 위해 포함되었습니다. **굵게 표시된** 필드가 알아두어야 할 가장 중요한 필드입니다.
+Many of these fields are optional or not important to know about but are included for completeness. The **bolded** fields are the most important ones to know about.
 
-| 필드 이름                      | 타입             | 설명                                                                                                                   |
-| ----------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------- |
-| **id**                        | UUID             | span의 고유 식별자입니다.                                                                                               |
-| **name**                      | string           | 실행과 연결된 이름입니다.                                                                                               |
-| **inputs**                    | object           | 실행에 제공된 입력의 맵 또는 집합입니다.                                                                                |
-| **run\_type**                 | string           | 실행 유형입니다(예: "llm", "chain", "tool").                                                                           |
-| **start\_time**               | datetime         | 실행 시작 시간입니다.                                                                                                   |
-| **end\_time**                 | datetime         | 실행 종료 시간입니다.                                                                                                   |
-| **extra**                     | object           | 실행과 관련된 추가 정보입니다.                                                                                          |
-| **error**                     | string           | 실행 중 오류가 발생한 경우 오류 메시지입니다.                                                                            |
-| **outputs**                   | object           | 실행에 의해 생성된 출력의 맵 또는 집합입니다.                                                                            |
-| **events**                    | array of objects | 실행과 연결된 이벤트 객체 목록입니다. 스트리밍으로 실행된 실행에 관련됩니다.                                              |
-| **tags**                      | array of strings | 실행과 연결된 태그 또는 레이블입니다.                                                                                    |
-| **trace\_id**                 | UUID             | 실행이 속한 트레이스의 고유 식별자입니다. 이는 트레이스의 루트 실행의 `id` 필드이기도 합니다.                             |
-| **dotted\_order**             | string           | 계층적 순서 문자열입니다. 형식: `run_start_time`Z`run_uuid`.`child_run_start_time`Z`child_run_uuid`...                 |
-| **status**                    | string           | 실행 실행의 현재 상태입니다(예: "error", "pending", "success").                                                         |
-| **child\_run\_ids**           | array of UUIDs   | 모든 자식 실행의 ID 목록입니다.                                                                                         |
-| **direct\_child\_run\_ids**   | array of UUIDs   | 이 실행의 직접 자식의 ID 목록입니다.                                                                                    |
-| **parent\_run\_ids**          | array of UUIDs   | 모든 부모 실행의 ID 목록입니다.                                                                                         |
-| **feedback\_stats**           | object           | 이 실행에 대한 피드백 통계의 집계입니다.                                                                                |
-| **reference\_example\_id**    | UUID             | 실행과 연결된 참조 예제의 ID입니다. 일반적으로 평가 실행에만 존재합니다.                                                 |
-| **total\_tokens**             | integer          | 실행에 의해 처리된 총 토큰 수입니다.                                                                                    |
-| **prompt\_tokens**            | integer          | 실행의 프롬프트에 있는 토큰 수입니다.                                                                                   |
-| **completion\_tokens**        | integer          | 실행의 완료에 있는 토큰 수입니다.                                                                                       |
-| **total\_cost**               | string           | 실행 처리와 관련된 총 비용입니다.                                                                                       |
-| **prompt\_cost**              | string           | 실행의 프롬프트 부분과 관련된 비용입니다.                                                                               |
-| **completion\_cost**          | string           | 실행의 완료와 관련된 비용입니다.                                                                                        |
-| **first\_token\_time**        | datetime         | 모델 출력의 첫 번째 토큰이 생성된 시간입니다. `run_type="llm"` 및 스트리밍이 활성화된 실행에만 적용됩니다.              |
-| **session\_id**               | string           | 실행의 세션 식별자입니다. 트레이싱 프로젝트 ID라고도 합니다.                                                            |
-| **in\_dataset**               | boolean          | 실행이 데이터셋에 포함되어 있는지를 나타냅니다.                                                                          |
-| **parent\_run\_id**           | UUID             | 부모 실행의 고유 식별자입니다.                                                                                          |
-| execution\_order (deprecated) | integer          | 트레이스 내에서 이 실행이 실행된 순서입니다.                                                                            |
-| serialized                    | object           | 해당되는 경우 실행을 실행하는 객체의 직렬화된 상태입니다.                                                               |
-| manifest\_id (deprecated)     | UUID             | span과 연결된 매니페스트의 식별자입니다.                                                                                |
-| manifest\_s3\_id              | UUID             | 매니페스트의 S3 식별자입니다.                                                                                           |
-| inputs\_s3\_urls              | object           | 입력의 S3 URL입니다.                                                                                                    |
-| outputs\_s3\_urls             | object           | 출력의 S3 URL입니다.                                                                                                    |
-| price\_model\_id              | UUID             | 실행에 적용된 가격 책정 모델의 식별자입니다.                                                                             |
-| app\_path                     | string           | 이 실행의 애플리케이션(UI) 경로입니다.                                                                                   |
-| last\_queued\_at              | datetime         | span이 마지막으로 대기열에 추가된 시간입니다.                                                                            |
-| share\_token                  | string           | 실행 데이터에 대한 액세스를 공유하기 위한 토큰입니다.                                                                     |
+| Field Name                    | Type             | Description                                                                                                                   |
+| ----------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **id**                        | UUID             | Unique identifier for the span.                                                                                               |
+| **name**                      | string           | The name associated with the run.                                                                                             |
+| **inputs**                    | object           | A map or set of inputs provided to the run.                                                                                   |
+| **run\_type**                 | string           | Type of run, e.g., "llm", "chain", "tool".                                                                                    |
+| **start\_time**               | datetime         | Start time of the run.                                                                                                        |
+| **end\_time**                 | datetime         | End time of the run.                                                                                                          |
+| **extra**                     | object           | Any extra information run.                                                                                                    |
+| **error**                     | string           | Error message if the run encountered an error.                                                                                |
+| **outputs**                   | object           | A map or set of outputs generated by the run.                                                                                 |
+| **events**                    | array of objects | A list of event objects associated with the run. This is relevant for runs executed with streaming.                           |
+| **tags**                      | array of strings | Tags or labels associated with the run.                                                                                       |
+| **trace\_id**                 | UUID             | Unique identifier for the trace the run is a part of. This is also the `id` field of the root run of the trace                |
+| **dotted\_order**             | string           | Ordering string, hierarchical. Format: `run_start_time`Z`run_uuid`.`child_run_start_time`Z`child_run_uuid`...                 |
+| **status**                    | string           | Current status of the run execution, e.g., "error", "pending", "success"                                                      |
+| **child\_run\_ids**           | array of UUIDs   | List of IDs for all child runs.                                                                                               |
+| **direct\_child\_run\_ids**   | array of UUIDs   | List of IDs for direct children of this run.                                                                                  |
+| **parent\_run\_ids**          | array of UUIDs   | List of IDs for all parent runs.                                                                                              |
+| **feedback\_stats**           | object           | Aggregations of feedback statistics for this run                                                                              |
+| **reference\_example\_id**    | UUID             | ID of a reference example associated with the run. This is usually only present for evaluation runs.                          |
+| **total\_tokens**             | integer          | Total number of tokens processed by the run.                                                                                  |
+| **prompt\_tokens**            | integer          | Number of tokens in the prompt of the run.                                                                                    |
+| **completion\_tokens**        | integer          | Number of tokens in the completion of the run.                                                                                |
+| **total\_cost**               | string           | Total cost associated with processing the run.                                                                                |
+| **prompt\_cost**              | string           | Cost associated with the prompt part of the run.                                                                              |
+| **completion\_cost**          | string           | Cost associated with the completion of the run.                                                                               |
+| **first\_token\_time**        | datetime         | Time when the first token of a model output was generated. Only applies for runs with `run_type="llm"` and streaming enabled. |
+| **session\_id**               | string           | Session identifier for the run, also known as the tracing project ID.                                                         |
+| **in\_dataset**               | boolean          | Indicates whether the run is included in a dataset.                                                                           |
+| **parent\_run\_id**           | UUID             | Unique identifier of the parent run.                                                                                          |
+| execution\_order (deprecated) | integer          | The order in which this run was executed within the trace.                                                                    |
+| serialized                    | object           | Serialized state of the object executing the run if applicable.                                                               |
+| manifest\_id (deprecated)     | UUID             | Identifier for a manifest associated with the span.                                                                           |
+| manifest\_s3\_id              | UUID             | S3 identifier for the manifest.                                                                                               |
+| inputs\_s3\_urls              | object           | S3 URLs for the inputs.                                                                                                       |
+| outputs\_s3\_urls             | object           | S3 URLs for the outputs.                                                                                                      |
+| price\_model\_id              | UUID             | Identifier for the pricing model applied to the run.                                                                          |
+| app\_path                     | string           | Application (UI) path for this run.                                                                                           |
+| last\_queued\_at              | datetime         | Last time the span was queued.                                                                                                |
+| share\_token                  | string           | Token for sharing access to the run's data.                                                                                   |
 
-다음은 위 형식의 실행을 JSON으로 표현한 예시입니다:
+Here is an example of a JSON representation of a run in the above format:
 
 ```json
 {
@@ -106,11 +106,11 @@ LangSmith는 내보내기와 가져오기가 쉬운 간단한 형식으로 트�
 }
 ```
 
-#### `dotted_order`란 무엇인가요?
+#### What is `dotted_order`?
 
-실행의 dotted order는 트레이싱 계층 구조 내에서 해당 위치를 완전히 지정하는 정렬 가능한 키입니다.
+A run's dotted order is a sortable key that fully specifies its location within the tracing hierarchy.
 
-다음 예시를 살펴보겠습니다:
+Take the following example:
 
 ```python
 import langsmith as ls
@@ -128,7 +128,7 @@ def parent():
     child()
 ```
 
-각 단계에서 ID를 출력하면 다음과 같은 결과를 얻을 수 있습니다:
+If you print out the IDs at each stage, you may get the following:
 
 ```python
 parent	run_id=0e01bf50-474d-4536-810f-67d3ee7ea3e7	trace_id=0e01bf50-474d-4536-810f-67d3ee7ea3e7  parent_run_id=null	dotted_order=20240919T171648521691Z0e01bf50-474d-4536-810f-67d3ee7ea3e7
@@ -136,12 +136,12 @@ child	run_id=a8024e23-5b82-47fd-970e-f6a5ba3f5097	trace_id=0e01bf50-474d-4536-81
 grandchild	run_id=0ec6b845-18b9-4aa1-8f1b-6ba3f9fdefd6	trace_id=0e01bf50-474d-4536-810f-67d3ee7ea3e7  parent_run_id=a8024e23-5b82-47fd-970e-f6a5ba3f5097	dotted_order=20240919T171648521691Z0e01bf50-474d-4536-810f-67d3ee7ea3e7.20240919T171648523407Za8024e23-5b82-47fd-970e-f6a5ba3f5097.20240919T171648523563Z0ec6b845-18b9-4aa1-8f1b-6ba3f9fdefd6
 ```
 
-몇 가지 불변 조건을 참고하세요:
+Note a few invariants:
 
-* "id"는 dotted order의 마지막 36자(마지막 "Z" 뒤의 접미사)와 같습니다. grandchild의 `0ec6b845-18b9-4aa1-8f1b-6ba3f9fdefd6`를 예로 들 수 있습니다.
-* "trace\_id"는 dotted order의 첫 번째 UUID와 같습니다(즉, `dotted_order.split('.')[0].split('Z')[1]`).
-* "parent\_run\_id"가 존재하는 경우, 이는 dotted order의 끝에서 두 번째 UUID입니다. grandchild의 `a8024e23-5b82-47fd-970e-f6a5ba3f5097`을 예로 들 수 있습니다.
-* dotted\_order를 점으로 분할하면 각 세그먼트는 `<run_start_time>Z<run_id>` 형식으로 구성됩니다.
+* The "id" is equal to the last 36 characters of the dotted order (the suffix after the final "Z"). See `0ec6b845-18b9-4aa1-8f1b-6ba3f9fdefd6` for example in the grandchild.
+* The "trace\_id" is equal to the first UUID in the dotted order (i.e., `dotted_order.split('.')[0].split('Z')[1]`)
+* If "parent\_run\_id" exists, it is the penultimate UUID in the dotted order. See `a8024e23-5b82-47fd-970e-f6a5ba3f5097` in the grandchild, for an example.
+* If you split the dotted\_order on the dots, each segment is formatted as (`<run_start_time>Z<run_id>`)
 
 ---
 

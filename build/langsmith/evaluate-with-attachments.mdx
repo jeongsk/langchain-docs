@@ -1,24 +1,24 @@
 ---
-title: 멀티모달 콘텐츠로 평가 실행하기
-sidebarTitle: 멀티모달 콘텐츠로 평가 실행하기
+title: Run an evaluation with multimodal content
+sidebarTitle: Run an evaluation with multimodal content
 ---
 
-LangSmith를 사용하면 파일 첨부(이미지, 오디오 파일, 문서 등)가 포함된 데이터셋 예제를 생성할 수 있으므로, 멀티모달 입력 또는 출력을 사용하는 애플리케이션을 평가할 때 이를 참조할 수 있습니다.
+LangSmith lets you create dataset examples with file attachments—like images, audio files, or documents—so you can reference them when evaluating an application that uses multimodal inputs or outputs.
 
-멀티모달 데이터를 base64로 인코딩하여 예제에 포함시킬 수 있지만, 이 방식은 비효율적입니다. 인코딩된 데이터는 원본 바이너리 파일보다 더 많은 공간을 차지하여 LangSmith로의 전송 속도가 느려집니다. 대신 첨부 파일을 사용하면 다음과 같은 두 가지 주요 이점이 있습니다:
+While you can include multimodal data in your examples by base64 encoding it, this approach is inefficient - the encoded data takes up more space than the original binary files, resulting in slower transfers to and from LangSmith. Using attachments instead provides two key benefits:
 
-1. 보다 효율적인 바이너리 파일 전송으로 인한 빠른 업로드 및 다운로드 속도
-2. LangSmith UI에서 다양한 파일 유형의 향상된 시각화
+1. Faster upload and download speeds due to more efficient binary file transfers
+2. Enhanced visualization of different file types in the LangSmith UI
 
 ## SDK
 
-### 1. 첨부 파일이 포함된 예제 생성하기
+### 1. Create examples with attachments
 
-SDK를 사용하여 첨부 파일이 포함된 예제를 업로드하려면, [create_examples](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.create_examples) / [update_examples](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.update_examples) Python 메서드 또는 [uploadExamplesMultipart](https://docs.smith.langchain.com/reference/js/classes/client.Client#uploadexamplesmultipart) / [updateExamplesMultipart](https://docs.smith.langchain.com/reference/js/classes/client.Client#updateexamplesmultipart) TypeScript 메서드를 사용하세요.
+To upload examples with attachments using the SDK, use the [create_examples](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.create_examples) / [update_examples](https://docs.smith.langchain.com/reference/python/client/langsmith.client.Client#langsmith.client.Client.update_examples) Python methods or the [uploadExamplesMultipart](https://docs.smith.langchain.com/reference/js/classes/client.Client#uploadexamplesmultipart) / [updateExamplesMultipart](https://docs.smith.langchain.com/reference/js/classes/client.Client#updateexamplesmultipart) TypeScript methods.
 
 #### Python
 
-`langsmith>=0.3.13` 버전이 필요합니다
+Requires `langsmith>=0.3.13`
 
 ```python
 import requests
@@ -80,16 +80,16 @@ ls_client.create_examples(
 
 #### TypeScript
 
-버전 >= 0.2.13이 필요합니다
+Requires version >= 0.2.13
 
-`uploadExamplesMultipart` 메서드를 사용하여 첨부 파일이 포함된 예제를 업로드할 수 있습니다.
+You can use the `uploadExamplesMultipart` method to upload examples with attachments.
 
-이 메서드는 현재 첨부 파일을 지원하지 않는 표준 `createExamples` 메서드와 다른 메서드임에 유의하세요. 각 첨부 파일은 데이터 타입으로 `Uint8Array` 또는 `ArrayBuffer`를 요구합니다.
+Note that this is a different method from the standard `createExamples` method, which currently does not support attachments. Each attachment requires either a `Uint8Array` or an `ArrayBuffer` as the data type.
 
-* `Uint8Array`: 바이너리 데이터를 직접 처리하는 데 유용합니다.
-* `ArrayBuffer`: 고정 길이 바이너리 데이터를 나타내며, 필요에 따라 `Uint8Array`로 변환할 수 있습니다.
+* `Uint8Array`: Useful for handling binary data directly.
+* `ArrayBuffer`: Represents fixed-length binary data, which can be converted to `Uint8Array` as needed.
 
-TypeScript SDK에서는 파일 경로를 직접 전달할 수 없습니다. 모든 런타임 환경에서 로컬 파일 액세스가 지원되지 않기 때문입니다.
+Note that you cannot directly pass in a file path in the TypeScript SDK, as accessing local files is not supported in all runtime environments.
 
 
 ```typescript
@@ -159,25 +159,25 @@ await langsmithClient.uploadExamplesMultipart(dataset.id, [example]);
 ```
 
 <Info>
-첨부 파일은 바이트로 전달되는 것 외에도 로컬 파일 경로로 지정할 수 있습니다. 이렇게 하려면 첨부 파일의 `data` 값에 경로를 전달하고 `dangerously_allow_filesystem=True` 인수를 지정하세요:
+Along with being passed in as bytes, attachments can be specified as paths to local files. To do so pass in a path for the attachment `data` value and specify arg `dangerously_allow_filesystem=True`:
 
 ```python
 client.create_examples(..., dangerously_allow_filesystem=True)
 ```
 </Info>
 
-## 2. 평가 실행하기
+## 2. Run evaluations
 
-### 대상 함수 정의하기
+### Define a target function
 
-이제 첨부 파일이 포함된 예제가 있는 데이터셋이 준비되었으므로, 이러한 예제에 대해 실행할 대상 함수를 정의할 수 있습니다. 다음 예제는 단순히 OpenAI의 GPT-4o 모델을 사용하여 이미지와 오디오 클립에 대한 질문에 답변합니다.
+Now that we have a dataset that includes examples with attachments, we can define a target function to run over these examples. The following example simply uses OpenAI's GPT-4o model to answer questions about an image and an audio clip.
 
 #### Python
 
-평가하려는 대상 함수는 예제와 연결된 첨부 파일을 사용하기 위해 두 개의 위치 인수를 가져야 하며, 첫 번째는 `inputs`로 호출되어야 하고 두 번째는 `attachments`로 호출되어야 합니다.
+The target function you are evaluating must have two positional arguments in order to consume the attachments associated with the example, the first must be called `inputs` and the second must be called `attachments`.
 
-* `inputs` 인수는 첨부 파일을 제외한 예제의 입력 데이터를 포함하는 딕셔너리입니다.
-* `attachments` 인수는 첨부 파일 이름을 미리 서명된 URL, mime_type 및 파일의 바이트 콘텐츠 리더를 포함하는 딕셔너리에 매핑하는 딕셔너리입니다. 미리 서명된 URL 또는 리더를 사용하여 파일 콘텐츠를 가져올 수 있습니다. attachments 딕셔너리의 각 값은 다음 구조를 가진 딕셔너리입니다:
+* The `inputs` argument is a dictionary that contains the input data for the example, excluding the attachments.
+* The `attachments` argument is a dictionary that maps the attachment name to a dictionary containing a presigned url, mime_type, and a reader of the bytes content of the file. You can use either the presigned url or the reader to get the file contents. Each value in the attachments dictionary is a dictionary with the following structure:
 
 ```python
 {
@@ -251,9 +251,9 @@ def file_qa(inputs, attachments):
 
 #### TypeScript
 
-TypeScript SDK에서는 `includeAttachments`가 `true`로 설정된 경우 `config` 인수를 사용하여 대상 함수에 첨부 파일을 전달합니다.
+In the TypeScript SDK, the `config` argument is used to pass in the attachments to the target function if `includeAttachments` is set to `true`.
 
-`config`에는 첨부 파일 이름을 다음 형식의 객체에 매핑하는 `attachments`가 포함됩니다:
+The `config` will contain `attachments` which is an object mapping the attachment name to an object of the form:
 
 ```typescript
 {
@@ -328,11 +328,11 @@ async function fileQA(inputs: Record<string, any>, config?: Record<string, any>)
 }
 ```
 
-### 커스텀 평가자 정의하기
+### Define custom evaluators
 
-평가자가 첨부 파일을 수신해야 하는지 여부를 결정하는 데에도 위와 동일한 규칙이 적용됩니다.
+The exact same rules apply as above to determine whether the evaluator should receive attachments.
 
-아래 평가자는 LLM을 사용하여 추론과 답변이 일치하는지 판단합니다. LLM 기반 평가자를 정의하는 방법에 대한 자세한 내용은 [이 가이드](/langsmith/llm-as-judge)를 참조하세요.
+The evaluator below uses an LLM to judge if the reasoning and the answer are consistent. To learn more about how to define llm-based evaluators, please see [this guide](/langsmith/llm-as-judge).
 
 <CodeGroup>
 
@@ -430,23 +430,23 @@ const resp = await evaluate(fileQA, {
 
 </CodeGroup>
 
-## 첨부 파일이 포함된 예제 업데이트하기
+## Update examples with attachments
 
-위의 코드에서는 데이터셋에 첨부 파일이 포함된 예제를 추가하는 방법을 보여주었습니다. SDK를 사용하여 이러한 예제를 업데이트하는 것도 가능합니다.
+In the code above, we showed how to add examples with attachments to a dataset. It is also possible to update these same examples using the SDK.
 
-기존 예제와 마찬가지로, 첨부 파일로 업데이트하면 데이터셋의 버전이 관리됩니다. 따라서 데이터셋 버전 기록으로 이동하여 각 예제에 대한 변경 사항을 확인할 수 있습니다. 자세한 내용은 [이 가이드](/langsmith/manage-datasets-in-application)를 참조하세요.
+As with existing examples, datasets are versioned when you update them with attachments. Therefore, you can navigate to the dataset version history to see the changes made to each example. To learn more, please see [this guide](/langsmith/manage-datasets-in-application).
 
-첨부 파일이 포함된 예제를 업데이트할 때 다음과 같은 몇 가지 방법으로 첨부 파일을 업데이트할 수 있습니다:
+When updating an example with attachments, you can update attachments in a few different ways:
 
-* 새 첨부 파일 전달
-* 기존 첨부 파일 이름 변경
-* 기존 첨부 파일 삭제
+* Pass in new attachments
+* Rename existing attachments
+* Delete existing attachments
 
-다음 사항에 유의하세요:
+Note that:
 
-* 명시적으로 이름이 변경되거나 보존되지 않은 기존 첨부 파일은 **삭제됩니다**.
-* `retain` 또는 `rename`에 존재하지 않는 첨부 파일 이름을 전달하면 오류가 발생합니다.
-* 동일한 첨부 파일 이름이 `attachments` 및 `attachment_operations` 필드에 나타나는 경우 새 첨부 파일이 기존 첨부 파일보다 우선합니다.
+* Any existing attachments that are not explicitly renamed or retained **will be deleted**.
+* An error will be raised if you pass in a non-existent attachment name to `retain` or `rename`.
+* New attachments take precedence over existing attachments in case the same attachment name appears in the `attachments` and `attachment_operations` fields.
 
 <CodeGroup>
 
@@ -505,61 +505,61 @@ await langsmithClient.updateExamplesMultipart(dataset.id, [exampleUpdate]);
 
 ## UI
 
-### 1. 첨부 파일이 포함된 예제 생성하기
+### 1. Create examples with attachments
 
-데이터셋에 첨부 파일이 포함된 예제를 추가하는 몇 가지 방법이 있습니다.
+You can add examples with attachments to a dataset in a few different ways.
 
-#### 기존 실행에서 추가하기
+#### From existing runs
 
-LangSmith 데이터셋에 실행을 추가할 때, 소스 실행에서 대상 예제로 첨부 파일을 선택적으로 전파할 수 있습니다. 자세한 내용은 [이 가이드](/langsmith/manage-datasets-in-application#add-runs-from-the-tracing-project-ui)를 참조하세요.
+When adding runs to a LangSmith dataset, attachments can be selectively propagated from the source run to the destination example. To learn more, please see [this guide](/langsmith/manage-datasets-in-application#add-runs-from-the-tracing-project-ui).
 
 ![Add trace with attachments to dataset](/langsmith/images/add-trace-with-attachments-to-dataset.png)
 
-#### 처음부터 생성하기
+#### From scratch
 
-LangSmith UI에서 직접 첨부 파일이 포함된 예제를 생성할 수 있습니다. 데이터셋 UI의 `Examples` 탭에서 `+ Example` 버튼을 클릭하세요. 그런 다음 "Upload Files" 버튼을 사용하여 첨부 파일을 업로드하세요:
+You can create examples with attachments directly from the LangSmith UI. Click the `+ Example` button in the `Examples` tab of the dataset UI. Then upload attachments using the "Upload Files" button:
 
 ![Create example with attachments](/langsmith/images/create-example-with-attachments.png)
 
-업로드가 완료되면 LangSmith UI에서 첨부 파일이 포함된 예제를 볼 수 있습니다. 각 첨부 파일은 쉽게 검사할 수 있도록 미리보기와 함께 렌더링됩니다. ![Attachments with examples](/langsmith/images/attachments-with-examples.png)
+Once uploaded, you can view examples with attachments in the LangSmith UI. Each attachment will be rendered with a preview for easy inspection. ![Attachments with examples](/langsmith/images/attachments-with-examples.png)
 
-### 2. 멀티모달 프롬프트 생성하기
+### 2. Create a multimodal prompt
 
-LangSmith UI를 사용하면 멀티모달 모델을 평가할 때 프롬프트에 첨부 파일을 포함할 수 있습니다:
+The LangSmith UI allows you to include attachments in your prompts when evaluating multimodal models:
 
-먼저 멀티모달 콘텐츠를 추가하려는 메시지에서 파일 아이콘을 클릭하세요. 다음으로 각 예제에 포함하려는 첨부 파일에 대한 템플릿 변수를 추가하세요.
+First, click the file icon in the message where you want to add multimodal content. Next, add a template variable for the attachment(s) you want to include for each example.
 
-* 단일 첨부 파일 유형의 경우: 제안된 변수 이름을 사용하세요. 참고: 모든 예제에는 이 이름의 첨부 파일이 있어야 합니다.
-* 여러 첨부 파일이 있거나 예제마다 첨부 파일 이름이 다른 경우: `All attachments` 변수를 사용하여 각 예제에 사용 가능한 모든 첨부 파일을 포함하세요.
+* For a single attachment type: Use the suggested variable name. Note: all examples must have an attachment with this name.
+* For multiple attachments or if your attachments have varying names from one example to another: Use the `All attachments` variable to include all available attachments for each example.
 
 ![Adding multimodal variable](/langsmith/images/adding-multimodal-variable.gif)
 
-### 커스텀 평가자 정의하기
+### Define custom evaluators
 
 <Note>
-LangSmith 플레이그라운드는 현재 평가자로 멀티모달 콘텐츠를 가져오는 것을 지원하지 않습니다. 이 기능이 사용 사례에 도움이 될 경우, [LangChain Forum](https://forum.langchain.com/)에 알려주세요 (아직 회원이 아니라면 [여기](https://www.langchain.com/join-community)에서 가입하세요)!
+The LangSmith playground does not currently support pulling multimodal content into evaluators. If this would be helpful for your use case, please let us know in the [LangChain Forum](https://forum.langchain.com/) (sign up [here](https://www.langchain.com/join-community) if you're not already a member)!
 </Note>
 
-예제의 입력 및 출력을 받는 평가자를 추가하여 모델의 텍스트 출력을 평가할 수 있습니다. 평가자에서 멀티모달 지원이 없어도 텍스트 전용 평가를 실행할 수 있습니다. 예를 들어:
+You can evaluate a model's text output by adding an evaluator that takes in the example's inputs and outputs. Even without multimodal support in your evaluators, you can still run text-only evaluations. For example:
 
-* OCR → 텍스트 수정: 비전 모델을 사용하여 문서에서 텍스트를 추출한 다음, 추출된 출력의 정확도를 평가합니다.
-* 음성-텍스트 변환 → 전사 품질: 음성 모델을 사용하여 오디오를 텍스트로 전사한 다음, 참조와 비교하여 전사를 평가합니다.
+* OCR → text correction: Use a vision model to extract text from a document, then evaluate the accuracy of the extracted output.
+* Speech-to-text → transcription quality: Use a voice model to transcribe audio to text, then evaluate the transcription against your reference.
 
-커스텀 평가자 정의에 대한 자세한 내용은 [LLM as Judge](/langsmith/llm-as-judge) 가이드를 참조하세요.
+For more information on defining custom evaluators, see the [LLM as Judge](/langsmith/llm-as-judge) guide.
 
-### 첨부 파일이 포함된 예제 업데이트하기
+### Update examples with attachments
 
 <Note>
-UI에서 첨부 파일의 크기는 20MB로 제한됩니다.
+Attachments are limited to 20MB in size in the UI.
 </Note>
 
-UI에서 예제를 편집할 때 다음을 수행할 수 있습니다:
+When editing an example in the UI, you can:
 
-* 새 첨부 파일 업로드
-* 첨부 파일 이름 변경 및 삭제
-* 빠른 재설정 버튼을 사용하여 첨부 파일을 이전 상태로 재설정
+* Upload new attachments
+* Rename and delete attachments
+* Reset attachments to their previous state using the quick reset button
 
-변경 사항은 제출 버튼을 클릭할 때까지 저장되지 않습니다.
+Changes are not saved until you click submit.
 
 ![Attachment editing](/langsmith/images/attachment-editing.gif)
 

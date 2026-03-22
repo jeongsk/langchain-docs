@@ -1,24 +1,24 @@
 ---
-title: LangChain용 Redis 캐시
+title: Redis Cache for LangChain
 ---
 
-이 노트북은 langchain-redis 패키지의 `RedisCache` 및 `RedisSemanticCache` 클래스를 사용하여 LLM 응답에 대한 캐싱을 구현하는 방법을 보여줍니다.
+This notebook demonstrates how to use the `RedisCache` and `RedisSemanticCache` classes from the langchain-redis package to implement caching for LLM responses.
 
-## 설정
+## Setup
 
-먼저 필요한 의존성을 설치하고 Redis 인스턴스가 실행 중인지 확인하겠습니다.
+First, let's install the required dependencies and ensure we have a Redis instance running.
 
 ```python
 pip install -U langchain-core langchain-redis langchain-openai redis
 ```
 
-Redis 서버가 실행 중인지 확인하세요. Docker를 사용하여 다음과 같이 시작할 수 있습니다:
+Ensure you have a Redis server running. You can start one using Docker with:
 
 ```
 docker run -d -p 6379:6379 redis:latest
 ```
 
-또는 운영 체제의 지침에 따라 Redis를 로컬에 설치하고 실행하세요.
+Or install and run Redis locally according to your operating system's instructions.
 
 ```python
 import os
@@ -32,7 +32,7 @@ print(f"Connecting to Redis at: {REDIS_URL}")
 Connecting to Redis at: redis://redis:6379
 ```
 
-## 필요한 라이브러리 가져오기
+## Importing Required Libraries
 
 ```python
 import time
@@ -50,7 +50,7 @@ import openai
 import redis
 ```
 
-### OpenAI API 키 설정
+### Set OpenAI API key
 
 ```python
 from getpass import getpass
@@ -79,7 +79,7 @@ Please enter your OpenAI API key:  ········
 OpenAI API key has been set for this session.
 ```
 
-## RedisCache 사용하기
+## Using RedisCache
 
 ```python
 # Initialize RedisCache
@@ -133,7 +133,7 @@ Speed improvement: 25.40x faster
 Cache cleared
 ```
 
-## RedisSemanticCache 사용하기
+## Using RedisSemanticCache
 
 ```python
 # Initialize RedisSemanticCache
@@ -194,9 +194,9 @@ Speed improvement: 5.22x faster
 Semantic cache cleared
 ```
 
-## 고급 사용법
+## Advanced Usage
 
-### 사용자 정의 TTL(Time-To-Live)
+### Custom TTL (Time-To-Live)
 
 ```python
 # Initialize RedisCache with custom TTL
@@ -226,7 +226,7 @@ Waiting for TTL to expire...
 Result after TTL: Not found (expired)
 ```
 
-### RedisSemanticCache 커스터마이징
+### Customizing RedisSemanticCache
 
 ```python
 # Initialize RedisSemanticCache with custom settings
@@ -263,9 +263,9 @@ Similar query result:
 The largest planet in our solar system is Jupiter.
 ```
 
-## 결론
+## Conclusion
 
-이 노트북에서는 langchain-redis 패키지의 `RedisCache`와 `RedisSemanticCache`의 사용법을 시연했습니다. 이러한 캐싱 메커니즘은 중복된 API 호출을 줄이고 지능적인 캐싱을 위해 의미적 유사성을 활용함으로써 LLM 기반 애플리케이션의 성능을 크게 향상시킬 수 있습니다. Redis 기반 구현은 분산 시스템에서 캐싱을 위한 빠르고 확장 가능하며 유연한 솔루션을 제공합니다.
+This notebook demonstrated the usage of `RedisCache` and `RedisSemanticCache` from the langchain-redis package. These caching mechanisms can significantly improve the performance of LLM-based applications by reducing redundant API calls and leveraging semantic similarity for intelligent caching. The Redis-based implementation provides a fast, scalable, and flexible solution for caching in distributed systems.
 
 ---
 

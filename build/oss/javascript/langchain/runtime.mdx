@@ -1,29 +1,29 @@
 ---
-title: 런타임
+title: Runtime
 ---
 
 
 
-## 개요
+## Overview
 
 
-LangChain의 `createAgent`는 내부적으로 LangGraph의 런타임에서 실행됩니다.
+LangChain's `createAgent` runs on LangGraph's runtime under the hood.
 
-LangGraph는 다음과 같은 정보를 포함하는 [Runtime](https://reference.langchain.com/javascript/interfaces/_langchain_langgraph.index.Runtime.html) 객체를 제공합니다:
+LangGraph exposes a [Runtime](https://reference.langchain.com/javascript/interfaces/_langchain_langgraph.index.Runtime.html) object with the following information:
 
-1. **Context**: 사용자 ID, 데이터베이스 연결 또는 에이전트 호출을 위한 기타 종속성과 같은 정적 정보
-2. **Store**: [장기 메모리](/oss/javascript/langchain/long-term-memory)에 사용되는 [BaseStore](https://langchain-ai.github.io/langgraphjs/reference/classes/checkpoint.BaseStore.html) 인스턴스
-3. **Stream writer**: `"custom"` 스트림 모드를 통해 정보를 스트리밍하는 데 사용되는 객체
+1. **Context**: static information like user id, db connections, or other dependencies for an agent invocation
+2. **Store**: a [BaseStore](https://langchain-ai.github.io/langgraphjs/reference/classes/checkpoint.BaseStore.html) instance used for [long-term memory](/oss/javascript/langchain/long-term-memory)
+3. **Stream writer**: an object used for streaming information via the `"custom"` stream mode
 
-런타임 정보는 [도구](#inside-tools) 및 [미들웨어](#inside-middleware) 내에서 접근할 수 있습니다.
+You can access the runtime information within [tools](#inside-tools) and [middleware](#inside-middleware).
 
-## 접근
-
-
-`createAgent`를 사용하여 에이전트를 생성할 때, 에이전트 [Runtime](https://reference.langchain.com/javascript/interfaces/_langchain_langgraph.index.Runtime.html)에 저장된 `context`의 구조를 정의하기 위해 `contextSchema`를 지정할 수 있습니다.
+## Access
 
 
-에이전트를 호출할 때는 실행에 필요한 관련 구성과 함께 `context` 인수를 전달합니다:
+When creating an agent with `createAgent`, you can specify a `contextSchema` to define the structure of the `context` stored in the agent [Runtime](https://reference.langchain.com/javascript/interfaces/_langchain_langgraph.index.Runtime.html).
+
+
+When invoking the agent, pass the `context` argument with the relevant configuration for the run:
 
 
 ```ts
@@ -49,16 +49,16 @@ const result = await agent.invoke(
 ```
 
 
-### 도구 내부에서
+### Inside tools
 
-도구 내부에서 런타임 정보에 접근하여 다음을 수행할 수 있습니다:
+You can access the runtime information inside tools to:
 
-* 컨텍스트 접근
-* 장기 메모리 읽기 또는 쓰기
-* [커스텀 스트림](/oss/javascript/langchain/streaming#custom-updates)에 쓰기 (예: 도구 진행 상황 / 업데이트)
+* Access the context
+* Read or write long-term memory
+* Write to the [custom stream](/oss/javascript/langchain/streaming#custom-updates) (ex, tool progress / updates)
 
 
-도구 내부에서 [Runtime](https://reference.langchain.com/javascript/interfaces/_langchain_langgraph.index.Runtime.html) 객체에 접근하려면 `runtime` 매개변수를 사용하세요.
+Use the `runtime` parameter to access the [Runtime](https://reference.langchain.com/javascript/interfaces/_langchain_langgraph.index.Runtime.html) object inside a tool.
 
 ```ts
 import * as z from "zod";
@@ -94,12 +94,12 @@ const fetchUserEmailPreferences = tool(
 ```
 
 
-### 미들웨어 내부에서
+### Inside middleware
 
-미들웨어에서 런타임 정보에 접근하여 동적 프롬프트를 생성하거나, 메시지를 수정하거나, 사용자 컨텍스트를 기반으로 에이전트 동작을 제어할 수 있습니다.
+You can access runtime information in middleware to create dynamic prompts, modify messages, or control agent behavior based on user context.
 
 
-미들웨어 내부에서 [Runtime](https://reference.langchain.com/javascript/interfaces/_langchain_langgraph.index.Runtime.html) 객체에 접근하려면 `runtime` 매개변수를 사용하세요.
+Use the `runtime` parameter to access the [Runtime](https://reference.langchain.com/javascript/interfaces/_langchain_langgraph.index.Runtime.html) object inside middleware.
 
 ```ts
 import * as z from "zod";
@@ -110,7 +110,7 @@ const contextSchema = z.object({
   userName: z.string(),
 });
 
-// 동적 프롬프트 미들웨어
+// Dynamic prompt middleware
 const dynamicPromptMiddleware = createMiddleware({
   name: "DynamicPrompt",
   beforeModel: (state: AgentState, runtime: Runtime<z.infer<typeof contextSchema>>) => {  // [!code highlight]
@@ -126,7 +126,7 @@ const dynamicPromptMiddleware = createMiddleware({
   }
 });
 
-// 로깅 미들웨어
+// Logging middleware
 const loggingMiddleware = createMiddleware({
   name: "Logging",
   beforeModel: (state: AgentState, runtime: Runtime<z.infer<typeof contextSchema>>) => {  // [!code highlight]

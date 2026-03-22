@@ -4,15 +4,15 @@ title: MISSING_CHECKPOINTER
 
 
 
-체크포인터를 제공하지 않고 LangGraph의 내장 지속성 기능을 사용하려고 시도하고 있습니다.
+You are attempting to use built-in LangGraph persistence without providing a checkpointer.
 
-이 오류는 [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html)의 `compile()` 메서드 또는 @[`@entrypoint`]에 `checkpointer`가 누락되었을 때 발생합니다.
+This happens when a `checkpointer` is missing in the `compile()` method of [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html) or @[`@entrypoint`].
 
-## 문제 해결
+## Troubleshooting
 
-다음 방법을 통해 이 오류를 해결할 수 있습니다:
+The following may help resolve this error:
 
--   체크포인터를 초기화하고 [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html)의 `compile()` 메서드 또는 @[`@entrypoint`]에 전달하세요.
+-   Initialize and pass a checkpointer to the `compile()` method of [`StateGraph`](https://langchain-ai.github.io/langgraphjs/reference/classes/langgraph.StateGraph.html) or @[`@entrypoint`].
 
 
 
@@ -36,11 +36,11 @@ const workflow = entrypoint(
 
 
 
--   체크포인터를 수동으로 구현하거나 구성할 필요 없이 LangGraph API를 사용하세요. API가 모든 지속성 인프라를 자동으로 처리합니다.
+-   Use the LangGraph API so you don't need to implement or configure checkpointers manually. The API handles all persistence infrastructure for you.
 
-## 관련 문서
+## Related
 
-- [지속성](/oss/javascript/langgraph/persistence)에 대해 자세히 알아보세요.
+- Read more about [persistence](/oss/javascript/langgraph/persistence).
 
 ---
 

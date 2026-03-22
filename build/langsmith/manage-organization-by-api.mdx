@@ -1,99 +1,99 @@
 ---
-title: API를 사용하여 조직 관리하기
-sidebarTitle: API를 사용한 조직 관리
+title: Manage your organization using the API
+sidebarTitle: Manage organizations using the API
 ---
 
-LangSmith의 API는 API 키를 통한 프로그래밍 방식 접근을 지원하며, [사용자 전용 엔드포인트](#user-only-endpoints)에 명시된 몇 가지 예외를 제외하고 UI에서 사용할 수 있는 모든 작업을 수행할 수 있습니다.
+LangSmith's API supports programmatic access via API key to all of the actions available in the UI, with only a few exceptions that are noted in [User-only endpoints](#user-only-endpoints).
 
 <Check>
-이 내용을 학습하기 전에 다음 문서를 읽어보시는 것이 도움이 될 수 있습니다:
+Before diving into this content, it might be helpful to read the following:
 
-* [조직 및 워크스페이스에 대한 개념 가이드](/langsmith/administration-overview)
-* [조직 설정 가이드](/langsmith/set-up-a-workspace#set-up-an-organization)
+* [Conceptual guide on organizations and workspaces](/langsmith/administration-overview)
+* [Organization setup how-to guild](/langsmith/set-up-a-workspace#set-up-an-organization)
 </Check>
 
 <Note>
-곧 해제될 몇 가지 제한 사항이 있습니다:
+There are a few limitations that will be lifted soon:
 
-* LangSmith SDK는 아직 이러한 조직 관리 작업을 지원하지 않습니다.
-* Organization Admin 권한이 있는 조직 범위 [서비스 키](/langsmith/administration-overview#service-keys)를 이러한 작업에 사용할 수 있습니다.
+* The LangSmith SDKs do not support these organization management actions yet.
+* Organization-scoped [service keys](/langsmith/administration-overview#service-keys) with Organization Admin permission may be used for these actions.
 </Note>
 
 <Warning>
-대상으로 지정할 워크스페이스를 `X-Tenant-Id` 헤더로 지정하세요. 헤더가 없는 경우, 작업은 API 키가 조직 범위가 아닌 경우 처음 생성된 워크스페이스를 기본값으로 사용합니다.
+Use the `X-Tenant-Id` header to specify which workspace to target. If the header is not present, operations will default to the workspace the API key was initially created in if it is not organization-scoped.
 
-**조직 범위 API 키로 워크스페이스 범위 리소스에 접근할 때 `X-Tenant-Id`를 지정하지 않으면, 요청이 `403 Forbidden`으로 실패합니다.**
+**If `X-Tenant-Id` is not specified when accessing workspace-scoped resources with an organization-scoped API key, the request will fail with `403 Forbidden`.**
 </Warning>
 
-자주 사용되는 엔드포인트와 사용 사례가 아래에 나열되어 있습니다. 사용 가능한 전체 엔드포인트 목록은 [API 문서](https://api.smith.langchain.com/redoc)를 참조하세요. **모든 요청에는 `X-Organization-Id` 헤더가 있어야 하며, 특정 워크스페이스에 범위가 지정된 요청에는 `X-Tenant-Id` 헤더가 있어야 합니다.**
+Some commonly-used endpoints and use cases are listed below. For a complete list of available endpoints, see the [API docs](https://api.smith.langchain.com/redoc). **The `X-Organization-Id` header should be present on all requests, and `X-Tenant-Id` header should be present on requests that are scoped to a particular workspace.**
 
-## 워크스페이스
+## Workspaces
 
-* [워크스페이스 목록 조회](https://api.smith.langchain.com/redoc#tag/workspaces/operation/list_workspaces_api_v1_workspaces_get)
-* [워크스페이스 생성](https://api.smith.langchain.com/redoc#tag/workspaces/operation/create_workspace_api_v1_workspaces_post)
-* [워크스페이스 이름 업데이트](https://api.smith.langchain.com/redoc#tag/workspaces/operation/patch_workspace_api_v1_workspaces__workspace_id__patch)
+* [List workspaces](https://api.smith.langchain.com/redoc#tag/workspaces/operation/list_workspaces_api_v1_workspaces_get)
+* [Create workspace](https://api.smith.langchain.com/redoc#tag/workspaces/operation/create_workspace_api_v1_workspaces_post)
+* [Update workspace name](https://api.smith.langchain.com/redoc#tag/workspaces/operation/patch_workspace_api_v1_workspaces__workspace_id__patch)
 
-## 사용자 관리
+## User management
 
 ### RBAC
 
-* [역할 목록 조회](https://api.smith.langchain.com/redoc#tag/orgs/operation/list_organization_roles_api_v1_orgs_current_roles_get)
-* [권한 목록 조회](https://api.smith.langchain.com/redoc#tag/orgs/operation/update_organization_roles_api_v1_orgs_current_roles__role_id__patch)
-* [역할 생성](https://api.smith.langchain.com/redoc#tag/orgs/operation/create_organization_roles_api_v1_orgs_current_roles_post)
-* [역할 업데이트](https://api.smith.langchain.com/redoc#tag/orgs/operation/update_organization_roles_api_v1_orgs_current_roles__role_id__patch)
+* [List roles](https://api.smith.langchain.com/redoc#tag/orgs/operation/list_organization_roles_api_v1_orgs_current_roles_get)
+* [List permissions](https://api.smith.langchain.com/redoc#tag/orgs/operation/update_organization_roles_api_v1_orgs_current_roles__role_id__patch)
+* [Create role](https://api.smith.langchain.com/redoc#tag/orgs/operation/create_organization_roles_api_v1_orgs_current_roles_post)
+* [Update role](https://api.smith.langchain.com/redoc#tag/orgs/operation/update_organization_roles_api_v1_orgs_current_roles__role_id__patch)
 
-### 멤버십 관리
+### Membership management
 
-이러한 작업의 역할 ID를 가져오려면 [RBAC](#rbac) 아래의 `역할 목록 조회`를 사용해야 합니다. 아래의 `[조직|워크스페이스] 멤버 목록 조회` 엔드포인트 응답의 `"id"` 값을 이러한 작업에서 `identity_id`로 사용해야 합니다.
+`List roles` under [RBAC](#rbac) should be used for retrieving role IDs of these operations. `List [organization|workspace] members` endpoints (below) response `"id"`s should be used as `identity_id` in these operations.
 
-조직 수준:
+Organization level:
 
-* [활성 조직 멤버 목록 조회](https://api.smith.langchain.com/redoc#tag/orgs/operation/get_current_active_org_members_api_v1_orgs_current_members_active_get)
-* [대기 중인 조직 멤버 목록 조회](https://api.smith.langchain.com/redoc#tag/orgs/operation/get_current_pending_org_members_api_v1_orgs_current_members_pending_get)
-* [조직 및 하나 이상의 워크스페이스에 사용자 초대](https://api.smith.langchain.com/redoc#tag/orgs/operation/add_members_to_current_org_batch_api_v1_orgs_current_members_batch_post). 사용자가 아직 조직의 멤버가 아닌 경우에 사용해야 합니다.
-* [사용자의 조직 역할 업데이트](https://api.smith.langchain.com/redoc#tag/workspaces/operation/add_member_to_current_workspace_api_v1_workspaces_current_members_post)
-* [조직에서 사용자 제거](https://api.smith.langchain.com/redoc#tag/orgs/operation/remove_member_from_current_org_api_v1_orgs_current_members__identity_id__delete)
+* [List active organization members](https://api.smith.langchain.com/redoc#tag/orgs/operation/get_current_active_org_members_api_v1_orgs_current_members_active_get)
+* [List pending organization members](https://api.smith.langchain.com/redoc#tag/orgs/operation/get_current_pending_org_members_api_v1_orgs_current_members_pending_get)
+* [Invite a user to the organization and one or more workspaces](https://api.smith.langchain.com/redoc#tag/orgs/operation/add_members_to_current_org_batch_api_v1_orgs_current_members_batch_post). This should be used when the user is not already a member in the organization.
+* [Update a user's organization role](https://api.smith.langchain.com/redoc#tag/workspaces/operation/add_member_to_current_workspace_api_v1_workspaces_current_members_post)
+* [Remove someone from the organization](https://api.smith.langchain.com/redoc#tag/orgs/operation/remove_member_from_current_org_api_v1_orgs_current_members__identity_id__delete)
 
-워크스페이스 수준:
+Workspace level:
 
-* [워크스페이스 멤버 목록 조회](https://api.smith.langchain.com/redoc#tag/workspaces/operation/get_current_workspace_members_api_v1_workspaces_current_members_get)
-* [이미 조직의 일부인 멤버를 워크스페이스에 추가](https://api.smith.langchain.com/redoc#tag/workspaces/operation/add_member_to_current_workspace_api_v1_workspaces_current_members_post)
-* [사용자의 워크스페이스 역할 업데이트](https://api.smith.langchain.com/redoc#tag/workspaces/operation/add_member_to_current_workspace_api_v1_workspaces_current_members_post)
-* [워크스페이스에서 사용자 제거](https://api.smith.langchain.com/redoc#tag/workspaces/operation/delete_current_workspace_member_api_v1_workspaces_current_members__identity_id__delete)
+* [List workspace members](https://api.smith.langchain.com/redoc#tag/workspaces/operation/get_current_workspace_members_api_v1_workspaces_current_members_get)
+* [Add a member to a workspace that is already part of the organization](https://api.smith.langchain.com/redoc#tag/workspaces/operation/add_member_to_current_workspace_api_v1_workspaces_current_members_post)
+* [Update a user's workspace role](https://api.smith.langchain.com/redoc#tag/workspaces/operation/add_member_to_current_workspace_api_v1_workspaces_current_members_post)
+* [Remove someone from a workspace](https://api.smith.langchain.com/redoc#tag/workspaces/operation/delete_current_workspace_member_api_v1_workspaces_current_members__identity_id__delete)
 
 <Note>
-다음 매개변수는 생략해야 합니다: `read_only` (더 이상 사용되지 않음), `password` 및 `full_name` ([기본 인증](/langsmith/authentication-methods)만 해당)
+These params should be omitted: `read_only` (deprecated), `password` and `full_name` ([basic auth](/langsmith/authentication-methods) only)
 </Note>
 
-## API 키
+## API keys
 
-* [서비스 키 생성](https://api.smith.langchain.com/redoc#tag/api-key/operation/generate_api_key_api_v1_api_key_post)
-* [서비스 키 삭제](https://api.smith.langchain.com/redoc#tag/api-key/operation/delete_api_key_api_v1_api_key__api_key_id__delete)
+* [Create a service key](https://api.smith.langchain.com/redoc#tag/api-key/operation/generate_api_key_api_v1_api_key_post)
+* [Delete a service key](https://api.smith.langchain.com/redoc#tag/api-key/operation/delete_api_key_api_v1_api_key__api_key_id__delete)
 
-## 보안 설정
+## Security settings
 
 <Note>
-이 맥락에서 "공유 리소스"는 [공개 프롬프트](/langsmith/create-a-prompt#save-your-prompt), [공유 실행](/langsmith/share-trace), [공유 데이터셋](/langsmith/manage-datasets#share-a-dataset)을 의미합니다.
+"Shared resources" in this context refer to [public prompts](/langsmith/create-a-prompt#save-your-prompt), [shared runs](/langsmith/share-trace), and [shared datasets](/langsmith/manage-datasets#share-a-dataset).
 </Note>
 
 <Warning>
-이러한 설정을 업데이트하면 **조직의 모든 리소스**에 영향을 미칩니다.
+Updating these settings affects **all resources in the organization**.
 </Warning>
 
-워크스페이스의 **설정 > 공유** 탭에서 이러한 설정을 업데이트하거나 API를 통해 업데이트할 수 있습니다:
-* [조직 공유 설정 업데이트](https://api.smith.langchain.com/redoc#tag/orgs/operation/update_current_organization_info_api_v1_orgs_current_info_patch)
-  * 조직의 **모든** 공유 리소스를 공유 해제하려면 `unshare_all`을 사용하고, 향후 리소스 공유를 방지하려면 `disable_public_sharing`을 사용하세요
+You can update these settings under the **Settings > Shared** tab for a workspace, or via API:
+* [Update organization sharing settings](https://api.smith.langchain.com/redoc#tag/orgs/operation/update_current_organization_info_api_v1_orgs_current_info_patch)
+  * use `unshare_all` to unshare **ALL** shared resources in the organization - use `disable_public_sharing` to prevent future sharing of resources
 
-## 사용자 전용 엔드포인트
+## User-only endpoints
 
-이러한 엔드포인트는 사용자 범위이며 로그인한 사용자의 JWT가 필요하므로 UI를 통해서만 실행해야 합니다.
+These endpoints are user-scoped and require a logged-in user's JWT, so they should only be executed through the UI.
 
-* `/api-key/current` 엔드포인트: 사용자의 PAT와 관련된 엔드포인트입니다
-* `/sso/email-verification/send` (Cloud 전용): 이 엔드포인트는 [SAML SSO](/langsmith/user-management)와 관련이 있습니다
+* `/api-key/current` endpoints: these are related a user's PATs
+* `/sso/email-verification/send` (Cloud-only): this endpoint is related to [SAML SSO](/langsmith/user-management)
 
-## 샘플 코드
+## Sample code
 
-아래 샘플 코드는 조직 관리와 관련된 몇 가지 일반적인 워크플로를 설명합니다. 코드에서 `<replace_me>`가 있는 곳마다 필요한 값으로 교체해야 합니다.
+The sample code below goes through a few common workflows related to organization management. Make sure to make necessary replacements wherever `<replace_me>` is in the code.
 
 ```python
 import os
@@ -101,9 +101,9 @@ import requests
 
 def main():
     api_key = os.environ["LANGSMITH_API_KEY"]
-    # LANGSMITH_ORGANIZATION_ID는 SDK의 표준 환경 변수가 아니며, 이 예제에서만 사용됩니다
+    # LANGSMITH_ORGANIZATION_ID is not a standard environment variable in the SDK, just used for this example
     organization_id = os.environ["LANGSMITH_ORGANIZATION_ID"]
-    base_url = os.environ.get("LANGSMITH_ENDPOINT")  # 또는 "https://api.smith.langchain.com". 자체 호스팅 설치 또는 EU 지역에 맞게 적절히 업데이트하세요
+    base_url = os.environ.get("LANGSMITH_ENDPOINT")  # or "https://api.smith.langchain.com". Update appropriately for self-hosted installations or the EU region
     headers = {
         "Content-Type": "application/json",
         "X-API-Key": api_key,
@@ -115,7 +115,7 @@ def main():
     orgs_path = f"{base_url}/api/v1/orgs/current"
     api_keys_path = f"{base_url}/api/v1/api-key"
 
-    # 워크스페이스 생성
+    # Create a workspace
     workspace_res = session.post(workspaces_path, json={"display_name": "My Workspace"})
     workspace_res.raise_for_status()
     workspace = workspace_res.json()
@@ -124,17 +124,17 @@ def main():
         "X-Tenant-Id": workspace_id,
     }
 
-    # 역할 가져오기 - 조직 및 워크스페이스 역할 모두 포함
+    # Grab roles - this includes both organization and workspace roles
     roles_res = session.get(f"{orgs_path}/roles")
     roles_res.raise_for_status()
     roles = roles_res.json()
-    # 시스템 조직 역할은 'Organization Admin', 'Organization User'입니다
-    # 시스템 워크스페이스 역할은 'Admin', 'Editor', 'Viewer'입니다
+    # system org roles are 'Organization Admin', 'Organization User'
+    # system workspace roles are 'Admin', 'Editor', 'Viewer'
     org_roles_by_name = {role["display_name"]: role for role in roles if role["access_scope"] == "organization"}
     ws_roles_by_name = {role["display_name"]: role for role in roles if role["access_scope"] == "workspace"}
 
-    # 조직 및 새 워크스페이스에 Editor로 사용자 초대
-    # workspace_role_id는 RBAC가 활성화된 경우에만 허용됩니다 (엔터프라이즈 기능).
+    # Invite a user to the org and the new workspace, as an Editor.
+    # workspace_role_id is only allowed if RBAC is enabled (an enterprise feature).
     new_user_email = "<replace_me>"
     new_user_res = session.post(
         f"{orgs_path}/members",
@@ -147,8 +147,8 @@ def main():
     )
     new_user_res.raise_for_status()
 
-    # 이미 조직에 있는 사용자를 Viewer로 새 워크스페이스에 추가
-    # workspace_role_id는 RBAC가 활성화된 경우에만 허용됩니다 (엔터프라이즈 기능).
+    # Add a user that already exists in the org to the new workspace, as a Viewer.
+    # workspace_role_id is only allowed if RBAC is enabled (an enterprise feature).
     existing_user_email = "<replace_me>"
     org_members_res = session.get(f"{orgs_path}/members")
     org_members_res.raise_for_status()
@@ -167,7 +167,7 @@ def main():
     )
     existing_user_res.raise_for_status()
 
-    # 워크스페이스의 모든 멤버 목록 조회
+    # List all members of the workspace
     members_res = session.get(f"{workspaces_path}/current/members", headers=new_workspace_headers)
     members_res.raise_for_status()
     members = members_res.json()
@@ -175,7 +175,7 @@ def main():
         (member for member in members["members"] if member["email"] == existing_user_email), None
     )
 
-    # 사용자의 워크스페이스 역할을 Admin으로 업데이트 (엔터프라이즈 전용)
+    # Update the user's workspace role to Admin (enterprise-only)
     existing_user_id = workspace_member["id"]
     update_res = session.patch(
         f"{workspaces_path}/current/members/{existing_user_id}",
@@ -184,14 +184,14 @@ def main():
     )
     update_res.raise_for_status()
 
-    # 사용자의 조직 역할을 Organization Admin으로 업데이트
+    # Update the user's organization role to Organization Admin
     update_res = session.patch(
         f"{orgs_path}/members/{existing_org_member['id']}",
         json={"role_id": org_roles_by_name["Organization Admin"]["id"]},
     )
     update_res.raise_for_status()
 
-    # 새 서비스 키 생성
+    # Create a new Service key
     api_key_res = session.post(
         api_keys_path,
         json={"description": "my key"},

@@ -1,49 +1,49 @@
 ---
-title: 다중 턴 대화 테스트하기
-sidebarTitle: 다중 턴 대화 테스트하기
+title: Test multi-turn conversations
+sidebarTitle: Test multi-turn conversations
 ---
 
-이 가이드에서는 다중 턴 대화를 위한 플레이그라운드 설정 방법을 안내합니다. 이를 통해 긴 메시지 스레드에 대해 다양한 도구 구성과 시스템 프롬프트를 테스트할 수 있습니다.
+This how-to guide walks you through the various ways you can set up the playground for multi-turn conversations, which will allow you to test different tool configurations and system prompts against longer threads of messages.
 
 ![](/langsmith/images/multiturn-diagram.png)
 
-## 기존 실행에서 시작하기
+## From an existing run
 
-먼저 다중 턴 대화를 적절히 [추적](/langsmith/observability)했는지 확인한 후, 추적 프로젝트로 이동합니다. 추적 프로젝트에 들어간 후 다음과 같이 실행을 열고 LLM 호출을 선택한 다음 플레이그라운드에서 엽니다:
+First, ensure you have properly [traced](/langsmith/observability) a multi-turn conversation, and then navigate to your tracing project. Once you get to your tracing project simply open the run, select the LLM call, and open it in the playground as follows:
 
 ![](/langsmith/images/multiturn-from-run.gif)
 
-그런 다음 시스템 프롬프트를 편집하고 도구 및/또는 출력 스키마를 조정하여 다중 턴 대화의 출력이 어떻게 변하는지 관찰할 수 있습니다.
+You can then edit the system prompt, tweak the tools and/or output schema and observe how the output of the multi-turn conversation changes.
 
-## 데이터셋에서 시작하기
+## From a dataset
 
-시작하기 전에 [데이터셋을 설정](/langsmith/manage-datasets-in-application)했는지 확인하세요. 다중 턴 대화를 평가하려면 입력에 메시지 목록을 포함하는 키가 있어야 합니다.
+Before starting, make sure you have [set up your dataset](/langsmith/manage-datasets-in-application). Since you want to evaluate multi-turn conversations, make sure there is a key in your inputs that contains a list of messages.
 
-데이터셋을 생성한 후 플레이그라운드로 이동하여 평가를 위해 [데이터셋을 로드](/langsmith/manage-datasets-in-application#from-the-prompt-playground)합니다.
+Once you have created your dataset, head to the playground and [load your dataset](/langsmith/manage-datasets-in-application#from-the-prompt-playground) to evaluate.
 
-그런 다음 프롬프트에 메시지 목록 변수를 추가하되, 메시지 목록을 포함하는 입력의 키와 동일한 이름을 지정해야 합니다:
+Then, add a messages list variable to your prompt, making sure to name it the same as the key in your inputs that contains the list of messages:
 
 ![](/langsmith/images/multiturn-from-dataset.gif)
 
-프롬프트를 실행하면 각 예제의 메시지가 'Messages List' 변수 자리에 목록으로 추가됩니다.
+When you run your prompt, the messages from each example will be added as a list in place of the 'Messages List' variable.
 
-## 수동으로 생성하기
+## Manually
 
-다중 턴 대화를 수동으로 생성하는 방법은 두 가지입니다. 첫 번째 방법은 프롬프트에 메시지를 추가하는 것입니다:
+There are two ways to manually create multi-turn conversations. The first way is by simply appending messages to the prompt:
 
 ![](/langsmith/images/multiturn-manual.gif)
 
-이 방법은 빠른 반복에 유용하지만 다중 턴 대화가 하드코딩되어 있어 유연하지 않습니다. 대신 프롬프트가 모든 다중 턴 대화에서 작동하도록 하려면 'Messages List' 변수를 추가하고 여기에 다중 턴 대화를 추가할 수 있습니다:
+This is helpful for quick iteration, but is rigid since the multi-turn conversation is hardcoded. Instead, if you want your prompt to work with any multi-turn conversation you can add a 'Messages List' variable and add your multi-turn conversation there:
 
 ![](/langsmith/images/multiturn-manual-list.gif)
 
-이렇게 하면 시스템 프롬프트나 도구만 조정하면서 `Messages List` 변수 자리에 모든 다중 턴 대화를 배치할 수 있어 다양한 실행에서 이 프롬프트를 재사용할 수 있습니다.
+This allows you to just tweak the system prompt or the tools, while allowing any multi-turn conversation to take the place of the `Messages List` variable, allowing you to reuse this prompt across various runs.
 
-## 다음 단계
+## Next Steps
 
-이제 다중 턴 상호작용을 위한 플레이그라운드 설정 방법을 알게 되었으므로, 출력을 수동으로 검사하고 판단하거나 결과를 분류하기 위해 [평가자를 추가](/langsmith/code-evaluator)할 수 있습니다.
+Now that you know how to set up the playground for multi-turn interactions, you can either manually inspect and judge the outputs, or you can [add evaluators](/langsmith/code-evaluator) to classify results.
 
-또한 플레이그라운드를 사용하여 평가를 실행하는 방법에 대해 자세히 알아보려면 [이 가이드들](/langsmith/create-a-prompt)을 참조하세요.
+You can also read [these how-to guides](/langsmith/create-a-prompt) to learn more about how to use the playground to run evaluations.
 
 ---
 

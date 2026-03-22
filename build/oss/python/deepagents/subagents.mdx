@@ -1,54 +1,54 @@
 ---
-title: 서브에이전트
-description: 작업을 위임하고 컨텍스트를 깨끗하게 유지하기 위해 서브에이전트를 사용하는 방법을 알아보세요
+title: Subagents
+description: Learn how to use subagents to delegate work and keep context clean
 ---
 
-Deep 에이전트는 작업을 위임하기 위해 서브에이전트를 생성할 수 있습니다. `subagents` 매개변수에서 커스텀 서브에이전트를 지정할 수 있습니다. 서브에이전트는 [컨텍스트 격리](https://www.dbreunig.com/2025/06/26/how-to-fix-your-context.html#context-quarantine)(메인 에이전트의 컨텍스트를 깨끗하게 유지)와 특화된 지시사항 제공에 유용합니다.
+Deep agents can create subagents to delegate work. You can specify custom subagents in the `subagents` parameter. Subagents are useful for [context quarantine](https://www.dbreunig.com/2025/06/26/how-to-fix-your-context.html#context-quarantine) (keeping the main agent's context clean) and for providing specialized instructions.
 
-## 서브에이전트를 사용하는 이유
+## Why use subagents?
 
-서브에이전트는 **컨텍스트 비대화 문제**를 해결합니다. 에이전트가 대용량 출력을 가진 도구(웹 검색, 파일 읽기, 데이터베이스 쿼리)를 사용할 때, 컨텍스트 윈도우는 중간 결과로 빠르게 채워집니다. 서브에이전트는 이러한 세부 작업을 격리합니다. 메인 에이전트는 수십 개의 도구 호출이 아닌 최종 결과만 받습니다.
+Subagents solve the **context bloat problem**. When agents use tools with large outputs (web search, file reads, database queries), the context window fills up quickly with intermediate results. Subagents isolate this detailed work—the main agent receives only the final result, not the dozens of tool calls that produced it.
 
-**서브에이전트를 사용해야 하는 경우:**
-- ✅ 메인 에이전트의 컨텍스트를 어지럽힐 수 있는 다단계 작업
-- ✅ 커스텀 지시사항이나 도구가 필요한 특화된 도메인
-- ✅ 다른 모델 기능이 필요한 작업
-- ✅ 메인 에이전트가 고수준 조정에 집중하도록 하고 싶을 때
+**When to use subagents:**
+- ✅ Multi-step tasks that would clutter the main agent's context
+- ✅ Specialized domains that need custom instructions or tools
+- ✅ Tasks requiring different model capabilities
+- ✅ When you want to keep the main agent focused on high-level coordination
 
-**서브에이전트를 사용하지 말아야 하는 경우:**
-- ❌ 간단한 단일 단계 작업
-- ❌ 중간 컨텍스트를 유지해야 하는 경우
-- ❌ 오버헤드가 이점보다 클 때
+**When NOT to use subagents:**
+- ❌ Simple, single-step tasks
+- ❌ When you need to maintain intermediate context
+- ❌ When the overhead outweighs benefits
 
-## 구성
+## Configuration
 
-`subagents`는 딕셔너리 목록 또는 `CompiledSubAgent` 객체여야 합니다. 두 가지 유형이 있습니다:
+`subagents` should be a list of dictionaries or `CompiledSubAgent` objects. There are two types:
 
-### SubAgent (딕셔너리 기반)
+### SubAgent (Dictionary-based)
 
-대부분의 사용 사례에서는 서브에이전트를 딕셔너리로 정의합니다:
+For most use cases, define subagents as dictionaries:
 
-**필수 필드:**
-- **name** (`str`): 서브에이전트의 고유 식별자입니다. 메인 에이전트는 `task()` 도구를 호출할 때 이 이름을 사용합니다.
-- **description** (`str`): 이 서브에이전트가 수행하는 작업입니다. 구체적이고 행동 지향적으로 작성하세요. 메인 에이전트는 이를 사용하여 언제 위임할지 결정합니다.
-- **system_prompt** (`str`): 서브에이전트에 대한 지시사항입니다. 도구 사용 가이드와 출력 형식 요구사항을 포함하세요.
-- **tools** (`List[Callable]`): 서브에이전트가 사용할 수 있는 도구입니다. 최소한으로 유지하고 필요한 것만 포함하세요.
+**Required fields:**
+- **name** (`str`): Unique identifier for the subagent. The main agent uses this name when calling the `task()` tool.
+- **description** (`str`): What this subagent does. Be specific and action-oriented. The main agent uses this to decide when to delegate.
+- **system_prompt** (`str`): Instructions for the subagent. Include tool usage guidance and output format requirements.
+- **tools** (`List[Callable]`): Tools the subagent can use. Keep this minimal and include only what's needed.
 
-**선택 필드:**
-- **model** (`str | BaseChatModel`): 메인 에이전트의 모델을 재정의합니다. `"provider:model-name"` 형식을 사용하세요(예: `"openai:gpt-4o"`).
-- **middleware** (`List[Middleware]`): 커스텀 동작, 로깅 또는 속도 제한을 위한 추가 미들웨어입니다.
-- **interrupt_on** (`Dict[str, bool]`): 특정 도구에 대한 human-in-the-loop을 구성합니다. 체크포인터가 필요합니다.
+**Optional fields:**
+- **model** (`str | BaseChatModel`): Override the main agent's model. Use the format `"provider:model-name"` (for example, `"openai:gpt-4o"`).
+- **middleware** (`List[Middleware]`): Additional middleware for custom behavior, logging, or rate limiting.
+- **interrupt_on** (`Dict[str, bool]`): Configure human-in-the-loop for specific tools. Requires a checkpointer.
 
 ### CompiledSubAgent
 
-복잡한 워크플로우의 경우, 사전 구축된 LangGraph 그래프를 사용합니다:
+For complex workflows, use a pre-built LangGraph graph:
 
-**필드:**
-- **name** (`str`): 고유 식별자
-- **description** (`str`): 이 서브에이전트가 수행하는 작업
-- **runnable** (`Runnable`): 컴파일된 LangGraph 그래프(먼저 `.compile()`을 호출해야 함)
+**Fields:**
+- **name** (`str`): Unique identifier
+- **description** (`str`): What this subagent does
+- **runnable** (`Runnable`): A compiled LangGraph graph (must call `.compile()` first)
 
-## SubAgent 사용하기
+## Using SubAgent
 
 ```python
 import os
@@ -87,22 +87,22 @@ agent = create_deep_agent(
 )
 ```
 
-## CompiledSubAgent 사용하기
+## Using CompiledSubAgent
 
-더 복잡한 사용 사례의 경우, 사전 구축된 LangGraph 그래프를 서브에이전트로 제공할 수 있습니다:
+For more complex use cases, you can provide your own pre-built LangGraph graph as a subagent:
 
 ```python
 from deepagents import create_deep_agent, CompiledSubAgent
 from langchain.agents import create_agent
 
-# 커스텀 에이전트 그래프 생성
+# Create a custom agent graph
 custom_graph = create_agent(
     model=your_model,
     tools=specialized_tools,
     prompt="You are a specialized agent for data analysis..."
 )
 
-# 커스텀 서브에이전트로 사용
+# Use it as a custom subagent
 custom_subagent = CompiledSubAgent(
     name="data-analyzer",
     description="Specialized agent for complex data analysis tasks",
@@ -122,34 +122,34 @@ agent = create_deep_agent(
 
 
 
-## 범용 서브에이전트
+## The general-purpose subagent
 
-사용자 정의 서브에이전트 외에도, deep 에이전트는 항상 `general-purpose` 서브에이전트에 접근할 수 있습니다. 이 서브에이전트는:
-- 메인 에이전트와 동일한 시스템 프롬프트를 가집니다
-- 동일한 모든 도구에 접근할 수 있습니다
-- 동일한 모델을 사용합니다(재정의되지 않은 경우)
+In addition to any user-defined subagents, deep agents have access to a `general-purpose` subagent at all times. This subagent:
+- Has the same system prompt as the main agent
+- Has access to all the same tools
+- Uses the same model (unless overridden)
 
-### 언제 사용하나요
+### When to use it
 
-범용 서브에이전트는 특화된 동작 없이 컨텍스트 격리에 이상적입니다. 메인 에이전트는 복잡한 다단계 작업을 이 서브에이전트에 위임하고 중간 도구 호출의 비대화 없이 간결한 결과를 받을 수 있습니다.
+The general-purpose subagent is ideal for context isolation without specialized behavior. The main agent can delegate a complex multi-step task to this subagent and get a concise result back without bloat from intermediate tool calls.
 
-<Card title="예시">
-    메인 에이전트가 10개의 웹 검색을 수행하고 컨텍스트를 결과로 채우는 대신, 범용 서브에이전트에 위임합니다: `task(name="general-purpose", task="Research quantum computing trends")`. 서브에이전트는 모든 검색을 내부적으로 수행하고 요약만 반환합니다.
+<Card title="Example">
+    Instead of the main agent making 10 web searches and filling its context with results, it delegates to the general-purpose subagent: `task(name="general-purpose", task="Research quantum computing trends")`. The subagent performs all the searches internally and returns only a summary.
 </Card>
 
-## 모범 사례
+## Best practices
 
-### 명확한 설명 작성
+### Write clear descriptions
 
-메인 에이전트는 설명을 사용하여 어떤 서브에이전트를 호출할지 결정합니다. 구체적으로 작성하세요:
+The main agent uses descriptions to decide which subagent to call. Be specific:
 
-✅ **좋음:** `"Analyzes financial data and generates investment insights with confidence scores"`
+✅ **Good:** `"Analyzes financial data and generates investment insights with confidence scores"`
 
-❌ **나쁨:** `"Does finance stuff"`
+❌ **Bad:** `"Does finance stuff"`
 
-### 시스템 프롬프트를 상세하게 유지
+### Keep system prompts detailed
 
-도구 사용 방법과 출력 형식에 대한 구체적인 가이드를 포함하세요:
+Include specific guidance on how to use tools and format outputs:
 
 ```python
 research_subagent = {
@@ -175,18 +175,18 @@ research_subagent = {
 
 
 
-### 도구 세트 최소화
+### Minimize tool sets
 
-서브에이전트에게 필요한 도구만 제공하세요. 이는 집중력과 보안을 향상시킵니다:
+Only give subagents the tools they need. This improves focus and security:
 
 ```python
-# ✅ 좋음: 집중된 도구 세트
+# ✅ Good: Focused tool set
 email_agent = {
     "name": "email-sender",
     "tools": [send_email, validate_email],  # Only email-related
 }
 
-# ❌ 나쁨: 너무 많은 도구
+# ❌ Bad: Too many tools
 email_agent = {
     "name": "email-sender",
     "tools": [send_email, web_search, database_query, file_upload],  # Unfocused
@@ -196,9 +196,9 @@ email_agent = {
 
 
 
-### 작업별로 모델 선택
+### Choose models by task
 
-서로 다른 모델은 서로 다른 작업에 탁월합니다:
+Different models excel at different tasks:
 
 ```python
 subagents = [
@@ -222,9 +222,9 @@ subagents = [
 
 
 
-### 간결한 결과 반환
+### Return concise results
 
-서브에이전트가 원시 데이터가 아닌 요약을 반환하도록 지시하세요:
+Instruct subagents to return summaries, not raw data:
 
 ```python
 data_analyst = {
@@ -245,11 +245,11 @@ data_analyst = {
 
 
 
-## 일반적인 패턴
+## Common patterns
 
-### 여러 특화 서브에이전트
+### Multiple specialized subagents
 
-서로 다른 도메인에 대한 특화된 서브에이전트를 생성하세요:
+Create specialized subagents for different domains:
 
 ```python
 from deepagents import create_deep_agent
@@ -285,33 +285,33 @@ agent = create_deep_agent(
 
 
 
-**워크플로우:**
-1. 메인 에이전트가 고수준 계획을 생성합니다
-2. data-collector에 데이터 수집을 위임합니다
-3. 결과를 data-analyzer에 전달합니다
-4. 인사이트를 report-writer에 보냅니다
-5. 최종 출력을 컴파일합니다
+**Workflow:**
+1. Main agent creates high-level plan
+2. Delegates data collection to data-collector
+3. Passes results to data-analyzer
+4. Sends insights to report-writer
+5. Compiles final output
 
-각 서브에이전트는 작업에만 집중하는 깨끗한 컨텍스트로 작업합니다.
+Each subagent works with clean context focused only on its task.
 
-## 문제 해결
+## Troubleshooting
 
-### 서브에이전트가 호출되지 않음
+### Subagent not being called
 
-**문제**: 메인 에이전트가 위임하는 대신 직접 작업을 수행하려고 합니다.
+**Problem**: Main agent tries to do work itself instead of delegating.
 
-**해결책**:
+**Solutions**:
 
-1. **설명을 더 구체적으로 작성:**
+1. **Make descriptions more specific:**
    ```python
-   # ✅ 좋음
+   # ✅ Good
    {"name": "research-specialist", "description": "Conducts in-depth research on specific topics using web search. Use when you need detailed information that requires multiple searches."}
 
-   # ❌ 나쁨
+   # ❌ Bad
    {"name": "helper", "description": "helps with stuff"}
    ```
 
-2. **메인 에이전트에게 위임하도록 지시:**
+2. **Instruct main agent to delegate:**
    ```python
    agent = create_deep_agent(
        system_prompt="""...your instructions...
@@ -322,13 +322,13 @@ agent = create_deep_agent(
    )
    ```
 
-### 컨텍스트가 여전히 비대화됨
+### Context still getting bloated
 
-**문제**: 서브에이전트를 사용함에도 컨텍스트가 채워집니다.
+**Problem**: Context fills up despite using subagents.
 
-**해결책**:
+**Solutions**:
 
-1. **서브에이전트에게 간결한 결과를 반환하도록 지시:**
+1. **Instruct subagent to return concise results:**
    ```python
    system_prompt="""...
 
@@ -337,7 +337,7 @@ agent = create_deep_agent(
    Your response should be under 500 words."""
    ```
 
-2. **대용량 데이터에 파일 시스템 사용:**
+2. **Use filesystem for large data:**
    ```python
    system_prompt="""When you gather large amounts of data:
    1. Save raw data to /data/raw_results.txt
@@ -347,11 +347,11 @@ agent = create_deep_agent(
    This keeps context clean."""
    ```
 
-### 잘못된 서브에이전트가 선택됨
+### Wrong subagent being selected
 
-**문제**: 메인 에이전트가 작업에 부적절한 서브에이전트를 호출합니다.
+**Problem**: Main agent calls inappropriate subagent for the task.
 
-**해결책**: 설명에서 서브에이전트를 명확하게 구분하세요:
+**Solution**: Differentiate subagents clearly in descriptions:
 
 ```python
 subagents = [

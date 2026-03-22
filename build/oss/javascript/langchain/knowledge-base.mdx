@@ -1,6 +1,6 @@
 ---
-title: LangChain으로 시맨틱 검색 엔진 구축하기
-sidebarTitle: 시맨틱 검색
+title: Build a semantic search engine with LangChain
+sidebarTitle: Semantic search
 ---
 
 
@@ -10,28 +10,28 @@ import EmbeddingsTabsJS from '/snippets/embeddings-tabs-js.mdx';
 import VectorstoreTabsPy from '/snippets/vectorstore-tabs-py.mdx';
 import VectorstoreTabsJS from '/snippets/vectorstore-tabs-js.mdx';
 
-## 개요
+## Overview
 
-이 튜토리얼에서는 LangChain의 [문서 로더](/oss/javascript/langchain/retrieval#document-loaders), [임베딩](/oss/javascript/langchain/retrieval#embedding-models), [벡터 저장소](/oss/javascript/langchain/retrieval#vector-store) 추상화를 살펴봅니다. 이러한 추상화는 (벡터) 데이터베이스와 기타 소스에서 데이터를 검색하여 LLM 워크플로우와 통합하는 것을 지원하도록 설계되었습니다. 이는 검색 증강 생성(Retrieval-Augmented Generation), 즉 [RAG](/oss/javascript/langchain/retrieval)의 경우처럼 모델 추론의 일부로 추론할 데이터를 가져오는 애플리케이션에 중요합니다.
+This tutorial will familiarize you with LangChain's [document loader](/oss/javascript/langchain/retrieval#document-loaders), [embedding](/oss/javascript/langchain/retrieval#embedding-models), and [vector store](/oss/javascript/langchain/retrieval#vector-store) abstractions. These abstractions are designed to support retrieval of data--  from (vector) databases and other sources -- for integration with LLM workflows. They are important for applications that fetch data to be reasoned over as part of model inference, as in the case of retrieval-augmented generation, or [RAG](/oss/javascript/langchain/retrieval).
 
-여기서는 PDF 문서에 대한 검색 엔진을 구축합니다. 이를 통해 입력 쿼리와 유사한 PDF의 구절을 검색할 수 있습니다. 이 가이드에는 검색 엔진 위에 최소한의 RAG 구현도 포함되어 있습니다.
+Here we will build a search engine over a PDF document. This will allow us to retrieve passages in the PDF that are similar to an input query. The guide also includes a minimal RAG implementation on top of the search engine.
 
-### 개념
+### Concepts
 
-이 가이드는 텍스트 데이터 검색에 중점을 둡니다. 다음 개념을 다룹니다:
+This guide focuses on retrieval of text data. We will cover the following concepts:
 
-- [문서 및 문서 로더](/oss/javascript/integrations/document_loaders);
-- [텍스트 분할기](/oss/javascript/integrations/splitters);
-- [임베딩](/oss/javascript/integrations/text_embedding);
-- [벡터 저장소](/oss/javascript/integrations/vectorstores) 및 [리트리버](/oss/javascript/integrations/retrievers).
+- [Documents and document loaders](/oss/javascript/integrations/document_loaders);
+- [Text splitters](/oss/javascript/integrations/splitters);
+- [Embeddings](/oss/javascript/integrations/text_embedding);
+- [Vector stores](/oss/javascript/integrations/vectorstores) and [retrievers](/oss/javascript/integrations/retrievers).
 
-## 설정
+## Setup
 
-### 설치
+### Installation
 
 
 
-이 가이드에는 `@langchain/community` 및 `pdf-parse`가 필요합니다:
+This guide requires `@langchain/community` and `pdf-parse`:
 
 <CodeGroup>
 ```bash npm
@@ -47,15 +47,15 @@ pnpm add @langchain/community pdf-parse
 
 
 
-자세한 내용은 [설치 가이드](/oss/javascript/langchain/install)를 참조하세요.
+For more details, see our [Installation guide](/oss/javascript/langchain/install).
 
 ### LangSmith
 
-LangChain으로 구축하는 많은 애플리케이션에는 여러 LLM 호출을 포함하는 여러 단계가 포함됩니다.
-이러한 애플리케이션이 점점 더 복잡해짐에 따라 체인 또는 에이전트 내부에서 정확히 무슨 일이 일어나고 있는지 검사할 수 있는 것이 중요합니다.
-이를 수행하는 가장 좋은 방법은 [LangSmith](https://smith.langchain.com)를 사용하는 것입니다.
+Many of the applications you build with LangChain will contain multiple steps with multiple invocations of LLM calls.
+As these applications get more and more complex, it becomes crucial to be able to inspect what exactly is going on inside your chain or agent.
+The best way to do this is with [LangSmith](https://smith.langchain.com).
 
-위의 링크에서 가입한 후, 트레이스 로깅을 시작하도록 환경 변수를 설정해야 합니다:
+After you sign up at the link above, make sure to set your environment variables to start logging traces:
 
 ```shell
 export LANGSMITH_TRACING="true"
@@ -64,19 +64,19 @@ export LANGSMITH_API_KEY="..."
 
 
 
-## 1. 문서 및 문서 로더
+## 1. Documents and Document Loaders
 
-LangChain은 텍스트 단위와 관련 메타데이터를 나타내기 위한 [Document](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) 추상화를 구현합니다. 이 추상화는 세 가지 속성을 가집니다:
-
-
-- `pageContent`: 콘텐츠를 나타내는 문자열;
-- `metadata`: 임의의 메타데이터를 포함하는 딕셔너리;
-- `id`: (선택 사항) 문서의 문자열 식별자.
+LangChain implements a [Document](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) abstraction, which is intended to represent a unit of text and associated metadata. It has three attributes:
 
 
-`metadata` 속성은 문서의 소스, 다른 문서와의 관계 및 기타 정보에 대한 정보를 담을 수 있습니다. 개별 [`Document`](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) 객체는 종종 더 큰 문서의 청크를 나타낸다는 점에 유의하세요.
+- `pageContent`: a string representing the content;
+- `metadata`: a dict containing arbitrary metadata;
+- `id`: (optional) a string identifier for the document.
 
-필요할 때 샘플 문서를 생성할 수 있습니다:
+
+The `metadata` attribute can capture information about the source of the document, its relationship to other documents, and other information. Note that an individual [`Document`](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) object often represents a chunk of a larger document.
+
+We can generate sample documents when desired:
 
 
 ```typescript
@@ -96,11 +96,11 @@ const documents = [
 ```
 
 
-그러나 LangChain 에코시스템은 [수백 개의 일반적인 소스와 통합하는](/oss/javascript/integrations/document_loaders/) [문서 로더](/oss/javascript/langchain/retrieval#document-loaders)를 구현합니다. 이를 통해 이러한 소스의 데이터를 AI 애플리케이션에 쉽게 통합할 수 있습니다.
+However, the LangChain ecosystem implements [document loaders](/oss/javascript/langchain/retrieval#document-loaders) that [integrate with hundreds of common sources](/oss/javascript/integrations/document_loaders/). This makes it easy to incorporate data from these sources into your AI application.
 
-### 문서 로드하기
+### Loading documents
 
-PDF를 [`Document`](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) 객체의 시퀀스로 로드해 보겠습니다. [여기 샘플 PDF가 있습니다](https://github.com/langchain-ai/langchain/blob/v0.3/docs/docs/example_data/nke-10k-2023.pdf) -- 2023년 Nike의 10-k 보고서입니다. [사용 가능한 PDF 문서 로더](/oss/javascript/integrations/document_loaders/#pdfs)는 LangChain 문서를 참조할 수 있습니다.
+Let's load a PDF into a sequence of [`Document`](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) objects. [Here is a sample PDF](https://github.com/langchain-ai/langchain/blob/v0.3/docs/docs/example_data/nke-10k-2023.pdf) -- a 10-k filing for Nike from 2023. We can consult the LangChain documentation for [available PDF document loaders](/oss/javascript/integrations/document_loaders/#pdfs).
 
 
 ```typescript
@@ -115,10 +115,10 @@ console.log(docs.length);
 107
 ```
 
-`PDFLoader`는 PDF 페이지당 하나의 [`Document`](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) 객체를 로드합니다. 각각에 대해 다음에 쉽게 액세스할 수 있습니다:
+`PDFLoader` loads one [`Document`](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) object per PDF page. For each, we can easily access:
 
-- 페이지의 문자열 콘텐츠;
-- 파일 이름 및 페이지 번호를 포함하는 메타데이터.
+- The string content of the page;
+- Metadata containing the file name and page number.
 
 
 
@@ -164,11 +164,18 @@ console.log(docs[0].metadata);
 ```
 
 
-### 분할
+### Splitting
 
-정보 검색과 하위 질문 답변 목적 모두에서 페이지는 너무 거친 표현일 수 있습니다. 우리의 최종 목표는 입력 쿼리에 답하는 [`Document`](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) 객체를 검색하는 것이며, PDF를 더 분할하면 관련 문서 부분의 의미가 주변 텍스트에 의해 "희석되지" 않도록 하는 데 도움이 됩니다.
+For both information retrieval and downstream question-answering purposes, a page may be too coarse a representation. Our goal in the end will be to retrieve [`Document`](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) objects that answer an input query, and further splitting our PDF will help ensure that the meanings of relevant portions of the document are not "washed out" by surrounding text.
 
-이를 위해 [텍스트 분할기](/oss/javascript/langchain/retrieval#text_splitters)를 사용할 수 있습니다. 여기서는 문자를 기반으로 분할하는 간단한 텍스트 분할기를 사용합니다. 문서를 청크 간 200자의 오버랩과 함께 1000자 청크로 분할합니다. 오버랩은 중요한 컨텍스트에서 문장이 분리될 가능성을 완화하는 데 도움이 됩니다. 우리는 줄바꿈과 같은 일반적인 구분자를 사용하여 각 청크가 적절한 크기가 될 때까지 문서를 재귀적으로 분할하는 `RecursiveCharacterTextSplitter`를 사용합니다. 이것은 일반적인 텍스트 사용 사례에 권장되는 텍스트 분할기입니다.
+We can use [text splitters](/oss/javascript/langchain/retrieval#text_splitters) for this purpose. Here we will use a simple text splitter that partitions based on characters. We will split our documents into chunks of 1000 characters
+with 200 characters of overlap between chunks. The overlap helps
+mitigate the possibility of separating a statement from important
+context related to it. We use the
+`RecursiveCharacterTextSplitter`,
+which will recursively split the document using common separators like
+new lines until each chunk is the appropriate size. This is the
+recommended text splitter for generic text use cases.
 
 
 ```typescript
@@ -190,11 +197,11 @@ console.log(allSplits.length);
 ```
 
 
-## 2. 임베딩
+## 2. Embeddings
 
-벡터 검색은 비정형 데이터(예: 비정형 텍스트)를 저장하고 검색하는 일반적인 방법입니다. 아이디어는 텍스트와 연관된 숫자 벡터를 저장하는 것입니다. 쿼리가 주어지면 동일한 차원의 벡터로 [임베딩](/oss/javascript/langchain/retrieval#embedding_models)하고 벡터 유사도 메트릭(예: 코사인 유사도)을 사용하여 관련 텍스트를 식별할 수 있습니다.
+Vector search is a common way to store and search over unstructured data (such as unstructured text). The idea is to store numeric vectors that are associated with the text. Given a query, we can [embed](/oss/javascript/langchain/retrieval#embedding_models) it as a vector of the same dimension and use vector similarity metrics (such as cosine similarity) to identify related text.
 
-LangChain은 [수십 개의 제공업체](/oss/javascript/integrations/text_embedding/)로부터 임베딩을 지원합니다. 이러한 모델은 텍스트를 숫자 벡터로 변환하는 방법을 지정합니다. 모델을 선택해 보겠습니다:
+LangChain supports embeddings from [dozens of providers](/oss/javascript/integrations/text_embedding/). These models specify how text should be converted into a numeric vector. Let's select a model:
 
 
 <EmbeddingsTabsJS />
@@ -214,19 +221,19 @@ Generated vectors of length 1536
 
 [-0.008586574345827103, -0.03341241180896759, -0.008936782367527485, -0.0036674530711025, 0.010564599186182022, 0.009598285891115665, -0.028587326407432556, -0.015824200585484505, 0.0030416189692914486, -0.012899317778646946]
 ```
-텍스트 임베딩을 생성하는 모델을 갖추었으므로, 이제 효율적인 유사도 검색을 지원하는 특수 데이터 구조에 이를 저장할 수 있습니다.
+Armed with a model for generating text embeddings, we can next store them in a special data structure that supports efficient similarity search.
 
-## 3. 벡터 저장소
+## 3. Vector stores
 
-LangChain @[VectorStore] 객체는 저장소에 텍스트 및 [`Document`](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) 객체를 추가하고 다양한 유사도 메트릭을 사용하여 쿼리하는 메서드를 포함합니다. 이들은 종종 텍스트 데이터를 숫자 벡터로 변환하는 방법을 결정하는 [임베딩](/oss/javascript/langchain/retrieval#embedding_models) 모델로 초기화됩니다.
+LangChain @[VectorStore] objects contain methods for adding text and [`Document`](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) objects to the store, and querying them using various similarity metrics. They are often initialized with [embedding](/oss/javascript/langchain/retrieval#embedding_models) models, which determine how text data is translated to numeric vectors.
 
-LangChain은 다양한 벡터 저장소 기술과의 [통합](/oss/javascript/integrations/vectorstores) 모음을 포함합니다. 일부 벡터 저장소는 제공업체(예: 다양한 클라우드 제공업체)에 의해 호스팅되며 사용하려면 특정 자격 증명이 필요합니다. 일부(예: [Postgres](/oss/javascript/integrations/vectorstores/pgvector))는 로컬 또는 타사를 통해 실행할 수 있는 별도의 인프라에서 실행됩니다. 다른 것들은 가벼운 워크로드를 위해 인메모리로 실행할 수 있습니다. 벡터 저장소를 선택해 보겠습니다:
+LangChain includes a suite of [integrations](/oss/javascript/integrations/vectorstores) with different vector store technologies. Some vector stores are hosted by a provider (e.g., various cloud providers) and require specific credentials to use; some (such as [Postgres](/oss/javascript/integrations/vectorstores/pgvector)) run in separate infrastructure that can be run locally or via a third-party; others can run in-memory for lightweight workloads. Let's select a vector store:
 
 
 <VectorstoreTabsJS />
 
 
-벡터 저장소를 인스턴스화했으므로 이제 문서를 인덱싱할 수 있습니다.
+Having instantiated our vector store, we can now index the documents.
 
 
 ```typescript
@@ -234,21 +241,21 @@ await vectorStore.addDocuments(allSplits);
 ```
 
 
-대부분의 벡터 저장소 구현에서는 기존 벡터 저장소에 연결할 수 있습니다(예: 클라이언트, 인덱스 이름 또는 기타 정보 제공). 자세한 내용은 특정 [통합](/oss/javascript/integrations/vectorstores) 문서를 참조하세요.
+Note that most vector store implementations will allow you to connect to an existing vector store--  e.g., by providing a client, index name, or other information. See the documentation for a specific [integration](/oss/javascript/integrations/vectorstores) for more detail.
 
-문서를 포함하는 @[`VectorStore`]를 인스턴스화한 후에는 쿼리할 수 있습니다. @[VectorStore]는 다음과 같은 쿼리 메서드를 포함합니다:
-- 동기 및 비동기;
-- 문자열 쿼리 및 벡터로;
-- 유사도 점수 반환 유무;
-- 유사도 및 @[maximum marginal relevance][VectorStore.max_marginal_relevance_search] (검색된 결과의 쿼리와의 유사도와 다양성의 균형을 맞추기 위해).
+Once we've instantiated a @[`VectorStore`] that contains documents, we can query it. @[VectorStore] includes methods for querying:
+- Synchronously and asynchronously;
+- By string query and by vector;
+- With and without returning similarity scores;
+- By similarity and @[maximum marginal relevance][VectorStore.max_marginal_relevance_search] (to balance similarity with query to diversity in retrieved results).
 
-이러한 메서드는 일반적으로 출력에 [Document](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) 객체 목록을 포함합니다.
+The methods will generally include a list of [Document](https://v03.api.js.langchain.com/classes/_langchain_core.documents.Document.html) objects in their outputs.
 
-**사용법**
+**Usage**
 
-임베딩은 일반적으로 텍스트를 유사한 의미를 가진 텍스트가 기하학적으로 가까운 "밀집" 벡터로 나타냅니다. 이를 통해 문서에 사용된 특정 핵심 용어에 대한 지식 없이 질문을 전달하는 것만으로 관련 정보를 검색할 수 있습니다.
+Embeddings typically represent text as a "dense" vector such that texts with similar meanings are geometrically close. This lets us retrieve relevant information just by passing in a question, without knowledge of any specific key-terms used in the document.
 
-문자열 쿼리와의 유사도를 기반으로 문서를 반환합니다:
+Return documents based on similarity to a string query:
 
 
 ```typescript
@@ -268,7 +275,7 @@ Document {
 
 
 
-점수 반환:
+Return scores:
 
 
 ```typescript
@@ -288,7 +295,7 @@ Document {
 ```
 
 
-임베딩된 쿼리와의 유사도를 기반으로 문서를 반환합니다:
+Return documents based on similarity to an embedded query:
 
 
 ```typescript
@@ -315,18 +322,18 @@ Document {
 ```
 
 
-더 알아보기:
+Learn more:
 
 - @[API Reference][VectorStore]
-- [통합별 문서](/oss/javascript/integrations/vectorstores)
+- [Integration-specific docs](/oss/javascript/integrations/vectorstores)
 
-## 4. 리트리버
+## 4. Retrievers
 
-LangChain @[`VectorStore`] 객체는 @[Runnable]을 하위 클래스로 하지 않습니다. LangChain @[Retrievers]는 Runnable이므로 표준 메서드 세트(예: 동기 및 비동기 `invoke` 및 `batch` 작업)를 구현합니다. 벡터 저장소에서 리트리버를 구성할 수 있지만 리트리버는 벡터 저장소가 아닌 데이터 소스(예: 외부 API)와도 인터페이스할 수 있습니다.
+LangChain @[`VectorStore`] objects do not subclass @[Runnable]. LangChain @[Retrievers] are Runnables, so they implement a standard set of methods (e.g., synchronous and asynchronous `invoke` and `batch` operations). Although we can construct retrievers from vector stores, retrievers can interface with non-vector store sources of data, as well (such as external APIs).
 
 
 
-벡터 저장소는 Retriever, 특히 [VectorStoreRetriever](https://python.langchain.com/api_reference/core/vectorstores/langchain_core.vectorstores.base.VectorStoreRetriever.html)를 생성하는 `as_retriever` 메서드를 구현합니다. 이러한 리트리버에는 기본 벡터 저장소의 어떤 메서드를 호출할지, 어떻게 매개변수화할지를 식별하는 특정 `search_type` 및 `search_kwargs` 속성이 포함됩니다. 예를 들어, 다음과 같이 위의 내용을 복제할 수 있습니다:
+Vectorstores implement an `as_retriever` method that will generate a Retriever, specifically a [VectorStoreRetriever](https://python.langchain.com/api_reference/core/vectorstores/langchain_core.vectorstores.base.VectorStoreRetriever.html). These retrievers include specific `search_type` and `search_kwargs` attributes that identify what methods of the underlying vector store to call, and how to parameterize them. For instance, we can replicate the above with the following:
 
 
 ```typescript
@@ -356,31 +363,31 @@ await retriever.batch([
 ```
 
 
-리트리버는 주어진 질문과 검색된 컨텍스트를 LLM용 프롬프트로 결합하는 [검색 증강 생성(RAG)](/oss/javascript/langchain/retrieval) 애플리케이션과 같이 더 복잡한 애플리케이션에 쉽게 통합할 수 있습니다. 이러한 애플리케이션 구축에 대해 자세히 알아보려면 [RAG 튜토리얼](/oss/javascript/langchain/rag)을 확인하세요.
+Retrievers can easily be incorporated into more complex applications, such as [retrieval-augmented generation (RAG)](/oss/javascript/langchain/retrieval) applications that combine a given question with retrieved context into a prompt for a LLM. To learn more about building such an application, check out the [RAG tutorial](/oss/javascript/langchain/rag) tutorial.
 
 
-## 다음 단계
+## Next steps
 
-이제 PDF 문서에 대한 시맨틱 검색 엔진을 구축하는 방법을 살펴보았습니다.
+You've now seen how to build a semantic search engine over a PDF document.
 
-문서 로더에 대한 자세한 내용은:
+For more on document loaders:
 
-- [개요](/oss/javascript/langchain/retrieval#document_loaders)
-- [사용 가능한 통합](/oss/javascript/integrations/document_loaders/)
+- [Overview](/oss/javascript/langchain/retrieval#document_loaders)
+- [Available integrations](/oss/javascript/integrations/document_loaders/)
 
-임베딩에 대한 자세한 내용은:
+For more on embeddings:
 
-- [개요](/oss/javascript/langchain/retrieval#embedding_models/)
-- [사용 가능한 통합](/oss/javascript/integrations/text_embedding/)
+- [Overview](/oss/javascript/langchain/retrieval#embedding_models/)
+- [Available integrations](/oss/javascript/integrations/text_embedding/)
 
-벡터 저장소에 대한 자세한 내용은:
+For more on vector stores:
 
-- [개요](/oss/javascript/langchain/retrieval#vectorstores/)
-- [사용 가능한 통합](/oss/javascript/integrations/vectorstores/)
+- [Overview](/oss/javascript/langchain/retrieval#vectorstores/)
+- [Available integrations](/oss/javascript/integrations/vectorstores/)
 
-RAG에 대한 자세한 내용은:
+For more on RAG, see:
 
-- [검색 증강 생성(RAG) 앱 구축하기](/oss/javascript/langchain/rag/)
+- [Build a Retrieval Augmented Generation (RAG) App](/oss/javascript/langchain/rag/)
 
 ---
 

@@ -2,9 +2,9 @@
 title: Figma
 ---
 
->[Figma](https://www.figma.com/)는 인터페이스 디자인을 위한 협업 웹 애플리케이션입니다.
+>[Figma](https://www.figma.com/) is a collaborative web application for interface design.
 
-이 노트북은 `Figma` REST API에서 LangChain으로 수집할 수 있는 형식으로 데이터를 로드하는 방법과 코드 생성을 위한 사용 예시를 다룹니다.
+This notebook covers how to load data from the `Figma` REST API into a format that can be ingested into LangChain, along with example usage for code generation.
 
 ```python
 import os
@@ -19,13 +19,13 @@ from langchain_core.prompts.chat import (
 from langchain_openai import ChatOpenAI
 ```
 
-Figma API에는 액세스 토큰, node_ids 및 파일 키가 필요합니다.
+The Figma API Requires an access token, node_ids, and a file key.
 
-파일 키는 URL에서 가져올 수 있습니다. [www.figma.com/file/\{filekey\}/sampleFilename](https://www.figma.com/file/\{filekey\}/sampleFilename)
+The file key can be pulled from the URL.  [www.figma.com/file/\{filekey\}/sampleFilename](https://www.figma.com/file/\{filekey\}/sampleFilename)
 
-Node ID도 URL에서 확인할 수 있습니다. 무언가를 클릭하고 '?node-id=\{node_id\}' 파라미터를 찾으세요.
+Node IDs are also available in the URL. Click on anything and look for the '?node-id=\{node_id\}' param.
 
-액세스 토큰 지침은 Figma 도움말 센터 문서에 있습니다: [help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens](https://help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens)
+Access token instructions are in the Figma help center article: [help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens](https://help.figma.com/hc/en-us/articles/8085703771159-Manage-personal-access-tokens)
 
 ```python
 figma_loader = FigmaFileLoader(
@@ -36,15 +36,15 @@ figma_loader = FigmaFileLoader(
 ```
 
 ```python
-# 자세한 내용은 https://python.langchain.com/en/latest/modules/data_connection/getting_started.html 을 참조하세요
+# see https://python.langchain.com/en/latest/modules/data_connection/getting_started.html for more details
 index = VectorstoreIndexCreator().from_loaders([figma_loader])
 figma_doc_retriever = index.vectorstore.as_retriever()
 ```
 
 ```python
 def generate_code(human_input):
-    # Jon Carmack 관련 내용이 더 나은 코드를 만드는지는 모르겠습니다. YMMV.
-    # 채팅 정보는 https://python.langchain.com/en/latest/modules/models/chat/getting_started.html 을 참조하세요
+    # I have no idea if the Jon Carmack thing makes for better code. YMMV.
+    # See https://python.langchain.com/en/latest/modules/models/chat/getting_started.html for chat info
     system_prompt_template = """You are expert coder Jon Carmack. Use the provided design context to create idiomatic HTML/CSS code as possible based on the user request.
     Everything must be inline in one file and your response must be directly renderable by the browser.
     Figma file nodes and metadata: {context}"""
@@ -56,9 +56,9 @@ def generate_code(human_input):
     human_message_prompt = HumanMessagePromptTemplate.from_template(
         human_prompt_template
     )
-    # 더 빠른 결과를 위해 기본 gpt-3.5 turbo를 사용하려면 gpt-4 model_name을 삭제하세요
+    # delete the gpt-4 model_name to use the default gpt-3.5 turbo for faster results
     gpt_4 = ChatOpenAI(temperature=0.02, model_name="gpt-4")
-    # 더 긴 문서를 필터링해야 하는 경우 retriever의 'get_relevant_documents' 메서드를 사용하세요
+    # Use the retriever's 'get_relevant_documents' method if needed to filter down longer docs
     relevant_nodes = figma_doc_retriever.invoke(human_input)
     conversation = [system_message_prompt, human_message_prompt]
     chat_prompt = ChatPromptTemplate.from_messages(conversation)
@@ -74,7 +74,7 @@ def generate_code(human_input):
 response = generate_code("page top header")
 ```
 
-`response.content`에서 다음을 반환합니다:
+Returns the following in `response.content`:
 
 ```
 <!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <style>\n        @import url(\'https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;700&family=Inter:wght@600&display=swap\');\n\n        body {\n            margin: 0;\n            font-family: \'DM Sans\', sans-serif;\n        }\n\n        .header {\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n            padding: 20px;\n            background-color: #fff;\n            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);\n        }\n\n        .header h1 {\n            font-size: 16px;\n            font-weight: 700;\n            margin: 0;\n        }\n\n        .header nav {\n            display: flex;\n            align-items: center;\n        }\n\n        .header nav a {\n            font-size: 14px;\n            font-weight: 500;\n            text-decoration: none;\n            color: #000;\n            margin-left: 20px;\n        }\n\n        @media (max-width: 768px) {\n            .header nav {\n                display: none;\n            }\n        }\n    </style>\n</head>\n<body>\n    <header class="header">\n        <h1>Company Contact</h1>\n        <nav>\n            <a href="#">Lorem Ipsum</a>\n            <a href="#">Lorem Ipsum</a>\n            <a href="#">Lorem Ipsum</a>\n        </nav>\n    </header>\n</body>\n</html>

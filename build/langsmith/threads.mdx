@@ -1,25 +1,25 @@
 ---
-title: 스레드 구성
-sidebarTitle: 스레드
+title: Configure threads
+sidebarTitle: Threads
 ---
 
-많은 LLM 애플리케이션은 사용자와 LLM 애플리케이션이 여러 차례에 걸쳐 대화를 주고받는 챗봇과 유사한 인터페이스를 제공합니다. 이러한 대화를 추적하기 위해 LangSmith의 `스레드` 기능을 사용할 수 있습니다.
+Many LLM applications have a chatbot-like interface in which the user and the LLM application engage in a multi-turn conversation. In order to track these conversations, you can use the `Threads` feature in LangSmith.
 
-## 트레이스를 스레드로 그룹화하기
+## Group traces into threads
 
-`스레드`는 단일 대화를 나타내는 일련의 트레이스입니다. 각 응답은 자체 트레이스로 표시되지만, 이러한 트레이스들은 동일한 스레드의 일부로 함께 연결됩니다.
+A `Thread` is a sequence of traces representing a single conversation. Each response is represented as its own trace, but these traces are linked together by being part of the same thread.
 
-트레이스를 함께 연결하려면 해당 스레드의 고유 식별자를 값으로 하는 특수한 `metadata` 키를 전달해야 합니다. 키 이름은 다음 중 하나여야 합니다:
+To associate traces together, you need to pass in a special `metadata` key where the value is the unique identifier for that thread. The key name should be one of:
 
 - `session_id`
 - `thread_id`
-- `conversation_id`
+- `conversation_id`.
 
-값은 원하는 모든 문자열이 될 수 있지만, `f47ac10b-58cc-4372-a567-0e02b2c3d479`와 같은 UUID를 사용하는 것을 권장합니다. 트레이스에 메타데이터를 추가하는 방법에 대한 지침은 [이 가이드](./add-metadata-tags)를 참조하세요.
+The value can be any string you want, but we recommend using UUIDs, such as `f47ac10b-58cc-4372-a567-0e02b2c3d479`. Check out [this guide](./add-metadata-tags) for instructions on adding metadata to your traces.
 
-### 예제
+### Example
 
-이 예제는 장기 실행 채팅을 유지하기 위해 구조화된 메시지 형식을 사용하여 대화 기록을 로깅하고 검색하는 방법을 보여줍니다.
+This example demonstrates how to log and retrieve conversation history using a structured message format to maintain long-running chats.
 
 <CodeGroup>
 
@@ -215,7 +215,9 @@ const result = await chatPipeline(input);
 
 </CodeGroup>
 
-몇 초 정도 기다린 후, 다음 호출을 통해 대화를 이어갈 수 있습니다. `get_chat_history=True`/`getChatHistory: true`를 전달하면 중단된 지점에서 대화를 이어갈 수 있습니다. 이는 LLM이 최신 메시지에만 응답하는 대신 전체 메시지 기록을 받아 응답한다는 것을 의미합니다.
+After waiting a few seconds, you can make the following calls to continue the conversation. By passing `get_chat_history=True,`/`getChatHistory: true`,
+you can continue the conversation from where it left off. This means that the LLM will receive the entire message history and respond to it,
+instead of just responding to the latest message.
 
 <CodeGroup>
 
@@ -248,7 +250,7 @@ await chatPipeline(input);
 ```
 </CodeGroup>
 
-대화를 계속 이어가세요. 과거 메시지가 포함되어 있으므로 LLM이 대화를 기억합니다.
+Keep the conversation going. Since past messages are included, the LLM will remember the conversation.
 
 <CodeGroup>
 
@@ -282,71 +284,71 @@ await chatPipeline(input);
 
 </CodeGroup>
 
-## 스레드 보기
+## View threads
 
-프로젝트 상세 페이지의 **스레드** 탭을 클릭하여 스레드를 볼 수 있습니다. 그러면 가장 최근 활동 순으로 정렬된 모든 스레드 목록이 표시됩니다.
+You can view threads by clicking on the **Threads** tab in any project details page. You will then see a list of all threads, sorted by the most recent activity.
 
 <div style={{ textAlign: 'center' }}>
 <img
     className="block dark:hidden"
     src="/langsmith/images/threads-tab-light.png"
-    alt="스레드 테이블을 보여주는 LangSmith UI"
+    alt="LangSmith UI showing the threads table."
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/threads-tab-dark.png"
-    alt="스레드 테이블을 보여주는 LangSmith UI"
+    alt="LangSmith UI showing the threads table."
 />
 </div>
 
 
-### 스레드 보기
+### View a thread
 
-특정 스레드를 클릭할 수 있습니다. 그러면 해당 스레드의 기록이 열립니다.
+You can then click into a particular thread. This will open the history for a particular thread.
 
 <div style={{ textAlign: 'center' }}>
 <img
     className="block dark:hidden"
     src="/langsmith/images/thread-overview-light.png"
-    alt="스레드 테이블을 보여주는 LangSmith UI"
+    alt="LangSmith UI showing the threads table."
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/thread-overview-dark.png"
-    alt="스레드 테이블을 보여주는 LangSmith UI"
+    alt="LangSmith UI showing the threads table."
 />
 </div>
 
-스레드는 두 가지 방식으로 볼 수 있습니다:
+Threads can be viewed in two different ways:
 
-- [스레드 개요](/langsmith/threads#thread-overview)
-- [트레이스 보기](/langsmith/threads#trace-view)
+- [Thread overview](/langsmith/threads#thread-overview)
+- [Trace view](/langsmith/threads#trace-view)
 
-페이지 상단의 버튼을 사용하여 두 보기 간에 전환하거나 키보드 단축키 `T`를 사용하여 두 보기를 토글할 수 있습니다.
+You can use the buttons at the top of the page to switch between the two views or use the keyboard shortcut `T` to toggle between the two views.
 
-#### 스레드 개요
+#### Thread overview
 
-스레드 개요 페이지는 대화의 각 턴에 대한 입력과 출력을 볼 수 있는 챗봇과 유사한 UI를 표시합니다. **구성** 버튼을 클릭하여 개요에 표시되는 입력 및 출력 필드를 구성하거나 여러 필드를 표시할 수 있습니다.
+The thread overview page shows you a chatbot-like UI where you can see the inputs and outputs for each turn of the conversation. You can configure which fields in the inputs and outputs are displayed in the overview, or show multiple fields by clicking the **Configure** button.
 
-입력 및 출력에 대한 JSON 경로는 음수 인덱싱을 지원하므로 `-1`을 사용하여 배열의 마지막 요소에 접근할 수 있습니다. 예를 들어, `inputs.messages[-1].content`는 `messages` 배열의 마지막 메시지에 접근합니다.
-
-
-#### 트레이스 보기
-
-여기의 트레이스 보기는 단일 실행을 볼 때의 트레이스 보기와 유사하지만, 스레드의 각 턴에 대한 모든 실행에 쉽게 접근할 수 있다는 점이 다릅니다.
-
-### 피드백 보기
-
-스레드를 볼 때 페이지 상단에 `피드백`이라는 섹션이 표시됩니다. 여기에서 스레드를 구성하는 각 실행에 대한 피드백을 볼 수 있습니다. 이 피드백은 집계되므로 동일한 기준으로 스레드의 각 실행을 평가하면 모든 실행에 걸친 평균 점수가 표시됩니다. 여기에 남겨진 [스레드 수준 피드백](/langsmith/online-evaluations#configure-multi-turn-online-evaluators)도 확인할 수 있습니다.
-
-### 스레드 수준 필터 저장
-
-프로젝트 수준에서 필터를 저장하는 것과 유사하게, 스레드 수준에서도 자주 사용하는 필터를 저장할 수 있습니다. 스레드 테이블에서 필터를 저장하려면 필터 버튼을 사용하여 필터를 설정한 다음 **필터 저장** 버튼을 클릭하세요.
+The JSON path for the inputs and outputs supports negative indexing, so you can use `-1` to access the last element of an array. For example, `inputs.messages[-1].content` will access the last message in the `messages` array.
 
 
-`주석 달기`와 `트레이스 열기`를 각각 클릭하여 사이드 패널에서 트레이스를 열거나 주석을 달 수 있습니다.
+#### Trace view
+
+The trace view here is similar to the trace view when looking at a single run, except that you have easy access to all the runs for each turn in the thread.
+
+### View feedback
+
+When viewing a thread, across the top of the page you will see a section called `Feedback`. This is where you can see the feedback for each of the runs that make up the thread. This feedback is aggregated, so if you evaluate each run of a thread for the same criteria, you will see the average score across all the runs displayed. You can also see [thread level feedback](/langsmith/online-evaluations#configure-multi-turn-online-evaluators) left here.
+
+### Save thread level filter
+
+Similar to saving filters at the project level, you can also save commonly used filters at the thread level. To save filters on the threads table, set a filter using the filters button and then click the **Save filter** button.
+
+
+You can open up the trace or annotate the trace in a side panel by clicking on `Annotate` and `Open trace`, respectively.
 
 ---
 

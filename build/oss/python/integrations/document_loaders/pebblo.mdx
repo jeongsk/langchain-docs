@@ -2,24 +2,24 @@
 title: Pebblo Safe DocumentLoader
 ---
 
-> [Pebblo](https://daxa-ai.github.io/pebblo/)는 개발자가 조직의 규정 준수 및 보안 요구 사항에 대한 걱정 없이 안전하게 데이터를 로드하고 Gen AI 앱을 배포할 수 있도록 합니다. 이 프로젝트는 로드된 데이터에서 발견된 의미론적 주제 및 엔티티를 식별하고 UI 또는 PDF 보고서에 요약합니다.
+> [Pebblo](https://daxa-ai.github.io/pebblo/) enables developers to safely load data and promote their Gen AI app to deployment without worrying about the organization’s compliance and security requirements. The project identifies semantic topics and entities found in the loaded data and summarizes them on the UI or a PDF report.
 
-Pebblo는 두 가지 구성 요소로 이루어져 있습니다.
+Pebblo has two components.
 
-1. LangChain용 Pebblo Safe DocumentLoader
+1. Pebblo Safe DocumentLoader for LangChain
 1. Pebblo Server
 
-이 문서는 기존 LangChain DocumentLoader를 Pebblo Safe DocumentLoader로 보강하여 Gen-AI LangChain 애플리케이션에 수집되는 주제 및 엔티티 유형에 대한 심층적인 데이터 가시성을 얻는 방법을 설명합니다. `Pebblo Server`에 대한 자세한 내용은 [pebblo server](https://daxa-ai.github.io/pebblo/daemon) 문서를 참조하세요.
+This document describes how to augment your existing LangChain DocumentLoader with Pebblo Safe DocumentLoader to get deep data visibility on the types of Topics and Entities ingested into the Gen-AI LangChain application. For details on `Pebblo Server` see this [pebblo server](https://daxa-ai.github.io/pebblo/daemon) document.
 
-Pebblo Safeloader는 LangChain `DocumentLoader`에 대한 안전한 데이터 수집을 가능하게 합니다. 이는 문서 로더 호출을 `Pebblo Safe DocumentLoader`로 래핑하여 수행됩니다.
+Pebblo Safeloader enables safe data ingestion for LangChain `DocumentLoader`. This is done by wrapping the document loader call with `Pebblo Safe DocumentLoader`.
 
-참고: pebblo의 기본(localhost:8000) URL이 아닌 다른 URL에서 pebblo 서버를 구성하려면 `PEBBLO_CLASSIFIER_URL` 환경 변수에 올바른 URL을 입력하세요. 이는 `classifier_url` 키워드 인수를 사용하여 구성할 수도 있습니다. 참조: [server-configurations](https://daxa-ai.github.io/pebblo/config)
+Note: To configure pebblo server on some url other that pebblo's default (localhost:8000) url, put the correct URL in `PEBBLO_CLASSIFIER_URL` env variable. This is configurable using the `classifier_url` keyword argument as well. Ref: [server-configurations](https://daxa-ai.github.io/pebblo/config)
 
-#### 문서 로딩에 Pebblo를 활성화하는 방법은?
+#### How to Pebblo enable Document Loading?
 
-`CSVLoader`를 사용하여 추론을 위해 CSV 문서를 읽는 LangChain RAG 애플리케이션 스니펫을 가정합니다.
+Assume a LangChain RAG application snippet using `CSVLoader` to read a CSV document for inference.
 
-다음은 `CSVLoader`를 사용한 문서 로딩 스니펫입니다.
+Here is the snippet of Document loading using `CSVLoader`.
 
 ```python
 from langchain_community.document_loaders import CSVLoader
@@ -29,7 +29,7 @@ documents = loader.load()
 print(documents)
 ```
 
-위 스니펫에 몇 줄의 코드 변경으로 Pebblo SafeLoader를 활성화할 수 있습니다.
+The Pebblo SafeLoader can be enabled with few lines of code change to the above snippet.
 
 ```python
 from langchain_community.document_loaders import CSVLoader, PebbloSafeLoader
@@ -44,9 +44,9 @@ documents = loader.load()
 print(documents)
 ```
 
-### Pebblo 클라우드 서버로 의미론적 주제 및 신원 전송
+### Send semantic topics and identities to Pebblo cloud server
 
-pebblo-cloud로 의미론적 데이터를 전송하려면 PebbloSafeLoader에 인수로 api-key를 전달하거나, 또는 `PEBBLO_API_KEY` 환경 변수에 api-key를 입력하세요.
+To send semantic data to pebblo-cloud, pass api-key to PebbloSafeLoader as an argument or alternatively, put the api-key in `PEBBLO_API_KEY` environment variable.
 
 ```python
 from langchain_community.document_loaders import CSVLoader, PebbloSafeLoader
@@ -62,9 +62,9 @@ documents = loader.load()
 print(documents)
 ```
 
-### 로드된 메타데이터에 의미론적 주제 및 신원 추가
+### Add semantic topics and identities to loaded metadata
 
-로드된 문서의 메타데이터에 의미론적 주제 및 의미론적 엔티티를 추가하려면 load_semantic을 True로 설정하거나, 또는 새 환경 변수 `PEBBLO_LOAD_SEMANTIC`을 정의하고 True로 설정하세요.
+To add semantic topics and sematic entities to metadata of loaded documents, set load_semantic to True as an argument or alternatively, define a new environment variable `PEBBLO_LOAD_SEMANTIC`, and setting it to True.
 
 ```python
 from langchain_community.document_loaders import CSVLoader, PebbloSafeLoader
@@ -81,12 +81,12 @@ documents = loader.load()
 print(documents[0].metadata)
 ```
 
-### 모든 PII 세부 정보를 삭제하기 위해 스니펫 익명화
+### Anonymize the snippets to redact all PII details
 
-`anonymize_snippets`를 `True`로 설정하여 VectorDB 및 생성된 보고서로 들어가는 스니펫에서 모든 개인 식별 정보(PII)를 익명화합니다.
+Set `anonymize_snippets` to `True` to anonymize all personally identifiable information (PII) from the snippets going into VectorDB and the generated reports.
 
-> 참고: _Pebblo Entity Classifier_는 개인 식별 정보(PII)를 효과적으로 식별하며 지속적으로 발전하고 있습니다. 재현율이 아직 100%는 아니지만 꾸준히 개선되고 있습니다.
-> 자세한 내용은 [_Pebblo Entity Classifier docs_](https://daxa-ai.github.io/pebblo/entityclassifier/)를 참조하세요.
+> Note: The _Pebblo Entity Classifier_ effectively identifies personally identifiable information (PII) and is continuously evolving. While its recall is not yet 100%, it is steadily improving.
+> For more details, please refer to the [_Pebblo Entity Classifier docs_](https://daxa-ai.github.io/pebblo/entityclassifier/)
 
 ```python
 from langchain_community.document_loaders import CSVLoader, PebbloSafeLoader

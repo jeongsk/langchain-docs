@@ -1,21 +1,21 @@
 ---
-title: LangSmith 호스팅
-sidebarTitle: LangSmith 호스팅
+title: Hosting LangSmith
+sidebarTitle: Hosting LangSmith
 mode: wide
 ---
 
-이 섹션에서는 관찰성, 평가 및 에이전트 배포 기능을 제공하는 인프라, 서비스, 데이터 저장소인 **LangSmith**를 호스팅하고 관리하는 방법을 다룹니다.
+This section covers how to host and manage **LangSmith**: the infrastructure, services, and datastores that power your observability, evaluation, and agent deployment capabilities.
 
 <Callout icon="building" color="#2563EB" iconType="regular">
-**LangSmith 인프라를 설정하거나 유지 관리하는 경우 여기에서 시작하세요.** 에이전트 애플리케이션을 배포할 준비가 되었다면, [배포 섹션](/langsmith/deployments)에서 애플리케이션 구조, 배포 구성 및 Cloud 배포 가이드를 확인할 수 있습니다.
+**Start here if you're setting up or maintaining LangSmith infrastructure.** If you're ready to deploy your agent application, the [Deployment section](/langsmith/deployments) covers application structure, deployment configuration, and guides for deploying to Cloud.
 </Callout>
 
-## 호스팅 옵션 선택
+## Choose your hosting option
 
-LangSmith는 다음 세 가지 모드 중 하나로 배포할 수 있습니다:
-- [**Cloud**](/langsmith/cloud): LangChain에서 완전 관리
-- [**Hybrid**](/langsmith/hybrid): LangChain이 <Tooltip tip="배포를 관리하기 위한 LangSmith UI 및 API입니다.">컨트롤 플레인</Tooltip>을 관리하고, 사용자가 <Tooltip tip="LangGraph Server와 에이전트가 실행되는 런타임 환경입니다.">데이터 플레인</Tooltip>을 호스팅
-- [**Self-hosted**](/langsmith/self-hosted): 사용자가 자체 인프라 내에서 전체 스택을 관리
+You'll deploy LangSmith in one of three modes:
+- [**Cloud**](/langsmith/cloud): fully managed by LangChain
+- [**Hybrid**](/langsmith/hybrid): LangChain manages the <Tooltip tip="The LangSmith UI and APIs for managing deployments.">control plane</Tooltip>; you host the <Tooltip tip="The runtime environment where your LangGraph Servers and agents execute.">data plane</Tooltip>
+- [**Self-hosted**](/langsmith/self-hosted): you manage the full stack within your infrastructure
 
 <Columns cols={3}>
   <Card
@@ -23,18 +23,18 @@ LangSmith는 다음 세 가지 모드 중 하나로 배포할 수 있습니다:
     icon="cloud"
     iconType="solid"
     href="/langsmith/cloud"
-    cta="시작하기"
+    cta="Get started"
   >
-    LangChain의 클라우드에서 모든 구성 요소를 완전 관리형으로 실행합니다.
+    Run all components fully managed in LangChain’s cloud.
   </Card>
 
   <Card
     title="Hybrid"
     icon="cloud"
     href="/langsmith/hybrid"
-    cta="Hybrid 설정"
+    cta="Set up Hybrid"
   >
-    **(Enterprise)** 사용자의 클라우드에서 실행되는 데이터 플레인을 관리하고, LangChain이 컨트롤 플레인을 관리합니다.
+    **(Enterprise)** Manage the data plane running in your cloud while LangChain manages the control plane.
   </Card>
 
   <Card
@@ -42,35 +42,35 @@ LangSmith는 다음 세 가지 모드 중 하나로 배포할 수 있습니다:
     icon="server"
     iconType="solid"
     href="/langsmith/self-hosted"
-    cta="Self-hosted 실행"
+    cta="Run self-hosted"
   >
-    **(Enterprise)** 전체 LangSmith를 실행하거나 컨트롤 플레인 UI 없이 독립형 LangGraph Server를 실행합니다.
+    **(Enterprise)** Run the full LangSmith or run standalone LangGraph Servers without the control plane UI.
   </Card>
 </Columns>
 
-### 비교
+### Comparison
 
-호스팅 옵션 비교는 다음 표를 참조하세요:
+Refer to the following table for a comparison of hosting options:
 
-| 기능 | **Cloud** | **Hybrid** | **Self-Hosted** |
+| Feature | **Cloud** | **Hybrid** | **Self-Hosted** |
 |---------|-----------|------------|-----------------|
-| **인프라 위치** | LangChain의 클라우드 | 분할: 컨트롤 플레인은 LangChain 클라우드, 데이터 플레인은 사용자의 클라우드 | 사용자의 클라우드 |
-| **업데이트 관리 주체** | LangChain | LangChain(컨트롤 플레인), 사용자(데이터 플레인) | 사용자 |
-| **앱 CI/CD 관리 주체** | LangChain | 사용자 | 사용자 |
-| **애플리케이션 배포 가능 여부** | ✅ 예 | ✅ 예 | ✅ 예(전체 플랫폼 옵션 사용 시) |
-| **관찰성 데이터 위치** | LangChain 클라우드 | LangChain 클라우드 | 사용자의 클라우드 |
-| **[가격](https://www.langchain.com/plans)** | Plus 티어 | Enterprise | Enterprise |
-| **최적 사용 사례** | 빠른 설정, 관리형 인프라 | 데이터 주권 요구사항 + 관리형 컨트롤 플레인 | 완전한 제어, 데이터 격리 |
+| **Infrastructure location** | LangChain's cloud | Split: Control plane in LangChain cloud, data plane in your cloud | Your cloud |
+| **Who manages updates** | LangChain | LangChain (control plane), You (data plane) | You |
+| **Who manages CI/CD for your apps** | LangChain | You | You |
+| **Can deploy applications?** | ✅ Yes | ✅ Yes | ✅ Yes (with full platform option) |
+| **Observability data location** | LangChain cloud | LangChain cloud | Your cloud |
+| **[Pricing](https://www.langchain.com/plans)** | Plus tier | Enterprise | Enterprise |
+| **Best for** | Quick setup, managed infrastructure | Data residency requirements + managed control plane | Full control, data isolation |
 
 <Tip>
-테스트 및 개발을 위해 [LangGraph Server를 로컬에서 무료로 실행](/langsmith/local-server)할 수 있습니다.
+You can [run a LangGraph Server locally for free](/langsmith/local-server) for testing and development.
 </Tip>
 
-### 관련 정보
+### Related
 
-- [플랜](https://langchain.com/pricing)
-- [가격](https://www.langchain.com/plans)
-- [관찰성](/langsmith/observability)
+- [Plans](https://langchain.com/pricing)
+- [Pricing](https://www.langchain.com/plans)
+- [Observability](/langsmith/observability)
 
 ---
 

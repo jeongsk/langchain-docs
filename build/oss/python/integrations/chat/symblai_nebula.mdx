@@ -2,19 +2,19 @@
 title: Nebula (Symbl.ai)
 ---
 
-이 노트북은 Symbl.ai의 채팅 모델인 [Nebula](https://docs.symbl.ai/docs/nebula-llm)를 시작하는 방법을 다룹니다.
+This notebook covers how to get started with [Nebula](https://docs.symbl.ai/docs/nebula-llm) - Symbl.ai's chat model.
 
-### 통합 세부 정보
+### Integration details
 
-자세한 문서는 [API reference](https://docs.symbl.ai/reference/nebula-chat)를 참조하세요.
+Head to the [API reference](https://docs.symbl.ai/reference/nebula-chat) for detailed documentation.
 
-### 모델 기능: TODO
+### Model features: TODO
 
-## 설정
+## Setup
 
-### 자격 증명
+### Credentials
 
-시작하려면 [Nebula API key](https://platform.symbl.ai/#/login)를 요청하고 `NEBULA_API_KEY` 환경 변수를 설정하세요:
+To get started, request a [Nebula API key](https://platform.symbl.ai/#/login) and set the `NEBULA_API_KEY` environment variable:
 
 ```python
 import getpass
@@ -23,11 +23,11 @@ import os
 os.environ["NEBULA_API_KEY"] = getpass.getpass()
 ```
 
-### 설치
+### Installation
 
-통합은 `langchain-community` 패키지에 설정되어 있습니다.
+The integration is set up in the `langchain-community` package.
 
-## 인스턴스화
+## Instantiation
 
 ```python
 from langchain_community.chat_models.symblai_nebula import ChatNebula
@@ -38,7 +38,7 @@ from langchain.messages import AIMessage, HumanMessage, SystemMessage
 chat = ChatNebula(max_tokens=1024, temperature=0.5)
 ```
 
-## 호출
+## Invocation
 
 ```python
 messages = [
@@ -54,7 +54,7 @@ chat.invoke(messages)
 AIMessage(content=[{'role': 'human', 'text': 'What is the capital of France?'}, {'role': 'assistant', 'text': 'The capital of France is Paris.'}])
 ```
 
-### 비동기
+### Async
 
 ```python
 await chat.ainvoke(messages)
@@ -64,7 +64,7 @@ await chat.ainvoke(messages)
 AIMessage(content=[{'role': 'human', 'text': 'What is the capital of France?'}, {'role': 'assistant', 'text': 'The capital of France is Paris.'}])
 ```
 
-### 스트리밍
+### Streaming
 
 ```python
 for chunk in chat.stream(messages):
@@ -75,7 +75,7 @@ for chunk in chat.stream(messages):
  The capital of France is Paris.
 ```
 
-### 배치
+### Batch
 
 ```python
 chat.batch([messages])
@@ -85,7 +85,7 @@ chat.batch([messages])
 [AIMessage(content=[{'role': 'human', 'text': 'What is the capital of France?'}, {'role': 'assistant', 'text': 'The capital of France is Paris.'}])]
 ```
 
-## 체이닝
+## Chaining
 
 ```python
 from langchain_core.prompts import ChatPromptTemplate
@@ -102,9 +102,9 @@ chain.invoke({"topic": "cows"})
 AIMessage(content=[{'role': 'human', 'text': 'Tell me a joke about cows'}, {'role': 'assistant', 'text': "Sure, here's a joke about cows:\n\nWhy did the cow cross the road?\n\nTo get to the udder side!"}])
 ```
 
-## API 참조
+## API reference
 
-자세한 내용은 [API reference](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.symblai_nebula.ChatNebula.html)를 확인하세요.
+Check out the [API reference](https://python.langchain.com/api_reference/community/chat_models/langchain_community.chat_models.symblai_nebula.ChatNebula.html) for more detail.
 
 ---
 

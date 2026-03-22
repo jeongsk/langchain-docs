@@ -1,43 +1,43 @@
 ---
-title: "소개"
-description: "Open SWE 소개"
+title: "Introduction"
+description: "An introduction to Open SWE"
 ---
 
-Open SWE는 [LangGraph](https://docs.langchain.com/oss/javascript/langgraph/overview)로 구축된 오픈소스 클라우드 기반 코딩 에이전트입니다. 전체 리포지토리에 걸쳐 코드 변경 사항을 자율적으로 이해하고, 계획하며, 실행하도록 설계되었습니다.
+Open SWE is an open source cloud-based coding agent built with [LangGraph](https://docs.langchain.com/oss/javascript/langgraph/overview). It's designed to autonomously understand, plan, and execute code changes across entire repositories.
 
-## 작동 방식
+## How It Works
 
-Open SWE는 세 가지 특화된 LangGraph 에이전트를 통해 작동합니다:
+Open SWE operates through three specialized LangGraph agents:
 
-- **Manager Graph**: 사용자 상호작용을 조율하고 다른 그래프들 간의 협업을 조정합니다
-- **Planner Graph**: 요구사항을 분석하고 상세한 실행 계획을 수립합니다
-- **Programmer Graph**: 승인된 계획을 기반으로 코드 변경 사항을 실행합니다
+- **Manager Graph**: Orchestrates user interactions and coordinates between other graphs
+- **Planner Graph**: Analyzes requirements and creates detailed execution plans
+- **Programmer Graph**: Executes code changes based on approved plans
 
-이 에이전트는 웹 인터페이스를 통해 사용하거나 GitHub 웹훅을 통해 자동으로 트리거할 수 있어, 대화형 개발과 자동화된 워크플로우 모두에 유연하게 대응합니다.
+The agent can be used through a web interface or triggered automatically via GitHub webhooks, making it flexible for both interactive development and automated workflows.
 
-![Open SWE UI 스크린샷](/images/ui-screenshot.png)
+![Open SWE UI Screenshot](/images/ui-screenshot.png)
 
 <CardGroup cols={2}>
-  <Card title="설정" icon="robot" href="/labs/swe/setup/intro">
-    개발을 위한 Open SWE 설정 방법
+  <Card title="Setup" icon="robot" href="/labs/swe/setup/intro">
+    How to set up Open SWE for development
   </Card>
-  <Card title="예제" icon="database" href="/labs/swe/usage/examples">
-    시도해볼 수 있는 작업 예제들
+  <Card title="Examples" icon="database" href="/labs/swe/usage/examples">
+    Examples of tasks you can try out
   </Card>
-  <Card title="사용법" icon="database" href="/labs/swe/usage/intro">
-    Open SWE 기능과 사용 방법
+  <Card title="Usage" icon="database" href="/labs/swe/usage/intro">
+    Open SWE features, and how to use them
   </Card>
 </CardGroup>
 
-## 문서 내용
+## What's in These Docs
 
-이 문서는 Open SWE에 대해 알아야 할 모든 내용을 다룹니다:
+This documentation covers everything you need to know about Open SWE:
 
-- **사용법**: 웹 인터페이스와 GitHub 웹훅을 통해 Open SWE와 상호작용하는 방법
-- **설정**: 모노레포 구조, 종속성, 인증을 포함한 완전한 개발 환경 설정
+- **Usage**: How to interact with Open SWE through the web interface and GitHub webhooks
+- **Setup**: Complete development environment setup including monorepo structure, dependencies, and authentication
 
 <Tip>
-  [라이브 데모](https://swe.langchain.com)를 체험하여 Open SWE의 실제 작동을 확인하세요.
+  Try out the [live demo](https://swe.langchain.com) to see Open SWE in action.
 </Tip>
 
 ---

@@ -1,90 +1,90 @@
 ---
-title: 주석 큐 사용하기
-sidebarTitle: 주석 큐 사용하기
+title: Use annotation queues
+sidebarTitle: Use annotation queues
 ---
 
-주석 큐는 사람 주석자가 특정 실행에 피드백을 첨부할 수 있도록 간소화되고 집중된 뷰를 제공하는 강력한 LangSmith 기능입니다. 트레이스를 인라인으로 언제든지 주석 처리할 수 있지만, 주석 큐는 실행을 그룹화한 다음 주석자가 이를 검토하고 피드백을 제공할 수 있는 또 다른 옵션을 제공합니다.
+Annotation queues are a powerful LangSmith feature that provide a streamlined, directed view for human annotators to attach feedback to specific runs. While you can always annotate traces inline, annotation queues provide another option to group runs together, then have annotators review and provide feedback on them.
 
-## 주석 큐 생성하기
+## Create an annotation queue
 
 ![](/langsmith/images/create-annotation-queue.png)
 
-주석 큐를 생성하려면 홈페이지 또는 왼쪽 탐색 모음을 통해 **Annotation queues** 섹션으로 이동합니다. 그런 다음 오른쪽 상단의 **+ New annotation queue**를 클릭합니다.
+To create an annotation queue, navigate to the **Annotation queues** section through the homepage or left-hand navigation bar. Then click **+ New annotation queue** in the top right corner.
 
 ![](/langsmith/images/create-annotation-queue-new.png)
 
-### 기본 세부 정보
+### Basic Details
 
-큐의 **이름**과 **설명**을 양식에 입력합니다. 또한 큐에 **기본 데이터셋**을 할당할 수 있으며, 이는 특정 실행의 입력과 출력을 LangSmith 워크스페이스의 데이터셋으로 전송하는 프로세스를 간소화합니다.
+Fill in the form with the **name** and **description** of the queue. You can also assign a **default dataset** to queue, which will streamline the process of sending the inputs and outputs of certain runs to datasets in your LangSmith workspace.
 
-### 주석 평가 기준
+### Annotation Rubric
 
-먼저 모든 실행의 사이드바에 표시될 주석자를 위한 상위 수준의 지침을 작성합니다.
+Begin by drafting some high-level instructions for your annotators, which will be shown in the sidebar on every run.
 
-다음으로 "+ Desired Feedback"을 클릭하여 주석 큐에 피드백 키를 추가합니다. 주석자는 각 실행에서 이러한 피드백 키를 제공받게 됩니다. 각 피드백 키에 대한 설명을 추가하고, 피드백이 범주형인 경우 각 범주에 대한 간단한 설명도 추가합니다.
+Next, click "+ Desired Feedback" to add feedback keys to your annotation queue. Annotators will be presented with these feedback keys on each run. Add a description for each, as well as a short description of each category if the feedback is categorical.
 
 ![annotation queue rubric](/langsmith/images/create-annotation-rubric.png)
 
-검토자는 다음을 보게 됩니다:
+Reviewers will see this:
 
 ![rubric for annotators](/langsmith/images/rubric-for-annotators.png)
 
-### 협업자 설정
+### Collaborator Settings
 
-여러 주석자와 관련된 몇 가지 설정이 있습니다:
+There are a few settings related to multiple annotators:
 
-* **실행당 검토자 수**: 실행을 큐에서 제거하려면 "완료"로 표시해야 하는 검토자의 수를 결정합니다. "모든 워크스페이스 구성원이 각 실행을 검토"를 선택하면 모든 워크스페이스 구성원이 "완료"로 표시할 때까지 실행이 큐에 남아 있습니다.
+* **Number of reviewers per run**: This determines the number of reviewers that must mark a run as "Done" for it to be removed from the queue. If you check "All workspace members review each run," then a run will remain in the queue until all workspace members have marked it "Done".
 
-  * 검토자는 다른 검토자가 남긴 피드백을 볼 수 없습니다.
-  * 실행에 대한 코멘트는 모든 검토자가 볼 수 있습니다.
+  * Reviewers cannot view the feedback left by other reviewers.
+  * Comments on runs are visible to all reviewers.
 
-* **실행 예약 활성화**: 예약을 활성화하는 것을 권장합니다. 이렇게 하면 여러 주석자가 동시에 같은 실행을 검토하는 것을 방지할 수 있습니다.
+* **Enable reservations on runs**: We recommend enabling reservations. This will prevent multiple annotators from reviewing the same run at the same time.
 
-1. **예약은 어떻게 작동하나요?**
+1. **How do reservations work?**
 
-검토자가 실행을 보면 해당 실행은 지정된 "예약 길이" 동안 해당 검토자를 위해 예약됩니다. 위에서 지정한 대로 실행당 여러 검토자가 있는 경우, 실행은 동시에 여러 검토자(실행당 검토자 수까지)에 의해 예약될 수 있습니다.
+When a reviewer views a run, the run is reserved for that reviewer for the specified "reservation length". If there are multiple reviewers per run as specified above, the run can be reserved by multiple reviewers (up to the number of reviewers per run) at the same time.
 
-2. **시간이 다 되면 어떻게 되나요?**
+2. **What happens if time runs out?**
 
-검토자가 실행을 보고 "완료"로 표시하지 않고 떠나면 지정된 "예약 길이" 후에 예약이 만료됩니다. 그러면 실행이 큐로 다시 돌아가며 다른 검토자가 예약할 수 있습니다.
+If a reviewer has viewed a run and then leaves the run without marking it "Done", the reservation will expire after the specified "reservation length". The run is then released back into the queue and can be reserved by another reviewer.
 
 <Note>
-"Requeue at end"를 클릭하면 현재 실행이 현재 사용자의 큐 끝으로만 이동합니다. 다른 사용자의 큐 순서에는 영향을 주지 않습니다. 또한 현재 사용자가 해당 실행에 대해 가지고 있던 예약도 해제됩니다.
+Clicking "Requeue at end" will only move the current run to the end of the current user's queue; it won't affect the queue order of any other user. It will also release the reservation that the current user has on that run.
 </Note>
 
-이러한 설정으로 인해 주석 큐에서 개인에게 표시되는 실행 수가 큐의 총 실행 수 및 다른 사람의 큐 크기와 다를 수 있으며(그럴 가능성이 높습니다).
+Because of these settings, it's possible (and likely) that the number of runs visible to an individual in an annotation queue differs from the total number of runs in the queue as well as anyone else's queue size.
 
-**Annotation Queues** 섹션에서 연필 아이콘을 클릭하면 언제든지 이러한 설정을 업데이트할 수 있습니다.
+You can update these settings at any time by clicking on the pencil icon in the **Annotation Queues** section.
 
 ![](/langsmith/images/annotation-queue-edit.png)
 
-## 주석 큐에 실행 할당하기
+## Assign runs to an annotation queue
 
-주석 큐에 실행을 할당하려면 다음 중 하나를 수행합니다:
+To assign runs to an annotation queue, either:
 
-1. 트레이스 뷰의 오른쪽 상단에 있는 **Add to Annotation Queue**를 클릭합니다. 루트 스팬뿐만 아니라 트레이스의 모든 중간 실행(스팬)을 주석 큐에 추가할 수 있습니다. ![](/langsmith/images/add-to-annotation-queue.png)
+1. Click on **Add to Annotation Queue** in top right corner of any trace view. You can add ANY intermediate run (span) of the trace to an annotation queue, not just the root span. ![](/langsmith/images/add-to-annotation-queue.png)
 
-2. 실행 테이블에서 여러 실행을 선택한 다음 페이지 하단의 **Add to Annotation Queue**를 클릭합니다. ![](/langsmith/images/multi-select-annotation-queue.png)
+2. Select multiple runs in the runs table then click **Add to Annotation Queue** at the bottom of the page. ![](/langsmith/images/multi-select-annotation-queue.png)
 
-3. 특정 필터와 샘플링 조건을 통과하는 실행을 자동으로 주석 큐에 할당하는 [자동화 규칙을 설정](/langsmith/rules)합니다.
+3. [Set up an automation rule](/langsmith/rules) that automatically assigns runs which pass a certain filter and sampling condition to an annotation queue.
 
-4. 데이터셋 페이지에서 하나 또는 여러 실험을 선택하고 **Annotate**를 클릭합니다. 표시되는 팝업에서 새 큐를 생성하거나 기존 큐에 실행을 추가할 수 있습니다: ![](/langsmith/images/annotate-experiment.png)
+4. Select one or multiple experiments from the dataset page and click **Annotate**. From the resulting popup, you may either create a new queue or add the runs to an existing one: ![](/langsmith/images/annotate-experiment.png)
 
 <Check>
-애플리케이션에서 특정 사용자 피드백 점수(예: 좋아요, 싫어요)를 가진 실행을 주석 큐에 할당하는 것은 매우 좋은 방법입니다. 이를 통해 사용자 불만을 유발하는 문제를 식별하고 해결할 수 있습니다. LLM 애플리케이션에서 사용자 피드백을 캡처하는 방법에 대한 자세한 내용은 [이 가이드](/langsmith/attach-user-feedback)를 참조하세요.
+It is often a very good idea to assign runs that have a certain user feedback score (eg thumbs up, thumbs down) from the application to an annotation queue. This way, you can identify and address issues that are causing user dissatisfaction. To learn more about how to capture user feedback from your LLM application, follow [this guide](/langsmith/attach-user-feedback).
 </Check>
 
-## 주석 큐에서 실행 검토하기
+## Review runs in an annotation queue
 
-주석 큐에서 실행을 검토하려면 홈페이지 또는 왼쪽 탐색 모음을 통해 **Annotation Queues** 섹션으로 이동합니다. 그런 다음 검토하려는 큐를 클릭합니다. 그러면 검토가 필요한 큐의 실행에 대한 집중적이고 순환적인 뷰로 이동합니다.
+To review runs in an annotation queue, navigate to the **Annotation Queues** section through the homepage or left-hand navigation bar. Then click on the queue you want to review. This will take you to a focused, cyclical view of the runs in the queue that require review.
 
-코멘트를 첨부하고, 특정 피드백 기준에 대한 점수를 첨부하고, 데이터셋에 실행을 추가하거나 실행을 검토됨으로 표시할 수 있습니다. 또한 "View run" 옆에 있는 **Trash** 아이콘을 클릭하여 현재 예약이나 큐 설정과 관계없이 모든 사용자의 큐에서 실행을 제거할 수 있습니다.
+You can attach a comment, attach a score for a particular feedback criteria, add the run a dataset and/or mark the run as reviewed. You can also remove the run from the queue for all users, despite any current reservations or settings for the queue, by clicking the **Trash** icon next to "View run".
 
-표시된 키보드 단축키는 검토 프로세스를 간소화하는 데 도움이 됩니다.
+The keyboard shortcuts shown can help streamline the review process.
 
 ![](/langsmith/images/review-runs.png)
 
-## 비디오 가이드
+## Video guide
 <iframe
   className="w-full aspect-video rounded-xl"
   src="https://www.youtube.com/embed/rxKYHA-2KS0?si=V4EnrUmzJaUVJh0m"

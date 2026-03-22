@@ -1,25 +1,25 @@
 ---
-title: 구성 옵션
+title: Configuration options
 ---
 
-Deep Agents는 에이전트의 동작과 기능을 맞춤 설정할 수 있는 다양한 구성 옵션을 제공합니다:
+Deep Agents provides a number of configuration options to customize the agent's behavior and capabilities:
 
-- **도구(Tools)** (필수): 에이전트와 모든 하위 에이전트가 접근할 수 있는 도구입니다.
-- **지시사항(Instructions)** (필수): 에이전트 프롬프트의 일부로 사용되는 맞춤 지시사항입니다. 이는 내장된 시스템 프롬프트를 보완합니다.
-- **하위 에이전트(Sub-agents)**: 특정 작업을 위한 전문화된 하위 에이전트입니다.
-- **모델(Model)**: 에이전트가 사용할 모델입니다.
+- **Tools** (required): The tools that the agent and any subagents will have access to.
+- **Instructions** (required): Custom instructions that serve as part of the agent's prompt. This supplements the built-in system prompt.
+- **Sub-agents**: Specialized subagents for specific tasks.
+- **Model**: The model to use for the agent.
 
 ## Tools
 
-필수 항목입니다. 에이전트와 모든 하위 에이전트가 접근할 수 있는 도구 목록입니다.
+Required. A list of tools that the agent and any subagents will have access to.
 
 ## Instructions
 
-필수 항목입니다. 에이전트 프롬프트의 일부로 사용되는 맞춤 지시사항입니다. 이는 내장된 시스템 프롬프트를 보완합니다.
+Required. Custom instructions that serve as part of the agent's prompt. This supplements the built-in system prompt.
 
 ## Sub-agents
 
-특정 작업을 위한 전문화된 하위 에이전트를 정의합니다:
+Define specialized subagents for specific tasks:
 
 <CodeGroup>
 
@@ -63,7 +63,7 @@ const agent = createDeepAgent({
 
 ## Model
 
-Python과 JavaScript 구현 모두 기본적으로 `"claude-sonnet-4-20250514"`를 사용하지만, 맞춤 모델도 지원합니다:
+Both the Python and JavaScript implementations default to `"claude-sonnet-4-20250514"` but support custom models:
 
 <CodeGroup>
 
@@ -91,17 +91,17 @@ const agent = createDeepAgent({
 
 </CodeGroup>
 
-### 맞춤 모델
+### Custom models
 
 <Note>
 
-맞춤 모델은 Python 구현에서만 지원됩니다.
+Custom models are only supported in the Python implementation.
 
 </Note>
 
-기본적으로 `deepagents`는 `"claude-sonnet-4-20250514"`를 사용합니다. [LangChain 모델 객체](https://python.langchain.com/docs/integrations/chat/)를 전달하여 이를 맞춤 설정할 수 있습니다.
+By default, `deepagents` uses `"claude-sonnet-4-20250514"`. You can customize this by passing any [LangChain model object](https://python.langchain.com/docs/integrations/chat/).
 
-예를 들어, Ollama를 통해 OpenAI의 `gpt-oss` 모델을 사용하는 방법:
+For example, use OpenAI's `gpt-oss` model via Ollama:
 
 ```python
 # pip install langchain langchain-ollama

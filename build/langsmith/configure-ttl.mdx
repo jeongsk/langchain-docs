@@ -1,19 +1,19 @@
 ---
-title: 애플리케이션에 TTL을 추가하는 방법
-sidebarTitle: 애플리케이션에 TTL 추가
+title: How to add TTLs to your application
+sidebarTitle: Add TTLs to your application
 ---
 <Tip>
-**사전 요구 사항**
-이 가이드는 [LangSmith](/langsmith/home), [Persistence](/oss/python/langgraph/persistence) 및 [Cross-thread persistence](/oss/python/langgraph/persistence#memory-store) 개념에 익숙하다고 가정합니다.
+**Prerequisites**
+This guide assumes familiarity with [LangSmith](/langsmith/home), [Persistence](/oss/python/langgraph/persistence), and [Cross-thread persistence](/oss/python/langgraph/persistence#memory-store) concepts.
 </Tip>
 
-LangSmith는 [체크포인트](/oss/python/langgraph/persistence#checkpoints)(스레드 상태)와 [크로스 스레드 메모리](/oss/python/langgraph/persistence#memory-store)(저장소 항목)를 모두 지속합니다. `langgraph.json`에서 TTL(Time-to-Live) 정책을 구성하여 이 데이터의 수명 주기를 자동으로 관리하여 무한정 누적되는 것을 방지할 수 있습니다.
+LangSmith persists both [checkpoints](/oss/python/langgraph/persistence#checkpoints) (thread state) and [cross-thread memories](/oss/python/langgraph/persistence#memory-store) (store items). Configure Time-to-Live (TTL) policies in `langgraph.json` to automatically manage the lifecycle of this data, preventing indefinite accumulation.
 
-## 체크포인트 TTL 구성
+## Configuring Checkpoint TTL
 
-체크포인트는 대화 스레드의 상태를 캡처합니다. TTL을 설정하면 오래된 체크포인트와 스레드가 자동으로 삭제됩니다.
+Checkpoints capture the state of conversation threads. Setting a TTL ensures old checkpoints and threads are automatically deleted.
 
-`langgraph.json` 파일에 `checkpointer.ttl` 구성을 추가합니다:
+Add a `checkpointer.ttl` configuration to your `langgraph.json` file:
 
 ```json
 {
@@ -31,15 +31,15 @@ LangSmith는 [체크포인트](/oss/python/langgraph/persistence#checkpoints)(�
 }
 ```
 
-* `strategy`: 만료 시 수행할 작업을 지정합니다. 현재는 `"delete"`만 지원되며, 만료 시 스레드의 모든 체크포인트를 삭제합니다.
-* `sweep_interval_minutes`: 시스템이 만료된 체크포인트를 확인하는 빈도를 분 단위로 정의합니다.
-* `default_ttl`: 스레드(및 해당 체크포인트)의 기본 수명을 분 단위로 설정합니다(예: 43200분 = 30일). 이 구성이 배포된 후 생성된 체크포인트에만 적용됩니다. 기존 체크포인트/스레드는 변경되지 않습니다. 오래된 데이터를 지우려면 명시적으로 삭제해야 합니다.
+* `strategy`: Specifies the action taken on expiration. Currently, only `"delete"` is supported, which deletes all checkpoints in the thread upon expiration.
+* `sweep_interval_minutes`: Defines how often, in minutes, the system checks for expired checkpoints.
+* `default_ttl`: Sets the default lifespan of threads (and corresponding checkpoints) in minutes (e.g., 43200 minutes = 30 days). Applies only to checkpoints created after this configuration is deployed; existing checkpoints/threads are not changed. To clear older data, delete it explicitly.
 
-## 저장소 항목 TTL 구성
+## Configuring Store Item TTL
 
-저장소 항목은 크로스 스레드 데이터 지속성을 허용합니다. 저장소 항목에 대한 TTL을 구성하면 오래된 데이터를 제거하여 메모리를 관리하는 데 도움이 됩니다.
+Store items allow cross-thread data persistence. Configuring TTL for store items helps manage memory by removing stale data.
 
-`langgraph.json` 파일에 `store.ttl` 구성을 추가합니다:
+Add a `store.ttl` configuration to your `langgraph.json` file:
 
 ```json
 {
@@ -57,13 +57,13 @@ LangSmith는 [체크포인트](/oss/python/langgraph/persistence#checkpoints)(�
 }
 ```
 
-* `refresh_on_read`: (선택 사항, 기본값 `true`) `true`인 경우 `get` 또는 `search`를 통해 항목에 액세스하면 만료 타이머가 재설정됩니다. `false`인 경우 TTL은 `put`에서만 새로 고쳐집니다.
-* `sweep_interval_minutes`: (선택 사항) 시스템이 만료된 항목을 확인하는 빈도를 분 단위로 정의합니다. 생략하면 스위핑이 발생하지 않습니다.
-* `default_ttl`: (선택 사항) 저장소 항목의 기본 수명을 분 단위로 설정합니다(예: 10080분 = 7일). 이 구성이 배포된 후 생성된 항목에만 적용됩니다. 기존 항목은 변경되지 않습니다. 오래된 항목을 지워야 하는 경우 수동으로 삭제해야 합니다. 생략하면 기본적으로 항목이 만료되지 않습니다.
+* `refresh_on_read`: (Optional, default `true`) If `true`, accessing an item via `get` or `search` resets its expiration timer. If `false`, TTL only refreshes on `put`.
+* `sweep_interval_minutes`: (Optional) Defines how often, in minutes, the system checks for expired items. If omitted, no sweeping occurs.
+* `default_ttl`: (Optional) Sets the default lifespan of store items in minutes (e.g., 10080 minutes = 7 days). Applies only to items created after this configuration is deployed; existing items are not changed. If you need to clear older items, delete them manually. If omitted, items do not expire by default.
 
-## TTL 구성 결합
+## Combining TTL Configurations
 
-동일한 `langgraph.json` 파일에서 체크포인트와 저장소 항목 모두에 대해 TTL을 구성하여 각 데이터 유형에 대해 다른 정책을 설정할 수 있습니다. 예제는 다음과 같습니다:
+You can configure TTLs for both checkpoints and store items in the same `langgraph.json` file to set different policies for each data type. Here is an example:
 
 ```json
 {
@@ -88,15 +88,15 @@ LangSmith는 [체크포인트](/oss/python/langgraph/persistence#checkpoints)(�
 }
 ```
 
-## 런타임 재정의
+## Runtime Overrides
 
-`langgraph.json`의 기본 `store.ttl` 설정은 `get`, `put` 및 `search`와 같은 SDK 메서드 호출에서 특정 TTL 값을 제공하여 런타임에 재정의할 수 있습니다.
+The default `store.ttl` settings from `langgraph.json` can be overridden at runtime by providing specific TTL values in SDK method calls like `get`, `put`, and `search`.
 
-## 배포 프로세스
+## Deployment Process
 
-`langgraph.json`에서 TTL을 구성한 후 변경 사항을 적용하려면 LangGraph 애플리케이션을 배포하거나 다시 시작합니다. 로컬 개발의 경우 `langgraph dev`를, Docker 배포의 경우 `langgraph up`을 사용합니다.
+After configuring TTLs in `langgraph.json`, deploy or restart your LangGraph application for the changes to take effect. Use `langgraph dev` for local development or `langgraph up` for Docker deployment.
 
-다른 구성 가능한 옵션에 대한 자세한 내용은 [langgraph.json CLI 참조](https://langchain-ai.github.io/langgraph/reference/configuration/#configuration-file)를 참조하세요.
+See the [langgraph.json CLI reference](https://langchain-ai.github.io/langgraph/reference/configuration/#configuration-file) for more details on the other configurable options.
 
 ---
 

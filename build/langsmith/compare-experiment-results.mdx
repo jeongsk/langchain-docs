@@ -1,69 +1,69 @@
 ---
-title: 실험 결과 비교 방법
-sidebarTitle: 실험 결과 비교
+title: How to compare experiment results
+sidebarTitle: Compare experiment results
 ---
 
-LLM 애플리케이션을 반복 개선할 때(예: 모델이나 프롬프트 변경) 다양한 [_실험_](/langsmith/evaluation-concepts#experiment)의 결과를 비교하고 싶을 것입니다.
+When you are iterating on your LLM application (such as changing the model or the prompt), you will want to compare the results of different [_experiments_](/langsmith/evaluation-concepts#experiment).
 
-LangSmith는 다양한 실험 간의 주요 차이점, 회귀 및 개선 사항에 집중할 수 있는 비교 보기를 지원합니다.
+LangSmith supports a comparison view that lets you hone in on key differences, regressions, and improvements between different experiments.
 
-## 비교 보기 열기
+## Open the comparison view
 
-1. 실험 비교 보기에 액세스하려면 **Datasets & Experiments** 페이지로 이동합니다.
-1. 데이터셋을 선택하면 **Experiments** 탭이 열립니다.
-1. 두 개 이상의 실험을 선택한 다음 **Compare**를 클릭합니다.
+1. To access the experiment comaprison view, navigate to the **Datasets & Experiments** page.
+1. Select a dataset, which will open the **Experiments** tab.
+1. Select two or more experiments abd then click **Compare**.
 
 ![The Experiments view in the UI with 3 experiments selected and the Compare button highlighted.](/langsmith/images/compare-select.png)
 
-## 테이블 표시 조정
+## Adjust the table display
 
-**Comparing Experiments** 페이지 상단의 **Full** 또는 **Compact**를 클릭하여 다양한 보기 간에 전환할 수 있습니다.
+You can toggle between different views by clicking **Full** or **Compact** at the top of the **Comparing Experiments** page.
 
-**Full**을 토글하면 각 실행에 대한 입력, 출력 및 참조 출력의 전체 텍스트가 표시됩니다. 참조 출력이 테이블에 표시하기에 너무 길면 **Expand detailed view**를 클릭하여 전체 내용을 볼 수 있습니다.
+Toggling **Full** will show the full text of the input, output, and reference output for each run. If the reference output is too long to display in the table, you can click on **Expand detailed view** to view the full content.
 
-또한 **Display** 설정 드롭다운에서 개별 피드백 키 또는 개별 메트릭을 선택하고 숨겨서 비교 보기에서 필요한 정보를 분리할 수 있습니다.
+You can also select and hide individual feedback keys or individual metrics in the **Display** settings dropdown to isolate the information you need in the comparison view.
 
-## 회귀 및 개선 사항 보기
+## View regressions and improvements
 
-비교 보기에서 기준 실험에 대해 지정된 피드백 키에서 *회귀*한 실행은 빨간색으로 강조 표시되고 *개선*된 실행은 녹색으로 강조 표시됩니다. 각 열 상단에서 해당 실험에서 기준 실험보다 더 나은 실행과 더 나쁜 실행이 몇 개인지 확인할 수 있습니다.
+In the comparison view, runs that *regressed* on your specified feedback key against your baseline experiment will be highlighted in red, while runs that *improved* will be highlighted in green. At the top of each column, you can find how many runs in that experiment did better and how many did worse than your baseline experiment.
 
-각 열 상단의 회귀 또는 개선 버튼을 클릭하여 해당 특정 실험에서 회귀되거나 개선된 실행을 필터링할 수 있습니다.
+Click on the regressions or improvements buttons on the top of each column to filter to the runs that regressed or improved in that specific experiment.
 
 ![The comparison view comparing 2 experiments with the regressions and improvements highlighted in red and green respectively.](/langsmith/images/regression-view.png)
 
-## 기준 실험 및 메트릭 업데이트
+## Update baseline experiment and metric
 
-회귀를 추적하려면 다음을 수행해야 합니다:
+In order to track regressions, you need to:
 
-1. 비교 보기 상단의 **Baseline** 드롭다운에서 비교할 **Baseline experiment**를 선택합니다. 기본적으로 최신 실험이 기준으로 선택됩니다.
-1. 비교하려는 **Feedback key**(평가 메트릭)를 선택합니다. 기본적으로 하나가 할당되지만 필요에 따라 조정할 수 있습니다.
-1. 선택한 피드백 키에 대해 더 높은 점수가 더 나은지 여부를 구성합니다. 이 기본 설정은 저장됩니다.
+1. In the **Baseline** dropdown at the top of the comparison view, select a **Baseline experiment** against which to compare. By default, the newest experiment is selected as the baseline.
+1. Select a  **Feedback key** (evaluation metric) you want to focus compare against. One will be assigned by default, but you can adjust as needed.
+1. Configure whether a higher score is better for the selected feedback key. This preference will be stored.
 
 ![The Baseline dropdown highlighted with a selected experiment and feedback key of "hallucination".](/langsmith/images/select-baseline.png)
 
-## 추적 열기
+## Open a trace
 
-평가 중인 예제가 수집된 [실행](/langsmith/observability-concepts#runs)에서 온 경우 출력 셀 위로 마우스를 가져가서 추적 아이콘을 클릭하여 해당 실행에 대한 추적 보기를 열 수 있습니다. 이렇게 하면 측면 패널에 추적이 열립니다.
+If the example you're evaluating is from an ingested [run](/langsmith/observability-concepts#runs), you can hover over the output cell and click on the trace icon to open the trace view for that run. This will open up a trace in the side panel.
 
 ![The View trace icon highlighted from an ingested run.](/langsmith/images/open-source-trace.png)
 
-## 상세 보기 확장
+## Expand detailed view
 
-모든 셀에서 호버 상태의 확장 아이콘을 클릭하여 해당 특정 예제 입력에 대한 모든 실험 결과와 피드백 키 및 점수의 상세 보기를 열 수 있습니다.
+From any cell, you can click on the expand icon in the hover state to open up a detailed view of all experiment results on that particular example input, along with feedback keys and scores.
 
 ![An example in the Comparing Experiments view of a expanded view of the repetitions.](/langsmith/images/expanded-view.png)
 
-## 요약 차트 보기
+## View summary charts
 
-페이지 상단의 **Charts** 탭을 클릭하여 요약 차트를 봅니다.
+View summary charts by clicking on the **Charts** tab at the top of the page.
 
 ![The Charts summary page with 8 summary charts for the comparison.](/langsmith/images/charts-tab.png)
 
-## 실험 메타데이터를 차트 레이블로 사용
+## Use experiment metadata as chart labels
 
-[실험 메타데이터](/langsmith/filter-experiments-ui#background-add-metadata-to-your-experiments)를 기반으로 차트의 x축 레이블을 구성할 수 있습니다.
+You can configure the x-axis labels for the charts based on [experiment metadata](/langsmith/filter-experiments-ui#background-add-metadata-to-your-experiments).
 
-**x-axis** 드롭다운에서 메타데이터 키를 선택하여 차트 레이블을 변경합니다.
+Select a metadata key in the **x-axis** dropdown to change the chart labels.
 
 ![x-axis dropdown highlighted with a list of the metadata attached to the experiment.](/langsmith/images/metadata-in-charts.png)
 

@@ -1,40 +1,40 @@
 ---
-title: 추적 빠른 시작
-sidebarTitle: 빠른 시작
+title: Tracing quickstart
+sidebarTitle: Quickstart
 ---
 
-[_관찰성(Observability)_](/langsmith/observability-concepts)은 대규모 언어 모델(LLM)로 구축된 애플리케이션의 핵심 요구사항입니다. LLM은 비결정적이므로 동일한 프롬프트가 다른 응답을 생성할 수 있습니다. 이러한 동작은 기존 소프트웨어보다 디버깅과 모니터링을 더 어렵게 만듭니다.
+[_Observability_](/langsmith/observability-concepts) is a critical requirement for applications built with large language models (LLMs). LLMs are non-deterministic, which means that the same prompt can produce different responses. This behavior makes debugging and monitoring more challenging than with traditional software.
 
-LangSmith는 애플리케이션이 요청을 처리하는 방법에 대한 엔드투엔드 가시성을 제공하여 이 문제를 해결합니다. 각 요청은 발생한 일의 전체 기록을 캡처하는 [_추적(trace)_](/langsmith/observability-concepts#traces)을 생성합니다. 추적 내에는 LLM 호출이나 검색 단계와 같이 애플리케이션이 수행한 특정 작업인 개별 [_실행(runs)_](/langsmith/observability-concepts#runs)이 있습니다. 실행을 추적하면 애플리케이션의 동작을 검사하고, 디버그하고, 검증할 수 있습니다.
+LangSmith addresses this by providing end-to-end visibility into how your application handles a request. Each request generates a [_trace_](/langsmith/observability-concepts#traces), which captures the full record of what happened. Within a trace are individual [_runs_](/langsmith/observability-concepts#runs), the specific operations your application performed, such as an LLM call or a retrieval step. Tracing runs allows you to inspect, debug, and validate your application’s behavior.
 
-이 빠른 시작에서는 최소한의 [_검색 증강 생성(RAG)_](https://www.mckinsey.com/featured-insights/mckinsey-explainers/what-is-retrieval-augmented-generation-rag) 애플리케이션을 설정하고 LangSmith로 추적을 추가합니다. 다음을 수행합니다:
+In this quickstart, you will set up a minimal [_Retrieval Augmented Generation (RAG)_](https://www.mckinsey.com/featured-insights/mckinsey-explainers/what-is-retrieval-augmented-generation-rag) application and add tracing with LangSmith. You will:
 
-1. 환경을 구성합니다.
-1. 컨텍스트를 검색하고 LLM을 호출하는 애플리케이션을 생성합니다.
-1. 검색 단계와 LLM 호출을 모두 캡처하는 추적을 활성화합니다.
-1. LangSmith UI에서 결과 추적을 확인합니다.
-
-<Tip>
-추적 시작에 관한 비디오를 보고 싶으시다면 빠른 시작 [비디오 가이드](#video-guide)를 참조하세요.
-</Tip>
-
-## 사전 요구 사항
-
-시작하기 전에 다음을 준비하세요:
-
-- **LangSmith 계정**: [smith.langchain.com](https://smith.langchain.com)에서 가입하거나 로그인합니다.
-- **LangSmith API 키**: [API 키 생성](/langsmith/create-account-api-key#create-an-api-key) 가이드를 따릅니다.
-- **OpenAI API 키**: [OpenAI 대시보드](https://platform.openai.com/account/api-keys)에서 생성합니다.
-
-이 빠른 시작의 예제 앱은 LLM 제공자로 OpenAI를 사용합니다. 앱의 LLM 제공자에 맞게 예제를 조정할 수 있습니다.
+1. Configure your environment.
+1. Create an application that retrieves context and calls an LLM.
+1. Enable tracing to capture both the retrieval step and the LLM call.
+1. View the resulting traces in the LangSmith UI.
 
 <Tip>
-[LangChain](https://python.langchain.com/docs/introduction/) 또는 [LangGraph](https://langchain-ai.github.io/langgraph/)로 애플리케이션을 구축하는 경우, 단일 환경 변수로 LangSmith 추적을 활성화할 수 있습니다. [LangChain으로 추적](/langsmith/trace-with-langchain) 또는 [LangGraph로 추적](/langsmith/trace-with-langgraph) 가이드를 읽고 시작하세요.
+If you prefer to watch a video on getting started with tracing, refer to the quickstart [Video guide](#video-guide).
 </Tip>
 
-## 1. 디렉토리 생성 및 의존성 설치
+## Prerequisites
 
-터미널에서 프로젝트 디렉토리를 생성하고 환경에 의존성을 설치합니다:
+Before you begin, make sure you have:
+
+- **A LangSmith account**: Sign up or log in at [smith.langchain.com](https://smith.langchain.com).
+- **A LangSmith API key**: Follow the [Create an API key](/langsmith/create-account-api-key#create-an-api-key) guide.
+- **An OpenAI API key**: Generate this from the [OpenAI dashboard](https://platform.openai.com/account/api-keys).
+
+The example app in this quickstart will use OpenAI as the LLM provider. You can adapt the example for your app's LLM provider.
+
+<Tip>
+If you're building an application with [LangChain](https://python.langchain.com/docs/introduction/) or [LangGraph](https://langchain-ai.github.io/langgraph/), you can enable LangSmith tracing with a single environment variable. Get started by reading the guides for tracing with [LangChain](/langsmith/trace-with-langchain) or tracing with [LangGraph](/langsmith/trace-with-langgraph).
+</Tip>
+
+## 1. Create a directory and install dependencies
+
+In your terminal, create a directory for your project and install the dependencies in your environment:
 
 <CodeGroup>
 
@@ -54,14 +54,14 @@ npx tsc --init
 
 </CodeGroup>
 
-## 2. 환경 변수 설정
+## 2. Set up environment variables
 
-다음 환경 변수를 설정합니다:
+Set the following environment variables:
 
 - `LANGSMITH_TRACING`
 - `LANGSMITH_API_KEY`
-- `OPENAI_API_KEY` (또는 사용 중인 LLM 제공자의 API 키)
-- (선택사항) `LANGSMITH_WORKSPACE_ID`: LangSmith API가 여러 워크스페이스에 연결된 경우, 사용할 워크스페이스를 지정하기 위해 이 변수를 설정합니다.
+- `OPENAI_API_KEY` (or your LLM provider's API key)
+- (optional) `LANGSMITH_WORKSPACE_ID`: If your LangSmith API is linked to multiple workspaces, set this variable to specify which workspace to use.
 
 ``` bash
 export LANGSMITH_TRACING=true
@@ -70,19 +70,19 @@ export OPENAI_API_KEY="<your-openai-api-key>"
 export LANGSMITH_WORKSPACE_ID="<your-workspace-id>"
 ```
 
-Anthropic을 사용하는 경우, [Anthropic 래퍼](/langsmith/annotate-code#wrap-the-anthropic-client-python-only)를 사용하여 호출을 추적합니다. 다른 제공자의 경우, [traceable 래퍼](/langsmith/annotate-code#use-%40traceable-%2F-traceable)를 사용합니다.
+If you're using Anthropic, use the [Anthropic wrapper](/langsmith/annotate-code#wrap-the-anthropic-client-python-only) to trace your calls. For other providers, use [the traceable wrapper](/langsmith/annotate-code#use-%40traceable-%2F-traceable).
 
-## 3. 애플리케이션 정의
+## 3. Define your application
 
-이 단계에서 설명하는 예제 앱 코드를 사용하여 RAG 애플리케이션을 계측할 수 있습니다. 또는 LLM 호출이 포함된 자체 애플리케이션 코드를 사용할 수 있습니다.
+You can use the example app code outlined in this step to instrument a RAG application. Or, you can use your own application code that includes an LLM call.
 
-이것은 아직 LangSmith 추적이 추가되지 않은 채 OpenAI SDK를 직접 사용하는 최소한의 RAG 앱입니다. 세 가지 주요 부분이 있습니다:
+This is a minimal RAG app that uses the OpenAI SDK directly without any LangSmith tracing added yet. It has three main parts:
 
-- **검색기 함수**: 항상 동일한 문자열을 반환하는 문서 검색을 시뮬레이션합니다.
-- **OpenAI 클라이언트**: 채팅 완료 요청을 보내기 위해 순수 OpenAI 클라이언트를 인스턴스화합니다.
-- **RAG 함수**: 검색된 문서와 사용자의 질문을 결합하여 시스템 프롬프트를 구성하고, `gpt-4o-mini`로 `chat.completions.create()` 엔드포인트를 호출한 다음 어시스턴트의 응답을 반환합니다.
+- **Retriever function**: Simulates document retrieval that always returns the same string.
+- **OpenAI client**: Instantiates a plain OpenAI client to send a chat completion request.
+- **RAG function**: Combines the retrieved documents with the user’s question to form a system prompt, calls the `chat.completions.create()` endpoint with `gpt-4o-mini`, and returns the assistant’s response.
 
-앱 파일(예: `app.py` 또는 `app.ts`)에 다음 코드를 추가합니다:
+Add the following code into your app file (e.g., `app.py` or `app.ts`):
 
 <CodeGroup>
 
@@ -154,16 +154,16 @@ async function rag(question: string) {
 
 </CodeGroup>
 
-## 4. LLM 호출 추적
+## 4. Trace LLM calls
 
-먼저 모든 OpenAI 호출을 추적합니다. LangSmith는 래퍼를 제공합니다:
+To start, you’ll trace all your OpenAI calls. LangSmith provides wrappers:
 
 - Python: [`wrap_openai`](https://docs.smith.langchain.com/reference/python/wrappers/langsmith.wrappers._openai.wrap_openai)
 - TypeScript: [`wrapOpenAI`](https://docs.smith.langchain.com/reference/js/functions/wrappers_openai.wrapOpenAI)
 
-이 스니펫은 OpenAI 클라이언트를 래핑하여 이후의 모든 모델 호출이 LangSmith에서 추적된 자식 실행으로 자동으로 로깅되도록 합니다.
+This snippet wraps the OpenAI client so that every subsequent model call is logged automatically as a traced child run in LangSmith.
 
-1. 앱 파일에 강조 표시된 줄을 포함시킵니다:
+1. Include the highlighted lines in your app file:
 
     <CodeGroup>
 
@@ -230,7 +230,7 @@ async function rag(question: string) {
 
     </CodeGroup>
 
-1. 애플리케이션을 호출합니다:
+1. Call your application:
 
     <CodeGroup>
 
@@ -245,33 +245,33 @@ async function rag(question: string) {
     </CodeGroup>
 
 
-    다음 출력을 받게 됩니다:
+    You'll receive the following output:
 
     ```
     Harrison worked at Kensho.
     ```
 
-1. [LangSmith UI](https://smith.langchain.com)에서 워크스페이스(또는 [2단계](#2-set-up-environment-variables)에서 지정한 워크스페이스)의 **default** 추적 프로젝트로 이동합니다. 방금 계측한 OpenAI 호출을 확인할 수 있습니다.
+1. In the [LangSmith UI](https://smith.langchain.com), navigate to the **default** Tracing Project for your workspace (or the workspace you specified in [Step 2](#2-set-up-environment-variables)). You'll see the OpenAI call you just instrumented.
 
 <div style={{ textAlign: 'center' }}>
 <img
     className="block dark:hidden"
     src="/langsmith/images/trace-quickstart-llm-call.png"
-    alt="시스템과 사용자 입력 다음 AI 출력을 보여주는 ChatOpenAI라는 LLM 호출 추적을 보여주는 LangSmith UI."
+    alt="LangSmith UI showing an LLM call trace called ChatOpenAI with a system and human input followed by an AI Output."
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/trace-quickstart-llm-call-dark.png"
-    alt="시스템과 사용자 입력 다음 AI 출력을 보여주는 ChatOpenAI라는 LLM 호출 추적을 보여주는 LangSmith UI."
+    alt="LangSmith UI showing an LLM call trace called ChatOpenAI with a system and human input followed by an AI Output."
 />
 </div>
 
-## 5. 전체 애플리케이션 추적
+## 5. Trace an entire application
 
-LLM 호출만이 아닌 전체 애플리케이션을 추적하기 위해 [Python](https://docs.smith.langchain.com/reference/python/run_helpers/langsmith.run_helpers.traceable) 또는 [TypeScript](https://langsmith-docs-bdk0fivr6-langchain.vercel.app/reference/js/functions/traceable.traceable)용 `traceable` 데코레이터를 사용할 수도 있습니다.
+You can also use the `traceable` decorator for [Python](https://docs.smith.langchain.com/reference/python/run_helpers/langsmith.run_helpers.traceable) or [TypeScript](https://langsmith-docs-bdk0fivr6-langchain.vercel.app/reference/js/functions/traceable.traceable) to trace your entire application instead of just the LLM calls.
 
-1. 앱 파일에 강조 표시된 코드를 포함시킵니다:
+1. Include the highlighted code in your app file:
 
     <CodeGroup>
 
@@ -340,7 +340,7 @@ LLM 호출만이 아닌 전체 애플리케이션을 추적하기 위해 [Python
 
     </CodeGroup>
 
-1. 실행을 생성하기 위해 애플리케이션을 다시 호출합니다:
+1. Call the application again to create a run:
 
     <CodeGroup>
 
@@ -354,32 +354,32 @@ LLM 호출만이 아닌 전체 애플리케이션을 추적하기 위해 [Python
 
     </CodeGroup>
 
-1. [LangSmith UI](https://smith.langchain.com)로 돌아가서 워크스페이스(또는 [2단계](#2-set-up-environment-variables)에서 지정한 워크스페이스)의 **default** 추적 프로젝트로 이동합니다. **rag** 단계와 **ChatOpenAI** LLM 호출을 포함한 전체 앱 파이프라인의 추적을 찾을 수 있습니다.
+1. Return to the [LangSmith UI](https://smith.langchain.com), navigate to the **default** Tracing Project for your workspace (or the workspace you specified in [Step 2](#2-set-up-environment-variables)). You'll find a trace of the entire app pipeline with the **rag** step and the **ChatOpenAI** LLM call.
 
 <div style={{ textAlign: 'center' }}>
 <img
     className="block dark:hidden"
     src="/langsmith/images/trace-quickstart-app.png"
-    alt="입력 다음 출력과 함께 rag라는 전체 애플리케이션의 추적을 보여주는 LangSmith UI."
+    alt="LangSmith UI showing a trace of the entire application called rag with an input followed by an output."
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/trace-quickstart-app-dark.png"
-    alt="입력 다음 출력과 함께 rag라는 전체 애플리케이션의 추적을 보여주는 LangSmith UI."
+    alt="LangSmith UI showing a trace of the entire application called rag with an input followed by an output."
 />
 </div>
 
-## 다음 단계
+## Next steps
 
-다음으로 탐색할 수 있는 주제들입니다:
+Here are some topics you might want to explore next:
 
-- [추적 통합](/langsmith/trace-with-langchain)은 다양한 LLM 제공자와 에이전트 프레임워크에 대한 지원을 제공합니다.
-- [추적 필터링](/langsmith/filter-traces-in-application)은 상당한 양의 데이터를 포함하는 추적 프로젝트에서 데이터를 효과적으로 탐색하고 분석하는 데 도움이 됩니다.
-- [RAG 애플리케이션 추적](/langsmith/observability-llm-tutorial)은 개발부터 프로덕션까지 애플리케이션에 관찰성을 추가하는 전체 튜토리얼입니다.
-- [특정 프로젝트로 추적 전송](/langsmith/log-traces-to-project)은 추적의 대상 프로젝트를 변경합니다.
+- [Tracing integrations](/langsmith/trace-with-langchain) provide support for various LLM providers and agent frameworks.
+- [Filtering traces](/langsmith/filter-traces-in-application) can help you effectively navigate and analyze data in tracing projects that contain a significant amount of data.
+- [Trace a RAG application](/langsmith/observability-llm-tutorial) is a full tutorial, which adds observability to an application from development through to production.
+- [Sending traces to a specific project](/langsmith/log-traces-to-project) changes the destination project of your traces.
 
-## 비디오 가이드
+## Video guide
 <iframe
   className="w-full aspect-video rounded-xl"
   src="https://www.youtube.com/embed/fA9b4D8IsPQ?si=0eBb1vzw5AxUtplS"

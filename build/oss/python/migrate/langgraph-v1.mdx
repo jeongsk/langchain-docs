@@ -1,11 +1,11 @@
 ---
-title: LangGraph v1 마이그레이션 가이드
-sidebarTitle: 마이그레이션 가이드
+title: LangGraph v1 migration guide
+sidebarTitle: Migration guide
 ---
 
-이 가이드는 LangGraph v1의 변경 사항과 이전 버전에서 마이그레이션하는 방법을 설명합니다. 변경 사항에 대한 전반적인 개요는 [새로운 기능](/oss/python/releases/langgraph-v1) 페이지를 참조하세요.
+This guide outlines changes in LangGraph v1 and how to migrate from previous versions. For a high-level overview of changes, see the [what's new](/oss/python/releases/langgraph-v1) page.
 
-업그레이드하려면:
+To upgrade:
 
 <CodeGroup>
 ```bash pip
@@ -16,35 +16,35 @@ uv add langgraph langchain-core
 ```
 </CodeGroup>
 
-## 변경 사항 요약
+## Summary of changes
 
-LangGraph v1은 이전 버전과 대부분 호환됩니다. 주요 변경 사항은 `create_react_agent`가 deprecated되고 LangChain의 새로운 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent) 함수를 사용하도록 변경된 것입니다.
+LangGraph v1 is largely backwards compatible with previous versions. The main change is the deprecation of `create_react_agent` in favor of LangChain's new [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent) function.
 
-## Deprecated 항목
+## Deprecations
 
-다음 표는 LangGraph v1에서 deprecated된 모든 항목을 나열합니다:
+The following table lists all items deprecated in LangGraph v1:
 
-| Deprecated 항목 | 대안 |
+| Deprecated item | Alternative |
 |----------------|-------------|
 | `create_react_agent` | [`langchain.agents.create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent) |
 | `AgentState` | [`langchain.agents.AgentState`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.AgentState) |
-| `AgentStatePydantic` | `langchain.agents.AgentState` (더 이상 pydantic state 없음) |
+| `AgentStatePydantic` | `langchain.agents.AgentState` (no more pydantic state) |
 | `AgentStateWithStructuredResponse` | `langchain.agents.AgentState` |
-| `AgentStateWithStructuredResponsePydantic` | `langchain.agents.AgentState` (더 이상 pydantic state 없음) |
+| `AgentStateWithStructuredResponsePydantic` | `langchain.agents.AgentState` (no more pydantic state) |
 | `HumanInterruptConfig` | `langchain.agents.middleware.human_in_the_loop.InterruptOnConfig` |
 | `ActionRequest` | `langchain.agents.middleware.human_in_the_loop.InterruptOnConfig` |
 | `HumanInterrupt` | `langchain.agents.middleware.human_in_the_loop.HITLRequest` |
-| `ValidationNode` | [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)를 사용하면 도구가 자동으로 입력 유효성 검사 수행 |
-| `MessageGraph` | [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)가 제공하는 것처럼 `messages` 키를 가진 [`StateGraph`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph) |
+| `ValidationNode` | Tools automatically validate input with [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent) |
+| `MessageGraph` | [`StateGraph`](https://reference.langchain.com/python/langgraph/graphs/#langgraph.graph.state.StateGraph) with a `messages` key, like [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent) provides |
 
 ## `create_react_agent` → `create_agent`
 
-LangGraph v1은 `create_react_agent` 사전 빌드를 deprecated합니다. 대신 LangGraph에서 실행되고 유연한 미들웨어 시스템을 추가하는 LangChain의 [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent)를 사용하세요.
+LangGraph v1 deprecates the `create_react_agent` prebuilt. Use LangChain's [`create_agent`](https://reference.langchain.com/python/langchain/agents/#langchain.agents.create_agent), which runs on LangGraph and adds a flexible middleware system.
 
-자세한 내용은 LangChain v1 문서를 참조하세요:
+See the LangChain v1 docs for details:
 
-- [릴리스 노트](/oss/python/releases/langchain-v1#createagent)
-- [마이그레이션 가이드](/oss/python/migrate/langchain-v1#migrate-to-create_agent)
+- [Release notes](/oss/python/releases/langchain-v1#createagent)
+- [Migration guide](/oss/python/migrate/langchain-v1#migrate-to-create_agent)
 
 <CodeGroup>
 ```python v1 (new)
@@ -67,11 +67,11 @@ agent = create_react_agent(  # [!code highlight]
 ```
 </CodeGroup>
 
-## 호환성을 깨는 변경 사항
+## Breaking changes
 
-### Python 3.9 지원 중단
+### Dropped Python 3.9 support
 
-모든 LangChain 패키지는 이제 **Python 3.10 이상**을 필요로 합니다. Python 3.9는 2025년 10월에 [지원 종료](https://devguide.python.org/versions/)되었습니다.
+All LangChain packages now require **Python 3.10 or higher**. Python 3.9 reached [end of life](https://devguide.python.org/versions/) in October 2025.
 
 ---
 

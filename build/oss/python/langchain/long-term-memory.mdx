@@ -1,32 +1,32 @@
 ---
-title: 장기 메모리
+title: Long-term memory
 ---
 
 
 
-## 개요
+## Overview
 
-LangChain 에이전트는 [LangGraph 영속성](/oss/python/langgraph/persistence#memory-store)을 사용하여 장기 메모리를 활성화합니다. 이는 고급 주제이며 사용하려면 LangGraph에 대한 지식이 필요합니다.
+LangChain agents use [LangGraph persistence](/oss/python/langgraph/persistence#memory-store) to enable long-term memory. This is a more advanced topic and requires knowledge of LangGraph to use.
 
 
-## 메모리 저장
+## Memory storage
 
-LangGraph는 장기 메모리를 [store](/oss/python/langgraph/persistence#memory-store)에 JSON 문서로 저장합니다.
+LangGraph stores long-term memories as JSON documents in a [store](/oss/python/langgraph/persistence#memory-store).
 
-각 메모리는 사용자 정의 `namespace`(폴더와 유사)와 고유한 `key`(파일 이름과 유사) 아래에 구성됩니다. 네임스페이스에는 정보를 더 쉽게 구성할 수 있도록 사용자 또는 조직 ID나 기타 레이블이 포함되는 경우가 많습니다.
+Each memory is organized under a custom `namespace` (similar to a folder) and a distinct `key` (like a file name). Namespaces often include user or org IDs or other labels that makes it easier to organize information.
 
-이러한 구조는 메모리의 계층적 구성을 가능하게 합니다. 네임스페이스 간 검색은 콘텐츠 필터를 통해 지원됩니다.
+This structure enables hierarchical organization of memories. Cross-namespace searching is then supported through content filters.
 
 ```python
 from langgraph.store.memory import InMemoryStore
 
 
 def embed(texts: list[str]) -> list[list[float]]:
-    # 실제 임베딩 함수 또는 LangChain 임베딩 객체로 교체하세요
+    # Replace with an actual embedding function or LangChain embeddings object
     return [[1.0, 2.0] * len(texts)]
 
 
-# InMemoryStore는 데이터를 인메모리 딕셔너리에 저장합니다. 프로덕션에서는 DB 기반 store를 사용하세요.
+# InMemoryStore saves data to an in-memory dictionary. Use a DB-backed store in production use.
 store = InMemoryStore(index={"embed": embed, "dims": 2}) # [!code highlight]
 user_id = "my-user"
 application_context = "chitchat"
@@ -42,9 +42,9 @@ store.put( # [!code highlight]
         "my-key": "my-value",
     },
 )
-# ID로 "메모리"를 가져옵니다
+# get the "memory" by ID
 item = store.get(namespace, "a-memory") # [!code highlight]
-# 이 네임스페이스 내에서 "메모리"를 검색하고, 콘텐츠 동등성으로 필터링하며, 벡터 유사도로 정렬합니다
+# search for "memories" within this namespace, filtering on content equivalence, sorted by vector similarity
 items = store.search( # [!code highlight]
     namespace, filter={"my-key": "my-value"}, query="language preferences"
 )

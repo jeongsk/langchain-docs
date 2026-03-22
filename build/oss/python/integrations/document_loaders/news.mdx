@@ -2,7 +2,7 @@
 title: News URL
 ---
 
-이 문서는 URL 목록에서 HTML 뉴스 기사를 로드하여 다운스트림에서 사용할 수 있는 문서 형식으로 변환하는 방법을 다룹니다.
+This covers how to load HTML news articles from a list of URLs into a document format that we can use downstream.
 
 ```python
 from langchain_community.document_loaders import NewsURLLoader
@@ -15,7 +15,7 @@ urls = [
 ]
 ```
 
-URL을 전달하여 Document로 로드합니다
+Pass in urls to load them into Documents
 
 ```python
 loader = NewsURLLoader(urls=urls)
@@ -30,7 +30,7 @@ First article:  page_content='In testimony to the congressional committee examin
 Second article:  page_content='Ms Williams added: "If there\'s anything that I can do in my power to ensure that dancers or singers or whoever decides to work with her don\'t have to go through that same experience, I\'m going to do that."' metadata={'title': "Lizzo dancers Arianna Davis and Crystal Williams: 'No one speaks out, they are scared'", 'link': 'https://www.bbc.com/news/entertainment-arts-66384971', 'authors': [], 'language': 'en', 'description': 'The US pop star is being sued for sexual harassment and fat-shaming but has yet to comment.', 'publish_date': None}
 ```
 
-nlp=True를 사용하여 nlp 분석을 실행하고 키워드 + 요약을 생성합니다
+Use nlp=True to run nlp analysis and generate keywords + summary
 
 ```python
 loader = NewsURLLoader(urls=urls, nlp=True)

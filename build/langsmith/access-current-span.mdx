@@ -1,13 +1,13 @@
 ---
-title: 추적된 함수 내에서 현재 실행(span)에 접근하기
-sidebarTitle: 추적된 함수 내에서 현재 실행(span)에 접근하기
+title: Access the current run (span) within a traced function
+sidebarTitle: Access the current run (span) within a traced function
 ---
 
-추적된 함수 내에서 현재 실행(span)에 접근해야 하는 경우가 있습니다. 이는 현재 실행에서 UUID, 태그 또는 기타 정보를 추출할 때 유용합니다.
+In some cases you will want to access the current run (span) within a traced function. This can be useful for extracting UUIDs, tags, or other information from the current run.
 
-Python 또는 TypeScript SDK에서 각각 `get_current_run_tree`/`getCurrentRunTree` 함수를 호출하여 현재 실행에 접근할 수 있습니다.
+You can access the current run by calling the `get_current_run_tree`/`getCurrentRunTree` function in the Python or TypeScript SDK, respectively.
 
-`RunTree` 객체에서 사용 가능한 속성의 전체 목록은 [이 참조 문서](/langsmith/run-data-format)를 확인하세요.
+For a full list of available properties on the `RunTree` object, see [this reference](/langsmith/run-data-format).
 
 <CodeGroup>
 

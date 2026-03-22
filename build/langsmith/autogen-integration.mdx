@@ -1,25 +1,25 @@
 ---
-title: LangGraph를 AutoGen, CrewAI 및 기타 프레임워크와 통합하는 방법
-sidebarTitle: LangGraph를 AutoGen, CrewAI 및 기타 프레임워크와 통합
+title: How to integrate LangGraph with AutoGen, CrewAI, and other frameworks
+sidebarTitle: Integrate LangGraph with AutoGen, CrewAI, and other frameworks
 ---
-이 가이드는 AutoGen 에이전트를 LangGraph와 통합하여 지속성, 스트리밍, 메모리와 같은 기능을 활용한 다음, 통합된 솔루션을 LangSmith에 배포하여 확장 가능한 프로덕션 환경에서 사용하는 방법을 보여줍니다. 이 가이드에서는 AutoGen과 통합되는 LangGraph 챗봇을 구축하는 방법을 보여주지만, 동일한 접근 방식을 다른 프레임워크에도 적용할 수 있습니다.
+This guide shows how to integrate AutoGen agents with LangGraph to leverage features like persistence, streaming, and memory, and then deploy the integrated solution to LangSmith for scalable production use. In this guide we show how to build a LangGraph chatbot that integrates with AutoGen, but you can follow the same approach with other frameworks.
 
-AutoGen을 LangGraph와 통합하면 다음과 같은 이점이 있습니다:
+Integrating AutoGen with LangGraph provides several benefits:
 
-* 향상된 기능: AutoGen 에이전트에 [지속성](/oss/python/langgraph/persistence), [스트리밍](/langsmith/streaming), [단기 및 장기 메모리](/oss/python/concepts/memory) 등을 추가할 수 있습니다.
-* 멀티 에이전트 시스템: 개별 에이전트가 서로 다른 프레임워크로 구축된 [멀티 에이전트 시스템](/oss/python/langchain/multi-agent)을 빌드할 수 있습니다.
-* 프로덕션 배포: 통합된 솔루션을 [LangSmith](/langsmith/home)에 배포하여 확장 가능한 프로덕션 환경에서 사용할 수 있습니다.
+* Enhanced features: Add [persistence](/oss/python/langgraph/persistence), [streaming](/langsmith/streaming), [short and long-term memory](/oss/python/concepts/memory) and more to your AutoGen agents.
+* Multi-agent systems: Build [multi-agent systems](/oss/python/langchain/multi-agent) where individual agents are built with different frameworks.
+* Production deployment: Deploy your integrated solution to [LangSmith](/langsmith/home) for scalable production use.
 
-## 사전 요구사항
+## Prerequisites
 
 * Python 3.9+
 * Autogen: `pip install autogen`
 * LangGraph: `pip install langgraph`
-* OpenAI API 키
+* OpenAI API key
 
-## 설정
+## Setup
 
-환경을 설정합니다:
+Set your your environment:
 
 ```python
 import getpass
@@ -34,9 +34,9 @@ def _set_env(var: str):
 _set_env("OPENAI_API_KEY")
 ```
 
-## 1. AutoGen 에이전트 정의
+## 1. Define AutoGen agent
 
-코드를 실행할 수 있는 AutoGen 에이전트를 생성합니다. 이 예제는 AutoGen의 [공식 튜토리얼](https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_web_info.ipynb)에서 발췌한 것입니다:
+Create an AutoGen agent that can execute code. This example is adapted from AutoGen's [official tutorials](https://github.com/microsoft/autogen/blob/0.2/notebook/agentchat_web_info.ipynb):
 
 ```python
 import autogen
@@ -70,9 +70,9 @@ user_proxy = autogen.UserProxyAgent(
 )
 ```
 
-## 2. 그래프 생성
+## 2. Create the graph
 
-이제 AutoGen 에이전트를 호출하는 LangGraph 챗봇 그래프를 생성합니다.
+We will now create a LangGraph chatbot graph that calls AutoGen agent.
 
 ```python
 from langchain_core.messages import convert_to_openai_messages
@@ -122,9 +122,9 @@ display(Image(graph.get_graph().draw_mermaid_png()))
 
 ![LangGraph chatbot with one step: START routes to autogen, where call_autogen_agent sends the latest user message (with prior context) to the AutoGen agent.](/langsmith/images/autogen-output.png)
 
-## 3. 로컬에서 그래프 테스트
+## 3. Test the graph locally
 
-LangSmith에 배포하기 전에 로컬에서 그래프를 테스트할 수 있습니다:
+Before deploying to LangSmith, you can test the graph locally:
 
 ```python {highlight={2,13}}
 # pass the thread ID to persist agent outputs for future interactions
@@ -144,7 +144,7 @@ for chunk in graph.stream(
     print(chunk)
 ```
 
-**출력:**
+**Output:**
 
 ```
 user_proxy (to assistant):
@@ -163,7 +163,7 @@ To find numbers between 10 and 30 in the Fibonacci sequence, we can generate the
 ...
 ```
 
-LangGraph의 [지속성](/oss/python/langgraph/persistence) 기능을 활용하고 있으므로 이제 동일한 스레드 ID를 사용하여 대화를 계속할 수 있습니다. LangGraph는 자동으로 이전 기록을 AutoGen 에이전트에 전달합니다:
+Since we're leveraging LangGraph's [persistence](/oss/python/langgraph/persistence) features we can now continue the conversation using the same thread ID -- LangGraph will automatically pass previous history to the AutoGen agent:
 
 ```python {highlight={10}}
 for chunk in graph.stream(
@@ -180,7 +180,7 @@ for chunk in graph.stream(
     print(chunk)
 ```
 
-**출력:**
+**Output:**
 
 ```
 user_proxy (to assistant):
@@ -211,9 +211,9 @@ TERMINATE
 {'call_autogen_agent': {'messages': {'role': 'assistant', 'content': 'The last number in the Fibonacci sequence between 10 and 30 is 21. Multiplying 21 by 3 gives:\n\n21 * 3 = 63\n\nTERMINATE'}}}
 ```
 
-## 4. 배포 준비
+## 4. Prepare for deployment
 
-LangSmith에 배포하려면 다음과 같은 파일 구조를 생성합니다:
+To deploy to LangSmith, create a file structure like the following:
 
 ```
 my-autogen-agent/
@@ -308,9 +308,9 @@ my-autogen-agent/
     </Tab>
 </Tabs>
 
-## 5. LangSmith에 배포
+## 5. Deploy to LangSmith
 
-LangSmith CLI를 사용하여 그래프를 배포합니다:
+Deploy the graph with the LangSmith CLI:
 
 <CodeGroup>
 ```bash pip

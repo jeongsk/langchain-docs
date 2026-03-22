@@ -1,242 +1,242 @@
 ---
-title: 평가 개념
-sidebarTitle: 개념
+title: Evaluation Concepts
+sidebarTitle: Concepts
 ---
 
-LangSmith는 고품질 평가를 쉽게 구축할 수 있도록 지원합니다. 이 가이드는 LangSmith 평가 프레임워크의 핵심 개념을 설명합니다. LangSmith 프레임워크의 구성 요소는 다음과 같습니다:
+LangSmith makes building high-quality evaluations easy. This guide explains the key concepts of the LangSmith evaluation framework. The building blocks of the LangSmith framework are:
 
-* [**데이터셋**:](/langsmith/evaluation-concepts#datasets) 테스트 입력과 참조 출력의 모음입니다.
-* [**평가자**](/langsmith/evaluation-concepts#evaluators): 출력에 점수를 매기는 함수입니다. 실시간으로 트레이스에서 실행되는 [온라인 평가자](/langsmith/evaluation-concepts#online-evaluation) 또는 데이터셋에서 실행되는 [오프라인 평가자](/langsmith/evaluation-concepts#offline-evaluation)가 있습니다.
+* [**Datasets**:](/langsmith/evaluation-concepts#datasets) Collections of test inputs and reference outputs.
+* [**Evaluators**](/langsmith/evaluation-concepts#evaluators): Functions for scoring outputs. These can be [online evaluators](/langsmith/evaluation-concepts#online-evaluation) that run on traces in real time or [offline evaluators](/langsmith/evaluation-concepts#offline-evaluation) that run on a dataset.
 
-## 데이터셋
+## Datasets
 
-데이터셋은 애플리케이션을 평가하는 데 사용되는 예제의 모음입니다. 예제는 테스트 입력과 참조 출력의 쌍입니다.
+A dataset is a collection of examples used for evaluating an application. An example is a test input, reference output pair.
 
 ![Dataset](/langsmith/images/dataset-concept.png)
 
-### 예제
+### Examples
 
-각 예제는 다음으로 구성됩니다:
+Each example consists of:
 
-* **입력**: 애플리케이션에 전달할 입력 변수의 딕셔너리입니다.
-* **참조 출력** (선택): 참조 출력의 딕셔너리입니다. 이는 애플리케이션에 전달되지 않으며, 평가자에서만 사용됩니다.
-* **메타데이터** (선택): 데이터셋의 필터링된 뷰를 생성하는 데 사용할 수 있는 추가 정보의 딕셔너리입니다.
+* **Inputs**: a dictionary of input variables to pass to your application.
+* **Reference outputs** (optional): a dictionary of reference outputs. These do not get passed to your application, they are only used in evaluators.
+* **Metadata** (optional): a dictionary of additional information that can be used to create filtered views of a dataset.
 
 ![Example](/langsmith/images/example-concept.png)
 
-### 데이터셋 큐레이션
+### Dataset curation
 
-평가를 위한 데이터셋을 구축하는 다양한 방법이 있습니다:
+There are various ways to build datasets for evaluation, including:
 
-#### 수동 큐레이션 예제
+#### Manually curated examples
 
-이는 일반적으로 데이터셋을 생성하기 시작할 때 권장하는 방법입니다. 애플리케이션을 구축하면서 애플리케이션이 처리할 수 있어야 하는 입력 유형과 "좋은" 응답이 무엇인지에 대한 아이디어를 가지고 있을 것입니다. 상상할 수 있는 몇 가지 일반적인 엣지 케이스나 상황을 다루고 싶을 것입니다. 10~20개의 고품질, 수동 큐레이션 예제만으로도 큰 효과를 볼 수 있습니다.
+This is how we typically recommend people get started creating datasets. From building your application, you probably have some idea of what types of inputs you expect your application to be able to handle, and what "good" responses may be. You probably want to cover a few different common edge cases or situations you can imagine. Even 10-20 high-quality, manually-curated examples can go a long way.
 
-#### 과거 트레이스
+#### Historical traces
 
-프로덕션 환경에서 애플리케이션을 운영하면 귀중한 정보를 얻기 시작합니다: 사용자가 실제로 어떻게 사용하고 있는가? 이러한 실제 실행은 가장 현실적이기 때문에 훌륭한 예제가 됩니다!
+Once you have an application in production, you start getting valuable information: how are users actually using it? These real-world runs make for great examples because they're, well, the most realistic!
 
-트래픽이 많은 경우, 어떤 실행을 데이터셋에 추가할 가치가 있는지 어떻게 결정할 수 있을까요? 다음과 같은 몇 가지 기법을 사용할 수 있습니다:
+If you're getting a lot of traffic, how can you determine which runs are valuable to add to a dataset? There are a few techniques you can use:
 
-* **사용자 피드백**: 가능하다면 최종 사용자 피드백을 수집해 보세요. 그런 다음 어떤 데이터포인트가 부정적인 피드백을 받았는지 확인할 수 있습니다. 이는 매우 가치가 있습니다! 이는 애플리케이션이 제대로 작동하지 않은 지점입니다. 향후 테스트를 위해 데이터셋에 이를 추가해야 합니다.
-* **휴리스틱**: 다른 휴리스틱을 사용하여 "흥미로운" 데이터포인트를 식별할 수도 있습니다. 예를 들어, 완료하는 데 오랜 시간이 걸린 실행은 살펴보고 데이터셋에 추가할 만한 흥미로운 대상이 될 수 있습니다.
-* **LLM 피드백**: 다른 LLM을 사용하여 주목할 만한 실행을 감지할 수 있습니다. 예를 들어, LLM을 사용하여 사용자가 질문을 다시 표현하거나 어떤 식으로든 모델을 수정해야 했던 챗봇 대화를 레이블링할 수 있으며, 이는 챗봇이 처음에 올바르게 응답하지 않았음을 나타냅니다.
+* **User feedback**: If possible - try to collect end user feedback. You can then see which datapoints got negative feedback. That is super valuable! These are spots where your application did not perform well. You should add these to your dataset to test against in the future.
+* **Heuristics**: You can also use other heuristics to identify "interesting" datapoints. For example, runs that took a long time to complete could be interesting to look at and add to a dataset.
+* **LLM feedback**: You can use another LLM to detect noteworthy runs. For example, you could use an LLM to label chatbot conversations where the user had to rephrase their question or correct the model in some way, indicating the chatbot did not initially respond correctly.
 
-#### 합성 데이터
+#### Synthetic data
 
-몇 가지 예제가 있으면 더 많은 예제를 인위적으로 생성해 볼 수 있습니다. 일반적으로 합성 데이터가 어떤 식으로든 이를 닮게 되므로, 그 전에 몇 가지 좋은 수작업 예제를 만드는 것이 권장됩니다. 이는 빠르게 많은 데이터포인트를 얻는 유용한 방법이 될 수 있습니다.
+Once you have a few examples, you can try to artificially generate some more. It's generally advised to have a few good hand-crafted examples before this, as this synthetic data will often resemble them in some way. This can be a useful way to get a lot of datapoints, quickly.
 
-### 분할
+### Splits
 
-평가를 설정할 때 데이터셋을 다른 분할로 분할하고 싶을 수 있습니다. 예를 들어, 많은 빠르고 저렴한 반복에는 더 작은 분할을 사용하고 최종 평가에는 더 큰 분할을 사용할 수 있습니다. 또한 분할은 실험의 해석 가능성에 중요할 수 있습니다. 예를 들어, RAG 애플리케이션이 있는 경우 데이터셋 분할이 다양한 유형의 질문(예: 사실, 의견 등)에 초점을 맞추고 각 분할에서 애플리케이션을 개별적으로 평가하고 싶을 수 있습니다.
+When setting up your evaluation, you may want to partition your dataset into different splits. For example, you might use a smaller split for many rapid and cheap iterations and a larger split for your final evaluation. In addition, splits can be important for the interpretability of your experiments. For example, if you have a RAG application, you may want your dataset splits to focus on different types of questions (e.g., factual, opinion, etc) and to evaluate your application on each split separately.
 
-[데이터셋 분할 생성 및 관리](/langsmith/manage-datasets-in-application#create-and-manage-dataset-splits) 방법을 알아보세요.
+Learn how to [create and manage dataset splits](/langsmith/manage-datasets-in-application#create-and-manage-dataset-splits).
 
-### 버전
+### Versions
 
-데이터셋은 [버전 관리](/langsmith/manage-datasets#version-a-dataset)되므로 데이터셋에서 예제를 추가, 업데이트 또는 삭제할 때마다 데이터셋의 새 버전이 생성됩니다. 이를 통해 실수를 한 경우 데이터셋의 변경 사항을 쉽게 검사하고 되돌릴 수 있습니다. 데이터셋의 버전에 [태그를 지정](/langsmith/manage-datasets#tag-a-version)하여 더 사람이 읽기 쉬운 이름을 부여할 수도 있습니다. 이는 데이터셋 기록의 중요한 이정표를 표시하는 데 유용할 수 있습니다.
+Datasets are [versioned](/langsmith/manage-datasets#version-a-dataset) such that every time you add, update, or delete examples in your dataset, a new version of the dataset is created. This makes it easy to inspect and revert changes to your dataset in case you make a mistake. You can also [tag versions](/langsmith/manage-datasets#tag-a-version) of your dataset to give them a more human-readable name. This can be useful for marking important milestones in your dataset's history.
 
-데이터셋의 특정 버전에서 평가를 실행할 수 있습니다. 이는 CI에서 평가를 실행할 때 데이터셋 업데이트가 실수로 CI 파이프라인을 손상시키지 않도록 하는 데 유용할 수 있습니다.
+You can run evaluations on specific versions of a dataset. This can be useful when running evaluations in CI, to make sure that a dataset update doesn't accidentally break your CI pipelines.
 
-## 평가자
+## Evaluators
 
-평가자는 특정 예제에서 애플리케이션이 얼마나 잘 수행되는지 점수를 매기는 함수입니다.
+Evaluators are functions that score how well your application performs on a particular example.
 
-#### 평가자 입력
+#### Evaluator inputs
 
-평가자는 다음 입력을 받습니다:
+Evaluators receive these inputs:
 
-* [예제](/langsmith/evaluation-concepts#examples): [데이터셋](/langsmith/evaluation-concepts#datasets)의 예제입니다. 입력, (참조) 출력 및 메타데이터를 포함합니다.
-* [실행](/langsmith/observability-concepts#runs): 예제 입력을 애플리케이션에 전달한 실제 출력과 중간 단계(자식 실행)입니다.
+* [Example](/langsmith/evaluation-concepts#examples): The example(s) from your [Dataset](/langsmith/evaluation-concepts#datasets). Contains inputs, (reference) outputs, and metadata.
+* [Run](/langsmith/observability-concepts#runs): The actual outputs and intermediate steps (child runs) from passing the example inputs to the application.
 
-#### 평가자 출력
+#### Evaluator outputs
 
-평가자는 하나 이상의 메트릭을 반환합니다. 이는 다음 형식의 딕셔너리 또는 딕셔너리 목록으로 반환되어야 합니다:
+An evaluator returns one or more metrics. These should be returned as a dictionary or list of dictionaries of the form:
 
-* `key`: 메트릭의 이름입니다.
-* `score` | `value`: 메트릭의 값입니다. 수치 메트릭인 경우 `score`를, 범주형인 경우 `value`를 사용합니다.
-* `comment` (선택): 점수를 정당화하는 이유 또는 추가 문자열 정보입니다.
+* `key`: The name of the metric.
+* `score` | `value`: The value of the metric. Use `score` if it's a numerical metric and `value` if it's categorical.
+* `comment` (optional): The reasoning or additional string information justifying the score.
 
-#### 평가자 정의
+#### Defining evaluators
 
-평가자를 정의하고 실행하는 여러 방법이 있습니다:
+There are a number of ways to define and run evaluators:
 
-* **사용자 정의 코드**: Python 또는 TypeScript 함수로 [사용자 정의 평가자](/langsmith/code-evaluator)를 정의하고 SDK를 사용하여 클라이언트 측에서 실행하거나 UI를 통해 서버 측에서 실행합니다.
-* **내장 평가자**: LangSmith에는 UI를 통해 구성하고 실행할 수 있는 여러 내장 평가자가 있습니다.
+* **Custom code**: Define [custom evaluators](/langsmith/code-evaluator) as Python or TypeScript functions and run them client-side using the SDKs or server-side via the UI.
+* **Built-in evaluators**: LangSmith has a number of built-in evaluators that you can configure and run via the UI.
 
-LangSmith SDK([Python](https://docs.smith.langchain.com/reference/python/reference) 및 [TypeScript](https://docs.smith.langchain.com/reference/js))를 사용하여, [프롬프트 플레이그라운드](/langsmith/observability-concepts#prompt-playground)를 통해 또는 [규칙](/langsmith/rules)을 구성하여 특정 트레이싱 프로젝트나 데이터셋에서 자동으로 실행되도록 평가자를 실행할 수 있습니다.
+You can run evaluators using the LangSmith SDK ([Python](https://docs.smith.langchain.com/reference/python/reference) and [TypeScript](https://docs.smith.langchain.com/reference/js)), via the [Prompt Playground](/langsmith/observability-concepts#prompt-playground), or by configuring [Rules](/langsmith/rules) to automatically run them on particular tracing projects or datasets.
 
-#### 평가 기법
+#### Evaluation techniques
 
-LLM 평가에 대한 몇 가지 고수준 접근 방식이 있습니다:
+There are a few high-level approaches to LLM evaluation:
 
-### 휴먼
+### Human
 
-휴먼 평가는 [종종 평가를 위한 훌륭한 시작점](https://hamel.dev/blog/posts/evals/#looking-at-your-traces)입니다. LangSmith를 사용하면 LLM 애플리케이션 출력과 트레이스(모든 중간 단계)를 쉽게 검토할 수 있습니다.
+Human evaluation is [often a great starting point for evaluation](https://hamel.dev/blog/posts/evals/#looking-at-your-traces). LangSmith makes it easy to review your LLM application outputs as well as the traces (all intermediate steps).
 
-LangSmith의 [어노테이션 큐](/langsmith/evaluation-concepts#annotation-queues)를 사용하면 애플리케이션의 출력에 대한 휴먼 피드백을 쉽게 얻을 수 있습니다.
+LangSmith's [annotation queues](/langsmith/evaluation-concepts#annotation-queues) make it easy to get human feedback on your application's outputs.
 
-### 휴리스틱
+### Heuristic
 
-휴리스틱 평가자는 결정론적이고 규칙 기반 함수입니다. 이는 챗봇의 응답이 비어 있지 않은지, 생성된 코드 스니펫을 컴파일할 수 있는지 또는 분류가 정확히 올바른지와 같은 간단한 확인에 적합합니다.
+Heuristic evaluators are deterministic, rule-based functions. These are good for simple checks like making sure that a chatbot's response isn't empty, that a snippet of generated code can be compiled, or that a classification is exactly correct.
 
 ### LLM-as-judge
 
-LLM-as-judge 평가자는 LLM을 사용하여 애플리케이션의 출력에 점수를 매깁니다. 이를 사용하려면 일반적으로 LLM 프롬프트에 채점 규칙/기준을 인코딩합니다. 참조가 필요 없을 수 있습니다(예: 시스템 출력에 공격적인 내용이 포함되어 있는지 확인하거나 특정 기준을 준수하는지 확인). 또는 작업 출력을 참조 출력과 비교할 수 있습니다(예: 출력이 참조에 비해 사실적으로 정확한지 확인).
+LLM-as-judge evaluators use LLMs to score the application's output. To use them, you typically encode the grading rules / criteria in the LLM prompt. They can be reference-free (e.g., check if system output contains offensive content or adheres to specific criteria). Or, they can compare task output to a reference output (e.g., check if the output is factually accurate relative to the reference).
 
-LLM-as-judge 평가자를 사용할 때는 결과 점수를 주의 깊게 검토하고 필요한 경우 채점자 프롬프트를 조정하는 것이 중요합니다. 종종 퓨샷 평가자로 작성하는 것이 도움이 되며, 채점자 프롬프트의 일부로 입력, 출력 및 예상 등급의 예를 제공합니다.
+With LLM-as-judge evaluators, it is important to carefully review the resulting scores and tune the grader prompt if needed. Often it is helpful to write these as few-shot evaluators, where you provide examples of inputs, outputs, and expected grades as part of the grader prompt.
 
-[LLM-as-a-judge 평가자를 정의하는 방법](/langsmith/llm-as-judge)을 알아보세요.
+Learn about [how to define an LLM-as-a-judge evaluator](/langsmith/llm-as-judge).
 
-### 쌍별 비교
+### Pairwise
 
-쌍별 비교 평가자를 사용하면 애플리케이션의 두 버전의 출력을 비교할 수 있습니다. [LMSYS Chatbot Arena](https://chat.lmsys.org/)를 생각해 보세요 - 이것은 동일한 개념이지만, 단순히 모델뿐만 아니라 AI 애플리케이션에 더 일반적으로 적용됩니다! 이는 휴리스틱("어느 응답이 더 긴가"), LLM(특정 쌍별 비교 프롬프트 사용) 또는 휴먼(예제에 수동으로 어노테이션을 요청)을 사용할 수 있습니다.
+Pairwise evaluators allow you to compare the outputs of two versions of an application. Think [LMSYS Chatbot Arena](https://chat.lmsys.org/) - this is the same concept, but applied to AI applications more generally, not just models! This can use either a heuristic ("which response is longer"), an LLM (with a specific pairwise prompt), or human (asking them to manually annotate examples).
 
-**쌍별 비교 평가는 언제 사용해야 할까요?**
+**When should you use pairwise evaluation?**
 
-쌍별 비교 평가는 LLM 출력에 직접 점수를 매기기 어렵지만 두 출력을 비교하기는 쉬운 경우에 유용합니다. 이는 요약과 같은 작업의 경우일 수 있습니다 - 요약에 절대 점수를 부여하기는 어려울 수 있지만, 두 요약 중 어느 것이 더 유익한지 선택하기는 쉬울 수 있습니다.
+Pairwise evaluation is helpful when it is difficult to directly score an LLM output, but easier to compare two outputs. This can be the case for tasks like summarization - it may be hard to give a summary an absolute score, but easy to choose which of two summaries is more informative.
 
-[쌍별 비교 평가를 실행하는 방법](/langsmith/evaluate-pairwise)을 알아보세요.
+Learn [how run pairwise evaluations](/langsmith/evaluate-pairwise).
 
-## 실험
+## Experiment
 
-데이터셋에서 애플리케이션을 평가할 때마다 실험을 수행하는 것입니다. 실험에는 데이터셋에서 애플리케이션의 특정 버전을 실행한 결과가 포함됩니다. LangSmith 실험 뷰 사용 방법을 이해하려면 [실험 결과 분석 방법](/langsmith/analyze-an-experiment)을 참조하세요.
+Each time we evaluate an application on a dataset, we are conducting an experiment. An experiment contains the results of running a specific version of your application on the dataset. To understand how to use the LangSmith experiment view, see [how to analyze experiment results](/langsmith/analyze-an-experiment).
 
 ![Experiment view](/langsmith/images/experiment-view.png)
 
-일반적으로 주어진 데이터셋에서 여러 실험을 실행하여 애플리케이션의 다양한 구성(예: 다른 프롬프트 또는 LLM)을 테스트합니다. LangSmith에서는 데이터셋과 관련된 모든 실험을 쉽게 볼 수 있습니다. 또한 [비교 뷰에서 여러 실험을 비교](/langsmith/compare-experiment-results)할 수 있습니다.
+Typically, we will run multiple experiments on a given dataset, testing different configurations of our application (e.g., different prompts or LLMs). In LangSmith, you can easily view all the experiments associated with your dataset. Additionally, you can [compare multiple experiments in a comparison view](/langsmith/compare-experiment-results).
 
 ![Comparison view](/langsmith/images/comparison-view.png)
 
 
-### 실험 구성
+### Experiment configuration
 
-LangSmith는 원하는 방식으로 평가를 더 쉽게 실행할 수 있도록 여러 실험 구성을 지원합니다.
+LangSmith supports a number of experiment configurations which make it easier to run your evals in the manner you want.
 
-#### 반복
+#### Repetitions
 
-실험을 여러 번 실행하면 LLM 출력이 결정론적이지 않고 한 반복에서 다음 반복으로 달라질 수 있기 때문에 유용할 수 있습니다. 여러 반복을 실행하면 시스템 성능에 대한 보다 정확한 추정치를 얻을 수 있습니다.
+Running an experiment multiple times can be helpful since LLM outputs are not deterministic and can differ from one repetition to the next. By running multiple repetitions, you can get a more accurate estimate of the performance of your system.
 
-반복은 `evaluate` / `aevaluate`([Python](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate), [TypeScript](https://docs.smith.langchain.com/reference/js/interfaces/evaluation.EvaluateOptions#numrepetitions))에 `num_repetitions` 인수를 전달하여 구성할 수 있습니다. 실험을 반복하면 출력을 생성하기 위해 대상 함수를 다시 실행하고 평가자를 다시 실행하는 것이 모두 포함됩니다.
+Repetitions can be configured by passing the `num_repetitions` argument to `evaluate` / `aevaluate` ([Python](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate), [TypeScript](https://docs.smith.langchain.com/reference/js/interfaces/evaluation.EvaluateOptions#numrepetitions)). Repeating the experiment involves both re-running the target function to generate outputs and re-running the evaluators.
 
-실험에서 반복 실행에 대해 자세히 알아보려면 [사용 방법 가이드](/langsmith/repetition)를 읽어보세요.
+To learn more about running repetitions on experiments, read the [how-to-guide](/langsmith/repetition).
 
-#### 동시성
+#### Concurrency
 
-`evaluate` / `aevaluate`에 `max_concurrency` 인수를 전달하여 실험의 동시성을 지정할 수 있습니다. `max_concurrency` 인수는 `evaluate` 또는 `aevaluate`를 사용하는지에 따라 의미가 약간 다릅니다.
+By passing the `max_concurrency` argument to `evaluate` / `aevaluate`, you can specify the concurrency of your experiment. The `max_concurrency` argument has slightly different semantics depending on whether you are using `evaluate` or `aevaluate`.
 
 ##### `evaluate`
 
-`evaluate`에 대한 `max_concurrency` 인수는 실험을 실행할 때 사용할 최대 동시 스레드 수를 지정합니다. 이는 대상 함수를 실행할 때와 평가자를 실행할 때 모두 해당됩니다.
+The `max_concurrency` argument to `evaluate` specifies the maximum number of concurrent threads to use when running the experiment. This is both for when running your target function as well as your evaluators.
 
 ##### `aevaluate`
 
-`aevaluate`에 대한 `max_concurrency` 인수는 `evaluate`와 상당히 유사하지만, 대신 세마포어를 사용하여 한 번에 실행할 수 있는 동시 작업 수를 제한합니다. `aevaluate`는 데이터셋의 각 예제에 대한 작업을 생성하여 작동합니다. 각 작업은 대상 함수를 실행하고 해당 특정 예제에 대한 모든 평가자를 실행하는 것으로 구성됩니다. `max_concurrency` 인수는 최대 동시 작업 수, 다시 말해 한 번에 실행할 예제 수를 지정합니다.
+The `max_concurrency` argument to `aevaluate` is fairly similar to `evaluate`, but instead uses a semaphore to limit the number of concurrent tasks that can run at once. `aevaluate` works by creating a task for each example in the dataset. Each task consists of running the target function as well as all of the evaluators on that specific example. The `max_concurrency` argument specifies the maximum number of concurrent tasks, or put another way - examples, to run at once.
 
-#### 캐싱
+#### Caching
 
-마지막으로 `LANGSMITH_TEST_CACHE`를 쓰기 액세스 권한이 있는 장치의 유효한 폴더로 설정하여 실험에서 수행된 API 호출을 캐시할 수도 있습니다. 이렇게 하면 실험에서 수행된 API 호출이 디스크에 캐시되어 동일한 API 호출을 하는 향후 실험의 속도가 크게 빨라집니다.
+Lastly, you can also cache the API calls made in your experiment by setting the `LANGSMITH_TEST_CACHE` to a valid folder on your device with write access. This will cause the API calls made in your experiment to be cached to disk, meaning future experiments that make the same API calls will be greatly sped up.
 
-## 어노테이션 큐
+## Annotation queues
 
-휴먼 피드백은 종종 애플리케이션에 대해 수집할 수 있는 가장 가치 있는 피드백입니다. [어노테이션 큐](/langsmith/annotation-queues)를 사용하면 어노테이션을 위해 애플리케이션의 실행에 플래그를 지정할 수 있습니다. 그러면 휴먼 어노테이터는 큐의 실행을 검토하고 피드백을 제공할 수 있는 간소화된 뷰를 갖게 됩니다. 종종 이러한 어노테이션된 실행의 (일부) 하위 집합은 향후 평가를 위해 [데이터셋](/langsmith/evaluation-concepts#datasets)으로 전송됩니다. 항상 [실행을 인라인으로 어노테이션](/langsmith/annotate-traces-inline)할 수 있지만, 어노테이션 큐는 실행을 함께 그룹화하고 어노테이션 기준을 지정하고 권한을 구성하는 또 다른 옵션을 제공합니다.
+Human feedback is often the most valuable feedback you can gather on your application. With [annotation queues](/langsmith/annotation-queues) you can flag runs of your application for annotation. Human annotators then have a streamlined view to review and provide feedback on the runs in a queue. Often (some subset of) these annotated runs are then transferred to a [dataset](/langsmith/evaluation-concepts#datasets) for future evaluations. While you can always [annotate runs inline](/langsmith/annotate-traces-inline), annotation queues provide another option to group runs together, specify annotation criteria, and configure permissions.
 
-[어노테이션 큐 및 휴먼 피드백](/langsmith/annotation-queues)에 대해 자세히 알아보세요.
+Learn more about [annotation queues and human feedback](/langsmith/annotation-queues).
 
-## 오프라인 평가
+## Offline evaluation
 
-데이터셋에서 애플리케이션을 평가하는 것을 "오프라인" 평가라고 합니다. 이는 사전 컴파일된 데이터 세트에서 평가하기 때문에 오프라인입니다. 반면 온라인 평가는 거의 실시간으로 실제 트래픽에서 배포된 애플리케이션의 출력을 평가하는 것입니다. 오프라인 평가는 배포 전에 애플리케이션의 버전을 테스트하는 데 사용됩니다.
+Evaluating an application on a dataset is what we call "offline" evaluation. It is offline because we're evaluating on a pre-compiled set of data. An online evaluation, on the other hand, is one in which we evaluate a deployed application's outputs on real traffic, in near realtime. Offline evaluations are used for testing a version(s) of your application pre-deployment.
 
-LangSmith SDK([Python](https://docs.smith.langchain.com/reference/python/reference) 및 [TypeScript](https://docs.smith.langchain.com/reference/js))를 사용하여 클라이언트 측에서 오프라인 평가를 실행할 수 있습니다. [프롬프트 플레이그라운드](/langsmith/observability-concepts#prompt-playground)를 통해 또는 특정 데이터셋에 대한 모든 새 실험에서 특정 평가자를 실행하도록 [자동화](/langsmith/rules)를 구성하여 서버 측에서 실행할 수 있습니다.
+You can run offline evaluations client-side using the LangSmith SDK ([Python](https://docs.smith.langchain.com/reference/python/reference) and [TypeScript](https://docs.smith.langchain.com/reference/js)). You can run them server-side via the [Prompt Playground](/langsmith/observability-concepts#prompt-playground) or by configuring [automations](/langsmith/rules) to run certain evaluators on every new experiment against a specific dataset.
 
 ![Offline](/langsmith/images/offline.png)
 
-### 벤치마킹
+### Benchmarking
 
-아마도 가장 일반적인 유형의 오프라인 평가는 대표적인 입력의 데이터셋을 큐레이션하고 주요 성능 메트릭을 정의하며 애플리케이션의 여러 버전을 벤치마킹하여 최상의 버전을 찾는 것입니다. 벤치마킹은 많은 사용 사례에 대해 골드 스탠다드 참조 출력으로 데이터셋을 큐레이션하고 실험 출력을 비교하기 위한 좋은 메트릭을 설계해야 하기 때문에 힘들 수 있습니다. RAG Q&A 봇의 경우 질문 및 참조 답변의 데이터셋과 실제 답변이 참조 답변과 의미론적으로 동등한지 판단하는 LLM-as-judge 평가자처럼 보일 수 있습니다. ReACT 에이전트의 경우 사용자 요청의 데이터셋과 모델이 수행해야 하는 모든 도구 호출의 참조 세트, 그리고 모든 참조 도구 호출이 수행되었는지 확인하는 휴리스틱 평가자처럼 보일 수 있습니다.
+Perhaps the most common type of offline evaluation is one in which we curate a dataset of representative inputs, define the key performance metrics, and benchmark multiple versions of our application to find the best one. Benchmarking can be laborious because for many use cases you have to curate a dataset with gold-standard reference outputs and design good metrics for comparing experimental outputs to them. For a RAG Q\&A bot this might look like a dataset of questions and reference answers, and an LLM-as-judge evaluator that determines if the actual answer is semantically equivalent to the reference answer. For a ReACT agent this might look like a dataset of user requests and a reference set of all the tool calls the model is supposed to make, and a heuristic evaluator that checks if all of the reference tool calls were made.
 
-### 단위 테스트
+### Unit tests
 
-단위 테스트는 소프트웨어 개발에서 개별 시스템 구성 요소의 정확성을 검증하는 데 사용됩니다. [LLM 컨텍스트의 단위 테스트는 종종 규칙 기반 어설션](https://hamel.dev/blog/posts/evals/#level-1-unit-tests)으로, LLM 입력 또는 출력(예: LLM 생성 코드를 컴파일할 수 있는지, JSON을 로드할 수 있는지 등)에 대한 기본 기능을 검증합니다.
+Unit tests are used in software development to verify the correctness of individual system components. [Unit tests in the context of LLMs are often rule-based assertions](https://hamel.dev/blog/posts/evals/#level-1-unit-tests) on LLM inputs or outputs (e.g., checking that LLM-generated code can be compiled, JSON can be loaded, etc.) that validate basic functionality.
 
-단위 테스트는 종종 항상 통과해야 한다는 기대로 작성됩니다. 이러한 유형의 테스트는 CI의 일부로 실행하기에 좋습니다. 그렇게 할 때는 LLM 호출을 최소화하기 위해 캐시를 설정하는 것이 유용합니다(빠르게 쌓일 수 있기 때문입니다!).
+Unit tests are often written with the expectation that they should always pass. These types of tests are nice to run as part of CI. Note that when doing so it is useful to set up a cache to minimize LLM calls (because those can quickly rack up!).
 
-### 회귀 테스트
+### Regression tests
 
-회귀 테스트는 시간이 지남에 따라 애플리케이션 버전 간 성능을 측정하는 데 사용됩니다. 이는 최소한 새 앱 버전이 현재 버전이 올바르게 처리하는 예제에서 회귀하지 않도록 하고, 이상적으로는 새 버전이 현재 버전에 비해 얼마나 더 나은지 측정하는 데 사용됩니다. 종종 사용자 경험에 영향을 미칠 것으로 예상되는 앱 업데이트(예: 모델 또는 아키텍처 업데이트)를 수행할 때 트리거됩니다.
+Regression tests are used to measure performance across versions of your application over time. They are used to, at the very least, ensure that a new app version does not regress on examples that your current version correctly handles, and ideally to measure how much better your new version is relative to the current. Often these are triggered when you are making app updates (e.g. updating models or architectures) that are expected to influence the user experience.
 
-LangSmith의 비교 뷰는 회귀 테스트를 기본적으로 지원하여 기준선에 비해 변경된 예제를 빠르게 볼 수 있습니다. 회귀는 빨간색으로, 개선은 녹색으로 강조 표시됩니다.
+LangSmith's comparison view has native support for regression testing, allowing you to quickly see examples that have changed relative to the baseline. Regressions are highlighted red, improvements green.
 
 ![Comparison view](/langsmith/images/comparison-view.png)
 
-### 백테스팅
+### Backtesting
 
-백테스팅은 데이터셋 생성(위에서 논의됨)과 평가를 결합하는 접근 방식입니다. 프로덕션 로그 모음이 있는 경우 이를 데이터셋으로 전환할 수 있습니다. 그런 다음 최신 애플리케이션 버전으로 해당 프로덕션 예제를 다시 실행할 수 있습니다. 이를 통해 과거의 현실적인 사용자 입력에 대한 성능을 평가할 수 있습니다.
+Backtesting is an approach that combines dataset creation (discussed above) with evaluation. If you have a collection of production logs, you can turn them into a dataset. Then, you can re-run those production examples with newer application versions. This allows you to assess performance on past and realistic user inputs.
 
-이는 일반적으로 새로운 모델 버전을 평가하는 데 사용됩니다. Anthropic이 새 모델을 출시했나요? 문제없습니다! 애플리케이션을 통해 가장 최근의 1000개 실행을 가져와 새 모델을 통해 전달합니다. 그런 다음 해당 결과를 프로덕션에서 실제로 발생한 것과 비교합니다.
+This is commonly used to evaluate new model versions. Anthropic dropped a new model? No problem! Grab the 1000 most recent runs through your application and pass them through the new model. Then compare those results to what actually happened in production.
 
-### 쌍별 비교 평가
+### Pairwise evaluation
 
-일부 작업의 경우 휴먼 또는 LLM 채점자가 "버전 A가 B보다 낫다"를 결정하는 것이 A 또는 B에 절대 점수를 할당하는 것보다 [더 쉽습니다](https://www.oreilly.com/radar/what-we-learned-from-a-year-of-building-with-llms-part-i/). 쌍별 비교 평가는 바로 이것입니다 — 두 버전의 출력을 일부 참조 출력 또는 절대 기준에 대해 비교하는 대신 서로에 대해 채점하는 것입니다. 쌍별 비교 평가는 종종 더 일반적인 작업에서 LLM-as-judge 평가자를 사용할 때 유용합니다. 예를 들어, 요약기 애플리케이션이 있는 경우 LLM-as-judge가 "이 두 요약 중 어느 것이 더 명확하고 간결한가?"를 결정하는 것이 "명확성과 간결성 측면에서 이 요약에 1-10점을 부여하세요"와 같은 절대 점수를 부여하는 것보다 쉬울 수 있습니다.
+For some tasks [it is easier](https://www.oreilly.com/radar/what-we-learned-from-a-year-of-building-with-llms-part-i/) for a human or LLM grader to determine if "version A is better than B" than to assign an absolute score to either A or B. Pairwise evaluations are just this — a scoring of the outputs of two versions against each other as opposed to against some reference output or absolute criteria. Pairwise evaluations are often useful when using LLM-as-judge evaluators on more general tasks. For example, if you have a summarizer application, it may be easier for an LLM-as-judge to determine "Which of these two summaries is more clear and concise?" than to give an absolute score like "Give this summary a score of 1-10 in terms of clarity and concision."
 
-[쌍별 비교 평가를 실행하는 방법](/langsmith/evaluate-pairwise)을 알아보세요.
+Learn [how run pairwise evaluations](/langsmith/evaluate-pairwise).
 
-## 온라인 평가
+## Online evaluation
 
-배포된 애플리케이션의 출력을 (거의) 실시간으로 평가하는 것을 "온라인" 평가라고 합니다. 이 경우 데이터셋이 포함되지 않으며 참조 출력 가능성도 없습니다 — 생성되는 실제 입력과 실제 출력에 대해 평가자를 실행하는 것입니다. 이는 애플리케이션을 모니터링하고 의도하지 않은 동작에 플래그를 지정하는 데 유용합니다. 온라인 평가는 오프라인 평가와 함께 작동할 수도 있습니다: 예를 들어, 온라인 평가자를 사용하여 입력 질문을 일련의 범주로 분류하고 나중에 오프라인 평가를 위한 데이터셋을 큐레이션하는 데 사용할 수 있습니다.
+Evaluating a deployed application's outputs in (roughly) realtime is what we call "online" evaluation. In this case there is no dataset involved and no possibility of reference outputs — we're running evaluators on real inputs and real outputs as they're produced. This is useful for monitoring your application and flagging unintended behavior. Online evaluation can also work hand-in-hand with offline evaluation: for example, an online evaluator can be used to classify input questions into a set of categories that can later be used to curate a dataset for offline evaluation.
 
-온라인 평가자는 일반적으로 서버 측에서 실행되도록 의도되었습니다. LangSmith에는 구성할 수 있는 내장 [LLM-as-judge 평가자](/langsmith/llm-as-judge)가 있으며, LangSmith 내에서도 실행되는 사용자 정의 코드 평가자를 정의할 수 있습니다.
+Online evaluators are generally intended to be run server-side. LangSmith has built-in [LLM-as-judge evaluators](/langsmith/llm-as-judge) that you can configure, or you can define custom code evaluators that are also run within LangSmith.
 
 ![Online](/langsmith/images/online.png)
 
-## 테스팅
+## Testing
 
-### 평가 vs 테스팅
+### Evaluations vs testing
 
-테스팅과 평가는 종종 혼동되는 매우 유사하고 겹치는 개념입니다.
+Testing and evaluation are very similar and overlapping concepts that often get confused.
 
-**평가는 메트릭에 따라 성능을 측정합니다.** 평가 메트릭은 퍼지하거나 주관적일 수 있으며, 절대적 측면보다 상대적 측면에서 더 유용합니다. 즉, 개별 시스템에 대해 무언가를 주장하는 것보다 두 시스템을 서로 비교하는 데 종종 사용됩니다.
+**An evaluation measures performance according to a metric(s).** Evaluation metrics can be fuzzy or subjective, and are more useful in relative terms than absolute ones. That is, they're often used to compare two systems against each other rather than to assert something about an individual system.
 
-**테스팅은 정확성을 주장합니다.** 시스템은 모든 테스트를 통과한 경우에만 배포할 수 있습니다.
+**Testing asserts correctness.** A system can only be deployed if it passes all tests.
 
-평가 메트릭은 테스트로 *전환될 수* 있습니다. 예를 들어, 시스템의 새 버전이 관련 평가 메트릭에서 시스템의 일부 기준 버전보다 성능이 우수해야 한다고 주장하는 회귀 테스트를 작성할 수 있습니다.
+Evaluation metrics can be *turned into* tests. For example, you can write regression tests to assert that any new version of a system must outperform some baseline version of the system on the relevant evaluation metrics.
 
-또한 시스템 실행 비용이 비싸고 테스트 및 평가를 위한 데이터셋이 겹치는 경우 테스트와 평가를 함께 실행하는 것이 리소스 효율적일 수 있습니다.
+It can also be more resource efficient to run tests and evaluations together if your system is expensive to run and you have overlapping datasets for your tests and evaluations.
 
-편의상 `pytest` 또는 `vitest/jest`와 같은 표준 소프트웨어 테스팅 도구를 사용하여 평가를 작성하도록 선택할 수도 있습니다.
+You can also choose to write evaluations using standard software testing tools like `pytest` or `vitest/jest` out of convenience.
 
-### `pytest` 및 `Vitest/Jest` 사용
+### Using `pytest` and `Vitest/Jest`
 
-LangSmith SDK에는 [pytest](/langsmith/pytest) 및 [`Vitest/Jest`](/langsmith/vitest-jest)를 위한 통합이 제공됩니다. 이를 통해 다음을 쉽게 수행할 수 있습니다:
+The LangSmith SDKs come with integrations for [pytest](/langsmith/pytest) and [`Vitest/Jest`](/langsmith/vitest-jest). These make it easy to:
 
-* LangSmith에서 테스트 결과 추적
-* 평가를 테스트로 작성
+* Track test results in LangSmith
+* Write evaluations as tests
 
-LangSmith에서 테스트 결과를 추적하면 결과를 쉽게 공유하고, 시스템을 비교하고, 실패한 테스트를 디버그할 수 있습니다.
+Tracking test results in LangSmith makes it easy to share results, compare systems, and debug failing tests.
 
-평가를 테스트로 작성하면 평가하려는 각 예제에 애플리케이션 및/또는 평가자를 실행하기 위한 사용자 정의 로직이 필요한 경우 유용할 수 있습니다. 표준 평가 흐름은 데이터셋의 모든 예제에서 동일한 방식으로 애플리케이션과 평가자를 실행할 수 있다고 가정합니다. 그러나 더 복잡한 시스템이나 포괄적인 평가의 경우 특정 유형의 입력 및 메트릭으로 시스템의 특정 하위 집합을 평가하고 싶을 수 있습니다. 이러한 유형의 이질적인 평가는 표준 평가 흐름을 사용하는 것보다 함께 추적되는 개별 테스트 케이스 모음으로 작성하는 것이 훨씬 쉽습니다.
+Writing evaluations as tests can be useful when each example you want to evaluate on requires custom logic for running the application and/or evaluators. The standard evaluation flows assume that you can run your application and evaluators in the same way on every example in a dataset. But for more complex systems or comprehensive evals, you may want to evaluate specific subsets of your system with specific types of inputs and metrics. These types of heterogenous evals are much easier to write as a suite of distinct test cases that all get tracked together rather than using the standard evaluate flow.
 
-테스팅 도구를 사용하는 것은 시스템의 출력을 *평가*하고 그에 대한 기본적인 사항을 *주장*하려는 경우에도 유용합니다.
+Using testing tools is also helpful when you want to *both* evaluate your system's outputs *and* assert some basic things about them.
 
 ---
 

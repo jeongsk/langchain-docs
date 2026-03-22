@@ -1,19 +1,19 @@
 ---
-title: "커스텀 프레임워크 구성"
-description: "커스텀 라이브러리를 위한 OpenSWE 구성 및 사용자 정의 방법"
+title: "Custom Framework Configuration"
+description: "How to configure and customize OpenSWE for custom libraries"
 ---
 
-Open SWE는 **LangGraph Engineer** 토글을 통해 LangGraph 개발 지원 기능을 제공합니다. 이 기능은 LangGraph 에이전트 및 워크플로우 구축을 위한 프레임워크별 프롬프트와 MCP 도구를 추가합니다.
+Open SWE includes support for LangGraph development through the **LangGraph Engineer** toggle. This feature adds framework-specific prompts and MCP tools for building LangGraph agents and workflows.
 
-유사한 접근 방식을 사용하여 자체 사용자 정의를 구축할 수 있습니다.
+You can use a similar approach to build your own customization.
 
-## LangGraph Engineer 구성
+## LangGraph Engineer Configuration
 
-### UI에서 구성 설정하기
+### Setting Configuration in the UI
 
-메인 입력 영역에서 **LangGraph Engineer** 토글을 활성화하면 특정 LangGraph 프롬프트가 추가되고 LangGraph 문서에 접근할 수 있습니다.
+Enabling the **LangGraph Engineer** toggle in the main input area adds specific LangGraph prompts and allows LangGraph documentation access.
 
-이렇게 하면 다음과 같은 구성이 설정됩니다:
+This sets the following configuration:
 
 ```typescript
 const config = {
@@ -23,71 +23,71 @@ const config = {
 }
 ```
 
-## 커스텀 프레임워크 구성 작동 방식
+## How Custom Framework Configuration Works
 
-구성은 모든 에이전트 노드에 전달되며 특수 프롬프트를 조건부로 포함하는 데 사용됩니다:
+The configuration is passed to all agent nodes and used to conditionally include specialized prompts:
 
 ```typescript
-// 프롬프트 포맷팅 함수 내부
+// In prompt formatting functions
 .replace(
   "{CUSTOM_FRAMEWORK_PROMPT}",
   shouldUseCustomFramework(config) ? CUSTOM_FRAMEWORK_PROMPT : "",
 )
 ```
 
-`shouldUseCustomFramework(config)` 함수는 `config.configurable?.customFramework === true`인지 확인합니다.
+The `shouldUseCustomFramework(config)` function checks if `config.configurable?.customFramework === true`.
 
-## 커스텀 프레임워크 파일
+## Custom Framework Files
 
-`customFramework`가 `true`인 경우, 에이전트에 일련의 커스텀 프롬프트와 도구를 주입합니다. 아래 표는 LangGraph가 아닌 다른 프레임워크에 맞게 사용자 정의하는 경우 업데이트해야 하는 코드베이스의 모든 위치를 보여줍니다.
+When `customFramework` is `true`, we inject a series of custom prompts and tools into the agent. The table below shows every place in the codebase that needs updating if you're customizing it for a framework other than LangGraph.
 
-### 프롬프트 파일
+### Prompt Files
 
-| 컴포넌트 | 파일 | 프롬프트 상수 | 설명 |
+| Component | File | Prompt Constant | Description |
 |-----------|------|-----------------|-------------|
-| Planner | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/planner/nodes/generate-message/prompt.ts) | `EXTERNAL_FRAMEWORK_DOCUMENTATION_PROMPT` | 프레임워크 문서 접근 지침을 추가합니다 |
-| Planner | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/planner/nodes/generate-message/prompt.ts) | `EXTERNAL_FRAMEWORK_PLAN_PROMPT` | 프레임워크별 계획 요구사항을 제공합니다 |
-| Programmer | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/programmer/nodes/generate-message/prompt.ts) | `CUSTOM_FRAMEWORK_PROMPT` | 포괄적인 프레임워크 구현 패턴 및 모범 사례를 제공합니다 |
-| Reviewer | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/reviewer/nodes/generate-review-actions/prompt.ts) | `CUSTOM_FRAMEWORK_PROMPT` | 프레임워크 검증 및 테스트 요구사항을 제공합니다 |
+| Planner | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/planner/nodes/generate-message/prompt.ts) | `EXTERNAL_FRAMEWORK_DOCUMENTATION_PROMPT` | Adds framework documentation access instructions |
+| Planner | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/planner/nodes/generate-message/prompt.ts) | `EXTERNAL_FRAMEWORK_PLAN_PROMPT` | Provides framework-specific planning requirements |
+| Programmer | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/programmer/nodes/generate-message/prompt.ts) | `CUSTOM_FRAMEWORK_PROMPT` | Comprehensive framework implementation patterns and best practices |
+| Reviewer | [prompt.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/graphs/reviewer/nodes/generate-review-actions/prompt.ts) | `CUSTOM_FRAMEWORK_PROMPT` | Framework validation and testing requirements |
 
-### 에이전트 및 UI 구성 파일
+### Agent & UI Configuration Files
 
-| 컴포넌트 | 파일 | 설명 |
+| Component | File | Description |
 |-----------|------|-------------|
-| 토글 버튼 | [default-view.tsx](https://github.com/langchain-ai/open-swe/tree/main/apps/web/src/components/v2/default-view.tsx) | LangGraph Engineer 토글 버튼을 포함합니다 - 자체 버튼을 추가하거나 기존 버튼을 변경하려면 이 파일을 수정하세요 |
-| 프레임워크 로직 | [should-use-custom-framework.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/utils/should-use-custom-framework.ts) | 커스텀 프레임워크 기능을 활성화할 시기를 결정하는 로직 함수입니다. 현재는 UI 토글을 기반으로 한 불리언 값입니다 |
-| 문서 | [constants.ts](https://github.com/langchain-ai/open-swe/tree/main/packages/shared/src/constants.ts) | 프레임워크 문서 접근을 위한 MCP 서버 구성입니다 |
+| Toggle Button | [default-view.tsx](https://github.com/langchain-ai/open-swe/tree/main/apps/web/src/components/v2/default-view.tsx) | Contains the LangGraph Engineer toggle button - modify this to add your own button or change the existing one |
+| Framework Logic | [should-use-custom-framework.ts](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/utils/should-use-custom-framework.ts) | Logic function that determines when to enable custom framework features. Currently a boolean based on the UI toggle |
+| Documentation | [constants.ts](https://github.com/langchain-ai/open-swe/tree/main/packages/shared/src/constants.ts) | MCP server configuration for framework documentation access |
 
 
-## 자체 프레임워크에 맞게 사용자 정의하기
+## Customizing for Your Own Framework
 
-다음 단계를 따라 Open SWE를 자체 프레임워크에 맞게 조정하세요:
+Follow these steps to adapt Open SWE for your own framework:
 
-### 프롬프트 상수 수정하기
+### Modify Prompt Constants
 
-1. 위 표의 **프롬프트 파일을 업데이트**하여 LangGraph 관련 콘텐츠를 교체합니다:
-   - `CUSTOM_FRAMEWORK_PROMPT`를 자체 프레임워크의 패턴으로 교체합니다
-   - `EXTERNAL_FRAMEWORK_DOCUMENTATION_PROMPT`를 자체 문서 접근 지침으로 업데이트합니다
-   - `EXTERNAL_FRAMEWORK_PLAN_PROMPT`를 자체 계획 요구사항으로 수정합니다
+1. **Update prompt files** from the table above to replace LangGraph-specific content:
+   - Replace `CUSTOM_FRAMEWORK_PROMPT` with your framework's patterns
+   - Update `EXTERNAL_FRAMEWORK_DOCUMENTATION_PROMPT` with your docs access instructions
+   - Modify `EXTERNAL_FRAMEWORK_PLAN_PROMPT` with your planning requirements
 
-### UI 구성 업데이트하기
+### Update UI Configuration
 
-1. [`default-view.tsx`](https://github.com/langchain-ai/open-swe/tree/main/apps/web/src/components/v2/default-view.tsx)의 **토글 버튼을 수정**합니다:
-   - 버튼 텍스트를 "LangGraph Engineer"에서 자체 프레임워크 이름으로 변경합니다
-   - 툴팁 텍스트 및 설명을 업데이트합니다
+1. **Modify the toggle button** in [`default-view.tsx`](https://github.com/langchain-ai/open-swe/tree/main/apps/web/src/components/v2/default-view.tsx):
+   - Change button text from "LangGraph Engineer" to your framework name
+   - Update tooltip text and descriptions
 
-2. **선택사항**: LangGraph 토글을 유지하면서 자체 프레임워크용 새 토글 버튼을 생성합니다
+2. **Optional**: Create a new toggle button for your framework while keeping the LangGraph one
 
-### 프레임워크 로직 구성하기
+### Configure Framework Logic
 
-다음 중 하나를 선택할 수 있습니다:
+You can either:
 
-- **기존 `customFramework: true` 구성을 재사용**하고 프롬프트를 LangGraph 대신 자체 프레임워크에 맞게 수정합니다 (추가 코드 변경 불필요)
-- **별도의 구성 변수를 생성**하여 그래프 구성에 새 필드를 추가하고 (예: `yourFramework: true`) [`should-use-custom-framework.ts`](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/utils/should-use-custom-framework.ts)와 유사한 감지 로직을 추가합니다
+- **Reuse the existing `customFramework: true` configuration** and modify the prompts to match your framework instead of LangGraph (no additional code changes needed)
+- **Create a separate config variable** by adding a new field in your graph configuration (e.g., `yourFramework: true`) and adding the detection logic similar to [`should-use-custom-framework.ts`](https://github.com/langchain-ai/open-swe/tree/main/apps/open-swe/src/utils/should-use-custom-framework.ts)
 
-### 문서 접근 추가하기
+### Add Documentation Access
 
-1. [`constants.ts`](https://github.com/langchain-ai/open-swe/tree/main/packages/shared/src/constants.ts)에서 **MCP 서버를 구성**합니다:
+1. **Configure MCP servers** in [`constants.ts`](https://github.com/langchain-ai/open-swe/tree/main/packages/shared/src/constants.ts):
    ```typescript
    export const DEFAULT_MCP_SERVERS = {
      "your-framework-docs-mcp": {
@@ -97,15 +97,15 @@ const config = {
    };
    ```
 
-### 빌드 및 테스트
+### Build and Test
 
-1. **애플리케이션을 리빌드**합니다:
+1. **Rebuild the application**:
    ```bash
    cd apps/open-swe
    yarn build
    ```
 
-2. 토글을 활성화하고 프레임워크별 프롬프트가 사용되는지 확인하여 **사용자 정의를 테스트**합니다
+2. **Test your customization** by enabling the toggle and verifying framework-specific prompts are used
 
 ---
 

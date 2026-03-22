@@ -2,50 +2,50 @@
 title: Modern Treasury
 ---
 
->[Modern Treasury](https://www.moderntreasury.com/)는 복잡한 결제 운영을 간소화합니다. 이는 돈을 이동하는 제품과 프로세스를 지원하는 통합 플랫폼입니다.
+>[Modern Treasury](https://www.moderntreasury.com/) simplifies complex payment operations. It is a unified platform to power products and processes that move money.
 >
->- 은행 및 결제 시스템에 연결
->- 실시간으로 거래 및 잔액 추적
->- 규모에 맞게 결제 운영 자동화
+>- Connect to banks and payment systems
+>- Track transactions and balances in real-time
+>- Automate payment operations for scale
 
-이 노트북은 `Modern Treasury REST API`에서 데이터를 로드하여 LangChain에 수집할 수 있는 형식으로 변환하는 방법과 벡터화를 위한 예제 사용법을 다룹니다.
+This notebook covers how to load data from the `Modern Treasury REST API` into a format that can be ingested into LangChain, along with example usage for vectorization.
 
 ```python
 from langchain.indexes import VectorstoreIndexCreator
 from langchain_community.document_loaders import ModernTreasuryLoader
 ```
 
-Modern Treasury API에는 Modern Treasury 대시보드의 개발자 설정 내에서 찾을 수 있는 조직 ID와 API 키가 필요합니다.
+The Modern Treasury API requires an organization ID and API key, which can be found in the Modern Treasury dashboard within developer settings.
 
-이 문서 로더는 로드하려는 데이터를 정의하는 `resource` 옵션도 필요합니다.
+This document loader also requires a `resource` option which defines what data you want to load.
 
-다음 리소스를 사용할 수 있습니다:
+Following resources are available:
 
-`payment_orders` [문서](https://docs.moderntreasury.com/reference/payment-order-object)
+`payment_orders` [Documentation](https://docs.moderntreasury.com/reference/payment-order-object)
 
-`expected_payments` [문서](https://docs.moderntreasury.com/reference/expected-payment-object)
+`expected_payments` [Documentation](https://docs.moderntreasury.com/reference/expected-payment-object)
 
-`returns` [문서](https://docs.moderntreasury.com/reference/return-object)
+`returns` [Documentation](https://docs.moderntreasury.com/reference/return-object)
 
-`incoming_payment_details` [문서](https://docs.moderntreasury.com/reference/incoming-payment-detail-object)
+`incoming_payment_details` [Documentation](https://docs.moderntreasury.com/reference/incoming-payment-detail-object)
 
-`counterparties` [문서](https://docs.moderntreasury.com/reference/counterparty-object)
+`counterparties` [Documentation](https://docs.moderntreasury.com/reference/counterparty-object)
 
-`internal_accounts` [문서](https://docs.moderntreasury.com/reference/internal-account-object)
+`internal_accounts` [Documentation](https://docs.moderntreasury.com/reference/internal-account-object)
 
-`external_accounts` [문서](https://docs.moderntreasury.com/reference/external-account-object)
+`external_accounts` [Documentation](https://docs.moderntreasury.com/reference/external-account-object)
 
-`transactions` [문서](https://docs.moderntreasury.com/reference/transaction-object)
+`transactions` [Documentation](https://docs.moderntreasury.com/reference/transaction-object)
 
-`ledgers` [문서](https://docs.moderntreasury.com/reference/ledger-object)
+`ledgers` [Documentation](https://docs.moderntreasury.com/reference/ledger-object)
 
-`ledger_accounts` [문서](https://docs.moderntreasury.com/reference/ledger-account-object)
+`ledger_accounts` [Documentation](https://docs.moderntreasury.com/reference/ledger-account-object)
 
-`ledger_transactions` [문서](https://docs.moderntreasury.com/reference/ledger-transaction-object)
+`ledger_transactions` [Documentation](https://docs.moderntreasury.com/reference/ledger-transaction-object)
 
-`events` [문서](https://docs.moderntreasury.com/reference/events)
+`events` [Documentation](https://docs.moderntreasury.com/reference/events)
 
-`invoices` [문서](https://docs.moderntreasury.com/reference/invoices)
+`invoices` [Documentation](https://docs.moderntreasury.com/reference/invoices)
 
 ```python
 modern_treasury_loader = ModernTreasuryLoader("payment_orders")

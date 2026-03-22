@@ -1,60 +1,60 @@
 ---
-title: 프롬프트 설정 구성하기
-sidebarTitle: 프롬프트 설정 구성하기
+title: Configure prompt settings
+sidebarTitle: Configure prompt settings
 ---
 
-LangSmith [플레이그라운드](/langsmith/prompt-engineering-concepts#prompt-playground)를 사용하면 프롬프트의 다양한 설정을 제어할 수 있습니다. **프롬프트 설정** 창에는 다음이 포함됩니다:
+The LangSmith [playground](/langsmith/prompt-engineering-concepts#prompt-playground) enables you to control various settings for your prompts. The **Prompt Settings** window contains:
 
-- [모델 구성](#model-configurations)
-- [도구 설정](#tool-settings)
-- [프롬프트 포맷팅](#prompt-formatting)
+- [Model configuration](#model-configurations)
+- [Tool settings](#tool-settings)
+- [Prompt formatting](#prompt-formatting)
 
-**프롬프트 설정**에 액세스하려면:
+To access **Prompt Settings**:
 
-1. 왼쪽 사이드바에서 **플레이그라운드**로 이동합니다.
-1. **프롬프트** 헤딩 아래에서 모델 이름 옆의 톱니바퀴 <Icon icon="gear" iconType="solid" /> 아이콘을 선택하면 **프롬프트 설정** 창이 실행됩니다.
+1. Navigate to the **Playground** in the left sidebar.
+1. Under the **Prompts** heading select the gear <Icon icon="gear" iconType="solid" /> icon next to the model name, which will launch the **Prompt Settings** window.
 
     <div style={{ textAlign: 'center' }}>
     <img
         className="block dark:hidden"
         src="/langsmith/images/model-config-light.png"
-        alt="LangSmith UI의 모델 구성 창, 제공자, 모델, 온도, 최대 출력 토큰, Top P, Presence Penalty, Frequency Penalty, Reasoning Effort 등의 설정"
+        alt="Model Configuration window in the LangSmith UI, settings for Provider, Model, Temperature, Max Output Tokens, Top P, Presence Penalty, Frequency Penalty, Reasoning Effort, etc."
     />
 
     <img
         className="hidden dark:block"
         src="/langsmith/images/model-config-dark.png"
-        alt="LangSmith UI의 모델 구성 창, 제공자, 모델, 온도, 최대 출력 토큰, Top P, Presence Penalty, Frequency Penalty, Reasoning Effort 등의 설정"
+        alt="Model Configuration window in the LangSmith UI, settings for Provider, Model, Temperature, Max Output Tokens, Top P, Presence Penalty, Frequency Penalty, Reasoning Effort, etc."
     />
     </div>
 
-## 모델 구성
+## Model configurations
 
-모델 구성은 프롬프트가 실행될 매개변수를 정의합니다. LangSmith 플레이그라운드에서는 이러한 구성을 저장하고 관리할 수 있으며, 이를 통해 선호하는 설정을 여러 프롬프트와 세션에서 재사용할 수 있습니다. 특정 설정에 대한 자세한 내용은 모델 제공자의 문서를 참조하세요(예: [Anthropic](https://docs.claude.com/en/api/messages), [OpenAI](https://platform.openai.com/docs/api-reference/responses/create)).
+Model configurations define the parameters your prompt runs against. In the LangSmith Playground, you can save and manage these configurations, which allows you to reuse your preferred settings across prompts and sessions. For details on specific settings, refer to your model provider’s documentation (for example, [Anthropic](https://docs.claude.com/en/api/messages), [OpenAI](https://platform.openai.com/docs/api-reference/responses/create)).
 
-### 저장된 구성 생성하기
+### Create saved configurations
 
-1. **모델 구성** 탭에서 필요에 따라 모델 구성을 조정합니다. [저장된 구성을 선택하여 편집](#edit-configurations)할 수도 있습니다.
-1. 상단 바에서 **다른 이름으로 저장** 버튼을 클릭합니다.
-1. 구성의 이름과 선택적 설명을 입력하고 확인합니다.
-1. 구성을 저장하면 조직의 [워크스페이스](/langsmith/administration-overview#workspaces)에 있는 모든 사람이 액세스할 수 있습니다. 저장된 모든 구성은 **모델 구성** 드롭다운에서 사용할 수 있습니다.
-1. 저장된 구성을 생성한 후에는 이를 기본값으로 설정할 수 있으며, 이렇게 하면 새로 생성하는 모든 프롬프트가 자동으로 이 구성을 사용합니다. 구성을 기본값으로 설정하려면 드롭다운에서 모델 이름 옆의 **기본값으로 설정** <Icon icon="thumbtack" iconType="solid" /> 아이콘을 클릭합니다.
+1. In the **Model Configurations** tab, adjust the model configuration as needed—you can select a [saved configuration to edit](#edit-configurations).
+1. Click the **Save As** button in the top bar.
+1. Enter a name and optional description for your configuration and confirm.
+1. Now that you've saved the configuration, anyone in your organization's [workspace](/langsmith/administration-overview#workspaces) can access it. All saved configurations are available in the **Model Configuration** dropdown.
+1. Once you have created a saved configuration, you can set it as your default, so any new prompt you create will automatically use this configuration. To set a configuration as your default, click the **Set as default** <Icon icon="thumbtack" iconType="solid" /> icon next to the model name in the dropdown.
 
-### 구성 편집하기
+### Edit configurations
 
-1. 저장된 구성의 이름을 변경하거나 설명을 업데이트하려면 구성 이름 또는 설명을 선택하고 필요한 변경을 수행합니다.
-1. 현재 구성의 매개변수를 필요에 따라 업데이트하고 상단의 **저장** 버튼을 클릭합니다.
+1. To rename a saved configuration, or update the description, select the configuration name or description and make the necessary changes.
+1. Update the current configuration's parameters as needed and click the **Save** button at the top.
 
-### 구성 삭제하기
+### Delete configurations
 
-1. 제거하려는 구성을 선택합니다.
-1. 휴지통 <Icon icon="trash" iconType="solid" /> 아이콘을 클릭하여 삭제합니다.
+1. Select the configuration you want to remove.
+1. Click the trash <Icon icon="trash" iconType="solid" /> icon to delete it.
 
-### 추가 매개변수
+### Extra parameters
 
-**추가 매개변수** 필드를 사용하면 LangSmith 인터페이스에서 직접 지원하지 않는 추가 모델 매개변수를 전달할 수 있습니다. 이는 두 가지 시나리오에서 특히 유용합니다:
+The **Extra Parameters** field allows you to pass additional model parameters that aren't directly supported in the LangSmith interface. This is particularly useful in two scenarios:
 
-1. 모델 제공자가 아직 LangSmith 인터페이스에 통합되지 않은 새로운 매개변수를 출시했을 때. 이러한 매개변수를 JSON 형식으로 지정하여 즉시 사용할 수 있습니다. 예를 들어:
+1. When model providers release new parameters that haven't yet been integrated into the LangSmith interface. You can specify these parameters in JSON format to use them right away. For example:
 
     ```json
     {
@@ -62,27 +62,27 @@ LangSmith [플레이그라운드](/langsmith/prompt-engineering-concepts#prompt-
     }
     ```
 
-1. 플레이그라운드에서 다음과 같은 매개변수 관련 오류를 해결할 때:
+1. When troubleshooting parameter-related errors in the playground, such as:
 
     ```
     TypeError: AsyncCompletions.create() got an unexpected keyword argument 'max_concurrency'
     ```
 
-    불필요한 매개변수에 대한 오류가 발생하는 경우([LangChain JS](/oss/python/langchain/overview)를 실행 추적에 사용할 때 더 흔함), 이 필드를 사용하여 추가 매개변수를 제거할 수 있습니다.
+    If you receive an error about unnecessary parameters (which is more common when using [LangChain JS](/oss/python/langchain/overview) for run tracing), you can use this field to remove the extra parameters.
 
-## 도구 설정
+## Tool settings
 
-[_도구_](/langsmith/prompt-engineering-concepts#tools)를 사용하면 LLM이 웹 검색, 정보 조회 등과 같은 작업을 수행할 수 있습니다. **도구 설정** 탭에서는 프롬프트에 정의한 도구를 LLM이 사용하고 액세스하는 방식을 관리할 수 있으며, 다음이 포함됩니다:
+[_Tools_](/langsmith/prompt-engineering-concepts#tools) enable your LLM to perform tasks like searching the web, looking up information, and so on. In the **Tools Settings** tab, you can manage the ways your LLM uses and accesses the tools you have defined in your prompt, including:
 
-- **병렬 도구 호출**: 적절한 경우 여러 도구를 병렬로 호출합니다. 이를 통해 모델이 서로 다른 소스에서 동시에 정보를 수집할 수 있습니다. (병렬 실행에 대한 모델 지원에 따라 다릅니다.)
-- **도구 선택**: 모델이 액세스할 수 있는 도구를 선택합니다. 자세한 내용은 [프롬프트에서 도구 사용하기](/langsmith/use-tools)를 참조하세요.
+- **Parallel Tool Calls**: Calling multiple tools in parallel when appropriate. This allows the model to gather information from different sources simultaneously. (Dependent on model support for parallel execution.)
+- **Tool Choice**: Select the tools that the model can access. For more details, refer to [Use tools in a prompt](/langsmith/use-tools).
 
-## 프롬프트 포맷팅
+## Prompt formatting
 
-**프롬프트 형식** 탭에서는 다음을 지정할 수 있습니다:
+The **Prompt Format** tab allows you to specify:
 
-- **프롬프트 유형**. 채팅 및 완성 프롬프트에 대한 자세한 내용은 [프롬프트 엔지니어링](/langsmith/prompt-engineering-concepts#chat-vs-completion) 개념을 참조하세요.
-- **템플릿 형식**. 프롬프트 템플릿 작성 및 변수 사용에 대한 자세한 내용은 [F-string vs. mustache](/langsmith/prompt-engineering-concepts##f-string-vs-mustache)를 참조하세요.
+- The **Prompt type**. For details on chat and completion prompts, refer to [Prompt engineering](/langsmith/prompt-engineering-concepts#chat-vs-completion) concepts.
+- The **Template format**. For details on prompt templating and using variables, refer to [F-string vs. mustache](/langsmith/prompt-engineering-concepts##f-string-vs-mustache).
 
 ---
 

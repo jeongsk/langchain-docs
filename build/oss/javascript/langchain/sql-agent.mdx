@@ -1,45 +1,45 @@
 ---
-title: SQL 에이전트 구축하기
-sidebarTitle: SQL 에이전트
+title: Build a SQL agent
+sidebarTitle: SQL agent
 ---
 
 import ChatModelTabsPy from '/snippets/chat-model-tabs.mdx';
 import ChatModelTabsJS from '/snippets/chat-model-tabs-js.mdx';
 
 
-## 개요
+## Overview
 
-이 튜토리얼에서는 LangChain [에이전트](/oss/javascript/langchain/agents)를 사용하여 SQL 데이터베이스에 대한 질문에 답변할 수 있는 에이전트를 구축하는 방법을 배웁니다.
+In this tutorial, you will learn how to build an agent that can answer questions about a SQL database using LangChain [agents](/oss/javascript/langchain/agents).
 
-높은 수준에서 에이전트는 다음 작업을 수행합니다:
+At a high level, the agent will:
 
 <Steps>
-<Step title="데이터베이스에서 사용 가능한 테이블과 스키마 가져오기" />
-<Step title="질문과 관련된 테이블 결정하기" />
-<Step title="관련 테이블의 스키마 가져오기" />
-<Step title="질문과 스키마 정보를 기반으로 쿼리 생성하기" />
-<Step title="LLM을 사용하여 일반적인 실수가 있는지 쿼리 재확인하기" />
-<Step title="쿼리 실행하고 결과 반환하기" />
-<Step title="쿼리가 성공할 때까지 데이터베이스 엔진에서 발생한 오류 수정하기" />
-<Step title="결과를 기반으로 응답 작성하기" />
+<Step title="Fetch the available tables and schemas from the database" />
+<Step title="Decide which tables are relevant to the question" />
+<Step title="Fetch the schemas for the relevant tables" />
+<Step title="Generate a query based on the question and information from the schemas" />
+<Step title="Double-check the query for common mistakes using an LLM" />
+<Step title="Execute the query and return the results" />
+<Step title="Correct mistakes surfaced by the database engine until the query is successful" />
+<Step title="Formulate a response based on the results" />
 </Steps>
 
 <Warning>
-SQL 데이터베이스에 대한 Q&A 시스템을 구축하려면 모델이 생성한 SQL 쿼리를 실행해야 합니다. 이 작업에는 본질적인 위험이 있습니다. 에이전트의 필요에 따라 데이터베이스 연결 권한을 항상 가능한 한 좁게 범위를 지정해야 합니다. 이렇게 하면 모델 기반 시스템 구축의 위험을 완전히 제거할 수는 없지만 완화할 수 있습니다.
+Building Q&A systems of SQL databases requires executing model-generated SQL queries. There are inherent risks in doing this. Make sure that your database connection permissions are always scoped as narrowly as possible for your agent's needs. This will mitigate, though not eliminate, the risks of building a model-driven system.
 </Warning>
 
-### 개념
+### Concepts
 
-다음 개념을 다룹니다:
+We will cover the following concepts:
 
-- SQL 데이터베이스에서 읽기 위한 [도구](/oss/javascript/langchain/tools)
-- LangChain [에이전트](/oss/javascript/langchain/agents)
-- [Human-in-the-loop](/oss/javascript/langchain/human-in-the-loop) 프로세스
+- [Tools](/oss/javascript/langchain/tools) for reading from SQL databases
+- LangChain [agents](/oss/javascript/langchain/agents)
+- [Human-in-the-loop](/oss/javascript/langchain/human-in-the-loop) processes
 
 
-## 설정
+## Setup
 
-### 설치
+### Installation
 
 
     <CodeGroup>
@@ -56,27 +56,27 @@ SQL 데이터베이스에 대한 Q&A 시스템을 구축하려면 모델이 생�
 
 
 ### LangSmith
-[LangSmith](https://smith.langchain.com)를 설정하여 체인이나 에이전트 내부에서 어떤 일이 발생하는지 검사하세요. 그런 다음 다음 환경 변수를 설정합니다:
+Set up [LangSmith](https://smith.langchain.com) to inspect what is happening inside your chain or agent. Then set the following environment variables:
 
     ```shell
     export LANGSMITH_TRACING="true"
     export LANGSMITH_API_KEY="..."
     ```
 
-## 1. LLM 선택하기
+## 1. Select an LLM
 
 
-[도구 호출](/oss/javascript/integrations/providers/overview)을 지원하는 모델을 선택하세요:
+Select a model that supports [tool-calling](/oss/javascript/integrations/providers/overview):
 <ChatModelTabsJS />
 
 
-아래 예제에 표시된 출력은 OpenAI를 사용했습니다.
+The output shown in the examples below used OpenAI.
 
-## 2. 데이터베이스 구성하기
+## 2. Configure the database
 
-이 튜토리얼에서는 [SQLite 데이터베이스](https://www.sqlitetutorial.net/sqlite-sample-database/)를 생성합니다. SQLite는 설정하고 사용하기 쉬운 경량 데이터베이스입니다. 디지털 미디어 스토어를 나타내는 샘플 데이터베이스인 `chinook` 데이터베이스를 로드합니다.
+You will be creating a [SQLite database](https://www.sqlitetutorial.net/sqlite-sample-database/) for this tutorial. SQLite is a lightweight database that is easy to set up and use. We will be loading the `chinook` database, which is a sample database that represents a digital media store.
 
-편의를 위해 공개 GCS 버킷에 데이터베이스(`Chinook.db`)를 호스팅했습니다.
+For convenience, we have hosted the database (`Chinook.db`) on a public GCS bucket.
 
 
 ```typescript
@@ -100,9 +100,9 @@ async function resolveDbPath() {
 
 
 
-## 3. 데이터베이스 상호작용을 위한 도구 추가하기
+## 3. Add tools for database interactions
 
-데이터베이스와 상호작용하기 위해 `langchain/sql_db`에서 제공하는 `SqlDatabase` 래퍼를 사용합니다. 이 래퍼는 SQL 쿼리를 실행하고 결과를 가져오는 간단한 인터페이스를 제공합니다:
+Use the `SqlDatabase` wrapper available in the `langchain/sql_db` to interact with the database. The wrapper provides a simple interface to execute SQL queries and fetch results:
 ```typescript
 import { SqlDatabase } from "@langchain/classic/sql_db";
 import { DataSource } from "typeorm";
@@ -126,11 +126,11 @@ async function getSchema() {
 
 
 
-## 6. Human-in-the-loop 검토 구현하기
+## 6. Implement human-in-the-loop review
 
-에이전트의 SQL 쿼리가 실행되기 전에 의도하지 않은 작업이나 비효율성이 있는지 확인하는 것이 현명할 수 있습니다.
+It can be prudent to check the agent's SQL queries before they are executed for any unintended actions or inefficiencies.
 
-LangChain 에이전트는 에이전트 도구 호출에 대한 감독을 추가하기 위해 내장된 [human-in-the-loop 미들웨어](/oss/javascript/langchain/human-in-the-loop)를 지원합니다. `sql_db_query` 도구 호출 시 사람의 검토를 위해 일시 중지하도록 에이전트를 구성해 보겠습니다:
+LangChain agents feature support for built-in [human-in-the-loop middleware](/oss/javascript/langchain/human-in-the-loop) to add oversight to agent tool calls. Let's configure the agent to pause for human review on calling the `sql_db_query` tool:
 
 ```python
 from langchain.agents import create_agent
@@ -152,10 +152,10 @@ agent = create_agent(
 )
 ```
 <Note>
-에이전트에 [체크포인터](/oss/javascript/langchain/short-term-memory)를 추가하여 실행을 일시 중지하고 재개할 수 있습니다. 이에 대한 자세한 내용과 사용 가능한 미들웨어 구성은 [human-in-the-loop 가이드](/oss/javascript/langchain/human-in-the-loop)를 참조하세요.
+We've added a [checkpointer](/oss/javascript/langchain/short-term-memory) to our agent to allow execution to be paused and resumed. See the [human-in-the-loop guide](/oss/javascript/langchain/human-in-the-loop) for detalis on this as well as available middleware configurations.
 </Note>
 
-에이전트를 실행하면 이제 `sql_db_query` 도구를 실행하기 전에 검토를 위해 일시 중지됩니다:
+On running the agent, it will now pause for review before executing the `sql_db_query` tool:
 ```python
 question = "Which genre on average has the longest tracks?"
 config = {"configurable": {"thread_id": "1"}} # [!code highlight]
@@ -184,7 +184,7 @@ Tool execution pending approval
 Tool: sql_db_query
 Args: {'query': 'SELECT g.Name AS Genre, AVG(t.Milliseconds) AS AvgTrackLength FROM Track t JOIN Genre g ON t.GenreId = g.GenreId GROUP BY g.Name ORDER BY AvgTrackLength DESC LIMIT 1;'}
 ```
-[Command](/oss/javascript/langgraph/use-graph-api#combine-control-flow-and-state-updates-with-command)를 사용하여 이 경우 쿼리를 수락하고 실행을 재개할 수 있습니다:
+We can resume execution, in this case accepting the query, using [Command](/oss/javascript/langgraph/use-graph-api#combine-control-flow-and-state-updates-with-command):
 ```python
 from langgraph.types import Command # [!code highlight]
 
@@ -219,11 +219,11 @@ Name: sql_db_query
 The genre with the longest average track length is "Sci Fi & Fantasy" with an average duration of about 2,911,783 milliseconds, followed by "Science Fiction" and "Drama."
 ```
 
-자세한 내용은 [human-in-the-loop 가이드](/oss/javascript/langchain/human-in-the-loop)를 참조하세요.
+Refer to the [human-in-the-loop guide](/oss/javascript/langchain/human-in-the-loop) for details.
 
-## 4. SQL 쿼리 실행하기
+## 4. Execute SQL queries
 
-명령을 실행하기 전에 ` _safe_sql`에서 LLM이 생성한 명령을 확인합니다:
+Before running the command, do a check to check the LLM generated command in ` _safe_sql`:
 
 ```typescript
 
@@ -257,7 +257,7 @@ function sanitizeSqlQuery(q) {
 
 ```
 
-그런 다음 `SQLDatabase`의 `run`을 사용하여 `execute_sql` 도구로 명령을 실행합니다:
+Then, use `run` from `SQLDatabase` to execute commands with an `execute_sql` tool:
 
 ```typescript
 import { tool } from "langchain"
@@ -284,11 +284,11 @@ const executeSql = tool(
 
 ```
 
-## 5. `createAgent` 사용하기
+## 5. Use `createAgent`
 
-`createAgent`를 사용하여 최소한의 코드로 [ReAct 에이전트](https://arxiv.org/pdf/2210.03629)를 구축합니다. 에이전트는 요청을 해석하고 SQL 명령을 생성합니다. 도구는 명령의 안전성을 확인한 다음 명령을 실행하려고 시도합니다. 명령에 오류가 있으면 오류 메시지가 모델로 반환됩니다. 그러면 모델은 원래 요청과 새 오류 메시지를 검토하고 새 명령을 생성할 수 있습니다. 이는 LLM이 명령을 성공적으로 생성하거나 종료 횟수에 도달할 때까지 계속될 수 있습니다. 이 경우 오류 메시지와 같은 피드백을 모델에 제공하는 패턴은 매우 강력합니다.
+Use `createAgent` to build a [ReAct agent](https://arxiv.org/pdf/2210.03629) with minimal code. The agent will interpret the request and generate a SQL command. The tools will check the command for safety and then try to execute the command. If the command has an error, the error message is returned to the model. The model can then examine the original request and the new error message and generate a new command. This can continue until the LLM generates the command successfully or reaches an end count. This pattern of providing a model with feedback - error messages in this case - is very powerful.
 
-에이전트의 동작을 사용자 정의하기 위해 설명적인 시스템 프롬프트로 에이전트를 초기화합니다:
+Initialize the agent with a descriptive system prompt to customize its behavior:
 
 ```typescript
 import { SystemMessage } from "langchain";
@@ -310,7 +310,7 @@ Rules:
 `);
 ```
 
-이제 모델, 도구 및 프롬프트로 에이전트를 생성합니다:
+Now, create an agent with the model, tools, and prompt:
 
 ```typescript
 import { createAgent } from "langchain";
@@ -323,9 +323,9 @@ const agent = createAgent({
 
 ```
 
-## 6. 에이전트 실행하기
+## 6. Run the agent
 
-샘플 쿼리에서 에이전트를 실행하고 동작을 관찰합니다:
+Run the agent on a sample query and observe its behavior:
 
 ```typescript
 const question = "Which genre, on average, has the longest tracks?";
@@ -346,24 +346,24 @@ tool: [{"Genre":"Sci Fi & Fantasy","AvgMilliseconds":2911783.0384615385}]
 ai: Sci Fi & Fantasy — average track length ≈ 48.5 minutes (about 2,911,783 ms).
 ```
 
-에이전트는 쿼리를 올바르게 작성하고, 쿼리를 확인하고, 실행하여 최종 응답을 알렸습니다.
+The agent correctly wrote a query, checked the query, and ran it to inform its final response.
 
 <Note>
-    위 실행의 모든 측면(수행된 단계, 호출된 도구, LLM이 본 프롬프트 등)을 [LangSmith 트레이스](https://smith.langchain.com/public/653d218b-af67-4854-95ca-6abecb9b2520/r)에서 검사할 수 있습니다.
+    You can inspect all aspects of the above run, including steps taken, tools invoked, what prompts were seen by the LLM, and more in the [LangSmith trace](https://smith.langchain.com/public/653d218b-af67-4854-95ca-6abecb9b2520/r).
 </Note>
 
-#### (선택 사항) Studio 사용하기
+#### (Optional) Use Studio
 
-[Studio](/langsmith/studio)는 "클라이언트 측" 루프와 메모리를 제공하므로 이를 채팅 인터페이스로 실행하고 데이터베이스를 쿼리할 수 있습니다. "데이터베이스 스키마를 알려주세요" 또는 "상위 5명의 고객에 대한 인보이스를 보여주세요"와 같은 질문을 할 수 있습니다. 생성된 SQL 명령과 결과 출력이 표시됩니다. 시작 방법에 대한 자세한 내용은 아래를 참조하세요.
-<Accordion title="Studio에서 에이전트 실행하기">
+[Studio](/langsmith/studio) provides a "client side" loop as well as memory so you can run this as a chat interface and query the database. You can ask questions like "Tell me the scheme of the database" or "Show me the invoices for the 5 top customers". You will see the SQL command that is generated and the resulting output. The details of how to get that started are below.
+<Accordion title="Run your agent in Studio">
 
-이전에 언급한 패키지 외에도 다음이 필요합니다:
+In addition to the previously mentioned packages, you will need to:
 
 ```shell
 npm i -g langgraph-cli@latest
 ```
 
-실행할 디렉토리에 다음 내용으로 `langgraph.json` 파일이 필요합니다:
+In directory you will run in, you will need a `langgraph.json` file with the following contents:
 
 ```json
 {
@@ -485,9 +485,9 @@ export const agent = createAgent({
 </Accordion>
 
 
-## 다음 단계
+## Next steps
 
-더 깊은 사용자 정의를 위해 LangGraph 프리미티브를 사용하여 직접 SQL 에이전트를 구현하는 [이 튜토리얼](/oss/javascript/langgraph/sql-agent)을 확인하세요.
+For deeper customization, check out [this tutorial](/oss/javascript/langgraph/sql-agent) for implementing a SQL agent directly using LangGraph primitives.
 
 ---
 

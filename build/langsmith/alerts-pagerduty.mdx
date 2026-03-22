@@ -1,79 +1,79 @@
 ---
-title: LangSmith 알림을 위한 PagerDuty 통합 구성
-sidebarTitle: PagerDuty 통합 구성
+title: Configure PagerDuty integration for LangSmith alerts
+sidebarTitle: Configure PagerDuty integration
 ---
 
-## 개요
+## Overview
 
-이 가이드는 PagerDuty의 [Events API v2](https://developer.pagerduty.com/docs/events-api-v2-overview)를 사용하여 [LangSmith 알림](/langsmith/alerts)의 알림 채널로 PagerDuty를 구성하는 과정을 안내합니다. 이 통합을 통해 중요한 LLM 애플리케이션 문제가 PagerDuty 인시던트를 트리거하여 설정된 인시던트 관리 워크플로우를 통해 신속한 대응이 가능합니다.
+This guide walks through the process of configuring PagerDuty as a notification channel for [LangSmith alerts](/langsmith/alerts) using PagerDuty's [Events API v2](https://developer.pagerduty.com/docs/events-api-v2-overview). This integration allows critical LLM application issues to trigger PagerDuty incidents, enabling rapid response through your established incident management workflow.
 
-## 사전 준비사항
+## Prerequisites
 
-* 관리자 액세스 권한이 있는 활성 PagerDuty 계정
-* PagerDuty의 서비스 수준 권한
+* An active PagerDuty account with administrator access
+* Appropriate service-level permissions in PagerDuty
 
-또한 LangSmith의 사용자 지정 배포를 사용하는 경우 LangSmith 서비스에서 나가는 트래픽을 차단하는 방화벽 설정이 없는지 확인하세요.
+Additionally, if on a custom deployment of LangSmith, make sure there are no firewall settings blocking egress traffic from LangSmith services.
 
-## 통합 단계
+## Integration Steps
 
-### 1단계: PagerDuty에서 서비스 생성
+### Step 1: Create a Service in PagerDuty
 
-1. PagerDuty 계정에 로그인합니다
+1. Log in to your PagerDuty account
 
-2. **Services → Service Directory**로 이동합니다
+2. Navigate to **Services → Service Directory**
 
-3. **+ New Service**를 클릭합니다
+3. Click **+ New Service**
 
-4. 다음 필드를 완료합니다:
+4. Complete the following fields:
 
-   * **Name**: 설명적인 이름을 제공합니다(예: "LangSmith Monitoring")
-   * **Description**: 모니터링되는 애플리케이션에 대한 세부 정보를 추가합니다
-   * **Escalation Policy**: 적절한 팀 에스컬레이션 정책을 선택합니다
-   * **Integration Type**: "Events API V2"를 선택합니다
+   * **Name**: Provide a descriptive name (e.g., "LangSmith Monitoring")
+   * **Description**: Add details about the monitored application
+   * **Escalation Policy**: Select the appropriate team escalation policy
+   * **Integration Type**: Select "Events API V2"
 
-5. **Add Service**를 클릭하여 서비스를 생성합니다
+5. Click **Add Service** to create the service
 
-### 2단계: Integration Key 가져오기
+### Step 2: Obtain Integration Key
 
-서비스를 생성한 후 Integration Key를 가져와야 합니다:
+After creating the service, you'll need to retrieve the Integration Key:
 
-1. Service 드롭다운 아래의 **Service Directory**에서 새로 생성된 서비스를 찾아 클릭합니다
-2. **Integrations** 탭을 선택합니다
-3. "Events API V2" 통합을 찾습니다
-4. **Integration Key**(32자 영숫자 문자열)를 복사합니다
+1. From the **Service Directory** under the Service dropdown, locate and click on your newly created service
+2. Select the **Integrations** tab
+3. Find the "Events API V2" integration
+4. Copy the **Integration Key** (a 32-character alphanumeric string)
 
 ![PagerDuty Integration Key Location](/langsmith/images/pager-duty.png)
 
-### 3단계: PagerDuty로 LangSmith 알림 구성
+### Step 3: Configure LangSmith Alert with PagerDuty
 
 <Info>
-트리거된 후 한 시간 이내에 동일한 알림을 다시 받으려면 PagerDuty에서 알림으로 생성된 활성 인시던트를 해결해야 합니다.
+To receive the same alert again within an hour of it being triggered, you must resolve the active incident created by the alert in PagerDuty.
 </Info>
 
 ![PagerDuty Setup](/langsmith/images/pagerduty-setup.png)
 
-1. LangSmith의 알림 설정 알림 섹션에서 **PagerDuty**를 선택합니다
-2. 키 아이콘을 클릭하여 Integration Key를 워크스페이스 시크릿으로 저장하거나 기존 워크스페이스 시크릿을 선택합니다. 모범 사례로, Integration Key를 직접 추가하는 대신 워크스페이스 시크릿으로 저장하는 것을 권장합니다. 이렇게 하면 워크스페이스의 알림 전체에서 동일한 키를 재사용할 수 있습니다.
-3. 추가 알림 옵션을 구성합니다:
-   * **Severity**: PagerDuty 인시던트 우선순위에 매핑됩니다
-4. **Send Test Alert**를 클릭하여 테스트 알림을 보냅니다
-5. 인시던트가 PagerDuty에 의해 트리거되고 관련 LangSmith 알림 정보를 포함하는지 확인합니다
+1. In the notification section of your alert set-up in LangSmith, select **PagerDuty**
+2. Click the key icon to save the Integration Key as a Workspace secret or select an existing Workspace secret. As a best practice, we recommend saving the Integration Key as a Workspace Secret rather than adding it directy. This will allow you to re-use the same key across alerts for a workspace.
+3. Configure additional notification options:
+   * **Severity**: Maps to PagerDuty incident priority
+4. Send a test alert by clicking **Send Test Alert**
+5. Verify the incident is triggered by PagerDuty and contains relevant LangSmith alert information
 
-## 문제 해결
+## Troubleshooting
 
-PagerDuty에서 인시던트가 생성되지 않는 경우:
+If incidents aren't being created in PagerDuty:
 
-* Integration Key가 LangSmith에 올바르게 입력되었는지 확인합니다
-* PagerDuty 서비스가 활성 상태이고 유지 관리 모드가 아닌지 확인합니다
-* PagerDuty 계정에 Events API v2가 활성화되어 있는지 확인합니다
-* 알림 트리거가 PagerDuty에서 누락된 것으로 보이는 경우, 예상 트리거가 동일한 알림 규칙의 이전 트리거로부터 한 시간 이내에 발생했는지, 그리고 이전 알림으로 생성된 인시던트가 여전히 열려 있는지 확인합니다.
-* LangSmith 인스턴스가 방화벽 뒤에 있는 경우 네트워크 연결을 검토합니다
+* Verify the Integration Key is entered correctly in LangSmith
+* Ensure the PagerDuty service is active and not in maintenance mode
+* Check that your PagerDuty account has Events API v2 enabled
+* If an alert trigger appears to be missing in PagerDuty, check whether the expected trigger occurred within one hour of a previous trigger from the same alert rule, and whether the incident created by the previous alert is still open.
+* Review network connectivity if your LangSmith instance is behind a firewall
 
-## 추가 리소스
+## Additional Resources
 
-* [PagerDuty Events API v2 문서](https://developer.pagerduty.com/docs/events-api-v2/overview/)
-* [PagerDuty 통합 가이드](https://support.pagerduty.com/docs/services-and-integrations)
-* [LangSmith 알림 문서](/langsmith/alerts)
+* [PagerDuty Events API v2 Documentation](https://developer.pagerduty.com/docs/events-api-v2/overview/)
+* [PagerDuty Integration Guide](https://support.pagerduty.com/docs/services-and-integrations)
+* [LangSmith Alerts Documentation](/langsmith/alerts)
 
 ---
 

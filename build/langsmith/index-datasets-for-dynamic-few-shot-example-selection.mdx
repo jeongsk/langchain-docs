@@ -1,60 +1,60 @@
 ---
-title: 동적 Few-shot 예제 선택
-sidebarTitle: 동적 Few-shot 예제 선택
+title: Dynamic few shot example selection
+sidebarTitle: Dynamic few shot example selection
 ---
 
 <Note>
-이 기능은 오픈 베타 단계입니다. 유료 팀 플랜에서만 사용할 수 있습니다. 활성화에 대한 질문이 있으시면 [support@langchain.dev](mailto:support@langchain.dev)로 문의해 주세요.
+This feature is in open beta. It is only available to paid team plans. Please reach out to [support@langchain.dev](mailto:support@langchain.dev) if you have questions about enablement.
 </Note>
 
-들어오는 요청을 기반으로 few-shot 예제를 검색할 수 있도록 데이터셋을 구성하세요.
+Configure your datasets so that you can search for few shot examples based on an incoming request.
 
-## 사전 조건
+## Pre-conditions
 
-1. 데이터셋은 KV 스토어 데이터 타입을 사용해야 합니다 (현재 채팅 모델 또는 LLM 타입 데이터셋은 지원하지 않습니다)
-2. 데이터셋에 입력 스키마가 정의되어 있어야 합니다. 자세한 내용은 [UI에서 스키마 검증 설정](/langsmith/manage-datasets-in-application#dataset-schema-validation)에 대한 문서를 참조하세요.
-3. 유료 팀 플랜(예: Plus 플랜)을 사용 중이어야 합니다
-4. LangSmith 클라우드를 사용 중이어야 합니다
+1. Your dataset must use the KV store data type (we do not currently support chat model or LLM type datasets)
+2. You must have an input schema defined for your dataset. See our docs on setting up schema validation [in our UI](/langsmith/manage-datasets-in-application#dataset-schema-validation) for details.
+3. You must be on a paid team plan (e.g. Plus plan)
+4. You must be on LangSmith cloud
 
-## Few-shot 검색을 위한 데이터셋 인덱싱
+## Index your dataset for few shot search
 
-데이터셋 UI로 이동하여 새로운 `Few-Shot search` 탭을 클릭하세요. `Start sync` 버튼을 클릭하면 데이터셋에 새로운 인덱스가 생성되어 검색 가능하게 됩니다.
+Navigate to the datasets UI, and click the new `Few-Shot search` tab. Hit the `Start sync` button, which will create a new index on your dataset to make it searchable.
 
 ![](/langsmith/images/few-shot-tab-unsynced.png)
 
-기본적으로 데이터셋의 최신 버전과 동기화됩니다. 즉, 데이터셋에 새로운 예제가 추가되면 자동으로 인덱스에 추가됩니다. 이 프로세스는 몇 분마다 실행되므로 새로운 예제를 인덱싱하는 데 아주 짧은 지연 시간만 발생합니다. 다음 섹션에서 화면 왼쪽의 `Few-shot index` 아래에서 인덱스가 최신 상태인지 확인할 수 있습니다.
+By default, we sync to the latest version of your dataset. That means when new examples are added to your dataset, they will automatically be added to your index. This process runs every few minutes, so there should be a very short delay for indexing new examples. You can see whether your index is up to date under `Few-shot index` on the lefthand side of the screen in the next section.
 
-## Few-shot 플레이그라운드에서 검색 품질 테스트
+## Test search quality in the few shot playground
 
-데이터셋에 대한 인덱싱을 활성화하면 새로운 few-shot 플레이그라운드가 표시됩니다.
+Now that you have turned on indexing for your dataset, you will see the new few shot playground.
 
 ![](/langsmith/images/few-shot-synced-empty-state.png)
 
-샘플 입력을 입력하고 검색 API에서 어떤 결과가 반환되는지 확인할 수 있습니다.
+You can type in a sample input, and check which results would be returned by our search API.
 
 ![](/langsmith/images/few-shot-search-results.png)
 
-각 결과에는 점수와 데이터셋의 예제에 대한 링크가 포함됩니다. 점수 시스템은 0이 완전히 무작위 결과이고 점수가 높을수록 더 좋은 결과입니다. 결과는 점수에 따라 내림차순으로 정렬됩니다.
+Each result will have a score and a link to the example in the dataset. The scoring system works such that 0 is a completely random result, and higher scores are better. Results will be sorted in descending order according to score.
 
 <Note>
-검색은 키워드 기반 유사도 점수를 위해 BM25와 유사한 알고리즘을 사용합니다. 실제 점수는 검색 알고리즘을 개선함에 따라 변경될 수 있으므로, 시간이 지남에 따라 의미가 진화할 수 있는 점수 자체에 의존하지 않는 것을 권장합니다. 점수는 단순히 플레이그라운드에서 출력을 간편하게 테스트하는 용도로만 사용됩니다.
+Search uses a BM25-like algorithm for keyword based similarity scores. The actual score is subject to change as we improve the search algorithm, so we recommend not relying on the scores themselves, as their meaning may evolve over time. They are simply used for convenience in vibe-testing outputs in the playground.
 </Note>
 
-## 애플리케이션에 Few-shot 검색 추가
+## Adding few shot search to your application
 
-이전 다이어그램에서 `Get Code Snippet` 버튼을 클릭하면 다양한 언어의 LangSmith SDK 코드 스니펫이 있는 화면으로 이동합니다.
+Click the `Get Code Snippet` button in the previous diagram, you'll be taken to a screen that has code snippets from our LangSmith SDK in different languages.
 
 ![](/langsmith/images/few-shot-code-snippet.png)
 
-LangChain Python 애플리케이션에서 few-shot 검색을 사용하는 코드 샘플은 [LangChain 문서의 사용 가이드](https://python.langchain.com/v0.2/docs/how_to/example_selectors_langsmith/)를 참조하세요.
+For code samples on using few shot search in LangChain python applications, please see our [how-to guide in the LangChain docs](https://python.langchain.com/v0.2/docs/how_to/example_selectors_langsmith/).
 
-### 코드 스니펫
+### Code snippets
 
 <Note>
-Python SDK 버전 >= 1.101 또는 TypeScript SDK 버전 >= 1.43을 사용하고 있는지 확인하세요
+Please ensure you are using the python SDK with version >= 1.101 or the typescript SDK with version >= 1.43
 </Note>
 
-복사 및 붙여넣기 편의를 위해 위 스크린샷에 표시된 것과 유사한 코드 스니펫을 여기에서 찾을 수 있습니다:
+For copy and paste convenience, you can find the similar code snippets to the ones shown in the screenshot above here:
 
 <CodeGroup>
 

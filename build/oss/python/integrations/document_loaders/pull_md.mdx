@@ -2,27 +2,27 @@
 title: PullMdLoader
 ---
 
-pull.md 서비스를 사용하여 URL을 Markdown으로 변환하는 로더입니다.
+Loader for converting URLs into Markdown using the pull.md service.
 
-이 패키지는 웹 콘텐츠용 [document loader](/oss/python/integrations/document_loaders/)를 구현합니다. 기존 웹 스크레이퍼와 달리 PullMdLoader는 React, Angular 또는 Vue.js와 같은 동적 JavaScript 프레임워크로 구축된 웹 페이지를 로컬 렌더링 없이 Markdown으로 변환할 수 있습니다.
+This package implements a [document loader](/oss/python/integrations/document_loaders/) for web content. Unlike traditional web scrapers, PullMdLoader can handle web pages built with dynamic JavaScript frameworks like React, Angular, or Vue.js, converting them into Markdown without local rendering.
 
-## 개요
+## Overview
 
-### 통합 세부 정보
+### Integration details
 
 | Class | Package | Local | Serializable | JS Support |
 | :--- | :--- | :---: | :---: | :---: |
 | PullMdLoader | langchain-pull-md | ✅ | ✅ | ❌ |
 
-## 설정
+## Setup
 
-### 설치
+### Installation
 
 ```bash
 pip install langchain-pull-md
 ```
 
-### 초기화
+### Initialization
 
 ```python
 from langchain_pull_md.markdown_loader import PullMdLoader
@@ -31,7 +31,7 @@ from langchain_pull_md.markdown_loader import PullMdLoader
 loader = PullMdLoader(url="https://example.com")
 ```
 
-### 로드
+### Load
 
 ```python
 documents = loader.load()
@@ -48,7 +48,7 @@ documents[0].metadata
 
 ## Lazy Load
 
-지연 로딩은 구현되지 않았습니다. `PullMdLoader`는 `load` 메서드가 호출될 때마다 제공된 URL을 실시간으로 Markdown 형식으로 변환합니다.
+No lazy loading is implemented. `PullMdLoader` performs a real-time conversion of the provided URL into Markdown format whenever the `load` method is called.
 
 ## API reference
 

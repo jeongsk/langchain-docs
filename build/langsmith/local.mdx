@@ -1,19 +1,19 @@
 ---
-title: 로컬에서 평가 실행하기 (Python 전용)
-sidebarTitle: 로컬에서 평가 실행하기 (Python)
+title: How to run an evaluation locally (Python only)
+sidebarTitle: Run an evaluation locally (Python)
 ---
 
-때때로 LangSmith에 결과를 업로드하지 않고 로컬에서 평가를 실행하는 것이 유용할 수 있습니다. 예를 들어, 프롬프트를 빠르게 반복하면서 몇 가지 예제로 간단히 테스트하거나, 대상 함수와 평가자 함수가 올바르게 정의되었는지 검증할 때 이러한 평가를 기록하지 않을 수 있습니다.
+Sometimes it is helpful to run an evaluation locally without uploading any results to LangSmith. For example, if you're quickly iterating on a prompt and want to smoke test it on a few examples, or if you're validating that your target and evaluator functions are defined correctly, you may not want to record these evaluations.
 
-LangSmith Python SDK를 사용하고 `evaluate()` / `aevaluate()`에 `upload_results=False`를 전달하면 이를 수행할 수 있습니다.
+You can do this by using the LangSmith Python SDK and passing `upload_results=False` to `evaluate()` / `aevaluate()`.
 
-이렇게 하면 애플리케이션과 평가자가 평소와 똑같이 실행되고 동일한 출력을 반환하지만, LangSmith에는 아무것도 기록되지 않습니다. 이는 실험 결과뿐만 아니라 애플리케이션과 평가자 추적도 포함됩니다.
+This will run you application and evaluators exactly as it always does and return the same output, but nothing will be recorded to LangSmith. This includes not just the experiment results but also the application and evaluator traces.
 
-## 예제
+## Example
 
-예제를 살펴보겠습니다:
+Let's take a look at an example:
 
-`langsmith>=0.2.0`이 필요합니다. 예제에서는 `pandas`도 사용합니다.
+Requires `langsmith>=0.2.0`. Example also uses `pandas`.
 
 ```python
 from langsmith import Client

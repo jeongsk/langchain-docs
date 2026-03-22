@@ -1,31 +1,31 @@
 ---
-title: OpenAI 호환 모델 공급자/프록시에 연결
-sidebarTitle: OpenAI 호환 모델 공급자/프록시
+title: Connect to an OpenAI compliant model provider/proxy
+sidebarTitle: OpenAI-compliant model provider/proxy
 ---
 
-LangSmith playground를 사용하면 OpenAI API와 호환되는 모든 모델을 사용할 수 있습니다. playground에서 Proxy Provider를 설정하여 모델을 활용할 수 있습니다.
+The LangSmith playground allows you to use any model that is compliant with the OpenAI API. You can utilize your model by setting the Proxy Provider for  in the playground.
 
-## OpenAI 호환 모델 배포
+## Deploy an OpenAI compliant model
 
-많은 공급자가 OpenAI 호환 모델 또는 프록시 서비스를 제공합니다. 예를 들면 다음과 같습니다:
+Many providers offer OpenAI compliant models or proxy services. Some examples of this include:
 
 * [LiteLLM Proxy](https://github.com/BerriAI/litellm?tab=readme-ov-file#quick-start-proxy---cli)
 * [Ollama](https://ollama.com/)
 
-이러한 공급자를 사용하여 모델을 배포하고 OpenAI API와 호환되는 API 엔드포인트를 얻을 수 있습니다.
+You can use these providers to deploy your model and get an API endpoint that is compliant with the OpenAI API.
 
-자세한 내용은 전체 [사양](https://platform.openai.com/docs/api-reference/chat)을 참조하세요.
+Take a look at the full [specification](https://platform.openai.com/docs/api-reference/chat) for more information.
 
-## LangSmith Playground에서 모델 사용
+## Use the model in the LangSmith Playground
 
-모델 서버를 배포한 후 LangSmith [Playground](/langsmith/prompt-engineering-concepts#prompt-playground)에서 사용할 수 있습니다.
+Once you have deployed a model server, you can use it in the LangSmith [Playground](/langsmith/prompt-engineering-concepts#prompt-playground).
 
-**Prompt Settings** 메뉴에 액세스하려면:
+To access the **Prompt Settings** menu:
 
-1. **Prompts** 제목 아래에서 모델 이름 옆에 있는 기어 <Icon icon="gear" iconType="solid" /> 아이콘을 선택합니다.
-1. **Model Configuration** 탭에서 드롭다운에서 편집할 모델을 선택합니다.
-1. **Provider** 드롭다운에서 **OpenAI Compatible Endpoint**를 선택합니다.
-1. **Base URL** 입력란에 OpenAI Compatible Endpoint를 추가합니다.
+1. Under the **Prompts** heading select the gear <Icon icon="gear" iconType="solid" /> icon next to the model name.
+1. In the **Model Configuration** tab, select the model to edit in the dropdown.
+1. For the **Provider** dropdown, select **OpenAI Compatible Endpoint**.
+1. Add your OpenAI Compatible Endpoint to the **Base URL** input.
 
     <div style={{ textAlign: 'center' }}>
     <img
@@ -41,9 +41,9 @@ LangSmith playground를 사용하면 OpenAI API와 호환되는 모든 모델을
     />
     </div>
 
-모든 것이 올바르게 설정되면 playground에서 모델의 응답을 볼 수 있습니다. 이 기능을 사용하여 다운스트림 파이프라인도 호출할 수 있습니다.
+If everything is set up correctly, you should see the model's response in the playground. You can also use this functionality to invoke downstream pipelines as well.
 
-모델 구성을 저장하는 방법에 대한 정보는 [Configure prompt settings](/langsmith/managing-model-configurations)를 참조하세요.
+For information on how to store your model configuration , refer to [Configure prompt settings](/langsmith/managing-model-configurations).
 
 ---
 

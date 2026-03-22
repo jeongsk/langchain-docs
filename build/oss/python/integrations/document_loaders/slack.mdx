@@ -2,19 +2,19 @@
 title: Slack
 ---
 
->[Slack](https://slack.com/)은 인스턴트 메시징 프로그램입니다.
+>[Slack](https://slack.com/) is an instant messaging program.
 
-이 노트북은 `Slack` 내보내기에서 생성된 Zipfile에서 문서를 로드하는 방법을 다룹니다.
+This notebook covers how to load documents from a Zipfile generated from a `Slack` export.
 
-이 `Slack` 내보내기를 얻으려면 다음 지침을 따르세요:
+In order to get this `Slack` export, follow these instructions:
 
-## 🧑 자체 데이터셋 수집 지침
+## 🧑 Instructions for ingesting your own dataset
 
-Slack 데이터를 내보내세요. 작업 공간 관리 페이지로 이동하여 Import/Export 옵션을 클릭하면 됩니다(\{your_slack_domain\}.slack.com/services/export). 그런 다음 적절한 날짜 범위를 선택하고 `Start export`를 클릭하세요. Slack은 내보내기가 준비되면 이메일과 DM을 보냅니다.
+Export your Slack data. You can do this by going to your Workspace Management page and clicking the Import/Export option (\{your_slack_domain\}.slack.com/services/export). Then, choose the right date range and click `Start export`. Slack will send you an email and a DM when the export is ready.
 
-다운로드하면 다운로드 폴더(또는 OS 구성에 따라 다운로드를 찾을 수 있는 위치)에 `.zip` 파일이 생성됩니다.
+The download will produce a `.zip` file in your Downloads folder (or wherever your downloads can be found, depending on your OS configuration).
 
-`.zip` 파일의 경로를 복사하여 아래의 `LOCAL_ZIPFILE`로 할당하세요.
+Copy the path to the `.zip` file, and assign it as `LOCAL_ZIPFILE` below.
 
 ```python
 from langchain_community.document_loaders import SlackDirectoryLoader

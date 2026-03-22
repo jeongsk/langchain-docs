@@ -1,24 +1,24 @@
 ---
-title: 분류기 최적화하기
-sidebarTitle: 분류기 최적화하기
+title: Optimize a classifier
+sidebarTitle: Optimize a classifier
 ---
 
-이 튜토리얼에서는 사용자 피드백을 기반으로 분류기를 최적화하는 방법을 안내합니다. 분류기는 원하는 출력을 수집하기가 일반적으로 매우 간단하기 때문에 최적화하기에 좋으며, 이를 통해 사용자 피드백을 기반으로 few-shot 예제를 쉽게 만들 수 있습니다. 이 예제에서 바로 그 작업을 수행할 것입니다.
+This tutorial walks through optimizing a classifier based on user a feedback. Classifiers are great to optimize because its generally pretty simple to collect the desired output, which makes it easy to create few shot examples based on user feedback. That is exactly what we will do in this example.
 
-## 목표
+## The objective
 
-이 예제에서는 GitHub 이슈의 제목을 기반으로 분류하는 봇을 구축합니다. 이 봇은 제목을 입력받아 여러 클래스 중 하나로 분류합니다. 그런 다음 사용자 피드백을 수집하기 시작하고 이를 사용하여 분류기의 성능을 개선합니다.
+In this example, we will build a bot that classify GitHub issues based on their title. It will take in a title and classify it into one of many different classes. Then, we will start to collect user feedback and use that to shape how this classifier performs.
 
-## 시작하기
+## Getting started
 
-시작하려면 먼저 모든 트레이스를 특정 프로젝트로 전송하도록 설정합니다. 환경 변수를 설정하여 이 작업을 수행할 수 있습니다:
+To get started, we will first set it up so that we send all traces to a specific project. We can do this by setting an environment variable:
 
 ```python
 import os
 os.environ["LANGSMITH_PROJECT"] = "classifier"
 ```
 
-이제 초기 애플리케이션을 생성할 수 있습니다. 이것은 GitHub 이슈 제목을 입력받아 레이블을 지정하려고 시도하는 매우 간단한 함수입니다.
+We can then create our initial application. This will be a really simple function that just takes in a GitHub issue title and tries to label it.
 
 ```python
 import openai
@@ -59,9 +59,9 @@ def topic_classifier(
     ).choices[0].message.content
 ```
 
-이제 이 함수와 상호작용을 시작할 수 있습니다. 상호작용할 때 LangSmith run ID를 미리 생성하여 이 함수에 전달합니다. 나중에 피드백을 첨부할 수 있도록 이 작업을 수행합니다.
+We can then start to interact with it. When interacting with it, we will generate the LangSmith run id ahead of time and pass that into this function. We do this so we can attach feedback later on.
 
-애플리케이션을 호출하는 방법은 다음과 같습니다:
+Here's how we can invoke the application:
 
 ```python
 run_id = uuid.uuid4()
@@ -70,9 +70,9 @@ topic_classifier(
     langsmith_extra={"run_id": run_id})
 ```
 
-다음은 나중에 피드백을 첨부하는 방법입니다. 두 가지 형태로 피드백을 수집할 수 있습니다.
+Here's how we can attach feedback after. We can collect feedback in two forms.
 
-먼저 "긍정적인" 피드백을 수집할 수 있습니다. 이것은 모델이 올바르게 예측한 예제에 대한 것입니다.
+First, we can collect "positive" feedback - this is for examples that the model got right.
 
 ```python
 ls_client = Client()
@@ -87,7 +87,7 @@ ls_client.create_feedback(
 )
 ```
 
-다음으로, 생성 결과에 대한 "수정"에 해당하는 피드백을 수집하는 데 중점을 둘 수 있습니다. 이 예제에서는 모델이 이를 버그로 분류하지만, 실제로는 문서화로 분류되기를 원합니다.
+Next, we can focus on collecting feedback that corresponds to a "correction" to the generation. In this example the model will classify it as a bug, whereas I really want this to be classified as documentation.
 
 ```python
 ls_client = Client()
@@ -101,28 +101,28 @@ ls_client.create_feedback(
     correction="documentation")
 ```
 
-## 자동화 설정하기
+## Set up automations
 
-이제 어떤 형태로든 피드백이 있는 예제를 데이터셋으로 이동하는 자동화를 설정할 수 있습니다. 긍정적인 피드백에 대한 자동화와 부정적인 피드백에 대한 자동화, 두 가지 자동화를 설정합니다.
+We can now set up automations to move examples with feedback of some form into a dataset. We will set up two automations, one for positive feedback and the other for negative feedback.
 
-첫 번째 자동화는 긍정적인 피드백이 있는 모든 실행을 가져와서 자동으로 데이터셋에 추가합니다. 이것의 논리는 긍정적인 피드백이 있는 모든 실행을 향후 반복에서 좋은 예제로 사용할 수 있다는 것입니다. 이 데이터를 추가할 `classifier-github-issues`라는 데이터셋을 생성하겠습니다.
+The first will take all runs with positive feedback and automatically add them to a dataset. The logic behind this is that any run with positive feedback we can use as a good example in future iterations. Let's create a dataset called `classifier-github-issues` to add this data to.
 
-![최적화 부정](/langsmith/images/class-optimization-neg.png)
+![Optimization Negative](/langsmith/images/class-optimization-neg.png)
 
-두 번째 자동화는 수정이 포함된 모든 실행을 가져와서 웹훅을 사용하여 데이터셋에 추가합니다. 이 웹훅을 생성할 때 "Use Corrections" 옵션을 선택합니다. 이 옵션을 사용하면 실행에서 데이터셋을 생성할 때 실행의 출력을 데이터 포인트의 정답 출력으로 사용하는 대신 수정 내용을 사용하게 됩니다.
+The second will take all runs with a correction and use a webhook to add them to a dataset. When creating this webhook, we will select the option to "Use Corrections". This option will make it so that when creating a dataset from a run, rather than using the output of the run as the gold-truth output of the datapoint, it will use the correction.
 
-![최적화 긍정](/langsmith/images/class-optimization-pos.png)
+![Optimization Positive](/langsmith/images/class-optimization-pos.png)
 
-## 애플리케이션 업데이트하기
+## Update the application
 
-이제 코드를 업데이트하여 실행을 보내고 있는 데이터셋을 가져올 수 있습니다. 데이터셋을 가져오면 예제가 포함된 문자열을 만들 수 있습니다. 그런 다음 이 문자열을 프롬프트의 일부로 넣을 수 있습니다!
+We can now update our code to pull down the dataset we are sending runs to. Once we pull it down, we can create a string with the examples in it. We can then put this string as part of the prompt!
 
 ```python
 ### NEW CODE ###
-# 데이터셋을 가져오는 데 사용할 수 있도록 LangSmith Client를 초기화합니다
+# Initialize the LangSmith Client so we can use to get the dataset
 ls_client = Client()
 
-# 예제 목록을 받아 문자열로 포맷하는 함수를 생성합니다
+# Create a function that will take in a list of examples and format them into a string
 def create_example_string(examples):
     final_strings = []
     for e in examples:
@@ -155,10 +155,10 @@ Issue: {text}
 )
 def topic_classifier(
     topic: str):
-    # 이제 데이터셋에서 예제를 가져올 수 있습니다
-    # 항상 최신 예제를 가져오기 위해 함수 내부에서 이 작업을 수행하지만,
-    # 원하는 경우 속도를 위해 외부에서 수행하고 캐시할 수 있습니다
-    examples = list(ls_client.list_examples(dataset_name="classifier-github-issues"))  # <- 새 코드
+    # We can now pull down the examples from the dataset
+    # We do this inside the function so it always get the most up-to-date examples,
+    # But this can be done outside and cached for speed if desired
+    examples = list(ls_client.list_examples(dataset_name="classifier-github-issues"))  # <- New Code
     example_string = create_example_string(examples)
     return client.chat.completions.create(
         model="gpt-4o-mini",
@@ -176,7 +176,7 @@ def topic_classifier(
     ).choices[0].message.content
 ```
 
-이전과 유사한 입력으로 애플리케이션을 실행하면 문서와 관련된 모든 것(버그라 하더라도)이 `documentation`으로 분류되어야 한다는 것을 올바르게 학습한 것을 확인할 수 있습니다.
+If now run the application with a similar input as before, we can see that it correctly learns that anything related to docs (even if a bug) should be classified as `documentation`
 
 ```python
 ls_client = Client()
@@ -186,11 +186,11 @@ topic_classifier(
     langsmith_extra={"run_id": run_id})
 ```
 
-## 예제에 대한 시맨틱 검색
+## Semantic search over examples
 
-추가로 할 수 있는 한 가지는 의미적으로 가장 유사한 예제만 사용하는 것입니다. 이것은 많은 예제가 쌓이기 시작할 때 유용합니다.
+One additional thing we can do is only use the most semantically similar examples. This is useful when you start to build up a lot of examples.
 
-이를 위해 먼저 `k`개의 가장 유사한 예제를 찾는 함수를 정의할 수 있습니다:
+In order to do this, we can first define an example to find the `k` most similar examples:
 
 ```python
 import numpy as np
@@ -205,7 +205,7 @@ def find_similar(examples, topic, k=5):
     return examples
 ```
 
-그런 다음 애플리케이션에서 이 함수를 사용할 수 있습니다.
+We can then use that in the application
 
 ```python
 ls_client = Client()

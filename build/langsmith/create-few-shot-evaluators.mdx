@@ -1,62 +1,62 @@
 ---
-title: Few-shot 예제로 평가자 개선하기
-sidebarTitle: Few-shot 예제로 평가자 개선하기
+title: How to improve your evaluator with few-shot examples
+sidebarTitle: Improve your evaluator with few-shot examples
 ---
 
-LLM-as-a-judge 평가자는 시스템을 프로그래밍 방식으로 평가할 수 없을 때 매우 유용합니다. 그러나 평가자의 효과는 품질과 사람 검토자의 피드백과 얼마나 잘 일치하는지에 따라 달라집니다. LangSmith는 few-shot 예제를 사용하여 LLM-as-a-judge 평가자를 사람의 선호도에 맞게 개선하는 기능을 제공합니다.
+Using LLM-as-a-judge evaluators can be very helpful when you can't evaluate your system programmatically. However, their effectiveness depends on their quality and how well they align with human reviewer feedback. LangSmith provides the ability to improve the alignment of LLM-as-a-judge evaluator to human preferences using few-shot examples.
 
-사람의 수정 사항은 few-shot 예제를 사용하여 평가자 프롬프트에 자동으로 삽입됩니다. Few-shot 예제는 몇 가지 고품질 예제로 모델의 출력을 안내하는 [few-shot 프롬프팅](https://www.promptingguide.ai/techniques/fewshot)에서 영감을 받은 기법입니다.
+Human corrections are automatically inserted into your evaluator prompt using few-shot examples. Few-shot examples is a technique inspired by [few-shot prompting](https://www.promptingguide.ai/techniques/fewshot) that guides the models output with a few high-quality examples.
 
-이 가이드는 LLM-as-a-judge 평가자의 일부로 few-shot 예제를 설정하고 피드백 점수에 수정 사항을 적용하는 방법을 다룹니다.
+This guide covers how to set up few-shot examples as part of your LLM-as-a-judge evaluator and apply corrections to feedback scores.
 
-## Few-shot 예제 작동 방식
+## How few-shot examples work
 
-* Few-shot 예제는 `{{Few-shot examples}}` 변수를 사용하여 평가자 프롬프트에 추가됩니다
-* Few-shot 예제가 포함된 평가자를 생성하면 데이터셋이 자동으로 생성되며, 수정 사항을 만들기 시작하면 few-shot 예제로 자동으로 채워집니다
-* 런타임에 이러한 예제는 평가자에 삽입되어 출력의 가이드 역할을 합니다 - 이는 평가자가 사람의 선호도에 더 잘 맞춰지도록 돕습니다
+* Few-shot examples are added to your evaluator prompt using the `{{Few-shot examples}}` variable
+* Creating an evaluator with few-shot examples, will automatically create a dataset for you, which will be auto-populated with few-shot examples once you start making corrections
+* At runtime, these examples will inserted into the evaluator to serve as a guide for its outputs - this will help the evaluator to better align with human preferences
 
-## 평가자 구성하기
+## Configure your evaluator
 
 <Note>
-Few-shot 예제는 현재 프롬프트 허브를 사용하는 LLM-as-a-judge 평가자에서 지원되지 않으며, mustache 형식을 사용하는 프롬프트와만 호환됩니다.
+Few-shot examples are not currently supported in LLM-as-a-judge evaluators that use the prompt hub and are only compatible with prompts that use mustache formatting.
 </Note>
 
-Few-shot 예제를 활성화하기 전에 LLM-as-a-judge 평가자를 설정하세요. 아직 설정하지 않았다면 [LLM-as-a-judge 평가자 가이드](/langsmith/llm-as-judge)의 단계를 따르세요.
+Before enabling few-shot examples, set up your LLM-as-a-judge evaluator. If you haven't done this yet, follow the steps in the [LLM-as-a-judge evaluator guide](/langsmith/llm-as-judge).
 
-### 1. 변수 매핑 구성하기
+### 1. Configure variable mapping
 
-각 few-shot 예제는 구성에 지정된 변수 매핑에 따라 형식이 지정됩니다. Few-shot 예제의 변수 매핑은 메인 프롬프트와 동일한 변수를 포함해야 하며, 추가로 `few_shot_explanation`과 피드백 키와 동일한 이름을 가져야 하는 `score` 변수를 포함해야 합니다.
+Each few-shot example is formatted according to the variable mapping specified in the configuration. The variable mapping for few-shot examples, should contain the same variables as your main prompt, plus a `few_shot_explanation` and a `score` variable which should have the same name as your feedback key.
 
-예를 들어, 메인 프롬프트에 `question`과 `response` 변수가 있고 평가자가 `correctness` 점수를 출력한다면, few-shot 프롬프트는 `question`, `response`, `few_shot_explanation`, `correctness` 변수를 가져야 합니다.
+For example, if your main prompt has variables `question` and `response`, and your evaluator outputs a `correctness` score, then your few-shot prompt should have the vartiables `question`, `response`, `few_shot_explanation`, and `correctness`.
 
-### 2. 사용할 few-shot 예제 개수 지정하기
+### 2. Specify the number of few-shot examples to use
 
-사용할 few-shot 예제의 개수도 지정할 수 있습니다. 기본값은 5입니다. 예제가 매우 길다면 토큰을 절약하기 위해 이 숫자를 낮게 설정할 수 있으며, 예제가 짧은 경향이 있다면 평가자가 더 많은 예제로부터 학습할 수 있도록 더 높은 숫자를 설정할 수 있습니다. 데이터셋에 이 숫자보다 더 많은 예제가 있다면 무작위로 선택됩니다.
+You may also specify the number of few-shot examples to use. The default is 5. If your examples are very long, you may want to set this number lower to save tokens - whereas if your examples tend to be short, you can set a higher number in order to give your evaluator more examples to learn from. If you have more examples in your dataset than this number, we will randomly choose them for you.
 
-## 수정하기
+## Make corrections
 
 <Info>
-[평가자 점수 감사하기](/langsmith/audit-evaluator-scores)
+[Audit evaluator scores](/langsmith/audit-evaluator-scores)
 </Info>
 
-트레이스를 로깅하거나 실험을 실행하기 시작하면 평가자가 부여한 일부 점수에 동의하지 않을 수 있습니다. [이러한 점수에 수정 사항을 적용](/langsmith/audit-evaluator-scores)하면 수정 데이터셋 내에 예제가 채워지기 시작합니다. 수정 사항을 만들 때는 반드시 설명을 첨부하세요 - 이 설명은 `few_shot_explanation` 변수 대신 평가자 프롬프트에 채워집니다.
+As you start logging traces or running experiments, you will likely disagree with some of the scores that your evaluator has given. When you [make corrections to these scores](/langsmith/audit-evaluator-scores), you will begin seeing examples populated inside your corrections dataset. As you make corrections, make sure to attach explanations - these will get populated into your evaluator prompt in place of the `few_shot_explanation` variable.
 
-Few-shot 예제의 입력은 체인/데이터셋의 입력, 출력, 참조(오프라인 평가자인 경우)에서 관련 필드가 됩니다. 출력은 수정된 평가자 점수와 수정 사항을 남길 때 작성한 설명이 됩니다. 원하는 대로 자유롭게 편집하세요. 다음은 수정 데이터셋에 있는 few-shot 예제의 예시입니다:
+The inputs to the few-shot examples will be the relevant fields from the inputs, outputs, and reference (if this an offline evaluator) of your chain/dataset. The outputs will be the corrected evaluator score and the explanations that you created when you left the corrections. Feel free to edit these to your liking. Here is an example of a few-shot example in a corrections dataset:
 
 ![Few-shot example](/langsmith/images/few-shot-example.png)
 
-수정 사항이 few-shot 데이터셋에 채워지는 데 1~2분 정도 걸릴 수 있습니다. 일단 채워지면 향후 평가자 실행 시 프롬프트에 포함됩니다!
+Note that the corrections may take a minute or two to be populated into your few-shot dataset. Once they are there, future runs of your evaluator will include them in the prompt!
 
-## 수정 데이터셋 보기
+## View your corrections dataset
 
-수정 데이터셋을 보려면:
+In order to view your corrections dataset:
 
-* **온라인 평가자**: 실행 규칙을 선택하고 **규칙 편집**을 클릭하세요
-* **오프라인 평가자**: 평가자를 선택하고 **평가자 편집**을 클릭하세요
+* **Online evaluators**: Select your run rule and click **Edit Rule**
+* **Offline evaluators**: Select your evaluator and click **Edit Evaluator**
 
 ![Edit Evaluator](/langsmith/images/edit-evaluator.png)
 
-**Few-shot 예제를 사용하여 평가자 정확도 개선** 섹션에 연결된 수정 데이터셋으로 이동하세요. 데이터셋에서 few-shot 예제를 보고 업데이트할 수 있습니다.
+Head to your dataset of corrections linked in the the **Improve evaluator accuracy using few-shot examples** section. You can view and update your few-shot examples in the dataset.
 
 ![View few-shot dataset](/langsmith/images/view-few-shot-ds.png)
 

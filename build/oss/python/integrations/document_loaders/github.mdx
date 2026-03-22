@@ -2,20 +2,20 @@
 title: GitHub
 ---
 
-이 노트북은 주어진 저장소의 [GitHub](https://github.com/)에서 이슈 및 풀 리퀘스트(PR)를 로드하는 방법을 보여줍니다. 또한 주어진 저장소의 [GitHub](https://github.com/)에서 github 파일을 로드하는 방법도 보여줍니다. 예제로 LangChain Python 저장소를 사용합니다.
+This notebooks shows how you can load issues and pull requests (PRs) for a given repository on [GitHub](https://github.com/). Also shows how you can load github files for a given repository on [GitHub](https://github.com/). We will use the LangChain Python repository as an example.
 
-## 액세스 토큰 설정
+## Setup access token
 
-GitHub API에 액세스하려면 개인 액세스 토큰이 필요합니다 - 여기에서 설정할 수 있습니다: [github.com/settings/tokens?type=beta](https://github.com/settings/tokens?type=beta). 이 토큰을 환경 변수 `GITHUB_PERSONAL_ACCESS_TOKEN`으로 설정하면 자동으로 가져옵니다. 또는 초기화 시 `access_token` 명명된 파라미터로 직접 전달할 수 있습니다.
+To access the GitHub API, you need a personal access token - you can set up yours here: [github.com/settings/tokens?type=beta](https://github.com/settings/tokens?type=beta). You can either set this token as the environment variable `GITHUB_PERSONAL_ACCESS_TOKEN` and it will be automatically pulled in, or you can pass it in directly at initialization as the `access_token` named parameter.
 
 ```python
-# 액세스 토큰을 환경 변수로 설정하지 않은 경우 여기에 전달하세요.
+# If you haven't set your access token as an environment variable, pass it in here.
 from getpass import getpass
 
 ACCESS_TOKEN = getpass()
 ```
 
-## 이슈 및 PR 로드
+## Load Issues and PRs
 
 ```python
 from langchain_community.document_loaders import GitHubIssuesLoader
@@ -24,14 +24,14 @@ from langchain_community.document_loaders import GitHubIssuesLoader
 ```python
 loader = GitHubIssuesLoader(
     repo="langchain-ai/langchain",
-    access_token=ACCESS_TOKEN,  # 액세스 토큰을 환경 변수로 설정한 경우 이 인수를 삭제/주석 처리하세요.
+    access_token=ACCESS_TOKEN,  # delete/comment out this argument if you've set the access token as an env var.
     creator="UmerHA",
 )
 ```
 
-"UmerHA"가 생성한 모든 이슈 및 PR을 로드해 보겠습니다.
+Let's load all issues and PRs created by "UmerHA".
 
-사용할 수 있는 모든 필터 목록은 다음과 같습니다:
+Here's a list of all filters you can use:
 
 - include_prs
 - milestone
@@ -44,7 +44,7 @@ loader = GitHubIssuesLoader(
 - direction
 - since
 
-자세한 내용은 [docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues](https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues)를 참조하세요.
+For more info, see [docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues](https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues).
 
 ```python
 docs = loader.load()
@@ -55,14 +55,14 @@ print(docs[0].page_content)
 print(docs[0].metadata)
 ```
 
-## 이슈만 로드
+## Only load issues
 
-기본적으로 GitHub API는 풀 리퀘스트도 이슈로 간주합니다. '순수한' 이슈(즉, 풀 리퀘스트 제외)만 가져오려면 `include_prs=False`를 사용하세요
+By default, the GitHub API returns considers pull requests to also be issues. To only get 'pure' issues (i.e., no pull requests), use `include_prs=False`
 
 ```python
 loader = GitHubIssuesLoader(
     repo="langchain-ai/langchain",
-    access_token=ACCESS_TOKEN,  # 액세스 토큰을 환경 변수로 설정한 경우 이 인수를 삭제/주석 처리하세요.
+    access_token=ACCESS_TOKEN,  # delete/comment out this argument if you've set the access token as an env var.
     creator="UmerHA",
     include_prs=False,
 )
@@ -74,9 +74,9 @@ print(docs[0].page_content)
 print(docs[0].metadata)
 ```
 
-## Github 파일 콘텐츠 로드
+## Load Github File Content
 
-아래 코드는 저장소 `langchain-ai/langchain`의 모든 markdown 파일을 로드합니다
+For below code, loads all markdown file in rpeo `langchain-ai/langchain`
 
 ```python
 from langchain_community.document_loaders import GithubFileLoader
@@ -84,18 +84,18 @@ from langchain_community.document_loaders import GithubFileLoader
 
 ```python
 loader = GithubFileLoader(
-    repo="langchain-ai/langchain",  # 저장소 이름
-    branch="master",  # 브랜치 이름
+    repo="langchain-ai/langchain",  # the repo name
+    branch="master",  # the branch name
     access_token=ACCESS_TOKEN,
     github_api_url="https://api.github.com",
     file_filter=lambda file_path: file_path.endswith(
         ".md"
-    ),  # 모든 markdown 파일을 로드합니다.
+    ),  # load all markdowns files.
 )
 documents = loader.load()
 ```
 
-문서 중 하나의 예제 출력:
+example output of one of document:
 
 ```json
 document.metadata:

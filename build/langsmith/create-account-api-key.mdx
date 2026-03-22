@@ -1,45 +1,45 @@
 ---
-title: 계정 및 API 키 생성
-sidebarTitle: 계정 및 API 키 생성
+title: Create an account and API key
+sidebarTitle: Create an account and API key
 ---
 
-LangSmith를 시작하려면 먼저 계정을 생성해야 합니다. [여기](https://smith.langchain.com)에서 무료 계정에 가입할 수 있습니다. Google, GitHub, 이메일을 통한 로그인을 지원합니다.
+To get started with LangSmith, you need to create an account. You can sign up for a free account [here](https://smith.langchain.com). We support logging in with Google, GitHub, and email.
 
 ![Create account](/langsmith/images/create-account.png)
 
-## API 키
+## API keys
 
-LangSmith는 두 가지 유형의 API 키를 지원합니다: Service Keys와 Personal Access Tokens입니다. 두 유형의 토큰 모두 LangSmith API에 대한 요청을 인증하는 데 사용할 수 있지만, 사용 사례가 다릅니다.
+LangSmith supports two types of API keys: Service Keys and Personal Access Tokens. Both types of tokens can be used to authenticate requests to the LangSmith API, but they have different use cases.
 
-Service Keys와 Personal Access Tokens 간의 차이점에 대한 자세한 내용은 [관리 개념](/langsmith/administration-overview)을 참조하세요.
+Read more about the differences between Service Keys and Personal Access Tokens under [admin concepts](/langsmith/administration-overview)
 
-## API 키 생성
+## Create an API key
 
-LangSmith로 트레이스를 기록하고 평가를 실행하려면 요청을 인증하기 위한 API 키를 생성해야 합니다. API 키는 워크스페이스 집합 또는 전체 조직으로 범위를 지정할 수 있습니다.
+To log traces and run evaluations with LangSmith, you will need to create an API key to authenticate your requests. API keys can be scoped to a set of workspaces, or the entire organization.
 
-두 유형의 API 키를 생성하려면 [설정 페이지](https://smith.langchain.com/settings)로 이동한 다음 **API Keys** 섹션까지 스크롤하세요. 서비스 키의 경우 조직 범위 키와 워크스페이스 범위 키 중에서 선택하세요. 키가 워크스페이스 범위인 경우 워크스페이스를 지정해야 합니다. Enterprise 사용자는 키에 특정 역할을 할당하여 권한을 조정할 수도 있습니다. 키의 만료 기간을 설정하세요. 키는 선택한 일수 후에 사용할 수 없게 되거나, 선택한 경우 만료되지 않습니다. 그런 다음 **Create API Key**를 클릭하세요.
+To create either type of API key head to the [Settings page](https://smith.langchain.com/settings), then scroll to the **API Keys** section. For service keys, choose between an organization-scoped and workspace-scoped key. If the key is workspace-scoped, the workspaces must then be specified. Enterprise users are also able to assign specific roles to the key, which adjusts its permissions. Set the key's expiration; the key will become unusable after the number of days chosen, or never, if that is selected. Then click **Create API Key.**
 
 <Note>
-API 키는 한 번만 표시되므로 반드시 복사하여 안전한 장소에 보관하세요.
+The API key will be shown only once, so make sure to copy it and store it in a safe place.
 </Note>
 
 ![Create API key](/langsmith/images/create-api-key.png)
 
-## SDK 구성
+## Configure the SDK
 
-`LANGSMITH_API_KEY` 외에 다음 환경 변수를 설정할 수 있습니다.
+You may set the following environment variables in addition to `LANGSMITH_API_KEY`.
 
-이는 EU 인스턴스를 사용하는 경우에만 필요합니다.
+This is only required if using the EU instance.
 
 `LANGSMITH_ENDPOINT=https://eu.api.smith.langchain.com`
 
-이는 둘 이상의 워크스페이스로 범위가 지정된 키에만 필요합니다.
+This is only required for keys scoped to more than one workspace.
 
 `LANGSMITH_WORKSPACE_ID=<Workspace ID>`
 
-## SDK 외부에서 API 키 사용
+## Using API keys outside of the SDK
 
-[API를 통한 조직 관리 지침](/langsmith/manage-organization-by-api)을 참조하세요.
+See [instructions for managing your organization via API](/langsmith/manage-organization-by-api).
 
 ---
 

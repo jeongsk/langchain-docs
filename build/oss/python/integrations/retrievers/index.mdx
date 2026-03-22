@@ -1,22 +1,22 @@
 ---
-title: "리트리버"
+title: "Retrievers"
 ---
 
-[리트리버](/oss/python/langchain/retrieval#building-blocks)는 비구조화된 쿼리가 주어졌을 때 문서를 반환하는 인터페이스입니다.
-벡터 스토어보다 더 일반적인 개념입니다.
-리트리버는 문서를 저장할 수 있을 필요는 없으며, 단지 반환(또는 검색)할 수 있기만 하면 됩니다.
-리트리버는 벡터 스토어로부터 생성될 수 있지만, [Wikipedia 검색](/oss/python/integrations/retrievers/wikipedia/)과 [Amazon Kendra](/oss/python/integrations/retrievers/amazon_kendra_retriever/)를 포함할 만큼 충분히 광범위합니다.
+A [retriever](/oss/python/langchain/retrieval#building-blocks) is an interface that returns documents given an unstructured query.
+It is more general than a vector store.
+A retriever does not need to be able to store documents, only to return (or retrieve) them.
+Retrievers can be created from vector stores, but are also broad enough to include [Wikipedia search](/oss/python/integrations/retrievers/wikipedia/) and [Amazon Kendra](/oss/python/integrations/retrievers/amazon_kendra_retriever/).
 
-리트리버는 문자열 쿼리를 입력으로 받아 [Document](https://python.langchain.com/api_reference/core/documents/langchain_core.documents.base.Document.html) 목록을 출력으로 반환합니다.
+Retrievers accept a string query as input and return a list of [Documents](https://python.langchain.com/api_reference/core/documents/langchain_core.documents.base.Document.html) as output.
 
-모든 [벡터 스토어](/oss/python/integrations/vectorstores)는 리트리버로 변환될 수 있습니다. 사용 가능한 벡터 스토어에 대해서는 벡터 스토어 [통합 문서](/oss/python/integrations/vectorstores/)를 참조하세요.
-이 페이지는 BaseRetriever를 서브클래싱하여 구현된 커스텀 리트리버를 나열합니다.
+Note that all [vector stores](/oss/python/integrations/vectorstores) can be cast to retrievers. Refer to the vector store [integration docs](/oss/python/integrations/vectorstores/) for available vector stores.
+This page lists custom retrievers, implemented via subclassing BaseRetriever.
 
-## 직접 문서 가져오기
+## Bring-your-own documents
 
-아래 리트리버를 사용하면 커스텀 문서 코퍼스를 인덱싱하고 검색할 수 있습니다.
+The below retrievers allow you to index and search a custom corpus of documents.
 
-| 리트리버 | 자체 호스팅 | 클라우드 제공 | 패키지 |
+| Retriever | Self-host | Cloud offering | Package |
 |-----------|-----------|----------------|---------|
 | [`AmazonKnowledgeBasesRetriever`](/oss/python/integrations/retrievers/bedrock) | ❌ | ✅ | [`langchain-aws`](https://python.langchain.com/api_reference/aws/retrievers/langchain_aws.retrievers.bedrock.AmazonKnowledgeBasesRetriever.html) |
 | [`AzureAISearchRetriever`](/oss/python/integrations/retrievers/azure_ai_search) | ❌ | ✅ | [`langchain-community`](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.azure_ai_search.AzureAISearchRetriever.html) |
@@ -24,20 +24,20 @@ title: "리트리버"
 | [`VertexAISearchRetriever`](/oss/python/integrations/retrievers/google_vertex_ai_search) | ❌ | ✅ | [`langchain-google-community`](https://python.langchain.com/api_reference/google_community/vertex_ai_search/langchain_google_community.vertex_ai_search.VertexAISearchRetriever.html) |
 
 
-## 외부 인덱스
+## External index
 
-아래 리트리버는 외부 인덱스(예: 인터넷 데이터 등으로부터 구성된)를 검색합니다.
+The below retrievers will search over an external index (e.g., constructed from Internet data or similar).
 
-| 리트리버 | 소스 | 패키지 |
+| Retriever | Source | Package |
 |-----------|---------|---------|
-| [`ArxivRetriever`](/oss/python/integrations/retrievers/arxiv) | [arxiv.org](https://arxiv.org/)의 학술 논문 | [`langchain-community`](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.arxiv.ArxivRetriever.html) |
-| [`TavilySearchAPIRetriever`](/oss/python/integrations/retrievers/tavily) | 인터넷 검색 | [`langchain-community`](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.tavily_search_api.TavilySearchAPIRetriever.html) |
-| [`WikipediaRetriever`](/oss/python/integrations/retrievers/wikipedia) | [Wikipedia](https://www.wikipedia.org/) 문서 | [`langchain-community`](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.wikipedia.WikipediaRetriever.html) |
+| [`ArxivRetriever`](/oss/python/integrations/retrievers/arxiv) | Scholarly articles on [arxiv.org](https://arxiv.org/) | [`langchain-community`](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.arxiv.ArxivRetriever.html) |
+| [`TavilySearchAPIRetriever`](/oss/python/integrations/retrievers/tavily) | Internet search | [`langchain-community`](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.tavily_search_api.TavilySearchAPIRetriever.html) |
+| [`WikipediaRetriever`](/oss/python/integrations/retrievers/wikipedia) | [Wikipedia](https://www.wikipedia.org/) articles | [`langchain-community`](https://python.langchain.com/api_reference/community/retrievers/langchain_community.retrievers.wikipedia.WikipediaRetriever.html) |
 
 
-## 모든 리트리버
+## All retrievers
 
-> **참고:** 가독성을 위해 아래 표의 설명은 생략되었습니다.
+> **Note:** The descriptions in the table below are truncated for readability.
 
 <Columns cols={3}>
 <Card title="Activeloop Deep Memory" icon="link" href="/oss/python/integrations/retrievers/activeloop" arrow="true" cta="View guide" />

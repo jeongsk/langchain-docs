@@ -1,18 +1,18 @@
 ---
-title: 구조화된 출력
+title: Structured output
 ---
 
 
 
 
-구조화된 출력을 사용하면 에이전트가 특정하고 예측 가능한 형식으로 데이터를 반환할 수 있습니다. 자연어 응답을 파싱하는 대신, 타입이 지정된 구조화된 데이터를 얻을 수 있습니다.
+Structured output allows agents to return data in a specific, predictable format. Instead of parsing natural language responses, you get typed structured data.
 
-LangChain의 사전 구축된 ReAct 에이전트 `createAgent`는 구조화된 출력을 자동으로 처리합니다. 사용자가 원하는 구조화된 출력 스키마를 설정하면, 모델이 구조화된 데이터를 생성할 때 이를 캡처하고 검증한 후 에이전트 상태의 `structuredResponse` 키에 반환합니다.
+LangChain's prebuilt ReAct agent `createAgent` handles structured output automatically. The user sets their desired structured output schema, and when the model generates the structured data, it's captured, validated, and returned in the `structuredResponse` key of the agent's state.
 
 ```ts
 type ResponseFormat = (
-    | ZodSchema<StructuredResponseT> // Zod 스키마
-    | Record<string, unknown> // JSON 스키마
+    | ZodSchema<StructuredResponseT> // a Zod schema
+    | Record<string, unknown> // a JSON Schema
 )
 
 const agent = createAgent({
@@ -22,29 +22,29 @@ const agent = createAgent({
 ```
 
 ## Response Format
-    에이전트가 구조화된 데이터를 반환하는 방식을 제어합니다. Zod 객체 또는 JSON 스키마를 제공할 수 있습니다. 기본적으로 에이전트는 도구 호출 전략을 사용하며, 이 경우 출력은 추가 도구 호출을 통해 생성됩니다. 특정 모델은 네이티브 구조화된 출력을 지원하며, 이 경우 에이전트가 해당 전략을 사용합니다.
+    Controls how the agent returns structured data. You can provide either a Zod object or JSON schema. By default, the agent uses a tool calling strategy, in which the output is created by an additional tool call. Certain models support native structured output, in which case the agent will use that strategy instead.
 
-    `ResponseFormat`을 `toolStrategy` 또는 `providerStrategy` 함수 호출로 래핑하여 동작을 제어할 수 있습니다:
+    You can control the behavior by wrapping `ResponseFormat` in a `toolStrategy` or `providerStrategy` function call:
 
     ```ts
     import { toolStrategy, providerStrategy } from "langchain";
 
     const agent = createAgent({
-        // 모델에서 지원하는 경우 제공자 전략 사용
+        // use a provider strategy if supported by the model
         responseFormat: providerStrategy(z.object({ ... }))
-        // 또는 도구 전략 강제 사용
+        // or enforce a tool strategy
         responseFormat: toolStrategy(z.object({ ... }))
     })
     ```
 
-    구조화된 응답은 에이전트의 최종 상태에서 `structuredResponse` 키에 반환됩니다.
+    The structured response is returned in the `structuredResponse` key of the agent's final state.
 
 
 ## Provider strategy
 
-일부 모델 제공자는 API를 통해 네이티브로 구조화된 출력을 지원합니다(현재 OpenAI와 Grok만 해당). 이는 사용 가능한 경우 가장 신뢰할 수 있는 방법입니다.
+Some model providers support structured output natively through their APIs (currently only OpenAI and Grok). This is the most reliable method when available.
 
-이 전략을 사용하려면 `ProviderStrategy`를 구성하세요:
+To use this strategy, configure a `ProviderStrategy`:
 
 
 ```ts
@@ -54,12 +54,12 @@ function providerStrategy<StructuredResponseT>(
 ```
 
 <ParamField path="schema" required>
-    구조화된 출력 형식을 정의하는 스키마입니다. 지원하는 형식:
-    - **Zod 스키마**: Zod 스키마
-    - **JSON 스키마**: JSON 스키마 객체
+    The schema defining the structured output format. Supports:
+    - **Zod Schema**: A zod schema
+    - **JSON Schema**: A JSON schema object
 </ParamField>
 
-스키마 타입을 `createAgent.responseFormat`에 직접 전달하고 모델이 네이티브 구조화된 출력을 지원하는 경우, LangChain이 자동으로 `ProviderStrategy`를 사용합니다:
+LangChain automatically uses `ProviderStrategy` when you pass a schema type directly to `createAgent.responseFormat` and the model supports native structured output:
 
 <CodeGroup>
     ```ts Zod Schema
@@ -67,9 +67,9 @@ function providerStrategy<StructuredResponseT>(
     import { createAgent, providerStrategy } from "langchain";
 
     const ContactInfo = z.object({
-        name: z.string().describe("사람의 이름"),
-        email: z.string().describe("사람의 이메일 주소"),
-        phone: z.string().describe("사람의 전화번호"),
+        name: z.string().describe("The name of the person"),
+        email: z.string().describe("The email address of the person"),
+        phone: z.string().describe("The phone number of the person"),
     });
 
     const agent = createAgent({
@@ -91,11 +91,11 @@ function providerStrategy<StructuredResponseT>(
 
     const contactInfoSchema = {
         "type": "object",
-        "description": "연락처 정보입니다.",
+        "description": "Contact information for a person.",
         "properties": {
-            "name": {"type": "string", "description": "사람의 이름"},
-            "email": {"type": "string", "description": "사람의 이메일 주소"},
-            "phone": {"type": "string", "description": "사람의 전화번호"}
+            "name": {"type": "string", "description": "The name of the person"},
+            "email": {"type": "string", "description": "The email address of the person"},
+            "phone": {"type": "string", "description": "The phone number of the person"}
         },
         "required": ["name", "email", "phone"]
     }
@@ -116,19 +116,19 @@ function providerStrategy<StructuredResponseT>(
 </CodeGroup>
 
 
-제공자 네이티브 구조화된 출력은 모델 제공자가 스키마를 강제하기 때문에 높은 신뢰성과 엄격한 검증을 제공합니다. 사용 가능한 경우 이를 사용하세요.
+Provider-native structured output provides high reliability and strict validation because the model provider enforces the schema. Use it when available.
 
 
 <Note>
-    제공자가 선택한 모델에 대해 네이티브로 구조화된 출력을 지원하는 경우, `responseFormat: contactInfoSchema` 대신 `responseFormat: toolStrategy(contactInfoSchema)`로 작성하는 것과 기능적으로 동일합니다. 두 경우 모두 구조화된 출력이 지원되지 않으면 에이전트가 도구 호출 전략으로 폴백합니다.
+    If the provider natively supports structured output for your model choice, it is functionally equivalent to write `responseFormat: contactInfoSchema` instead of `responseFormat: toolStrategy(contactInfoSchema)`. In either case, if structured output is not supported, the agent will fall back to a tool calling strategy.
 </Note>
 
 
 ## Tool calling strategy
 
-네이티브 구조화된 출력을 지원하지 않는 모델의 경우, LangChain은 도구 호출을 사용하여 동일한 결과를 달성합니다. 이는 도구 호출을 지원하는 모든 모델에서 작동하며, 대부분의 최신 모델이 이에 해당합니다.
+For models that don't support native structured output, LangChain uses tool calling to achieve the same result. This works with all models that support tool calling, which is most modern models.
 
-이 전략을 사용하려면 `ToolStrategy`를 구성하세요:
+To use this strategy, configure a `ToolStrategy`:
 
 
 ```ts
@@ -142,22 +142,22 @@ function toolStrategy<StructuredResponseT>(
 ```
 
 <ParamField path="schema" required>
-    구조화된 출력 형식을 정의하는 스키마입니다. 지원하는 형식:
-    - **Zod 스키마**: Zod 스키마
-    - **JSON 스키마**: JSON 스키마 객체
+    The schema defining the structured output format. Supports:
+    - **Zod Schema**: A zod schema
+    - **JSON Schema**: A JSON schema object
 </ParamField>
 
 <ParamField path="options.toolMessageContent">
-    구조화된 출력이 생성될 때 반환되는 도구 메시지의 커스텀 콘텐츠입니다.
-    제공되지 않으면 구조화된 응답 데이터를 표시하는 기본 메시지가 사용됩니다.
+    Custom content for the tool message returned when structured output is generated.
+    If not provided, defaults to a message showing the structured response data.
 </ParamField>
 
 <ParamField path="options.handleError">
-    오류 처리 전략을 커스터마이즈하기 위한 선택적 `handleError` 매개변수를 포함하는 옵션 매개변수입니다.
+    Options parameter containing an optional `handleError` parameter for customizing the error handling strategy.
 
-    - **`true`**: 기본 오류 템플릿으로 모든 오류 처리 (기본값)
-    - **`False`**: 재시도 없이 예외를 전파
-    - **`(error: ToolStrategyError) => string | Promise<string>`**: 제공된 메시지로 재시도하거나 오류를 throw
+    - **`true`**: Catch all errors with default error template (default)
+    - **`False`**: No retry, let exceptions propagate
+    - **`(error: ToolStrategyError) => string | Promise<string>`**: retry with the provided message or throw the error
 </ParamField>
 
 <CodeGroup>
@@ -168,7 +168,7 @@ function toolStrategy<StructuredResponseT>(
     const ProductReview = z.object({
         rating: z.number().min(1).max(5).optional(),
         sentiment: z.enum(["positive", "negative"]),
-        keyPoints: z.array(z.string()).describe("리뷰의 핵심 포인트. 소문자, 각 1-3 단어."),
+        keyPoints: z.array(z.string()).describe("The key points of the review. Lowercase, 1-3 words each."),
     });
 
     const agent = createAgent({
@@ -190,23 +190,23 @@ function toolStrategy<StructuredResponseT>(
 
     const productReviewSchema = {
         "type": "object",
-        "description": "제품 리뷰 분석입니다.",
+        "description": "Analysis of a product review.",
         "properties": {
             "rating": {
                 "type": ["integer", "null"],
-                "description": "제품 평점 (1-5)",
+                "description": "The rating of the product (1-5)",
                 "minimum": 1,
                 "maximum": 5
             },
             "sentiment": {
                 "type": "string",
                 "enum": ["positive", "negative"],
-                "description": "리뷰의 감성"
+                "description": "The sentiment of the review"
             },
             "key_points": {
                 "type": "array",
                 "items": {"type": "string"},
-                "description": "리뷰의 핵심 포인트"
+                "description": "The key points of the review"
             }
         },
         "required": ["sentiment", "key_points"]
@@ -233,13 +233,13 @@ function toolStrategy<StructuredResponseT>(
     const ProductReview = z.object({
         rating: z.number().min(1).max(5).optional(),
         sentiment: z.enum(["positive", "negative"]),
-        keyPoints: z.array(z.string()).describe("리뷰의 핵심 포인트. 소문자, 각 1-3 단어."),
+        keyPoints: z.array(z.string()).describe("The key points of the review. Lowercase, 1-3 words each."),
     });
 
     const CustomerComplaint = z.object({
         issueType: z.enum(["product", "service", "shipping", "billing"]),
         severity: z.enum(["low", "medium", "high"]),
-        description: z.string().describe("불만에 대한 간단한 설명"),
+        description: z.string().describe("Brief description of the complaint"),
     });
 
     const agent = createAgent({
@@ -259,23 +259,23 @@ function toolStrategy<StructuredResponseT>(
 
 ### Custom tool message content
 
-`toolMessageContent` 매개변수를 사용하면 구조화된 출력이 생성될 때 대화 기록에 나타나는 메시지를 커스터마이즈할 수 있습니다:
+The `toolMessageContent` parameter allows you to customize the message that appears in the conversation history when structured output is generated:
 
 ```ts
 import * as z from "zod";
 import { createAgent, toolStrategy } from "langchain";
 
 const MeetingAction = z.object({
-    task: z.string().describe("완료해야 할 구체적인 작업"),
-    assignee: z.string().describe("작업 담당자"),
-    priority: z.enum(["low", "medium", "high"]).describe("우선순위 레벨"),
+    task: z.string().describe("The specific task to be completed"),
+    assignee: z.string().describe("Person responsible for the task"),
+    priority: z.enum(["low", "medium", "high"]).describe("Priority level"),
 });
 
 const agent = createAgent({
     model: "openai:gpt-5",
     tools: [],
     responseFormat: toolStrategy(MeetingAction, {
-        toolMessageContent: "액션 아이템이 캡처되어 회의록에 추가되었습니다!"
+        toolMessageContent: "Action item captured and added to meeting notes!"
     })
 });
 
@@ -288,15 +288,15 @@ console.log(result);
  * {
  *   messages: [
  *     { role: "user", content: "From our meeting: Sarah needs to update the project timeline as soon as possible" },
- *     { role: "assistant", content: "액션 아이템이 캡처되어 회의록에 추가되었습니다!", tool_calls: [ { name: "MeetingAction", args: { task: "update the project timeline", assignee: "Sarah", priority: "high" }, id: "call_456" } ] },
- *     { role: "tool", content: "액션 아이템이 캡처되어 회의록에 추가되었습니다!", tool_call_id: "call_456", name: "MeetingAction" }
+ *     { role: "assistant", content: "Action item captured and added to meeting notes!", tool_calls: [ { name: "MeetingAction", args: { task: "update the project timeline", assignee: "Sarah", priority: "high" }, id: "call_456" } ] },
+ *     { role: "tool", content: "Action item captured and added to meeting notes!", tool_call_id: "call_456", name: "MeetingAction" }
  *   ],
  *   structuredResponse: { task: "update the project timeline", assignee: "Sarah", priority: "high" }
  * }
  */
 ```
 
-`toolMessageContent` 없이는 다음과 같이 표시됩니다:
+Without `toolMessageContent`, we'd see:
 
 ```ts
 # console.log(result);
@@ -314,11 +314,11 @@ console.log(result);
 
 ### Error handling
 
-모델은 도구 호출을 통해 구조화된 출력을 생성할 때 실수를 할 수 있습니다. LangChain은 이러한 오류를 자동으로 처리하기 위한 지능형 재시도 메커니즘을 제공합니다.
+Models can make mistakes when generating structured output via tool calling. LangChain provides intelligent retry mechanisms to handle these errors automatically.
 
 #### Multiple structured outputs error
 
-모델이 여러 구조화된 출력 도구를 잘못 호출하면, 에이전트는 @[`ToolMessage`]에 오류 피드백을 제공하고 모델에 재시도를 요청합니다:
+When a model incorrectly calls multiple structured output tools, the agent provides error feedback in a @[`ToolMessage`] and prompts the model to retry:
 
 
 ```ts
@@ -326,13 +326,13 @@ import * as z from "zod";
 import { createAgent, toolStrategy } from "langchain";
 
 const ContactInfo = z.object({
-    name: z.string().describe("사람의 이름"),
-    email: z.string().describe("이메일 주소"),
+    name: z.string().describe("Person's name"),
+    email: z.string().describe("Email address"),
 });
 
 const EventDetails = z.object({
-    event_name: z.string().describe("이벤트 이름"),
-    date: z.string().describe("이벤트 날짜"),
+    event_name: z.string().describe("Name of the event"),
+    date: z.string().describe("Event date"),
 });
 
 const agent = createAgent({
@@ -371,7 +371,7 @@ console.log(result);
 
 #### Schema validation error
 
-구조화된 출력이 예상 스키마와 일치하지 않으면, 에이전트가 구체적인 오류 피드백을 제공합니다:
+When structured output doesn't match the expected schema, the agent provides specific error feedback:
 
 
 ```ts
@@ -379,8 +379,8 @@ import * as z from "zod";
 import { createAgent, toolStrategy } from "langchain";
 
 const ProductRating = z.object({
-    rating: z.number().min(1).max(5).describe("1-5 사이의 평점"),
-    comment: z.string().describe("리뷰 코멘트"),
+    rating: z.number().min(1).max(5).describe("Rating from 1-5"),
+    comment: z.string().describe("Review comment"),
 });
 
 const agent = createAgent({
@@ -416,54 +416,54 @@ console.log(result);
 
 #### Error handling strategies
 
-`handleErrors` 매개변수를 사용하여 오류 처리 방식을 커스터마이즈할 수 있습니다:
+You can customize how errors are handled using the `handleErrors` parameter:
 
-**커스텀 오류 메시지:**
+**Custom error message:**
 ```ts
 const responseFormat = toolStrategy(ProductRating, {
-    handleError: "1-5 사이의 유효한 평점과 코멘트를 제공해주세요."
+    handleError: "Please provide a valid rating between 1-5 and include a comment."
 )
 
-// 오류 메시지는 다음과 같이 표시됩니다:
-// { role: "tool", content: "1-5 사이의 유효한 평점과 코멘트를 제공해주세요." }
+// Error message becomes:
+// { role: "tool", content: "Please provide a valid rating between 1-5 and include a comment." }
 ```
 
-**특정 예외만 처리:**
+**Handle specific exceptions only:**
 ```ts
 import { ToolInputParsingException } from "@langchain/core/tools";
 
 const responseFormat = toolStrategy(ProductRating, {
     handleError: (error: ToolStrategyError) => {
         if (error instanceof ToolInputParsingException) {
-        return "1-5 사이의 유효한 평점과 코멘트를 제공해주세요.";
+        return "Please provide a valid rating between 1-5 and include a comment.";
         }
         return error.message;
     }
 )
 
-// 검증 오류만 기본 메시지로 재시도됩니다:
+// Only validation errors get retried with default message:
 // { role: "tool", content: "Error: Failed to parse structured output for tool 'ProductRating': ...\n Please fix your mistakes." }
 ```
 
-**여러 예외 타입 처리:**
+**Handle multiple exception types:**
 ```ts
 const responseFormat = toolStrategy(ProductRating, {
     handleError: (error: ToolStrategyError) => {
         if (error instanceof ToolInputParsingException) {
-        return "1-5 사이의 유효한 평점과 코멘트를 제공해주세요.";
+        return "Please provide a valid rating between 1-5 and include a comment.";
         }
         if (error instanceof CustomUserError) {
-        return "커스텀 사용자 오류입니다.";
+        return "This is a custom user error.";
         }
         return error.message;
     }
 )
 ```
 
-**오류 처리 없음:**
+**No error handling:**
 ```ts
 const responseFormat = toolStrategy(ProductRating, {
-    handleError: false  // 모든 오류 발생
+    handleError: false  // All errors raised
 )
 ```
 

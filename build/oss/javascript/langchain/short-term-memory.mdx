@@ -1,37 +1,37 @@
 ---
-title: 단기 메모리
+title: Short-term memory
 ---
 
 
 
-## 개요
+## Overview
 
-메모리는 이전 상호작용에 대한 정보를 기억하는 시스템입니다. AI 에이전트에게 메모리는 이전 상호작용을 기억하고, 피드백으로부터 학습하며, 사용자 선호도에 적응할 수 있게 해주기 때문에 매우 중요합니다. 에이전트가 수많은 사용자 상호작용을 포함하는 더 복잡한 작업을 처리할수록, 이 기능은 효율성과 사용자 만족도 모두에 필수적이 됩니다.
+Memory is a system that remembers information about previous interactions. For AI agents, memory is crucial because it lets them remember previous interactions, learn from feedback, and adapt to user preferences. As agents tackle more complex tasks with numerous user interactions, this capability becomes essential for both efficiency and user satisfaction.
 
-단기 메모리는 애플리케이션이 단일 스레드 또는 대화 내에서 이전 상호작용을 기억할 수 있게 해줍니다.
+Short term memory lets your application remember previous interactions within a single thread or conversation.
 
 <Note>
-    스레드는 이메일이 하나의 대화에서 메시지를 그룹화하는 것과 유사하게, 세션 내의 여러 상호작용을 조직화합니다.
+    A thread organizes multiple interactions in a session, similar to the way email groups messages in a single conversation.
 </Note>
 
-대화 기록은 단기 메모리의 가장 일반적인 형태입니다. 긴 대화는 오늘날의 LLM에 도전 과제를 제기합니다. 전체 기록이 LLM의 컨텍스트 윈도우 안에 들어가지 않을 수 있으며, 이는 컨텍스트 손실이나 오류를 초래합니다.
+Conversation history is the most common form of short-term memory. Long conversations pose a challenge to today's LLMs; a full history may not fit inside an LLM's context window, resulting in an context loss or errors.
 
-모델이 전체 컨텍스트 길이를 지원하더라도, 대부분의 LLM은 여전히 긴 컨텍스트에서 성능이 떨어집니다. 오래되거나 주제에서 벗어난 콘텐츠에 "산만해지며", 동시에 느린 응답 시간과 높은 비용을 겪게 됩니다.
+Even if your model supports the full context length, most LLMs still perform poorly over long contexts. They get "distracted" by stale or off-topic content, all while suffering from slower response times and higher costs.
 
-채팅 모델은 [메시지](/oss/javascript/langchain/messages)를 사용하여 컨텍스트를 받아들이며, 여기에는 지시사항(시스템 메시지)과 입력(사람 메시지)이 포함됩니다. 채팅 애플리케이션에서 메시지는 사람 입력과 모델 응답 사이를 번갈아가며, 시간이 지남에 따라 점점 더 길어지는 메시지 목록을 생성합니다. 컨텍스트 윈도우가 제한적이기 때문에, 많은 애플리케이션이 오래된 정보를 제거하거나 "잊는" 기법을 사용함으로써 이점을 얻을 수 있습니다.
+Chat models accept context using [messages](/oss/javascript/langchain/messages), which include instructions (a system message) and inputs (human messages). In chat applications, messages alternate between human inputs and model responses, resulting in a list of messages that grows longer over time. Because context windows are limited, many applications can benefit from using techniques to remove or "forget" stale information.
 
-## 사용법
+## Usage
 
-에이전트에 단기 메모리(스레드 수준 지속성)를 추가하려면, 에이전트를 생성할 때 `checkpointer`를 지정해야 합니다.
+To add short-term memory (thread-level persistence) to an agent, you need to specify a `checkpointer` when creating an agent.
 
 <Info>
-    LangChain의 에이전트는 단기 메모리를 에이전트 상태의 일부로 관리합니다.
+    LangChain's agent manages short-term memory as a part of your agent's state.
 
-    이를 그래프의 상태에 저장함으로써, 에이전트는 서로 다른 스레드 간의 분리를 유지하면서 주어진 대화에 대한 전체 컨텍스트에 액세스할 수 있습니다.
+    By storing these in the graph's state, the agent can access the full context for a given conversation while maintaining separation between different threads.
 
-    상태는 checkpointer를 사용하여 데이터베이스(또는 메모리)에 지속되므로, 스레드를 언제든지 재개할 수 있습니다.
+    State is persisted to a database (or memory) using a checkpointer so the thread can be resumed at any time.
 
-    단기 메모리는 에이전트가 호출되거나 단계(도구 호출 등)가 완료될 때 업데이트되며, 각 단계의 시작 시 상태를 읽습니다.
+    Short-term memory updates when the agent is invoked or a step (like a tool call) is completed, and the state is read at the start of each step.
 </Info>
 
 
@@ -54,9 +54,9 @@ await agent.invoke(
 ```
 
 
-### 프로덕션 환경
+### In production
 
-프로덕션 환경에서는 데이터베이스로 백업되는 checkpointer를 사용하세요:
+In production, use a checkpointer backed by a database:
 
 
 
@@ -69,11 +69,11 @@ const checkpointer = PostgresSaver.fromConnString(DB_URI);
 
 
 
-## 에이전트 메모리 커스터마이징
+## Customizing agent memory
 
-기본적으로 에이전트는 @[`AgentState`]를 사용하여 단기 메모리를 관리하며, 특히 `messages` 키를 통해 대화 기록을 관리합니다.
+By default, agents use @[`AgentState`] to manage short term memory, specifically the conversation history via a `messages` key.
 
-@[`AgentState`]를 확장하여 추가 필드를 추가할 수 있습니다. 커스텀 상태 스키마는 @[`state_schema`] 파라미터를 사용하여 @[`create_agent`]에 전달됩니다.
+You can extend @[`AgentState`] to add additional fields. Custom state schemas are passed to @[`create_agent`] using the @[`state_schema`] parameter.
 
 
 ```typescript
@@ -82,7 +82,7 @@ import { createAgent, createMiddleware } from "langchain";
 import { MessagesZodState, MemorySaver } from "@langchain/langgraph";
 
 const customStateSchema = z.object({  // [!code highlight]
-    messages: MessagesZodState.shape.messages,  # [!code highlight]
+    messages: MessagesZodState.shape.messages,  // [!code highlight]
     userId: z.string(),  // [!code highlight]
     preferences: z.record(z.string(), z.any()),  // [!code highlight]
 });  // [!code highlight]
@@ -109,38 +109,38 @@ const result = await agent.invoke({
 ```
 
 
-## 일반적인 패턴
+## Common patterns
 
-[단기 메모리](#add-short-term-memory)가 활성화되면, 긴 대화가 LLM의 컨텍스트 윈도우를 초과할 수 있습니다. 일반적인 해결책은 다음과 같습니다:
+With [short-term memory](#add-short-term-memory) enabled, long conversations can exceed the LLM's context window. Common solutions are:
 
 <CardGroup cols={2}>
-    <Card title="메시지 트리밍" icon="scissors" href="#trim-messages" arrow>
-        처음 또는 마지막 N개의 메시지 제거 (LLM 호출 전)
+    <Card title="Trim messages" icon="scissors" href="#trim-messages" arrow>
+        Remove first or last N messages (before calling LLM)
     </Card>
-    <Card title="메시지 삭제" icon="trash" href="#delete-messages" arrow>
-        LangGraph 상태에서 메시지를 영구적으로 삭제
+    <Card title="Delete messages" icon="trash" href="#delete-messages" arrow>
+        Delete messages from LangGraph state permanently
     </Card>
-    <Card title="메시지 요약" icon="layer-group" href="#summarize-messages" arrow>
-        기록의 이전 메시지를 요약하여 요약본으로 대체
+    <Card title="Summarize messages" icon="layer-group" href="#summarize-messages" arrow>
+        Summarize earlier messages in the history and replace them with a summary
     </Card>
-    <Card title="커스텀 전략" icon="gears">
-        커스텀 전략 (예: 메시지 필터링 등)
+    <Card title="Custom strategies" icon="gears">
+        Custom strategies (e.g., message filtering, etc.)
     </Card>
 </CardGroup>
 
-이를 통해 에이전트는 LLM의 컨텍스트 윈도우를 초과하지 않으면서 대화를 추적할 수 있습니다.
+This allows the agent to keep track of the conversation without exceeding the LLM's context window.
 
-### 메시지 트리밍
+### Trim messages
 
-대부분의 LLM은 최대 지원 컨텍스트 윈도우(토큰 단위로 표시)를 가지고 있습니다.
-
-
-메시지를 언제 자를지 결정하는 한 가지 방법은 메시지 기록의 토큰을 세고 그 한계에 근접할 때마다 잘라내는 것입니다. LangChain을 사용하는 경우, trim messages 유틸리티를 사용하여 목록에서 유지할 토큰 수와 경계를 처리하는 데 사용할 `strategy`(예: 마지막 `maxTokens` 유지)를 지정할 수 있습니다.
+Most LLMs have a maximum supported context window (denominated in tokens).
 
 
+One way to decide when to truncate messages is to count the tokens in the message history and truncate whenever it approaches that limit. If you're using LangChain, you can use the trim messages utility and specify the number of tokens to keep from the list, as well as the `strategy` (e.g., keep the last `maxTokens`) to use for handling the boundary.
 
 
-에이전트에서 메시지 기록을 트리밍하려면, [`trimMessages`](https://js.langchain.com/docs/how_to/trim_messages/) 함수와 함께 `stateModifier`를 사용하세요:
+
+
+To trim message history in an agent, use `stateModifier` with the [`trimMessages`](https://js.langchain.com/docs/how_to/trim_messages/) function:
 
 ```typescript
 import {
@@ -173,17 +173,17 @@ const agent = createAgent({
 ```
 
 
-### 메시지 삭제
+### Delete messages
 
-메시지 기록을 관리하기 위해 그래프 상태에서 메시지를 삭제할 수 있습니다.
+You can delete messages from the graph state to manage the message history.
 
-이는 특정 메시지를 제거하거나 전체 메시지 기록을 지우려는 경우에 유용합니다.
+This is useful when you want to remove specific messages or clear the entire message history.
 
 
 
-그래프 상태에서 메시지를 삭제하려면, `RemoveMessage`를 사용할 수 있습니다. `RemoveMessage`가 작동하려면, `MessagesZodState`와 같이 [`messagesStateReducer`](https://langchain-ai.github.io/langgraphjs/reference/functions/langgraph.messagesStateReducer.html) [리듀서](/oss/javascript/langgraph/graph-api#reducers)가 있는 상태 키를 사용해야 합니다.
+To delete messages from the graph state, you can use the `RemoveMessage`. For `RemoveMessage` to work, you need to use a state key with [`messagesStateReducer`](https://langchain-ai.github.io/langgraphjs/reference/functions/langgraph.messagesStateReducer.html) [reducer](/oss/javascript/langgraph/graph-api#reducers), like `MessagesZodState`.
 
-특정 메시지를 제거하려면:
+To remove specific messages:
 
 ```typescript
 import { RemoveMessage } from "@langchain/core/messages";
@@ -203,10 +203,10 @@ const deleteMessages = (state) => {
 
 
 <Warning>
-    메시지를 삭제할 때는, 결과 메시지 기록이 유효한지 **확인**하세요. 사용 중인 LLM 제공업체의 제한 사항을 확인하세요. 예를 들어:
+    When deleting messages, **make sure** that the resulting message history is valid. Check the limitations of the LLM provider you're using. For example:
 
-    * 일부 제공업체는 메시지 기록이 `user` 메시지로 시작하기를 기대합니다
-    * 대부분의 제공업체는 도구 호출이 있는 `assistant` 메시지 뒤에 해당하는 `tool` 결과 메시지가 와야 합니다.
+    * Some providers expect message history to start with a `user` message
+    * Most providers require `assistant` messages with tool calls to be followed by corresponding `tool` result messages.
 </Warning>
 
 
@@ -275,16 +275,16 @@ for await (const event of streamB) {
 ```
 
 
-### 메시지 요약
+### Summarize messages
 
-위에서 보여준 것처럼 메시지를 트리밍하거나 제거하는 문제점은 메시지 큐를 제거함으로써 정보를 잃을 수 있다는 것입니다.
-이 때문에, 일부 애플리케이션은 채팅 모델을 사용하여 메시지 기록을 요약하는 보다 정교한 접근 방식의 이점을 얻습니다.
+The problem with trimming or removing messages, as shown above, is that you may lose information from culling of the message queue.
+Because of this, some applications benefit from a more sophisticated approach of summarizing the message history using a chat model.
 
 ![](/oss/images/summary.png)
 
 
 
-에이전트에서 메시지 기록을 요약하려면, 내장된 [`summarizationMiddleware`](/oss/javascript/langchain/middleware#summarization)를 사용하세요:
+To summarize message history in an agent, use the built-in [`summarizationMiddleware`](/oss/javascript/langchain/middleware#summarization):
 
 ```typescript
 import { createAgent, summarizationMiddleware } from "langchain";
@@ -315,20 +315,20 @@ console.log(finalResponse.messages.at(-1)?.content);
 // Your name is Bob!
 ```
 
-추가 구성 옵션은 [`summarizationMiddleware`](/oss/javascript/langchain/middleware#summarization)를 참조하세요.
+See [`summarizationMiddleware`](/oss/javascript/langchain/middleware#summarization) for more configuration options.
 
 
-## 메모리 액세스
+## Access memory
 
-에이전트의 단기 메모리(상태)에 여러 방법으로 액세스하고 수정할 수 있습니다:
+You can access and modify the short-term memory (state) of an agent in several ways:
 
-### 도구
+### Tools
 
-#### 도구에서 단기 메모리 읽기
+#### Read short-term memory in a tool
 
-`ToolRuntime` 파라미터를 사용하여 도구에서 단기 메모리(상태)에 액세스합니다.
+Access short term memory (state) in a tool using the `ToolRuntime` parameter.
 
-`tool_runtime` 파라미터는 도구 시그니처에서 숨겨져 있지만(모델이 보지 못함), 도구는 이를 통해 상태에 액세스할 수 있습니다.
+The `tool_runtime` parameter is hidden from the tool signature (so the model doesn't see it), but the tool can access the state through it.
 
 
 ```typescript
@@ -373,11 +373,11 @@ console.log(result.messages.at(-1)?.content);
 ```
 
 
-#### 도구에서 단기 메모리 쓰기
+#### Write short-term memory from tools
 
-실행 중에 에이전트의 단기 메모리(상태)를 수정하려면, 도구에서 직접 상태 업데이트를 반환할 수 있습니다.
+To modify the agent's short-term memory (state) during execution, you can return state updates directly from the tools.
 
-이는 중간 결과를 지속하거나 정보를 후속 도구나 프롬프트에서 액세스할 수 있게 만드는 데 유용합니다.
+This is useful for persisting intermediate results or making information accessible to subsequent tools or prompts.
 
 
 
@@ -441,9 +441,9 @@ await agent.invoke(
 ```
 
 
-### 프롬프트
+### Prompt
 
-미들웨어에서 단기 메모리(상태)에 액세스하여 대화 기록이나 커스텀 상태 필드를 기반으로 동적 프롬프트를 생성합니다.
+Access short term memory (state) in middleware to create dynamic prompts based on conversation history or custom state fields.
 
 
 ```typescript
@@ -528,7 +528,7 @@ for (const message of result.messages) {
 
 ### Before model
 
-@[`@before_model`] 미들웨어에서 단기 메모리(상태)에 액세스하여 모델 호출 전에 메시지를 처리합니다.
+Access short term memory (state) in @[`@before_model`] middleware to process messages before model calls.
 
 
 ```mermaid
@@ -586,7 +586,7 @@ const agent = createAgent({
 
 ### After model
 
-@[`@after_model`] 미들웨어에서 단기 메모리(상태)에 액세스하여 모델 호출 후에 메시지를 처리합니다.
+Access short term memory (state) in @[`@after_model`] middleware to process messages after model calls.
 
 ```mermaid
 %%{

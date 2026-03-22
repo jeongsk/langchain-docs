@@ -1,124 +1,124 @@
 ---
-title: 관찰성 개념
-sidebarTitle: 개념
+title: Observability concepts
+sidebarTitle: Concepts
 ---
 
-이 페이지는 LangSmith에 추적을 로깅할 때 이해해야 할 핵심 개념들을 다룹니다.
+This page covers key concepts that are important to understand when logging traces to LangSmith.
 
-[_추적(trace)_](#traces)은 애플리케이션이 입력을 받아 중간 처리를 거쳐 최종 출력을 생성하기까지의 일련의 단계들을 기록합니다. 추적 내의 각 단계는 [_실행(run)_](#runs)으로 표현됩니다. 여러 추적들은 [_프로젝트(project)_](#projects) 내에 그룹화되며, 다중 턴 대화의 추적들은 [_스레드(thread)_](#threads)로 연결될 수 있습니다.
+A [_trace_](#traces) records the sequence of steps your application takes—from receiving an input, through intermediate processing, to producing a final output. Each step within a trace is represented by a [_run_](#runs). Multiple traces are grouped together within a [_project_](#projects), and traces from multi-turn conversations can be linked together as a [_thread_](#threads).
 
-다음 다이어그램은 인덱스에서 문서를 검색하고 답변을 생성하는 간단한 RAG 앱의 맥락에서 이러한 개념들을 보여줍니다.
+The following diagram displays these concepts in the context of a simple RAG app, which retrieves documents from an index and generates an answer.
 
 <div style={{ textAlign: 'center' }}>
 <img
     className="block dark:hidden"
     src="/langsmith/images/primitives.png"
-    alt="질문 답변 RAG 앱의 맥락에서 LangSmith 프로젝트, 추적, 실행의 기본 요소."
+    alt="Primitives of LangSmith Project, Trace, Run in the context of a question and answer RAG app."
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/primitives-dark.png"
-    alt="질문 답변 RAG 앱의 맥락에서 LangSmith 프로젝트, 추적, 실행의 기본 요소."
+    alt="Primitives of LangSmith Project, Trace, Run in the context of a question and answer RAG app."
 />
 </div>
 
-## 실행(Runs)
+## Runs
 
-_실행(run)_ 은 LLM 애플리케이션 내에서 단일 작업 단위 또는 작업을 나타내는 스팬입니다. 이는 LLM이나 체인에 대한 단일 호출부터 프롬프트 포맷팅 호출, 실행 가능한 람다 호출까지 무엇이든 될 수 있습니다. [OpenTelemetry](https://opentelemetry.io/)에 익숙하시다면, 실행을 스팬으로 생각하실 수 있습니다.
+A _run_ is a span representing a single unit of work or operation within your LLM application. This could be anything from a single call to an LLM or chain, to a prompt formatting call, to a runnable lambda invocation. If you are familiar with [OpenTelemetry](https://opentelemetry.io/), you can think of a run as a span.
 
 ![Run](/langsmith/images/run.png)
 
-## 추적(Traces)
+## Traces
 
-_추적(trace)_ 은 단일 작업에 대한 실행들의 모음입니다. 예를 들어, 사용자 요청이 체인을 트리거하고, 그 체인이 LLM을 호출한 다음 출력 파서를 호출하는 등의 경우, 이 모든 실행들은 동일한 추적의 일부가 됩니다. [OpenTelemetry](https://opentelemetry.io/)에 익숙하시다면, LangSmith 추적을 스팬들의 모음으로 생각하실 수 있습니다. 실행들은 고유한 추적 ID를 통해 추적에 바인딩됩니다.
+A _trace_ is a collection of runs for a single operation. For example, if you have a user request that triggers a chain, and that chain makes a call to an LLM, then to an output parser, and so on, all of these runs would be part of the same trace. If you are familiar with [OpenTelemetry](https://opentelemetry.io/), you can think of a LangSmith trace as a collection of spans. Runs are bound to a trace by a unique trace ID.
 
 ![Trace](/langsmith/images/trace.png)
 
-## 스레드(Threads)
+## Threads
 
-_스레드(thread)_ 는 단일 대화를 나타내는 추적들의 시퀀스입니다. 많은 LLM 애플리케이션은 사용자와 LLM 애플리케이션이 다중 턴 대화를 나누는 챗봇과 같은 인터페이스를 가지고 있습니다. 대화의 각 턴은 자체 추적으로 표현되지만, 이러한 추적들은 동일한 스레드의 일부로서 함께 연결됩니다. 스레드에서 가장 최근의 추적은 가장 최신 메시지 교환입니다.
+A _thread_ is a sequence of traces representing a single conversation. Many LLM applications have a chatbot-like interface in which the user and the LLM application engage in a multi-turn conversation. Each turn in the conversation is represented as its own trace, but these traces are linked together by being part of the same thread. The most recent trace in a thread is the latest message exchange.
 
-추적들을 스레드로 그룹화하려면, 추적들을 함께 연결하는 고유 식별자 값과 함께 특수 메타데이터 키(`session_id`, `thread_id` 또는 `conversation_id`)를 전달합니다.
+To group traces into threads, you pass a special metadata key (`session_id`, `thread_id`, or `conversation_id`) with a unique identifier value that links the traces together.
 
-[스레드 구성 방법 알아보기](/langsmith/threads).
+[Learn how to configure threads](/langsmith/threads).
 
 <img
     className="block dark:hidden"
     src="/langsmith/images/thread-overview-light.png"
-    alt="다중 턴 대화에서 추적들의 시퀀스를 나타내는 스레드."
+    alt="Thread representing a sequence of traces in a multi-turn conversation."
 />
 
 <img
     className="hidden dark:block"
     src="/langsmith/images/thread-overview-dark.png"
-    alt="다중 턴 대화에서 추적들의 시퀀스를 나타내는 스레드."
+    alt="Thread representing a sequence of traces in a multi-turn conversation."
 />
 
-## 프로젝트(Projects)
+## Projects
 
-_프로젝트(project)_ 는 추적들의 모음입니다. 프로젝트는 단일 애플리케이션이나 서비스와 관련된 모든 추적들을 담는 컨테이너로 생각할 수 있습니다. 여러 개의 프로젝트를 가질 수 있으며, 각 프로젝트는 여러 개의 추적을 가질 수 있습니다.
+A _project_ is a collection of traces. You can think of a project as a container for all the traces that are related to a single application or service. You can have multiple projects, and each project can have multiple traces.
 
 ![Project](/langsmith/images/project.png)
 
-## 피드백(Feedback)
+## Feedback
 
-_피드백(feedback)_ 을 사용하면 특정 기준에 따라 개별 실행에 점수를 매길 수 있습니다. 각 피드백 항목은 피드백 태그와 피드백 점수로 구성되며, 고유한 실행 ID를 통해 실행에 바인딩됩니다. 피드백은 연속적이거나 이산적(범주형)일 수 있으며, 조직 내 다양한 실행에서 피드백 태그를 재사용할 수 있습니다.
+_Feedback_ allows you to score an individual run based on certain criteria. Each feedback entry consists of a feedback tag and feedback score, and is bound to a run by a unique run ID. Feedback can be continuous or discrete (categorical), and you can reuse feedback tags across different runs within an organization.
 
-다음과 같은 여러 방법으로 실행에 대한 피드백을 수집할 수 있습니다:
+You can collect feedback on runs in a number of ways:
 
-1. LLM 애플리케이션에서 [추적과 함께 전송](/langsmith/attach-user-feedback)합니다.
-2. 앱에서 사용자가 [인라인](/langsmith/annotate-traces-inline)으로 생성하거나 [주석 큐](/langsmith/annotation-queues)에서 생성합니다.
-3. [오프라인 평가](/langsmith/evaluate-llm-application) 중에 자동 평가자가 생성합니다.
-4. [온라인 평가자](/langsmith/online-evaluations)가 생성합니다.
+1. [Sent up along with a trace](/langsmith/attach-user-feedback) from the LLM application.
+2. Generated by a user in the app [inline](/langsmith/annotate-traces-inline) or in an [annotation queue](/langsmith/annotation-queues).
+3. Generated by an automatic evaluator during [offline evaluation](/langsmith/evaluate-llm-application).
+4. Generated by an [online evaluator](/langsmith/online-evaluations).
 
-애플리케이션에서 피드백이 저장되는 방법에 대해 자세히 알아보려면 [피드백 데이터 형식 가이드](/langsmith/feedback-data-format)를 참조하세요.
+To learn more about how feedback is stored in the application, refer to the [Feedback data format guide](/langsmith/feedback-data-format).
 
 ![Feedback](/langsmith/images/feedback.png)
 
-## 태그(Tags)
+## Tags
 
-_태그(tags)_ 는 실행에 첨부할 수 있는 문자열 모음입니다. LangSmith UI에서 태그를 사용하여 다음을 수행할 수 있습니다:
+_Tags_ are collections of strings that can be attached to runs. You can use tags to do the following in the LangSmith UI:
 
-- 더 쉬운 검색을 위해 실행을 범주화합니다.
-- 실행을 필터링합니다.
-- 분석을 위해 실행을 함께 그룹화합니다.
+- Categorize runs for easier search.
+- Filter runs.
+- Group runs together for analysis.
 
-[추적에 태그를 첨부하는 방법 알아보기](/langsmith/add-metadata-tags).
+[Learn how to attach tags to your traces](/langsmith/add-metadata-tags).
 
 ![Tags](/langsmith/images/tags.png)
 
-## 메타데이터(Metadata)
+## Metadata
 
-_메타데이터(metadata)_ 는 실행에 첨부할 수 있는 키-값 쌍의 모음입니다. 메타데이터를 사용하여 실행을 생성한 애플리케이션의 버전, 실행이 생성된 환경 또는 실행과 연결하려는 기타 정보와 같은 실행에 대한 추가 정보를 저장할 수 있습니다. 태그와 마찬가지로, 메타데이터를 사용하여 LangSmith UI에서 실행을 필터링하거나 분석을 위해 실행을 함께 그룹화할 수 있습니다.
+_Metadata_ is a collection of key-value pairs that you can attach to runs. You can use metadata to store additional information about a run, such as the version of the application that generated the run, the environment in which the run was generated, or any other information that you want to associate with a run. Similarly to tags, you can use metadata to filter runs in the LangSmith UI or group runs together for analysis.
 
-[추적에 메타데이터를 추가하는 방법 알아보기](/langsmith/add-metadata-tags).
+[Learn how to add metadata to your traces](/langsmith/add-metadata-tags).
 
 ![Metadata](/langsmith/images/metadata.png)
 
-## 데이터 저장 및 보존
+## Data storage and retention
 
-2024년 5월 22일 수요일 이후에 수집된 추적의 경우, LangSmith(SaaS)는 추적이 LangSmith 추적 데이터베이스에 삽입된 날짜와 시간으로부터 최대 400일 동안 추적 데이터를 보존합니다.
+For traces ingested on or after Wednesday, May 22, 2024, LangSmith (SaaS) retains trace data for a maximum of 400 days past the date and time the trace was inserted into the LangSmith trace database.
 
-400일이 지나면 추적은 LangSmith에서 영구적으로 삭제되며, 과거 사용량 및 비용과 같은 정확한 통계를 표시하기 위한 목적으로 제한된 양의 메타데이터만 보존됩니다.
+After 400 days, the traces are permanently deleted from LangSmith, with a limited amount of metadata retained for the purpose of showing accurate statistics, such as historic usage and cost.
 
 <Note>
-데이터 보존 기간보다 더 오래 추적 데이터를 보관하려면, 데이터셋에 추가할 수 있습니다. [데이터셋](/langsmith/manage-datasets)을 사용하면 추적 입력 및 출력(예: 키-값 데이터셋)을 저장할 수 있으며, 추적이 삭제된 후에도 무기한 유지됩니다.
+If you wish to keep tracing data longer than the data retention period, you can add it to a dataset. A [dataset](/langsmith/manage-datasets) allows you to store the trace inputs and outputs (e.g., as a key-value dataset), and will persist indefinitely, even after the trace gets deleted.
 </Note>
 
-## LangSmith에서 추적 삭제하기
+## Deleting traces from LangSmith
 
-만료 날짜 이전에 LangSmith에서 추적을 제거해야 하는 경우, 추적이 포함된 프로젝트를 삭제하여 제거할 수 있습니다.
+If you need to remove a trace from LangSmith before its expiration date, you can do so by deleting the project that contains it.
 
-다음 방법 중 하나로 프로젝트를 삭제할 수 있습니다:
+You can delete a project with one of the following ways:
 
-- [LangSmith UI](https://smith.langchain.com)에서 프로젝트의 오버플로 메뉴에 있는 **Delete** 옵션을 선택합니다.
-- [`delete_tracer_sessions`](https://api.smith.langchain.com/redoc#tag/tracer-sessions/operation/delete_tracer_session_api_v1_sessions__session_id__delete) API 엔드포인트를 사용합니다.
-- LangSmith SDK의 `delete_project()` ([Python](/langsmith/smith-python-sdk)) 또는 `deleteProject()` ([JS/TS](/langsmith/smith-js-ts-sdk))를 사용합니다.
+- In the [LangSmith UI](https://smith.langchain.com), select the **Delete** option on the project's overflow menu.
+- With the [`delete_tracer_sessions`](https://api.smith.langchain.com/redoc#tag/tracer-sessions/operation/delete_tracer_session_api_v1_sessions__session_id__delete) API endpoint
+- With the `delete_project()` ([Python](/langsmith/smith-python-sdk)) or `deleteProject()` ([JS/TS](/langsmith/smith-js-ts-sdk)) in the LangSmith SDK.
 
-LangSmith는 개별 추적의 셀프 서비스 삭제를 지원하지 않습니다.
+LangSmith does not support self-service deletion of individual traces.
 
-만료 날짜 이전에 LangSmith 프로젝트에서 단일 추적(또는 추적 세트)을 삭제해야 하는 경우, 계정 소유자는 조직 ID와 추적 ID를 가지고 [LangSmith 지원팀](mailto:support@langchain.dev)에 문의해야 합니다.
+If you have a need to delete a single trace (or set of traces) from LangSmith project before its expiration date, the account owner should reach out to [LangSmith Support](mailto:support@langchain.dev) with the organization ID and trace IDs.
 
 ---
 

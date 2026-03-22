@@ -1,13 +1,13 @@
 ---
-title: Agent Auth 설정 (베타)
-description: Agent Auth를 사용하여 OAuth 2.0 자격 증명으로 에이전트에서 모든 시스템에 안전하게 액세스할 수 있습니다.
+title: Set up Agent Auth (Beta)
+description: Enable secure access from agents to any system using OAuth 2.0 credentials with Agent Auth.
 ---
 
-<Note>Agent Auth는 **베타** 버전이며 활발히 개발 중입니다. 피드백을 제공하거나 이 기능을 사용하려면 [LangChain 팀](https://forum.langchain.com/c/help/langsmith/)에 문의하세요.</Note>
+<Note>Agent Auth is in **Beta** and under active development. To provide feedback or use this feature, reach out to the [LangChain team](https://forum.langchain.com/c/help/langsmith/).</Note>
 
-## 설치
+## Installation
 
-PyPI에서 Agent Auth 클라이언트 라이브러리를 설치합니다:
+Install the Agent Auth client library from PyPI:
 
 <CodeGroup>
 ```bash pip
@@ -20,9 +20,9 @@ uv add langchain-auth
 </CodeGroup>
 
 
-## 빠른 시작
+## Quickstart
 
-### 1. 클라이언트 초기화
+### 1. Initialize the client
 
 ```python
 from langchain_auth import Client
@@ -30,29 +30,29 @@ from langchain_auth import Client
 client = Client(api_key="your-langsmith-api-key")
 ```
 
-### 2. OAuth 공급자 설정
+### 2. Set up OAuth providers
 
-에이전트가 인증하기 전에 다음 프로세스를 사용하여 OAuth 공급자를 구성해야 합니다:
+Before agents can authenticate, you need to configure an OAuth provider using the following process:
 
-1. LangChain 플랫폼에서 사용할 OAuth 공급자의 고유 식별자를 선택합니다(예: "github-local-dev", "google-workspace-prod").
+1. Select a unique identifier for your OAuth provider to use in LangChain's platform (e.g., "github-local-dev", "google-workspace-prod").
 
-2. OAuth 공급자의 개발자 콘솔로 이동하여 새 OAuth 애플리케이션을 생성합니다.
+2. Go to your OAuth provider's developer console and create a new OAuth application.
 
-3. 다음 구조를 사용하여 LangChain의 API를 사용 가능한 콜백 URL로 설정합니다:
+3. Set LangChain's API as an available callback URL using this structure:
    ```
    https://api.host.langchain.com/v2/auth/callback/{provider_id}
    ```
-   예를 들어 provider_id가 "github-local-dev"인 경우 다음을 사용합니다:
+   For example, if your provider_id is "github-local-dev", use:
    ```
    https://api.host.langchain.com/v2/auth/callback/github-local-dev
    ```
 
-4. OAuth 앱의 자격 증명과 함께 `client.create_oauth_provider()`를 사용합니다:
+4. Use `client.create_oauth_provider()` with the credentials from your OAuth app:
 
 ```python
 new_provider = await client.create_oauth_provider(
-    provider_id="{provider_id}", # 고유한 ID를 제공합니다. 공급자와 공식적으로 연결되지 않습니다.
-    name="{provider_display_name}", # 표시 이름을 제공합니다
+    provider_id="{provider_id}", # Provide any unique ID. Not formally tied to the provider.
+    name="{provider_display_name}", # Provide any display name
     client_id="{your_client_id}",
     client_secret="{your_client_secret}",
     auth_url="{auth_url_of_your_provider}",
@@ -60,22 +60,22 @@ new_provider = await client.create_oauth_provider(
 )
 ```
 
-### 3. 에이전트에서 인증
+### 3. Authenticate from an agent
 
-클라이언트 `authenticate()` API는 미리 구성된 공급자로부터 OAuth 토큰을 가져오는 데 사용됩니다. 첫 번째 호출 시 호출자를 OAuth 2.0 인증 플로우로 안내합니다.
+The client `authenticate()` API is used to get OAuth tokens from pre-configured providers. On the first call, it takes the caller through an OAuth 2.0 auth flow.
 
-#### LangGraph 컨텍스트에서
+#### In LangGraph context
 
-기본적으로 토큰은 Assistant ID 매개변수를 사용하여 호출 에이전트로 범위가 지정됩니다.
+By default, tokens are scoped to the calling agent using the Assistant ID parameter.
 
 ```python
 auth_result = await client.authenticate(
     provider="{provider_id}",
     scopes=["scopeA"],
-    user_id="your_user_id" # 이 토큰을 사람 호출자로 범위를 지정하는 고유 식별자
+    user_id="your_user_id" # Any unique identifier to scope this token to the human caller
 )
 
-# 또는 모든 에이전트가 사용할 수 있는 토큰을 원하는 경우 agent_scoped=False로 설정합니다
+# Or if you'd like a token that can be used by any agent, set agent_scoped=False
 auth_result = await client.authenticate(
     provider="{provider_id}",
     scopes=["scopeA"],
@@ -84,27 +84,27 @@ auth_result = await client.authenticate(
 )
 ```
 
-실행 중에 인증이 필요한 경우 SDK는 [interrupt](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/add-human-in-the-loop/#pause-using-interrupt)를 발생시킵니다. 에이전트 실행이 일시 중지되고 사용자에게 OAuth URL을 표시합니다:
+During execution, if authentication is required, the SDK will throw an [interrupt](https://langchain-ai.github.io/langgraph/how-tos/human_in_the_loop/add-human-in-the-loop/#pause-using-interrupt). The agent execution pauses and presents the OAuth URL to the user:
 
 ![Studio interrupt showing OAuth URL](/images/langgraph-auth-interrupt.png)
 
-사용자가 OAuth 인증을 완료하고 공급자로부터 콜백을 받으면 인증 성공 페이지가 표시됩니다.
+After the user completes OAuth authentication and we receive the callback from the provider, they will see the auth success page.
 
 ![GitHub OAuth success page](/images/github-auth-success.png)
 
-그런 다음 에이전트는 중단된 지점부터 실행을 재개하며, 토큰은 모든 API 호출에 사용할 수 있습니다. OAuth 토큰을 저장하고 갱신하므로 사용자나 에이전트가 향후 서비스를 사용할 때 OAuth 플로우가 필요하지 않습니다.
+The agent then resumes execution from the point it left off at, and the token can be used for any API calls. We store and refresh OAuth tokens so that future uses of the service by either the user or agent do not require an OAuth flow.
 
 ```python
 token = auth_result.token
 ```
 
-#### LangGraph 컨텍스트 외부
+#### Outside LangGraph context
 
-대역 외 OAuth 플로우를 위해 사용자에게 `auth_url`을 제공합니다.
+Provide the `auth_url` to the user for out-of-band OAuth flows.
 
 
 ```python
-# 기본값: 사용자 범위 토큰(이 사용자의 모든 에이전트에서 작동)
+# Default: user-scoped token (works for any agent under this user)
 auth_result = await client.authenticate(
     provider="{provider_id}",
     scopes=["scopeA"],
@@ -112,8 +112,8 @@ auth_result = await client.authenticate(
 )
 
 if auth_result.needs_auth:
-    print(f"다음에서 OAuth를 완료하세요: {auth_result.auth_url}")
-    # 완료 대기
+    print(f"Complete OAuth at: {auth_result.auth_url}")
+    # Wait for completion
     completed_auth = await client.wait_for_completion(auth_result.auth_id)
     token = completed_auth.token
 else:

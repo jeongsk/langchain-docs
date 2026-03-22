@@ -1,166 +1,166 @@
 ---
-title: 커스텀 규칙
-description: AGENTS.md를 사용하여 프로젝트별 규칙으로 Open SWE 구성하기
+title: Custom Rules
+description: Configure Open SWE with project-specific rules using `AGENTS.md`
 ---
 
-# 커스텀 규칙
+# Custom Rules
 
-커스텀 규칙을 사용하면 저장소 루트의 마크다운 파일을 통해 Open SWE에 프로젝트별 컨텍스트와 가이드라인을 제공할 수 있습니다.
+Custom rules allow you to provide project-specific context and guidelines to Open SWE through a markdown file in your repository root.
 
-## 시작하기
+## Getting Started
 
-가장 쉬운 시작 방법은 Open SWE가 이 파일을 직접 작성하도록 하는 것입니다! Open SWE UI는 "Generate `AGENTS.md`" 빠른 작업을 제공하며, 이는 미리 정의된 프롬프트를 입력란에 삽입합니다. 이 프롬프트는 에이전트가 잘 포맷된 `AGENTS.md` 파일을 생성하도록 설계되었습니다.
+The easiest way to get started is to have Open SWE itself write this file for you! The Open SWE UI provides a "Generate `AGENTS.md`" quick action which will insert a predefined prompt into the input. This prompt has been designed to generate a well-formatted `AGENTS.md` file from the agent.
 
 ![Quick Action Generate AGENTS.md](/images/quick_action_generate_agents_md.png)
 
-## `AGENTS.md`란 무엇인가요?
+## What is `AGENTS.md`?
 
-`AGENTS.md`는 Open SWE에게 프로젝트의 다음 내용을 알려주는 마크다운 파일입니다:
+`AGENTS.md` is a markdown file that tells Open SWE about your project's:
 
-- 코딩 표준 및 컨벤션
-- 저장소 구조 및 아키텍처
-- 의존성 및 설치 절차
-- 테스팅 프레임워크 및 관행
-- Pull Request 포맷팅 요구사항
+- Coding standards and conventions
+- Repository structure and architecture
+- Dependencies and installation procedures
+- Testing frameworks and practices
+- Pull request formatting requirements
 
-## 커스텀 규칙을 사용하는 이유
+## Why Use Custom Rules?
 
-커스텀 규칙은 Open SWE가 다음을 수행하는 데 도움을 줍니다:
+Custom rules help Open SWE:
 
-- 프로젝트의 특정 컨벤션 준수
-- 코드베이스 아키텍처 이해
-- 올바른 패키지 매니저 및 도구 사용
-- 테스팅 패턴에 맞는 테스트 작성
-- 적절하게 포맷된 Pull Request 생성
+- Follow your project's specific conventions
+- Understand your codebase architecture
+- Use the correct package managers and tools
+- Write tests that match your testing patterns
+- Generate properly formatted pull requests
 
-커스텀 규칙이 없으면 Open SWE는 프로젝트와 맞지 않을 수 있는 일반적인 모범 사례를 사용합니다.
+Without custom rules, Open SWE uses generic best practices that may not align with your project.
 
-## 지원되는 섹션
+## Supported Sections
 
 ### `<general_rules>`
 
-프로젝트별 코딩 표준 및 컨벤션:
+Project-specific coding standards and conventions:
 
-- 패키지 매니저 선호도 (예: "항상 Yarn 사용")
-- 코드 스타일 요구사항
-- Import/export 패턴
-- 아키텍처 가이드라인
-- 공통 스크립트 및 실행 방법
+- Package manager preferences (e.g., "Always use Yarn")
+- Code style requirements
+- Import/export patterns
+- Architectural guidelines
+- Common scripts, and how to run them
 
-예시: "테스트를 실행하려면 `yarn test`를 실행하세요" 또는 "프로젝트를 빌드하려면 `yarn build`를 실행하세요"
+Example: "Run `yarn test` to run tests", or "Run `yarn build` to build the project"
 
 ### `<repository_structure>`
 
-코드베이스 구조에 대한 설명:
+Description of your codebase organization:
 
-- Monorepo 대 단일 패키지 구조
-- 주요 디렉토리 및 그 목적
-- 패키지 관계 및 의존성
-- 빌드 시스템 구성
+- Monorepo vs single package structure
+- Key directories and their purposes
+- Package relationships and dependencies
+- Build system configuration
 
-이 섹션에는 새 파일, 앱, 패키지 등을 어디에/어떻게 생성할지에 대한 컨텍스트를 포함하세요.
+Include context about where/how to create new files, apps, packages, etc. in this section.
 
-예시: "새 패키지를 생성할 때는 `packages` 디렉토리 안에 배치하세요."
+Example: "When creating new packages, place them inside the `packages` directory."
 
 ### `<dependencies_and_installation>`
 
-패키지 관리 및 설정 지침:
+Package management and setup instructions:
 
-- 패키지 매니저 명령어
-- 설치 절차
-- 주요 의존성 및 그 목적
-- Workspace 구성 세부사항
+- Package manager commands
+- Installation procedures
+- Key dependencies and their purposes
+- Workspace configuration details
 
-이 섹션에는 프로젝트에서 사용되는 패키지 매니저와 의존성을 설치하는 방법/위치에 대한 정보를 포함해야 합니다.
+This section should include information about the package manager(s) used in the project, and how/where to install dependencies.
 
-예시: "의존성은 항상 사용되는 특정 앱/패키지 내부에 설치하고, resolution을 추가하는 경우가 아니면 절대 루트 `package.json`에 설치하지 마세요."
+Example: "Always install dependencies inside the specific app/package where they're used, never in the root `package.json` unless adding a resolution."
 
 ### `<testing_instructions>`
 
-테스팅 프레임워크 및 관행:
+Testing framework and practices:
 
-- 테스트 러너 구성 (Jest, Vitest 등)
-- 테스트 파일 명명 규칙
-- 다양한 테스트 유형 실행 방법
-- 프로젝트의 테스팅 모범 사례 (예: 작성할 테스트 유형)
+- Test runner configuration (Jest, Vitest, etc.)
+- Test file naming conventions
+- How to run different test types
+- Testing best practices for your project (e.g. what types of tests to write)
 
-예시: "변경사항을 만든 후에는 항상 `yarn test`를 실행하세요."
+Example: "Always run `yarn test` after making changes."
 
 ### `<pull_request_formatting>`
 
-PR 생성 및 포맷팅 가이드라인:
+PR creation and formatting guidelines:
 
-- 제목 및 설명 템플릿
-- 필수 섹션 또는 체크리스트
-- 리뷰 프로세스 요구사항
-- 링크 연결 규칙
+- Title and description templates
+- Required sections or checklists
+- Review process requirements
+- Linking conventions
 
-예시: "Pull Request 본문에는 변경사항을 테스트하는 방법을 설명하는 글머리 기호가 포함된 `Testing Steps` 섹션이 있어야 합니다."
+Example: "The pull request body should include a `Testing Steps` section which includes bullet points describing how to test the changes."
 
-## 파일명
+## File Names
 
-Open SWE는 다음 파일에서 커스텀 규칙을 읽습니다 (우선순위 순):
+Open SWE reads custom rules from these files (in order of precedence):
 
-1. `AGENTS.md` (권장)
+1. `AGENTS.md` (recommended)
 2. `AGENT.md`
 3. `CLAUDE.md`
 4. `CURSOR.md`
 
 <Note>
-  프로젝트 간 일관성을 위해 `AGENTS.md`를 표준 파일명으로 사용하세요.
+  Use `AGENTS.md` as the standard filename for consistency across projects.
 </Note>
 
-## 누락된 섹션
+## Missing Sections
 
-커스텀 규칙 파일에 XML 섹션 태그가 포함되지 않은 경우, 전체 파일 내용이 커스텀 규칙 섹션 내부의 프롬프트로 전달됩니다.
+If your custom rules file doesn't include XML section tags, the entire file content will be passed to the prompt inside a custom rules section.
 
-## 포맷팅 예시
+## Formatting Example
 
-커스텀 규칙 파일에 적절한 XML 섹션 태그가 포함된 경우, 알려진 태그 내부의 내용만 시스템 프롬프트로 전달됩니다.
+If your custom rules file does include the proper XML section tags, only the content from inside the known tags will be passed to the system prompt.
 
-알려진 태그:
+Known tags:
 - `<general_rules>`
 - `<repository_structure>`
 - `<dependencies_and_installation>`
 - `<testing_instructions>`
 - `<pull_request_formatting>`
 
-각 태그는 반드시 적절한 닫는 태그를 포함해야 합니다. 태그에 닫는 태그가 누락된 경우, 전체 파일 내용이 커스텀 규칙 섹션 내부의 프롬프트로 전달됩니다.
+Each tag _must_ contain a proper closing tag. If a tag is missing a closing tag, the entire file content will be passed to the prompt inside a custom rules section.
 
-다음은 `AGENTS.md` 파일이 어떻게 보여야 하는지를 보여주는 예시입니다:
+Here is an example showing what your `AGENTS.md` file should look like:
 
 ```markdown
 <general_rules>
 
-- 항상 Yarn을 패키지 매니저로 사용
-- 엄격한 TypeScript 관행 준수
-- 코드 품질을 위해 ESLint와 Prettier 사용
+- Always use Yarn as the package manager
+- Follow strict TypeScript practices
+- Use ESLint and Prettier for code quality
   </general_rules>
 
 <repository_structure>
-이것은 세 개의 주요 패키지가 있는 Yarn workspace monorepo입니다:
+This is a Yarn workspace monorepo with three main packages:
 
-- apps/web: Next.js 프론트엔드
-- apps/api: Express 백엔드
-- packages/shared: 공통 유틸리티
+- apps/web: Next.js frontend
+- apps/api: Express backend
+- packages/shared: Common utilities
   </repository_structure>
 
 <dependencies_and_installation>
-모든 의존성을 설치하려면 저장소 루트에서 `yarn install`을 실행하세요.
-주요 의존성에는 React 18, TypeScript, 그리고 테스팅을 위한 Jest가 포함됩니다.
+Run `yarn install` from the repository root to install all dependencies.
+Key dependencies include React 18, TypeScript, and Jest for testing.
 </dependencies_and_installation>
 
 <testing_instructions>
 
-- 단위 테스트를 실행하려면 `yarn test` 실행
-- End-to-end 테스트를 실행하려면 `yarn test:e2e` 실행
-- 테스트 파일은 `.test.ts` 확장자 사용
-- React Testing Library와 함께 Jest 사용
+- Run `yarn test` for unit tests
+- Run `yarn test:e2e` for end-to-end tests
+- Test files use `.test.ts` extension
+- Use Jest with React Testing Library
   </testing_instructions>
 
 <pull_request_formatting>
-PR 제목은 "feat: 설명" 또는 "fix: 설명" 형식을 따라야 합니다.
-간단한 설명을 포함하고 관련 이슈를 링크하세요.
+PR titles should follow: "feat: description" or "fix: description"
+Include a brief description and link any related issues.
 </pull_request_formatting>
 ```
 

@@ -1,62 +1,62 @@
 ---
-title: 배포 기능을 포함한 LangSmith 자체 호스팅
-sidebarTitle: 배포 기능 포함
+title: Self-host LangSmith with deployment
+sidebarTitle: With deployment
 icon: "server"
 ---
 
-이 가이드에서는 자체 호스팅된 LangSmith 인스턴스에서 **배포 관리** 기능을 활성화하는 방법을 안내합니다. 이를 통해 [컨트롤 플레인](/langsmith/control-plane)과 [데이터 플레인](/langsmith/data-plane)이 추가되어 LangSmith UI를 통해 에이전트와 애플리케이션을 직접 배포, 확장 및 관리할 수 있습니다.
+This guide shows you how to enable **deployment management** on your self-hosted LangSmith instance. This adds a [control plane](/langsmith/control-plane) and [data plane](/langsmith/data-plane) that let you deploy, scale, and manage agents and applications directly through the LangSmith UI.
 
-<Info>**중요**<br></br> 배포 기능을 포함한 LangSmith 자체 호스팅은 [Enterprise](https://langchain.com/pricing) 플랜이 필요합니다. </Info>
+<Info>**Important**<br></br> Self-hosting LangSmith with deployment requires an [Enterprise](https://langchain.com/pricing) plan. </Info>
 
 <Note>
-**이 설정 페이지는 기존 LangSmith 인스턴스에 [배포](/langsmith/deployments) 기능을 추가하기 위한 것입니다.**
+**This setup page is for adding [deployment](/langsmith/deployments) capabilities to an existing LangSmith instance.**
 
-[자체 호스팅 옵션](/langsmith/self-hosted)을 검토하여 다음 내용을 이해하시기 바랍니다:
-- [LangSmith (관찰성)](/langsmith/self-hosted#langsmith): 먼저 설치해야 하는 항목입니다.
-- [배포 기능을 포함한 LangSmith](/langsmith/self-hosted#langsmith-with-deployment): 이 가이드에서 활성화하는 기능입니다.
-- [독립형 서버](/langsmith/self-hosted#standalone-server): UI 없이 사용할 수 있는 경량 대안입니다.
+Review the [self-hosted options](/langsmith/self-hosted) to understand:
+- [LangSmith (observability)](/langsmith/self-hosted#langsmith): What you should install first.
+- [LangSmith with deployment](/langsmith/self-hosted#langsmith-with-deployment): What this guide enables.
+- [Standalone Server](/langsmith/self-hosted#standalone-server): Lightweight alternative without the UI.
 </Note>
 
-## 개요
+## Overview
 
-이 가이드는 [Kubernetes 설치 가이드](/langsmith/kubernetes)를 기반으로 합니다. **계속 진행하기 전에 먼저 해당 가이드를 완료해야 합니다**. 이 페이지에서는 배포 기능을 활성화하는 데 필요한 추가 설정 단계를 다룹니다:
-- LangGraph 운영자 설치
-- 인그레스 구성
-- 컨트롤 플레인 연결
+This guide builds on top of the [Kubernetes installation guide](/langsmith/kubernetes). **You must complete that guide first** before continuing. This page covers the additional setup steps required to enable deployment functionality:
+- Installing the LangGraph operator
+- Configuring your ingress
+- Connecting to the control plane
 
-## 사전 요구사항
+## Prerequisites
 
-1. Kubernetes를 사용하고 있어야 합니다.
-2. [자체 호스팅 LangSmith](/langsmith/kubernetes) 인스턴스가 실행 중이어야 합니다.
-3. [LangGraph CLI](/langsmith/cli)를 사용하여 [애플리케이션을 로컬에서 테스트](/langsmith/local-server)합니다.
-4. [LangGraph CLI](/langsmith/cli)를 사용하여 Docker 이미지를 빌드(예: `langgraph build`)하고 Kubernetes 클러스터가 액세스할 수 있는 레지스트리에 푸시합니다.
-5. 클러스터에 `KEDA`가 설치되어 있어야 합니다.
+1. You are using Kubernetes.
+2. You have an instance of [self-hosted LangSmith](/langsmith/kubernetes) running.
+3. Use the [LangGraph CLI](/langsmith/cli) to [test your application locally](/langsmith/local-server).
+4. Use the [LangGraph CLI](/langsmith/cli) to build a Docker image (i.e. `langgraph build`) and push it to a registry your Kubernetes cluster has access to.
+5. `KEDA` is installed on your cluster.
 ```bash
   helm repo add kedacore https://kedacore.github.io/charts
   helm install keda kedacore/keda --namespace keda --create-namespace
 ```
-6. 인그레스 구성
-    1. LangSmith 인스턴스에 대해 인그레스, 게이트웨이를 설정하거나 Istio를 사용해야 합니다. 모든 에이전트는 이 인그레스 뒤의 Kubernetes 서비스로 배포됩니다. 인스턴스에 대한 [인그레스 설정](/langsmith/self-host-ingress) 가이드를 참조하세요.
-7. 여러 배포를 위한 충분한 여유 공간이 클러스터에 있어야 합니다. 새 노드를 자동으로 프로비저닝하기 위해 `Cluster-Autoscaler`를 사용하는 것이 권장됩니다.
-8. 클러스터에서 유효한 동적 PV 프로비저너 또는 사용 가능한 PV가 있어야 합니다. 다음 명령으로 확인할 수 있습니다:
+6. Ingress Configuration
+    1. You must set up an ingress, gateway, or use Istio for your LangSmith instance. All agents will be deployed as Kubernetes services behind this ingress. Use this guide to [set up an ingress](/langsmith/self-host-ingress) for your instance.
+7. You must have slack space in your cluster for multiple deployments. `Cluster-Autoscaler` is recommended to automatically provision new nodes.
+8. A valid Dynamic PV provisioner or PVs available on your cluster. You can verify this by running:
 ```bash
   kubectl get storageclass
 ```
-9. 네트워크에서 `https://beacon.langchain.com`으로의 이그레스가 필요합니다. 에어갭 모드로 실행하지 않는 경우 라이선스 검증 및 사용량 보고를 위해 필요합니다. 자세한 내용은 [이그레스 문서](/langsmith/self-host-egress)를 참조하세요.
+9. Egress to `https://beacon.langchain.com` from your network. This is required for license verification and usage reporting if not running in air-gapped mode. See the [Egress documentation](/langsmith/self-host-egress) for more details.
 
-## 설정
+## Setup
 
-1. 자체 호스팅 LangSmith 인스턴스 구성의 일부로 `deployment` 옵션을 활성화합니다. 이렇게 하면 몇 가지 주요 리소스가 프로비저닝됩니다.
-    1. `listener`: [컨트롤 플레인](/langsmith/control-plane)에서 배포 변경 사항을 수신하고 다운스트림 CRD를 생성/업데이트하는 서비스입니다.
-    2. `LangGraphPlatform CRD`: LangSmith 배포를 위한 CRD입니다. LangSmith 배포 인스턴스 관리를 위한 사양이 포함되어 있습니다.
-    3. `operator`: LangSmith CRD에 대한 변경 사항을 처리하는 운영자입니다.
-    4. `host-backend`: [컨트롤 플레인](/langsmith/control-plane)입니다.
+1. As part of configuring your self-hosted LangSmith instance, you enable the `deployment` option. This will provision a few key resources.
+    1. `listener`: This is a service that listens to the [control plane](/langsmith/control-plane) for changes to your deployments and creates/updates downstream CRDs.
+    2. `LangGraphPlatform CRD`: A CRD for LangSmith Deployment. This contains the spec for managing an instance of a LangSmith deployment.
+    3. `operator`: This operator handles changes to your LangSmith CRDs.
+    4. `host-backend`: This is the [control plane](/langsmith/control-plane).
 
 <Note>
-v0.12.0부터 `langgraphPlatform` 옵션은 더 이상 사용되지 않습니다. v0.12.0 이후 버전에서는 `config.deployment`를 사용하세요.
+As of v0.12.0, the `langgraphPlatform` option is deprecated. Use `config.deployment` for any version after v0.12.0.
 </Note>
 
-2. 차트에서 두 개의 추가 이미지가 사용됩니다. 최신 릴리스에 지정된 이미지를 사용하세요.
+2. Two additional images will be used by the chart. Use the images that are specified in the latest release.
 ```bash
   hostBackendImage:
     repository: "docker.io/langchain/hosted-langserve-backend"
@@ -65,19 +65,19 @@ v0.12.0부터 `langgraphPlatform` 옵션은 더 이상 사용되지 않습니다
     repository: "docker.io/langchain/langgraph-operator"
     pullPolicy: IfNotPresent
 ```
-3. langsmith 구성 파일(보통 `langsmith_config.yaml`)에서 `deployment` 옵션을 활성화합니다. 유효한 인그레스 설정도 있어야 합니다:
+3. In your config file for langsmith (usually `langsmith_config.yaml`), enable the `deployment` option. Note that you must also have a valid ingress setup:
 ```bash
   config:
     deployment:
       enabled: true
-    # v0.12.0부터 이 섹션은 더 이상 사용되지 않습니다. v0.12.0 이후 버전에서는 config.deployment를 사용하세요.
+    # As of v0.12.0, this section is deprecated. Use config.deployment for any version after v0.12.0.
     langgraphPlatform:
       enabled: true
       langgraphPlatformLicenseKey: "YOUR_LANGGRAPH_PLATFORM_LICENSE_KEY"
 ```
-4. `values.yaml` 파일에서 `hostBackendImage` 및 `operatorImage` 옵션을 구성합니다(이미지를 미러링해야 하는 경우).
-5. [여기](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/values.yaml#L898)에서 기본 템플릿을 재정의하여 에이전트에 대한 기본 템플릿을 구성할 수도 있습니다.
-6. [컨트롤 플레인 UI](/langsmith/control-plane#control-plane-ui)에서 배포를 생성합니다.
+4. In your `values.yaml` file, configure the `hostBackendImage` and `operatorImage` options (if you need to mirror images)
+5. You can also configure base templates for your agents by overriding the base templates [here](https://github.com/langchain-ai/helm/blob/main/charts/langsmith/values.yaml#L898).
+6. You create a deployment from the [control plane UI](/langsmith/control-plane#control-plane-ui).
 
 ---
 

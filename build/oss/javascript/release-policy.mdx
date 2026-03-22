@@ -1,201 +1,200 @@
 ---
-title: 릴리스 정책
-description: LangChain과 LangGraph의 릴리스 정책 및 버전 관리 방식
+title: Release policy
 ---
 
 
 
-이 페이지에서는 LangChain과 LangGraph의 릴리스 정책을 설명합니다. 아래 탭을 클릭하여 각 제품의 릴리스 정책을 확인하세요:
+This page explains the LangChain and LangGraph release policies. Click on the tabs below to view the release policies for each:
 
 <Tabs>
     <Tab title="LangChain">
 
 
-    LangChain 생태계는 여러 컴포넌트 패키지(예: `@langchain/core`, `langchain`, `@langchain/community`, 파트너 패키지 등)로 구성되어 있습니다.
+    The LangChain ecosystem is composed of different component packages (e.g., `@langchain/core`, `langchain`, `@langchain/community`, partner packages, etc.)
 
 
-    ## 릴리스 주기
+    ## Release cadence
 
 
-    LangChain 1.0 릴리스 이후, `langchain`과 `@langchain/core`의 **마이너** 릴리스(예: `1.0.x`에서 `1.1.0`으로)는 시맨틱 버저닝을 따르며 자주 릴리스될 수 있습니다. 마이너 릴리스에는 새로운 기능과 개선 사항이 포함되지만 호환성을 깨는 변경 사항은 포함되지 않습니다.
+    With the release of LangChain 1.0, **minor** releases (e.g., from `1.0.x` to `1.1.0`) of `langchain` and `@langchain/core` follow semantic versioning and may be released frequently. Minor releases contain new features and improvements but do not include breaking changes.
 
 
-    패치 버전은 버그 수정과 사소한 개선 사항을 포함하므로 주에 몇 번씩 자주 릴리스됩니다.
+    Patch versions are released frequently, up to a few times per week, as they contain bug fixes and minor improvements.
 
-    ## API 안정성
-
-
-    LLM 애플리케이션 개발은 빠르게 진화하는 분야이며, 사용자와 커뮤니티로부터 지속적으로 배우고 있습니다. 따라서 `langchain`과 `@langchain/core`의 API는 사용자의 요구 사항을 더 잘 충족하기 위해 계속 발전할 것으로 예상됩니다.
+    ## API stability
 
 
-    LangChain 1.0의 시맨틱 버저닝 도입으로:
-    - 공개 API의 호환성을 깨는 변경 사항은 메이저 버전 릴리스(예: `2.0.0`)에서만 발생합니다
-    - 마이너 버전 증가(예: `1.0.0`에서 `1.1.0`으로)는 호환성을 깨지 않고 새로운 기능을 추가합니다
-    - 패치 버전 증가(예: `1.0.0`에서 `1.0.1`로)는 버그 수정과 사소한 개선 사항을 포함합니다
-
-    일반적으로 불필요한 변경을 피하려고 노력하며, 제거되는 기능에 대해서는 지원 중단 정책을 제공합니다.
-
-    ### 다른 패키지의 안정성
-
-    LangChain 생태계의 다른 패키지들은 안정성이 다를 수 있습니다:
-
-    - **LangChain에서 유지 관리하는 파트너 패키지**(`langchain-openai`, `langchain-anthropic` 등)는 시맨틱 버저닝을 따르며 1.0 이후 안정적일 것으로 예상됩니다. 다른 파트너 패키지는 다른 안정성 및 버전 관리 정책을 따를 수 있으므로, 자세한 내용은 해당 패키지의 문서를 참조하세요.
+    The development of LLM applications is a rapidly evolving field, and we are constantly learning from our users and the community. As such, we expect that the APIs in `langchain` and `@langchain/core` will continue to evolve to better serve the needs of our users.
 
 
-    - **`@langchain/community`**는 서드파티 통합을 포함하는 커뮤니티 유지 관리 패키지입니다. 커뮤니티 기여와 서드파티 종속성의 특성상 `@langchain/community`는 `langchain` 및 `@langchain/core`와 동일한 엄격한 시맨틱 버저닝 정책을 따르지 않습니다. 자세한 내용은 장기 지원의 "특별 고려 사항" 섹션을 참조하세요.
+    With LangChain 1.0's adoption of semantic versioning:
+    - Breaking changes to the public API will only occur in major version releases (e.g., `2.0.0`)
+    - Minor version bumps (e.g., `1.0.0` to `1.1.0`) add new features without breaking changes
+    - Patch version bumps (e.g., `1.0.0` to `1.0.1`) contain bug fixes and minor improvements
+
+    We will generally try to avoid making unnecessary changes, and will provide a deprecation policy for features that are being removed.
+
+    ### Stability of other packages
+
+    The stability of other packages in the LangChain ecosystem may vary:
+
+    - **Partner packages maintained by LangChain** (such as `langchain-openai` and `langchain-anthropic`) follow semantic versioning and are expected to be stable post 1.0. Other partner packages may follow different stability and versioning policies, and users should refer to the documentation of those packages for more information.
 
 
-    ## 지원 중단 정책
-
-    더 나은 대안이 제공될 때까지 기능 지원 중단을 일반적으로 피합니다.
+    - **`@langchain/community`** is a community maintained package that contains 3rd party integrations. Due to the nature of community contributions and third-party dependencies, `@langchain/community` does not follow the same strict semantic versioning policy as `langchain` and `@langchain/core`. See the "Special considerations" section under Long-term support for more details.
 
 
-    LangChain 1.0의 시맨틱 버저닝 접근 방식에 따라, 지원 중단된 기능은 1.x 릴리스 시리즈 전체에서 계속 작동합니다. 지원 중단된 기능의 제거를 포함한 호환성을 깨는 변경 사항은 메이저 버전 릴리스(예: 2.0)에서만 발생합니다.
+    ## Deprecation policy
 
-    `langchain` 또는 `@langchain/core`에서 기능이 지원 중단되면:
-    - 코드와 문서에서 지원 중단으로 명확히 표시합니다
-    - 권장 대안으로의 마이그레이션 가이드를 제공합니다
-    - 모든 1.x 마이너 릴리스를 통해 지원 중단된 기능에 대한 보안 업데이트를 제공합니다
+    We will generally avoid deprecating features until a better alternative is available.
 
 
-    경우에 따라 유지 관리 문제를 일으키지 않는다면 지원 중단된 기능을 코드베이스에 더 오래 남겨둘 수 있으며, 이는 사용자의 부담을 더욱 줄이기 위한 것입니다.
+    With LangChain 1.0's semantic versioning approach, deprecated features will continue to work throughout the entire 1.x release series. Breaking changes, including the removal of deprecated features, will only occur in major version releases (e.g., 2.0).
 
-    ## 장기 지원(LTS)
+    When a feature is deprecated in `langchain` or `@langchain/core`, we will:
+    - Clearly mark it as deprecated in the code and documentation
+    - Provide migration guidance to the recommended alternative
+    - Provide security updates for the deprecated feature through all 1.x minor releases
 
-    LangChain은 프로덕션 애플리케이션의 안정성을 제공하기 위해 장기 지원(LTS) 정책을 따릅니다:
 
-    ### 릴리스 상태 정의
+    In some situations, we may allow deprecated features to remain in the code base even longer if they are not causing maintenance issues, to further reduce the burden on users.
 
-    패키지는 다음 상태 중 하나로 표시됩니다:
-    - **ACTIVE**: 현재 활발히 개발 중이며, 버그 수정, 보안 패치 및 새로운 기능이 포함됩니다
-    - **MAINTENANCE**: 모든 보안 패치와 중요한 버그 수정을 받지만 새로운 기능은 포함되지 않습니다
+    ## Long-term support (LTS)
 
-    ### 현재 LTS 릴리스
+    LangChain follows a long-term support (LTS) policy to provide stability for production applications:
 
-    **LangChain 1.0**은 LTS 릴리스로 지정됩니다:
-    - **상태**: 2.0 릴리스 전까지 ACTIVE
-    - **지원 기간**: 2.0이 릴리스된 후, 1.0은 최소 1년 동안 MAINTENANCE 모드로 전환됩니다
-    - **시맨틱 버저닝 준수**: 사용자는 호환성을 깨지 않고 마이너 버전(예: 1.0에서 1.1로) 간 업그레이드할 수 있습니다
+    ### Release status definitions
 
-    ### 레거시 버전 지원
+    Packages are marked with one of the following statuses:
+    - **ACTIVE**: Current active development, includes bug fixes, security patches, and new features
+    - **MAINTENANCE**: Receives all security patches and critical bug fixes, but no new features
+
+    ### Current LTS releases
+
+    **LangChain 1.0** is designated as an LTS release:
+    - **Status**: ACTIVE until the release of 2.0
+    - **Support period**: After 2.0 is released, 1.0 will enter MAINTENANCE mode for at least 1 year
+    - **Semver compliance**: Users can upgrade between minor versions (e.g., 1.0 to 1.1) without breaking changes
+
+    ### Legacy version support
 
     **LangChain 0.3**:
-    - **상태**: MAINTENANCE 모드
-    - **지원 기간**: 2026년 12월까지
-    - **지원 내용**: 보안 패치 및 중요한 버그 수정
+    - **Status**: MAINTENANCE mode
+    - **Support period**: Until December 2026
+    - **Support includes**: Security patches and critical bug fixes
 
-    ### 특별 고려 사항
+    ### Special considerations
 
 
-    **@langchain/community 1.0**: 커뮤니티 기여와 서드파티 통합의 특성상 `@langchain/community`는 마이너 릴리스에서 호환성을 깨는 변경 사항이 있을 수 있습니다.
+    **@langchain/community 1.0**: Due to the nature of community contributions and third-party integrations, `@langchain/community` may have breaking changes on minor releases.
 
 
     </Tab>
     <Tab title="LangGraph">
-    LangGraph는 프로덕션 애플리케이션을 구축하는 사용자에게 안정성과 예측 가능성을 보장하기 위해 체계적인 릴리스 정책을 따릅니다.
+    LangGraph follows a structured release policy to ensure stability and predictability for users building production applications.
 
-    ## 릴리스 주기
+    ## Release cadence
 
-    프로덕션 애플리케이션의 안정성을 제공하기 위해 **메이저** 릴리스는 최소 6~12개월 간격으로 진행될 것으로 예상됩니다.
+    We expect to space out **major** releases by at least 6-12 months to provide stability for production applications.
 
-    **마이너** 릴리스는 일반적으로 1~2개월마다 새로운 기능과 개선 사항과 함께 릴리스됩니다.
+    **Minor** releases are typically released every 1-2 months with new features and improvements.
 
-    **패치** 릴리스는 버그와 보안 문제를 해결하기 위해 필요에 따라, 주로 주 단위로 릴리스됩니다.
+    **Patch** releases are released as needed, often weekly, to address bugs and security issues.
 
-    ## API 안정성
+    ## API stability
 
-    ### 안정적인 API
+    ### Stable APIs
 
-    특별한 접두사가 없는 모든 API는 안정적이며 프로덕션 사용에 적합한 것으로 간주됩니다. 메이저 버전 내에서 안정적인 기능에 대한 하위 호환성을 유지합니다.
+    All APIs without special prefixes are considered stable and ready for production use. We maintain backward compatibility for stable features within a major version.
 
-    ### 베타 기능
+    ### Beta features
 
-    문서에서 `beta`로 표시된 기능은:
+    Features marked as `beta` in the documentation are:
 
-    - 기능이 완성되고 테스트되었습니다
-    - 변경될 수 있다는 점을 이해하고 프로덕션에서 안전하게 사용할 수 있습니다
-    - 사용자 피드백에 따라 사소한 API 조정이 있을 수 있습니다
+    - Feature-complete and tested
+    - Safe for production use with the understanding they may change
+    - Subject to minor API adjustments based on user feedback
 
-    ### 실험적 기능
+    ### Experimental features
 
-    `experimental` 또는 `alpha`로 표시된 기능은:
+    Features marked as `experimental` or `alpha`:
 
-    - 활발히 개발 중입니다
-    - 크게 변경되거나 제거될 수 있습니다
-    - 프로덕션에서 신중하게 사용해야 합니다
+    - Are under active development
+    - May change significantly or be removed
+    - Should be used with caution in production
 
-    ### 내부 API
+    ### Internal APIs
 
-    밑줄(`_`)로 시작하거나 명시적으로 내부로 표시된 API는:
+    APIs prefixed with underscore (`_`) or explicitly marked as internal:
 
-    - 공개 API의 일부가 아닙니다
-    - 예고 없이 변경될 수 있습니다
-    - 직접 사용해서는 안 됩니다
+    - Are not part of the public API
+    - May change without notice
+    - Should not be used directly
 
-    ## 지원 중단 정책
+    ## Deprecation policy
 
-    기능 지원 중단 시:
+    When deprecating features:
 
-    1. **지원 중단 공지**: 명확한 마이그레이션 가이드와 함께 기능이 지원 중단으로 표시됩니다
-    2. **유예 기간**: 지원 중단된 기능은 최소 한 마이너 버전 동안 계속 작동합니다
-    3. **제거**: 기능은 메이저 버전 릴리스에서만 제거됩니다
-    4. **마이그레이션 지원**: 마이그레이션 가이드를 제공하며, 가능한 경우 자동화된 도구를 제공합니다
+    1. **Deprecation Notice**: Features are marked as deprecated with clear migration guidance
+    2. **Grace Period**: Deprecated features remain functional for at least one minor version
+    3. **Removal**: Features are removed only in major version releases
+    4. **Migration Support**: We provide migration guides and, when possible, automated tools
 
-    ## 플랫폼 호환성
-
-
-
-    ### JavaScript/TypeScript 지원
-
-    - Node.js LTS 버전을 지원합니다
-    - 모든 공개 API에 대해 TypeScript 정의가 제공됩니다
-    - 클라이언트 측 컴포넌트에 대한 브라우저 호환성이 문서화되어 있습니다
+    ## Platform compatibility
 
 
-    ## 호환성을 깨는 변경 사항
 
-    호환성을 깨는 변경 사항은 메이저 버전에서만 도입되며 다음을 포함합니다:
-    - 지원 중단된 API 제거
-    - 필수 매개변수 변경
-    - 기존 애플리케이션에 영향을 미치는 기본 동작 변경
-    - 최소 Python/Node.js 버전 업데이트
+    ### JavaScript/TypeScript support
 
-    ## 마이그레이션 지원
+    - We support Node.js LTS versions
+    - TypeScript definitions are provided for all public APIs
+    - Browser compatibility is documented for client-side components
 
-    메이저 버전 업그레이드 시 다음을 제공합니다:
-    - 포괄적인 마이그레이션 가이드
-    - 가능한 경우 자동화된 마이그레이션 스크립트
-    - 이전 메이저 버전에 대한 확장 지원 기간
-    - 모든 호환성을 깨는 변경 사항에 대한 명확한 문서
 
-    ## 장기 지원(LTS)
+    ## Breaking changes
 
-    LangGraph는 프로덕션 애플리케이션의 안정성을 제공하기 위해 장기 지원(LTS) 정책을 따릅니다:
+    Breaking changes are only introduced in major versions and include:
+    - Removal of deprecated APIs
+    - Changes to required parameters
+    - Changes to default behavior that affect existing applications
+    - Minimum Python/Node.js version updates
 
-    ### 릴리스 상태 정의
+    ## Migration support
 
-    패키지는 다음 상태 중 하나로 표시됩니다:
-    - **ACTIVE**: 현재 활발히 개발 중이며, 버그 수정, 보안 패치 및 새로운 기능이 포함됩니다
-    - **MAINTENANCE**: 모든 보안 패치와 중요한 버그 수정을 받지만 새로운 기능은 포함되지 않습니다
+    For major version upgrades, we provide:
+    - Comprehensive migration guides
+    - Automated migration scripts when feasible
+    - Extended support period for the previous major version
+    - Clear documentation of all breaking changes
 
-    ### 현재 LTS 릴리스
+    ## Long-term support (LTS)
 
-    **LangGraph 1.0**은 LTS 릴리스로 지정됩니다:
-    - **상태**: 2.0 릴리스 전까지 ACTIVE
-    - **지원 기간**: 2.0이 릴리스된 후, 1.0은 최소 1년 동안 MAINTENANCE 모드로 전환됩니다
-    - **시맨틱 버저닝 준수**: 사용자는 호환성을 깨지 않고 마이너 버전(예: 1.0에서 1.1로) 간 업그레이드할 수 있습니다
+    LangGraph follows a long-term support (LTS) policy to provide stability for production applications:
 
-    ### 레거시 버전 지원
+    ### Release status definitions
+
+    Packages are marked with one of the following statuses:
+    - **ACTIVE**: Current active development, includes bug fixes, security patches, and new features
+    - **MAINTENANCE**: Receives all security patches and critical bug fixes, but no new features
+
+    ### Current LTS releases
+
+    **LangGraph 1.0** is designated as an LTS release:
+    - **Status**: ACTIVE until the release of 2.0
+    - **Support period**: After 2.0 is released, 1.0 will enter MAINTENANCE mode for at least 1 year
+    - **Semver compliance**: Users can upgrade between minor versions (e.g., 1.0 to 1.1) without breaking changes
+
+    ### Legacy version support
 
     **LangGraph 0.4**:
-    - **상태**: MAINTENANCE 모드
-    - **지원 기간**: 2026년 12월까지
-    - **지원 내용**: 모든 보안 패치 및 중요한 버그 수정
+    - **Status**: MAINTENANCE mode
+    - **Support period**: Until December 2026
+    - **Support includes**: All security patches and critical bug fixes
 
-    ## 참고 자료
+    ## See also
 
-    - [버전 관리](/oss/javascript/versioning) - 버전 번호 체계 및 지원 세부 정보
-    - [릴리스](/oss/javascript/releases) - 버전별 릴리스 노트 및 마이그레이션 가이드
+    - [Versioning](/oss/javascript/versioning) - Version numbering and support details
+    - [Releases](/oss/javascript/releases) - Version-specific release notes and migration guides
     </Tab>
 </Tabs>
 

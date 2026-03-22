@@ -1,13 +1,13 @@
 ---
-title: 트레이스에 메타데이터 및 태그 추가하기
-sidebarTitle: 트레이스에 메타데이터 및 태그 추가하기
+title: Add metadata and tags to traces
+sidebarTitle: Add metadata and tags to traces
 ---
 
-LangSmith는 트레이스와 함께 임의의 메타데이터와 태그를 전송하는 기능을 지원합니다.
+LangSmith supports sending arbitrary metadata and tags along with traces.
 
-태그는 트레이스를 분류하거나 라벨링하는 데 사용할 수 있는 문자열입니다. 메타데이터는 트레이스에 대한 추가 정보를 저장하는 데 사용할 수 있는 키-값 쌍의 딕셔너리입니다.
+Tags are strings that can be used to categorize or label a trace. Metadata is a dictionary of key-value pairs that can be used to store additional information about a trace.
 
-두 기능 모두 실행 환경, 트레이스를 시작한 사용자, 내부 상관관계 ID 등 트레이스와 관련된 추가 정보를 연결하는 데 유용합니다. 태그와 메타데이터에 대한 자세한 정보는 [개념](/langsmith/observability-concepts#tags) 페이지를 참조하세요. 메타데이터와 태그로 트레이스 및 실행을 쿼리하는 방법은 [애플리케이션에서 트레이스 필터링하기](/langsmith/filter-traces-in-application) 페이지를 참조하세요.
+Both are useful for associating additional information with a trace, such as the environment in which it was executed, the user who initiated it, or an internal correlation ID. For more information on tags and metadata, see the [Concepts](/langsmith/observability-concepts#tags) page. For information on how to query traces and runs by metadata and tags, see the [Filter traces in the application](/langsmith/filter-traces-in-application) page.
 
 <CodeGroup>
 
@@ -22,9 +22,9 @@ messages = [
     {"role": "user", "content": "Hello!"}
 ]
 
-    # 함수를 데코레이팅할 때 메타데이터와 태그를 **정적으로** 설정할 수 있습니다
-    # 태그와 메타데이터가 포함된 @traceable 데코레이터 사용
-    # @traceable이 작동하려면 LANGSMITH_TRACING 환경 변수가 설정되어 있어야 합니다
+    # You can set metadata & tags **statically** when decorating a function
+    # Use the @traceable decorator with tags and metadata
+    # Ensure that the LANGSMITH_TRACING environment variables are set for @traceable to work
     @ls.traceable(
         run_type="llm",
         name="OpenAI Call Decorator",
@@ -34,7 +34,7 @@ messages = [
     def call_openai(
         messages: list[dict], model: str = "gpt-4o-mini"
     ) -> str:
-        # 부모 실행에 메타데이터를 동적으로 설정할 수도 있습니다:
+        # You can also dynamically set metadata on the parent run:
         rt = ls.get_current_run_tree()
         rt.metadata["some-conditional-key"] = "some-val"
         rt.tags.extend(["another-tag"])
@@ -45,12 +45,12 @@ messages = [
 
     call_openai(
         messages,
-        # 함수를 호출할 때 **호출 시점**에 추가하려면
-        # langsmith_extra 매개변수를 사용합니다
+        # To add at **invocation time**, when calling the function.
+        # via the langsmith_extra parameter
         langsmith_extra={"tags": ["my-other-tag"], "metadata": {"my-other-key": "my-value"}}
     )
 
-    # 또는 컨텍스트 매니저를 사용할 수 있습니다
+    # Alternatively, you can use the context manager
     with ls.trace(
         name="OpenAI Call Trace",
         run_type="llm",
@@ -65,7 +65,7 @@ messages = [
         rt.metadata["some-conditional-key"] = "some-val"
         rt.end(outputs={"output": chat_completion})
 
-# 래핑된 클라이언트에서도 동일한 기법을 사용할 수 있습니다
+# You can use the same techniques with the wrapped client
 patched_client = wrap_openai(
     client, tracing_extra={"metadata": {"my-key": "my-value"}, "tags": ["a-tag"]}
 )

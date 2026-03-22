@@ -1,26 +1,26 @@
 ---
-title: 챗봇 평가하기
-sidebarTitle: 챗봇 평가하기
+title: Evaluate a chatbot
+sidebarTitle: Evaluate a chatbot
 ---
 
-이 가이드에서는 챗봇을 위한 평가를 설정하는 방법을 다룹니다. 평가를 통해 데이터 세트에 대한 애플리케이션의 성능을 측정할 수 있습니다. 이러한 인사이트를 빠르고 안정적으로 얻을 수 있다면 확신을 가지고 반복 개선할 수 있습니다.
+In this guide we will set up evaluations for a chatbot. These allow you to measure how well your application is performing over a set of data. Being able to get this insight quickly and reliably will allow you to iterate with confidence.
 
-높은 수준에서 보면, 이 튜토리얼에서는 다음을 수행합니다:
+At a high level, in this tutorial we will:
 
-* *성능 측정을 위한 초기 골든 데이터셋 생성*
-* *성능 측정에 사용할 메트릭 정의*
-* *여러 다른 프롬프트나 모델에 대한 평가 실행*
-* *결과를 수동으로 비교*
-* *시간 경과에 따른 결과 추적*
-* *CI/CD에서 실행할 자동화된 테스트 설정*
+* *Create an initial golden dataset to measure performance*
+* *Define metrics to use to measure performance*
+* *Run evaluations on a few different prompts or models*
+* *Compare results manually*
+* *Track results over time*
+* *Set up automated testing to run in CI/CD*
 
-LangSmith가 지원하는 평가 워크플로에 대한 자세한 내용은 [사용 방법 가이드](/langsmith/evaluation)를 확인하거나, [evaluate](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate) 및 비동기 버전인 [aevaluate](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._arunner.aevaluate)의 레퍼런스 문서를 참조하세요.
+For more information on the evaluation workflows LangSmith supports, check out the [how-to guides](/langsmith/evaluation), or see the reference docs for [evaluate](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._runner.evaluate) and its asynchronous [aevaluate](https://docs.smith.langchain.com/reference/python/evaluation/langsmith.evaluation._arunner.aevaluate) counterpart.
 
-다룰 내용이 많으니 시작하겠습니다!
+Lots to cover, let's dive in!
 
-## 설정
+## Setup
 
-먼저 이 튜토리얼에 필요한 종속성을 설치합니다. 여기서는 OpenAI를 사용하지만, LangSmith는 어떤 모델과도 함께 사용할 수 있습니다:
+First install the required dependencies for this tutorial. We happen to use OpenAI, but LangSmith can be used with any model:
 
 <CodeGroup>
 ```bash pip
@@ -32,7 +32,7 @@ uv add langsmith openai
 ```
 </CodeGroup>
 
-그리고 LangSmith 트레이싱을 활성화하기 위한 환경 변수를 설정합니다:
+And set environment variables to enable LangSmith tracing:
 
 ```bash
 export LANGSMITH_TRACING="true"
@@ -40,23 +40,23 @@ export LANGSMITH_API_KEY="<Your LangSmith API key>"
 export OPENAI_API_KEY="<Your OpenAI API key>"
 ```
 
-## 데이터셋 생성
+## Create a dataset
 
-애플리케이션을 테스트하고 평가할 준비를 할 때 첫 번째 단계는 평가하려는 데이터 포인트를 정의하는 것입니다. 여기서 고려해야 할 몇 가지 측면이 있습니다:
+The first step when getting ready to test and evaluate your application is to define the datapoints you want to evaluate. There are a few aspects to consider here:
 
-* 각 데이터 포인트의 스키마는 어떻게 되어야 하는가?
-* 몇 개의 데이터 포인트를 수집해야 하는가?
-* 데이터 포인트를 어떻게 수집해야 하는가?
+* What should the schema of each datapoint be?
+* How many datapoints should I gather?
+* How should I gather those datapoints?
 
-**스키마:** 각 데이터 포인트는 최소한 애플리케이션의 입력으로 구성되어야 합니다. 가능하다면 예상 출력도 정의하는 것이 매우 도움이 됩니다. 예상 출력은 올바르게 작동하는 애플리케이션이 출력하길 기대하는 내용을 나타냅니다. 종종 완벽한 출력을 정의할 수 없는 경우가 있습니다. 괜찮습니다! 평가는 반복적인 프로세스입니다. 때로는 각 예제에 대해 더 많은 정보를 정의하고 싶을 수도 있습니다. 예를 들어, RAG에서 가져올 것으로 예상되는 문서나 에이전트로서 수행할 것으로 예상되는 단계 등이 있습니다. LangSmith 데이터셋은 매우 유연하며 임의의 스키마를 정의할 수 있습니다.
+**Schema:** Each datapoint should consist of, at the very least, the inputs to the application. If you are able, it is also very helpful to define the expected outputs - these represent what you would expect a properly functioning application to output. Often times you cannot define the perfect output - that's okay! Evaluation is an iterative process. Sometimes you may also want to define more information for each example - like the expected documents to fetch in RAG, or the expected steps to take as an agent. LangSmith datasets are very flexible and allow you to define arbitrary schemas.
 
-**몇 개:** 몇 개를 수집해야 하는지에 대한 엄격한 규칙은 없습니다. 가장 중요한 것은 방어하고자 하는 엣지 케이스를 적절히 포함하는 것입니다. 심지어 10-50개의 예제만으로도 많은 가치를 제공할 수 있습니다! 시작할 때 많은 수를 모으는 것에 대해 걱정하지 마세요. 시간이 지남에 따라 항상 추가할 수 있고 추가해야 합니다!
+**How many:** There's no hard and fast rule for how many you should gather. The main thing is to make sure you have proper coverage of edge cases you may want to guard against. Even 10-50 examples can provide a lot of value! Don't worry about getting a large number to start - you can (and should) always add over time!
 
-**수집 방법:** 이것이 아마도 가장 까다로운 부분일 것입니다. 데이터셋을 수집하고 싶다는 것을 알게 되면... 실제로 어떻게 진행하나요? 새로운 프로젝트를 시작하는 대부분의 팀의 경우, 일반적으로 처음 10-20개의 데이터 포인트를 손으로 수집하는 것으로 시작하는 것을 볼 수 있습니다. 이러한 데이터 포인트로 시작한 후, 이러한 데이터셋은 일반적으로 *살아있는* 구조이며 시간이 지남에 따라 성장합니다. 일반적으로 실제 사용자가 애플리케이션을 어떻게 사용하는지 보고, 존재하는 문제점을 확인한 다음, 그 중 일부 데이터 포인트를 이 세트로 이동한 후에 성장합니다. 데이터셋을 보강하는 데 사용할 수 있는 합성 데이터 생성과 같은 방법도 있습니다. 시작하려면 이러한 방법에 대해 걱정하지 말고 약 10-20개의 예제를 손으로 레이블링하는 것을 권장합니다.
+**How to get:** This is maybe the trickiest part. Once you know you want to gather a dataset... how do you actually go about it? For most teams that are starting a new project, we generally see them start by collecting the first 10-20 datapoints by hand. After starting with these datapoints, these datasets are generally *living* constructs and grow over time. They generally grow after seeing how real users will use your application, seeing the pain points that exist, and then moving a few of those datapoints into this set. There are also methods like synthetically generating data that can be used to augment your dataset. To start, we recommend not worrying about those and just hand labeling \~10-20 examples.
 
-데이터셋을 준비했다면 LangSmith에 업로드하는 몇 가지 다른 방법이 있습니다. 이 튜토리얼에서는 클라이언트를 사용하지만, UI를 통해 업로드하거나 UI에서 생성할 수도 있습니다.
+Once you've got your dataset, there are a few different ways to upload them to LangSmith. For this tutorial, we will use the client, but you can also upload via the UI (or even create them in the UI).
 
-이 튜토리얼에서는 평가할 5개의 데이터 포인트를 생성합니다. 질문-답변 애플리케이션을 평가할 것입니다. 입력은 질문이고 출력은 답변입니다. 질문-답변 애플리케이션이므로 예상 답변을 정의할 수 있습니다. 이 데이터셋을 생성하고 LangSmith에 업로드하는 방법을 보여드리겠습니다!
+For this tutorial, we will create 5 datapoints to evaluate on. We will be evaluating a question-answering application. The input will be a question, and the output will be an answer. Since this is a question-answering application, we can define the expected answer. Let's show how to create and upload this dataset to LangSmith!
 
 ```python
 from langsmith import Client
@@ -94,19 +94,19 @@ client.create_examples(
 )
 ```
 
-이제 LangSmith UI로 이동하여 `Datasets & Testing` 페이지에서 `QA Example Dataset`을 찾아 클릭하면 5개의 새로운 예제가 있는 것을 볼 수 있습니다.
+Now, if we go the LangSmith UI and look for `QA Example Dataset` in the `Datasets & Testing` page, when we click into it we should see that we have five new examples.
 
 ![](/langsmith/images/testing-tutorial-dataset.png)
 
-## 메트릭 정의
+## Define metrics
 
-데이터셋을 생성한 후, 이제 응답을 평가할 몇 가지 메트릭을 정의할 수 있습니다. 예상 답변이 있으므로 평가의 일부로 이를 비교할 수 있습니다. 그러나 애플리케이션이 **정확히** 그 답변을 출력할 것으로 기대하지는 않고, 오히려 유사한 내용을 출력할 것으로 기대합니다. 이렇게 되면 평가가 조금 더 까다로워집니다.
+After creating our dataset, we can now define some metrics to evaluate our responses on. Since we have an expected answer, we can compare to that as part of our evaluation. However, we do not expect our application to output those **exact** answers, but rather something that is similar. This makes our evaluation a little trickier.
 
-정확성 평가 외에도 답변이 짧고 간결한지 확인해 보겠습니다. 이는 조금 더 쉬울 것입니다. 응답의 길이를 측정하는 간단한 Python 함수를 정의할 수 있습니다.
+In addition to evaluating correctness, let's also make sure our answers are short and concise. This will be a little easier - we can define a simple Python function to measure the length of the response.
 
-이 두 가지 메트릭을 정의해 보겠습니다.
+Let's go ahead and define these two metrics.
 
-첫 번째의 경우, LLM을 사용하여 출력이 (예상 출력과 비교하여) 올바른지 **판단**할 것입니다. 이러한 **LLM-as-a-judge**는 간단한 함수로 측정하기에는 너무 복잡한 경우에 비교적 일반적입니다. 여기에서 평가에 사용할 자체 프롬프트와 LLM을 정의할 수 있습니다:
+For the first, we will use an LLM to **judge** whether the output is correct (with respect to the expected output). This **LLM-as-a-judge** is relatively common for cases that are too complex to measure with a simple function. We can define our own prompt and LLM to use for evaluation here:
 
 ```python
 import openai
@@ -136,16 +136,16 @@ Grade:"""
     return response == "CORRECT"
 ```
 
-응답의 길이를 평가하는 것은 훨씬 쉽습니다! 실제 출력이 예상 결과 길이의 2배 미만인지 확인하는 간단한 함수를 정의하면 됩니다.
+For evaluating the length of the response, this is a lot easier! We can just define a simple function that checks whether the actual output is less than 2x the length of the expected result.
 
 ```python
 def concision(outputs: dict, reference_outputs: dict) -> bool:
     return int(len(outputs["response"]) < 2 * len(reference_outputs["answer"]))
 ```
 
-## 평가 실행
+## Run Evaluations
 
-훌륭합니다! 그렇다면 이제 평가를 어떻게 실행할까요? 이제 데이터셋과 평가자가 있으니 필요한 것은 애플리케이션뿐입니다! 응답 방법에 대한 지침이 포함된 시스템 메시지를 가지고 있다가 LLM에 전달하는 간단한 애플리케이션을 구축하겠습니다. OpenAI SDK를 직접 사용하여 구축하겠습니다:
+Great! So now how do we run evaluations? Now that we have a dataset and evaluators, all that we need is our application! We will build a simple application that just has a system message with instructions on how to respond and then passes it to the LLM. We will build this using the OpenAI SDK directly:
 
 ```python
 default_instructions = "Respond to the users question in a short, concise manner (one short sentence)."
@@ -161,14 +161,14 @@ def my_app(question: str, model: str = "gpt-4o-mini", instructions: str = defaul
     ).choices[0].message.content
 ```
 
-LangSmith 평가를 통해 이를 실행하기 전에 데이터셋의 입력 키를 호출하려는 함수에 매핑하고 함수의 출력을 예상하는 출력 키에 매핑하는 간단한 래퍼를 정의해야 합니다.
+Before running this through LangSmith evaluations, we need to define a simple wrapper that maps the input keys from our dataset to the function we want to call, and then also maps the output of the function to the output key we expect.
 
 ```python
 def ls_target(inputs: str) -> dict:
     return {"response": my_app(inputs["question"])}
 ```
 
-훌륭합니다! 이제 평가를 실행할 준비가 되었습니다. 실행해 봅시다!
+Great! Now we're ready to run an evaluation. Let's do it!
 
 ```python
 experiment_results = client.evaluate(
@@ -179,15 +179,15 @@ experiment_results = client.evaluate(
 )
 ```
 
-이렇게 하면 URL이 출력됩니다. 이를 클릭하면 평가 결과를 볼 수 있습니다!
+This will output a URL. If we click on it, we should see results of our evaluation!
 
 ![](/langsmith/images/testing-tutorial-run.png)
 
-데이터셋 페이지로 돌아가서 `Experiments` 탭을 선택하면 이제 하나의 실행 요약을 볼 수 있습니다!
+If we go back to the dataset page and select the `Experiments` tab, we can now see a summary of our one run!
 
 ![](/langsmith/images/testing-tutorial-one-run.png)
 
-이제 다른 모델로 시도해 봅시다! `gpt-4-turbo`를 시도해 보겠습니다.
+Let's now try it out with a different model! Let's try `gpt-4-turbo`
 
 ```python
 def ls_target_v2(inputs: str) -> dict:
@@ -201,7 +201,7 @@ experiment_results = client.evaluate(
 )
 ```
 
-이제 GPT-4를 사용하되 프롬프트를 업데이트하여 답변이 짧아야 한다는 요구 사항을 좀 더 엄격하게 해봅시다.
+And now let's use GPT-4 but also update the prompt to be a bit more strict in requiring the answer to be short.
 
 ```python
 instructions_v3 = "Respond to the users question in a short, concise manner (one short sentence). Do NOT use more than ten words."
@@ -222,29 +222,29 @@ experiment_results = client.evaluate(
 )
 ```
 
-데이터셋 페이지의 `Experiments` 탭으로 돌아가면 세 가지 실행이 모두 표시되는 것을 볼 수 있습니다!
+If we go back to the `Experiments` tab on the datasets page, we should see that all three runs now show up!
 
 ![](/langsmith/images/testing-tutorial-three-runs.png)
 
-## 결과 비교
+## Comparing results
 
-멋집니다, 세 가지 다른 실행을 평가했습니다. 하지만 결과를 어떻게 비교할 수 있을까요? 첫 번째 방법은 `Experiments` 탭에서 실행을 살펴보는 것입니다. 그렇게 하면 각 실행에 대한 메트릭의 높은 수준 보기를 볼 수 있습니다:
+Awesome, we've evaluated three different runs. But how can we compare results? The first way we can do this is just by looking at the runs in the `Experiments` tab. If we do that, we can see a high level view of the metrics for each run:
 
 ![](/langsmith/images/testing-tutorial-compare-metrics.png)
 
-훌륭합니다! GPT-4가 기업이 누구인지 아는 데 있어 GPT-3.5보다 낫다는 것을 알 수 있고, 엄격한 프롬프트가 길이에 많은 도움이 되었다는 것을 볼 수 있습니다. 하지만 더 자세히 탐색하고 싶다면 어떻게 해야 할까요?
+Great! So we can tell that GPT-4 is better than GPT-3.5 at knowing who companies are, and we can see that the strict prompt helped a lot with the length. But what if we want to explore in more detail?
 
-이를 위해 비교하려는 모든 실행(이 경우 세 가지 모두)을 선택하고 비교 보기에서 열 수 있습니다. 세 가지 테스트를 나란히 즉시 볼 수 있습니다. 일부 셀은 색상으로 구분되어 있는데, 이는 *특정 기준선*과 비교하여 *특정 메트릭*의 회귀를 보여줍니다. 기준선과 메트릭에 대해 자동으로 기본값을 선택하지만 직접 변경할 수 있습니다. `Display` 컨트롤을 사용하여 어떤 열과 어떤 메트릭을 볼지 선택할 수도 있습니다. 상단의 아이콘을 클릭하여 개선/회귀가 있는 실행만 자동으로 필터링할 수도 있습니다.
+In order to do that, we can select all the runs we want to compare (in this case all three) and open them up in a comparison view. We immediately see all three tests side by side. Some of the cells are color coded - this is showing a regression of *a certain metric* compared to *a certain baseline*. We automatically choose defaults for the baseline and metric, but you can change those yourself. You can also choose which columns and which metrics you see by using the `Display` control. You can also automatically filter to only see the runs that have improvements/regressions by clicking on the icons at the top.
 
 ![](/langsmith/images/testing-tutorial-compare-runs.png)
 
-더 많은 정보를 보려면 행 위로 마우스를 가져갈 때 나타나는 `Expand` 버튼을 선택하여 더 자세한 정보가 있는 사이드 패널을 열 수도 있습니다:
+If we want to see more information, we can also select the `Expand` button that appears when hovering over a row to open up a side panel with more detailed information:
 
 ![](/langsmith/images/testing-tutorial-side-panel.png)
 
-## CI/CD에서 실행할 자동화된 테스트 설정
+## Set up automated testing to run in CI/CD
 
-이제 일회성 방식으로 실행했으므로 자동화된 방식으로 실행하도록 설정할 수 있습니다. CI/CD에서 실행하는 pytest 파일로 포함하면 매우 쉽게 수행할 수 있습니다. 이의 일환으로 결과만 기록하거나 통과 여부를 결정하기 위한 일부 기준을 설정할 수 있습니다. 예를 들어, 생성된 응답의 최소 80%가 항상 `length` 체크를 통과하도록 보장하려면 다음과 같은 테스트로 설정할 수 있습니다:
+Now that we've run this in a one-off manner, we can set it to run in an automated fashion. We can do this pretty easily by just including it as a pytest file that we run in CI/CD. As part of this, we can either just log the results OR set up some criteria to determine if it passes or not. For example, if I wanted to ensure that we always got at least 80% of generated responses passing the `length` check, we could set that up with a test like:
 
 ```python
 def test_length_score() -> None:
@@ -263,25 +263,25 @@ def test_length_score() -> None:
     assert sum(scores) / len(scores) >= 0.8, "Aggregate score should be at least .8"
 ```
 
-## 시간 경과에 따른 결과 추적
+## Track results over time
 
-이제 이러한 실험이 자동화된 방식으로 실행되고 있으므로 시간 경과에 따라 이러한 결과를 추적하고 싶습니다. 데이터셋 페이지의 전체 `Experiments` 탭에서 이를 수행할 수 있습니다. 기본적으로 시간 경과에 따른 평가 메트릭을 표시합니다(빨간색으로 강조 표시됨). 또한 코드 브랜치와 쉽게 연결할 수 있도록 git 메트릭을 자동으로 추적합니다(노란색으로 강조 표시됨).
+Now that we've got these experiments running in an automated fashion, we want to track these results over time. We can do this from the overall `Experiments` tab in the datasets page. By default, we show evaluation metrics over time (highlighted in red). We also automatically track git metrics, to easily associate it with the branch of your code (highlighted in yellow).
 
 ![](/langsmith/images/testing-tutorial-over-time.png)
 
-## 결론
+## Conclusion
 
-이 튜토리얼은 여기까지입니다!
+That's it for this tutorial!
 
-초기 테스트 세트를 생성하고, 일부 평가 메트릭을 정의하고, 실험을 실행하고, 수동으로 비교하고, CI/CD를 설정하고, 시간 경과에 따라 결과를 추적하는 방법을 살펴보았습니다. 이를 통해 확신을 가지고 반복 개선할 수 있기를 바랍니다.
+We've gone over how to create an initial test set, define some evaluation metrics, run experiments, compare them manually, set up CI/CD, and track results over time. Hopefully this can help you iterate with confidence.
 
-이것은 시작에 불과합니다. 앞서 언급했듯이 평가는 지속적인 프로세스입니다. 예를 들어, 평가하려는 데이터 포인트는 시간이 지남에 따라 계속 변경될 가능성이 높습니다. 탐색하고 싶은 다양한 유형의 평가자가 있을 수 있습니다. 이에 대한 자세한 내용은 [사용 방법 가이드](/langsmith/evaluation)를 확인하세요.
+This is just the start. As mentioned earlier, evaluation is an ongoing process. For example - the datapoints you will want to evaluate on will likely continue to change over time. There are many types of evaluators you may wish to explore. For information on this, check out the [how-to guides](/langsmith/evaluation).
 
-또한 이 "오프라인" 방식 외에 데이터를 평가하는 다른 방법이 있습니다(예: 프로덕션 데이터를 평가할 수 있습니다). 온라인 평가에 대한 자세한 내용은 [이 가이드](/langsmith/online-evaluations)를 확인하세요.
+Additionally, there are other ways to evaluate data besides in this "offline" manner (e.g. you can evaluate production data). For more information on online evaluation, check out [this guide](/langsmith/online-evaluations).
 
-## 참조 코드
+## Reference code
 
-<Accordion title="통합된 코드 스니펫을 보려면 클릭하세요">
+<Accordion title="Click to see a consolidated code snippet">
 ```python
 import openai
 from langsmith import Client, wrappers

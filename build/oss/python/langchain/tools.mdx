@@ -1,73 +1,73 @@
 ---
-title: 도구
+title: Tools
 ---
 
 
 
-많은 AI 애플리케이션은 자연어를 통해 사용자와 상호작용합니다. 그러나 일부 사용 사례에서는 모델이 API, 데이터베이스 또는 파일 시스템과 같은 외부 시스템과 구조화된 입력을 사용하여 직접 인터페이스해야 합니다.
+Many AI applications interact with users via natural language. However, some use cases require models to interface directly with external systems—such as APIs, databases, or file systems—using structured input.
 
-도구는 [에이전트](/oss/python/langchain/agents)가 작업을 수행하기 위해 호출하는 구성 요소입니다. 도구는 잘 정의된 입력과 출력을 통해 모델이 외부 세계와 상호작용할 수 있도록 하여 모델의 기능을 확장합니다. 도구는 호출 가능한 함수와 해당 입력 스키마를 캡슐화합니다. 이러한 도구는 호환되는 [챗 모델](/oss/python/langchain/models)에 전달될 수 있으며, 모델이 도구를 호출할지 여부와 어떤 인수로 호출할지 결정할 수 있게 합니다. 이러한 시나리오에서 도구 호출은 모델이 지정된 입력 스키마에 부합하는 요청을 생성할 수 있도록 합니다.
+Tools are components that [agents](/oss/python/langchain/agents) call to perform actions. They extend model capabilities by letting them interact with the world through well-defined inputs and outputs. Tools encapsulate a callable function and its input schema. These can be passed to compatible [chat models](/oss/python/langchain/models), allowing the model to decide whether to invoke a tool and with what arguments. In these scenarios, tool calling enables models to generate requests that conform to a specified input schema.
 
 <Note>
-**서버 측 도구 사용**
+**Server-side tool use**
 
-일부 챗 모델(예: [OpenAI](/oss/python/integrations/chat/openai), [Anthropic](/oss/python/integrations/chat/anthropic), [Gemini](/oss/python/integrations/chat/google_generative_ai))은 웹 검색 및 코드 인터프리터와 같이 서버 측에서 실행되는 [내장 도구](/oss/python/langchain/models#server-side-tool-use)를 제공합니다. 특정 챗 모델에서 이러한 도구에 액세스하는 방법을 알아보려면 [프로바이더 개요](/oss/python/integrations/providers/overview)를 참조하세요.
+Some chat models (e.g., [OpenAI](/oss/python/integrations/chat/openai), [Anthropic](/oss/python/integrations/chat/anthropic), and [Gemini](/oss/python/integrations/chat/google_generative_ai)) feature [built-in tools](/oss/python/langchain/models#server-side-tool-use) that are executed server-side, such as web search and code interpreters. Refer to the [provider overview](/oss/python/integrations/providers/overview) to learn how to access these tools with your specific chat model.
 </Note>
 
-## 도구 생성
+## Create tools
 
-### 기본 도구 정의
+### Basic tool definition
 
-도구를 생성하는 가장 간단한 방법은 [`@tool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool) 데코레이터를 사용하는 것입니다. 기본적으로 함수의 docstring이 모델이 도구를 언제 사용해야 하는지 이해하는 데 도움이 되는 도구 설명이 됩니다:
+The simplest way to create a tool is with the [`@tool`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.tool) decorator. By default, the function's docstring becomes the tool's description that helps the model understand when to use it:
 
 ```python wrap
 from langchain.tools import tool
 
 @tool
 def search_database(query: str, limit: int = 10) -> str:
-    """쿼리와 일치하는 레코드를 고객 데이터베이스에서 검색합니다.
+    """Search the customer database for records matching the query.
 
     Args:
-        query: 검색할 검색어
-        limit: 반환할 최대 결과 수
+        query: Search terms to look for
+        limit: Maximum number of results to return
     """
     return f"Found {limit} results for '{query}'"
 ```
 
-타입 힌트는 도구의 입력 스키마를 정의하므로 **필수**입니다. docstring은 모델이 도구의 목적을 이해하는 데 도움이 되도록 유익하고 간결해야 합니다.
+Type hints are **required** as they define the tool's input schema. The docstring should be informative and concise to help the model understand the tool's purpose.
 
 
 
 
-### 도구 속성 사용자 정의
+### Customize tool properties
 
-#### 사용자 정의 도구 이름
+#### Custom tool name
 
-기본적으로 도구 이름은 함수 이름에서 가져옵니다. 더 설명적인 이름이 필요한 경우 재정의할 수 있습니다:
+By default, the tool name comes from the function name. Override it when you need something more descriptive:
 
 ```python wrap
-@tool("web_search")  # 사용자 정의 이름
+@tool("web_search")  # Custom name
 def search(query: str) -> str:
-    """웹에서 정보를 검색합니다."""
+    """Search the web for information."""
     return f"Results for: {query}"
 
 print(search.name)  # web_search
 ```
 
-#### 사용자 정의 도구 설명
+#### Custom tool description
 
-더 명확한 모델 가이드를 위해 자동 생성된 도구 설명을 재정의할 수 있습니다:
+Override the auto-generated tool description for clearer model guidance:
 
 ```python wrap
 @tool("calculator", description="Performs arithmetic calculations. Use this for any math problems.")
 def calc(expression: str) -> str:
-    """수학 표현식을 평가합니다."""
+    """Evaluate mathematical expressions."""
     return str(eval(expression))
 ```
 
-### 고급 스키마 정의
+### Advanced schema definition
 
-Pydantic 모델 또는 JSON 스키마로 복잡한 입력을 정의할 수 있습니다:
+Define complex inputs with Pydantic models or JSON schemas:
 
 <CodeGroup>
     ```python wrap Pydantic model
@@ -75,7 +75,7 @@ Pydantic 모델 또는 JSON 스키마로 복잡한 입력을 정의할 수 있�
     from typing import Literal
 
     class WeatherInput(BaseModel):
-        """날씨 쿼리를 위한 입력."""
+        """Input for weather queries."""
         location: str = Field(description="City name or coordinates")
         units: Literal["celsius", "fahrenheit"] = Field(
             default="celsius",
@@ -88,7 +88,7 @@ Pydantic 모델 또는 JSON 스키마로 복잡한 입력을 정의할 수 있�
 
     @tool(args_schema=WeatherInput)
     def get_weather(location: str, units: str = "celsius", include_forecast: bool = False) -> str:
-        """현재 날씨와 선택적 예보를 가져옵니다."""
+        """Get current weather and optional forecast."""
         temp = 22 if units == "celsius" else 72
         result = f"Current weather in {location}: {temp} degrees {units[0].upper()}"
         if include_forecast:
@@ -109,7 +109,7 @@ Pydantic 모델 또는 JSON 스키마로 복잡한 입력을 정의할 수 있�
 
     @tool(args_schema=weather_schema)
     def get_weather(location: str, units: str = "celsius", include_forecast: bool = False) -> str:
-        """현재 날씨와 선택적 예보를 가져옵니다."""
+        """Get current weather and optional forecast."""
         temp = 22 if units == "celsius" else 72
         result = f"Current weather in {location}: {temp} degrees {units[0].upper()}"
         if include_forecast:
@@ -119,42 +119,42 @@ Pydantic 모델 또는 JSON 스키마로 복잡한 입력을 정의할 수 있�
 </CodeGroup>
 
 
-## 컨텍스트 액세스
+## Accessing Context
 
 <Info>
-**중요한 이유:** 도구는 에이전트 상태, 런타임 컨텍스트 및 장기 메모리에 액세스할 수 있을 때 가장 강력합니다. 이를 통해 도구는 컨텍스트 인식 의사 결정을 내리고 응답을 개인화하며 대화 전반에 걸쳐 정보를 유지할 수 있습니다.
+**Why this matters:** Tools are most powerful when they can access agent state, runtime context, and long-term memory. This enables tools to make context-aware decisions, personalize responses, and maintain information across conversations.
 </Info>
 
-도구는 `ToolRuntime` 매개변수를 통해 런타임 정보에 액세스할 수 있으며, 다음을 제공합니다:
+Tools can access runtime information through the `ToolRuntime` parameter, which provides:
 
-- **State** - 실행 과정에서 흐르는 변경 가능한 데이터(메시지, 카운터, 사용자 정의 필드)
-- **Context** - 사용자 ID, 세션 세부 정보 또는 애플리케이션별 구성과 같은 불변 구성
-- **Store** - 대화 전반에 걸친 영구 장기 메모리
-- **Stream Writer** - 도구 실행 시 사용자 정의 업데이트 스트리밍
-- **Config** - 실행을 위한 RunnableConfig
-- **Tool Call ID** - 현재 도구 호출의 ID
+- **State** - Mutable data that flows through execution (messages, counters, custom fields)
+- **Context** - Immutable configuration like user IDs, session details, or application-specific configuration
+- **Store** - Persistent long-term memory across conversations
+- **Stream Writer** - Stream custom updates as tools execute
+- **Config** - RunnableConfig for the execution
+- **Tool Call ID** - ID of the current tool call
 
 ### ToolRuntime
 
-`ToolRuntime`을 사용하여 단일 매개변수로 모든 런타임 정보에 액세스할 수 있습니다. 도구 시그니처에 `runtime: ToolRuntime`을 추가하기만 하면 LLM에 노출되지 않고 자동으로 주입됩니다.
+Use `ToolRuntime` to access all runtime information in a single parameter. Simply add `runtime: ToolRuntime` to your tool signature, and it will be automatically injected without being exposed to the LLM.
 
 <Info>
-**`ToolRuntime`**: 도구가 state, context, store, streaming, config 및 tool call ID에 액세스할 수 있도록 하는 통합 매개변수입니다. 이는 별도의 [`InjectedState`](https://reference.langchain.com/python/langgraph/agents/#langgraph.prebuilt.tool_node.InjectedState), [`InjectedStore`](https://reference.langchain.com/python/langgraph/agents/#langgraph.prebuilt.tool_node.InjectedStore), [`get_runtime`](https://reference.langchain.com/python/langgraph/runtime/#langgraph.runtime.get_runtime), [`InjectedToolCallId`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.InjectedToolCallId) 어노테이션을 사용하는 이전 패턴을 대체합니다.
+**`ToolRuntime`**: A unified parameter that provides tools access to state, context, store, streaming, config, and tool call ID. This replaces the older pattern of using separate [`InjectedState`](https://reference.langchain.com/python/langgraph/agents/#langgraph.prebuilt.tool_node.InjectedState), [`InjectedStore`](https://reference.langchain.com/python/langgraph/agents/#langgraph.prebuilt.tool_node.InjectedStore), [`get_runtime`](https://reference.langchain.com/python/langgraph/runtime/#langgraph.runtime.get_runtime), and [`InjectedToolCallId`](https://reference.langchain.com/python/langchain/tools/#langchain.tools.InjectedToolCallId) annotations.
 </Info>
 
-**상태 액세스:**
+**Accessing state:**
 
-도구는 `ToolRuntime`을 사용하여 현재 그래프 상태에 액세스할 수 있습니다:
+Tools can access the current graph state using `ToolRuntime`:
 
 ```python wrap
 from langchain.tools import tool, ToolRuntime
 
-# 현재 대화 상태 액세스
+# Access the current conversation state
 @tool
 def summarize_conversation(
     runtime: ToolRuntime
 ) -> str:
-    """지금까지의 대화를 요약합니다."""
+    """Summarize the conversation so far."""
     messages = runtime.state["messages"]
 
     human_msgs = sum(1 for m in messages if m.__class__.__name__ == "HumanMessage")
@@ -163,24 +163,24 @@ def summarize_conversation(
 
     return f"Conversation has {human_msgs} user messages, {ai_msgs} AI responses, and {tool_msgs} tool results"
 
-# 사용자 정의 상태 필드 액세스
+# Access custom state fields
 @tool
 def get_user_preference(
     pref_name: str,
-    runtime: ToolRuntime  # ToolRuntime 매개변수는 모델에 보이지 않습니다
+    runtime: ToolRuntime  # ToolRuntime parameter is not visible to the model
 ) -> str:
-    """사용자 기본 설정 값을 가져옵니다."""
+    """Get a user preference value."""
     preferences = runtime.state.get("user_preferences", {})
     return preferences.get(pref_name, "Not set")
 ```
 
 <Warning>
-`tool_runtime` 매개변수는 모델에서 숨겨집니다. 위 예제의 경우 모델은 도구 스키마에서 `pref_name`만 볼 수 있으며, `tool_runtime`은 요청에 포함되지 *않습니다*.
+The `tool_runtime` parameter is hidden from the model. For the example above, the model only sees `pref_name` in the tool schema - `tool_runtime` is *not* included in the request.
 </Warning>
 
-**상태 업데이트:**
+**Updating state:**
 
-[`Command`](https://reference.langchain.com/python/langgraph/types/#langgraph.types.Command)를 사용하여 에이전트의 상태를 업데이트하거나 그래프의 실행 흐름을 제어할 수 있습니다:
+Use [`Command`](https://reference.langchain.com/python/langgraph/types/#langgraph.types.Command) to update the agent's state or control the graph's execution flow:
 
 ```python wrap
 from langgraph.types import Command
@@ -188,10 +188,10 @@ from langchain.messages import RemoveMessage
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langchain.tools import tool, ToolRuntime
 
-# 모든 메시지를 제거하여 대화 기록 업데이트
+# Update the conversation history by removing all messages
 @tool
 def clear_conversation() -> Command:
-    """대화 기록을 지웁니다."""
+    """Clear the conversation history."""
 
     return Command(
         update={
@@ -199,22 +199,22 @@ def clear_conversation() -> Command:
         }
     )
 
-# 에이전트 상태에서 user_name 업데이트
+# Update the user_name in the agent state
 @tool
 def update_user_name(
     new_name: str,
     runtime: ToolRuntime
 ) -> Command:
-    """사용자 이름을 업데이트합니다."""
+    """Update the user's name."""
     return Command(update={"user_name": new_name})
 ```
 
 
 #### Context
 
-`runtime.context`를 통해 사용자 ID, 세션 세부 정보 또는 애플리케이션별 구성과 같은 불변 구성 및 컨텍스트 데이터에 액세스할 수 있습니다.
+Access immutable configuration and contextual data like user IDs, session details, or application-specific configuration through `runtime.context`.
 
-도구는 `ToolRuntime`을 통해 런타임 컨텍스트에 액세스할 수 있습니다:
+Tools can access runtime context through `ToolRuntime`:
 
 ```python wrap
 from dataclasses import dataclass
@@ -244,7 +244,7 @@ class UserContext:
 
 @tool
 def get_account_info(runtime: ToolRuntime[UserContext]) -> str:
-    """현재 사용자의 계정 정보를 가져옵니다."""
+    """Get the current user's account information."""
     user_id = runtime.context.user_id
 
     if user_id in USER_DATABASE:
@@ -269,11 +269,11 @@ result = agent.invoke(
 
 
 
-#### 메모리 (Store)
+#### Memory (Store)
 
-store를 사용하여 대화 전반에 걸쳐 영구 데이터에 액세스할 수 있습니다. store는 `runtime.store`를 통해 액세스되며 사용자별 또는 애플리케이션별 데이터를 저장하고 검색할 수 있습니다.
+Access persistent data across conversations using the store. The store is accessed via `runtime.store` and allows you to save and retrieve user-specific or application-specific data.
 
-도구는 `ToolRuntime`을 통해 store에 액세스하고 업데이트할 수 있습니다:
+Tools can access and update the store through `ToolRuntime`:
 
 ```python wrap expandable
 from typing import Any
@@ -282,18 +282,18 @@ from langchain.agents import create_agent
 from langchain.tools import tool, ToolRuntime
 
 
-# 메모리 액세스
+# Access memory
 @tool
 def get_user_info(user_id: str, runtime: ToolRuntime) -> str:
-    """사용자 정보를 조회합니다."""
+    """Look up user info."""
     store = runtime.store
     user_info = store.get(("users",), user_id)
     return str(user_info.value) if user_info else "Unknown user"
 
-# 메모리 업데이트
+# Update memory
 @tool
 def save_user_info(user_id: str, user_info: dict[str, Any], runtime: ToolRuntime) -> str:
-    """사용자 정보를 저장합니다."""
+    """Save user info."""
     store = runtime.store
     store.put(("users",), user_id, user_info)
     return "Successfully saved user info."
@@ -305,12 +305,12 @@ agent = create_agent(
     store=store
 )
 
-# 첫 번째 세션: 사용자 정보 저장
+# First session: save user info
 agent.invoke({
     "messages": [{"role": "user", "content": "Save the following user: userid: abc123, name: Foo, age: 25, email: foo@langchain.dev"}]
 })
 
-# 두 번째 세션: 사용자 정보 가져오기
+# Second session: get user info
 agent.invoke({
     "messages": [{"role": "user", "content": "Get user info for user with id 'abc123'"}]
 })
@@ -325,17 +325,17 @@ agent.invoke({
 
 #### Stream Writer
 
-`runtime.stream_writer`를 사용하여 도구가 실행되는 동안 사용자 정의 업데이트를 스트리밍할 수 있습니다. 이는 도구가 수행하는 작업에 대한 실시간 피드백을 사용자에게 제공하는 데 유용합니다.
+Stream custom updates from tools as they execute using `runtime.stream_writer`. This is useful for providing real-time feedback to users about what a tool is doing.
 
 ```python wrap
 from langchain.tools import tool, ToolRuntime
 
 @tool
 def get_weather(city: str, runtime: ToolRuntime) -> str:
-    """주어진 도시의 날씨를 가져옵니다."""
+    """Get weather for a given city."""
     writer = runtime.stream_writer
 
-    # 도구가 실행되는 동안 사용자 정의 업데이트 스트리밍
+    # Stream custom updates as the tool executes
     writer(f"Looking up data for city: {city}")
     writer(f"Acquired data for city: {city}")
 
@@ -343,7 +343,7 @@ def get_weather(city: str, runtime: ToolRuntime) -> str:
 ```
 
 <Note>
-도구 내에서 `runtime.stream_writer`를 사용하는 경우 도구는 LangGraph 실행 컨텍스트 내에서 호출되어야 합니다. 자세한 내용은 [스트리밍](/oss/python/langchain/streaming)을 참조하세요.
+If you use `runtime.stream_writer` inside your tool, the tool must be invoked within a LangGraph execution context. See [Streaming](/oss/python/langchain/streaming) for more details.
 </Note>
 
 ---
