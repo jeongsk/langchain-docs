@@ -1395,6 +1395,10 @@
   },
   "redirects": [
   {
+    "source": "/:path*",
+    "destination": "https://docs.langchain.com/:path*"
+  },
+  {
     "source": "/langsmith/cloud-architecture-and-scalability",
     "destination": "/langsmith/cloud#cloud-architecture-and-scalability"
   },
